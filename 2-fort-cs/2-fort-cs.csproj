@@ -12,4 +12,17 @@
       <PackageReference Include="Raylib-cs" Version="7.0.1" />
     </ItemGroup>
 
+    <ItemGroup>
+        <None Update="resources/**/*.png">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        </None>
+    </ItemGroup>
+    <ItemGroup>
+        <None Update="resources/**/*.wav">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        </None>
+    </ItemGroup>
+
 </Project>
