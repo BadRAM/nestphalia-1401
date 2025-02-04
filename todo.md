@@ -3,13 +3,15 @@
 Programming todo:
 =================
 - Setup raylib environment
-- Tile map rendering
+- Tilemap rendering
+- Tilemap data structure
 - Minion movement/rendering (no pathfinding, behaves as flyers)
 - Tile health and destruction
 - Minion attacks
 - Towers and tower attacks
 - Fort save/load
 - Fort editor
+- Minion pathfinding
 
 
 
