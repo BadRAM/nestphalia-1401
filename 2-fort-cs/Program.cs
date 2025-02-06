@@ -3,138 +3,107 @@ using Raylib_cs;
 using static Raylib_cs.Raylib;
 namespace _2_fort_cs;
 
-class Program
+static class Program
 {
-	private static int[,] _grid = new int[48,22];
+	private static TileTemplate brush;
+	private static bool Paused;
 	
     public static void Main()
     {
         InitWindow(1152, 864, "2-fort");
+        SetTargetFPS(60);
         
         // Load a texture from the resources directory
-        Texture2D wabbit = LoadTexture("resources/wabbit_alpha.png");
-        Texture2D wall = LoadTexture("resources/wall.png");
-        Texture2D floor1 = LoadTexture("resources/floor1.png");
-        Texture2D floor2 = LoadTexture("resources/floor2.png");
-
+        Resources.Load();
+        Assets.Load();
+        brush = Assets.Tiles[0];
+        
+        World.Initialize();
+        
         while (!WindowShouldClose())
         {
-	        if (IsMouseButtonPressed(MouseButton.Left))
-			{
-				flip_tile();
-			}
+	        // ----- INPUT + GUI PHASE -----
+	        if (IsKeyPressed(KeyboardKey.One))
+	        {
+		        brush = Assets.Tiles[0];
+	        }
+	        if (IsKeyPressed(KeyboardKey.Two))
+	        {
+		        brush = Assets.Tiles[2];
+	        }
+	        if (IsKeyPressed(KeyboardKey.Three))
+	        {
+		        brush = Assets.Tiles[3];
+	        }
+	        if (IsKeyPressed(KeyboardKey.Four))
+	        {
+		        brush = Assets.Tiles[4];
+	        }
+	        if (IsKeyPressed(KeyboardKey.Five))
+	        {
+		        brush = Assets.Tiles[0];
+	        }
 	        
+	        if (IsMouseButtonDown(MouseButton.Left))
+	        {
+		        TilePos tilePos = World.GetTilePosition(GetMousePosition());
+		        if (brush != World.GetTile(tilePos).Template)
+		        {
+			        World.SetTile(brush, tilePos);
+		        }
+	        }
+	        
+	        if (IsMouseButtonDown(MouseButton.Right))
+	        {
+		        Vector2 t = GetMousePosition();
+		        foreach (Minion m in World.Minions)
+		        {
+			        m.SetTarget(t);
+		        }
+	        }
+
+	        if (IsKeyPressed(KeyboardKey.Space))
+	        {
+		        SetTargetFPS(300);
+	        }
+
+	        if (IsKeyReleased(KeyboardKey.Space))
+	        {
+		        SetTargetFPS(60);
+	        }
+
+	        if (IsKeyPressed(KeyboardKey.P))
+	        {
+		        Paused = !Paused;
+	        }
+	        
+	        
+	        // ----- WORLD UPDATE PHASE -----
+	        if (!Paused)
+	        {
+		        World.Update();
+	        }
+	        
+	        
+	        // ----- DRAW PHASE -----
             BeginDrawing();
             ClearBackground(Color.Black);
-
-
-			for (int x = 0; x < _grid.GetLength(0); ++x)
-			{
-				for (int y = 0; y < _grid.GetLength(1); ++y)
-				{
-					if (_grid[x,y] != 0)
-					{
-						DrawTexture(wall, x*24, y*24, Color.White);
-					}
-					else
-					{
-						DrawTexture((x%2 != y%2) ? floor1 : floor2, x*24, y*24, Color.White);
-					}
-				}
-			}
 			
-			DrawText("Hello, world!", 12, 12, 20, Color.Black);
-			DrawTexture(wabbit, 400, 200, Color.White);
+            World.Draw();
+			
+            //DrawText($"Minion 0's wherabouts: X={World.Minions[0].Position.X} Y={World.Minions[0].Position.Y}", 12, 12, 20, Color.White);
+            DrawText($"FPS: {GetFPS()}", 12, 16, 20, Color.White);
+            DrawText($"Wave: {World.Wave}", 12, 32, 20, Color.White);
+            DrawText($"Minions: {World.Minions.Count}", 12, 48, 20, Color.White);
+            DrawText($"Projectiles: {World.Projectiles.Count}", 12, 64, 20, Color.White);
+            
+			//DrawTexture(Resources.wabbit, 400, 200, Color.White);
 
             EndDrawing();
         }
 
-        UnloadTexture(wabbit);
-        UnloadTexture(wall);
-        UnloadTexture(floor1);
-        UnloadTexture(floor2);
+	    Resources.Unload();
         
         CloseWindow();
     }
-    
-	static void flip_tile()
-	{
-		Vector2 mouse_pos = GetMousePosition();
-		int x = (int) mouse_pos.X      / 24;
-		int y = (int)(mouse_pos.Y - 8) / 24;
-		if (x >= _grid.GetLength(0)) return;
-		if (y >= _grid.GetLength(1)) return;
-		_grid[x,y] = _grid[x,y] == 1 ? 0 : 1;
-	}
 }
-
-// #include "raylib.h"
-// #include "resource_dir.h"	// utility header for SearchAndSetResourceDir
-//
-// #define GRID_SIZE_X 48
-// #define GRID_SIZE_Y 22
-//
-// int grid[GRID_SIZE_X][GRID_SIZE_Y];
-//
-
-//
-// int main ()
-// {
-//
-//
-// 	for (int x = 0; x < GRID_SIZE_X; ++x)
-// 	{
-// 		for (int y = 0; y < GRID_SIZE_Y; ++y)
-// 		{
-// 			grid[x][y] = 0;
-// 		}
-// 	}
-// 	grid[5][5] = 1;
-// 	grid[5][6] = 1;
-// 	grid[5][7] = 1;
-// 	grid[6][5] = 1;
-// 	grid[6][7] = 1;
-// 	grid[7][5] = 1;
-// 	grid[7][6] = 1;
-// 	grid[7][7] = 1;
-//
-//
-// 	// Tell the window to use vsync and work on high DPI displays
-// 	SetConfigFlags(FLAG_VSYNC_HINT);
-//
-// 	// Create the window and OpenGL context
-// 	InitWindow(1152, 864, "2-fort");
-//
-// 	// Utility function from resource_dir.h to find the resources folder and set it as the current working directory so we can load from it
-// 	SearchAndSetResourceDir("resources");
-//
-//
-// 	
-// 	// game loop
-// 	while (!WindowShouldClose())		// run the loop untill the user presses ESCAPE or presses the Close button on the window
-// 	{
-
-//
-//
-// 		// drawing
-// 		BeginDrawing();
-//
-// 		// Setup the back buffer for drawing (clear color and depth buffers)
-// 		ClearBackground(BLACK);
-//
-// 		// draw some text using the default font
-// 		DrawText("2 fort", 200,200,20,WHITE);
-//
-// 		// draw our texture to the screen
-//
-// 		
-// 		// end the frame and get ready for the next one  (display frame, poll input, etc...)
-// 		EndDrawing();
-// 	}
-//
-// 	// cleanup
-//
-// 	// destroy the window and cleanup the OpenGL context
-// 	CloseWindow();
-// 	return 0;
-// }
