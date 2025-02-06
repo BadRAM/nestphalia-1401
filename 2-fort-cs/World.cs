@@ -24,10 +24,10 @@ public static class World
             }
         }
         
-        for (int i = 0; i < 100; i++)
-        {
-            Minions.Add(new Minion(Assets.Minions[0], new Vector2(i * 16, 192), 0));
-        }
+        // for (int i = 0; i < 100; i++)
+        // {
+        //     Assets.Minions[0].Instantiate(new Vector2(i * 16, 192), TeamName.Neutral);
+        // }
     }
     
     public static void SetTile(TileTemplate tile, TilePos tilePos)
@@ -136,6 +136,13 @@ public static class World
     {
         return GetTile(GetTilePosition(position));
     }
+}
+
+public enum TeamName
+{
+    Player,
+    Enemy,
+    Neutral
 }
 
 public struct TilePos

@@ -43,6 +43,7 @@ public class Turret : Structure
             float minDist = float.MaxValue;
             for (int i = 0; i < World.Minions.Count; i++)
             {
+                if (World.Minions[i].Team == Team) continue;
                 float d = Vector2.Distance(World.Minions[i].Position, position);
                 if (d < minDist)
                 {

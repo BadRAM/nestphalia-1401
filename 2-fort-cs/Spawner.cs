@@ -37,7 +37,7 @@ public class Spawner : Structure
         base.Update();
         if (_spawnsRemaining > 0 && Raylib.GetTime() - _lastSpawnTime > _template.TimeBetweenSpawns)
         {
-            _template.Minion.Instantiate(position);
+            _template.Minion.Instantiate(position, Team);
             _spawnsRemaining--;
             _lastSpawnTime = (float)Raylib.GetTime();
         }
@@ -50,6 +50,6 @@ public class Spawner : Structure
 
     public override bool IsSolid()
     {
-        return false;
+        return true;
     }
 }

@@ -44,6 +44,11 @@ public class Tile
     {
         return false;
     }
+
+    public virtual TeamName GetTeam()
+    {
+        return TeamName.Neutral;
+    }
     
     public virtual void Update() { }
 

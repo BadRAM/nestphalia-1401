@@ -16,7 +16,7 @@ public static class Assets
         Tiles.Add(new TileTemplate(Resources.floor2));
         Tiles.Add(new StructureTemplate(Resources.wall, 100));
         Tiles.Add(new TurretTemplate(Resources.turret, 200, 100, Projectiles[0], 60));
-        Tiles.Add(new SpawnerTemplate(Resources.spawner, 200, Minions[0], 3, 1));
+        Tiles.Add(new SpawnerTemplate(Resources.spawner, 200, Minions[0], 3, 0.5f));
         
     }
 }
