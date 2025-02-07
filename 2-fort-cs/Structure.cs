@@ -6,7 +6,7 @@ public class StructureTemplate : TileTemplate
 {
     public float MaxHealth;
 
-    public StructureTemplate(Texture2D texture, float maxHealth) : base(texture)
+    public StructureTemplate(string name, Texture2D texture, float maxHealth) : base(name, texture)
     {
         MaxHealth = maxHealth;
     }

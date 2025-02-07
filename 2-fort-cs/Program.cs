@@ -44,6 +44,20 @@ static class Program
 		        brush = Assets.Tiles[0];
 	        }
 	        
+	        if (IsKeyPressed(KeyboardKey.F))
+	        {
+		        World.Flip();
+	        }
+	        
+	        if (IsKeyPressed(KeyboardKey.S))
+	        {
+		        Resources.SaveFort();
+	        }
+	        if (IsKeyPressed(KeyboardKey.L))
+	        {
+		        Resources.LoadFort();
+	        }
+	        
 	        if (IsMouseButtonDown(MouseButton.Left))
 	        {
 		        TilePos tilePos = World.GetTilePosition(GetMousePosition());

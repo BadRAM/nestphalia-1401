@@ -5,10 +5,12 @@ namespace _2_fort_cs;
 
 public class TileTemplate
 {
+    public string Name;
     public Texture2D Texture;
 
-    public TileTemplate(Texture2D texture)
+    public TileTemplate(string name, Texture2D texture)
     {
+        Name = name;
         Texture = texture;
     }
 

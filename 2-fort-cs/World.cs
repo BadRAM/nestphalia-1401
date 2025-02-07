@@ -136,6 +136,19 @@ public static class World
     {
         return GetTile(GetTilePosition(position));
     }
+
+    public static void Flip()
+    {
+        Tile[,] boardBuf = new Tile[_board.GetLength(0), _board.GetLength(1)];
+        for (int x = 0; x < _board.GetLength(0); ++x)
+        {
+            for (int y = 0; y < _board.GetLength(1); ++y)
+            {
+                boardBuf[x,y] = _board[_board.GetLength(0)-(x+1),y];
+            }
+        }
+        Array.Copy(boardBuf, _board, boardBuf.Length);
+    }
 }
 
 public enum TeamName
