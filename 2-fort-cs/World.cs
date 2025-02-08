@@ -5,32 +5,34 @@ namespace _2_fort_cs;
 
 public static class World
 {
-    private static Tile[,] _board = new Tile[48, 22];
+    public const int BoardWidth = 48;
+    public const int BoardHeight = 22;
+    private static Tile[,] _board = new Tile[BoardWidth, BoardHeight];
     public static List<Minion> Minions = new List<Minion>();
     public static List<Minion> MinionsToRemove = new List<Minion>();
     public static List<Projectile> Projectiles = new List<Projectile>();
     public static List<Projectile> ProjectilesToRemove = new List<Projectile>();
-    public static float WaveDuration = 30f;
+    public static float WaveDuration = 10f;
     public static float FirstWaveTime = 0f;
     public static int Wave = 0;
 
     public static void Initialize()
     {
-        for (int x = 0; x < _board.GetLength(0); x++)
+        for (int x = 0; x < BoardWidth; x++)
         {
-            for (int y = 0; y < _board.GetLength(1); y++)
+            for (int y = 0; y < BoardHeight; y++)
             {
                 _board[x,y] = (x%2 != y%2) ? Assets.Tiles[0].Instantiate(x,y) : Assets.Tiles[1].Instantiate(x,y);
             }
         }
         
-        // for (int i = 0; i < 100; i++)
-        // {
-        //     Assets.Minions[0].Instantiate(new Vector2(i * 16, 192), TeamName.Neutral);
-        // }
+        for (int i = 0; i < 4; i++)
+        {
+            Assets.Minions[0].Instantiate(new Vector2(i * 16, 192), TeamName.Neutral);
+        }
     }
     
-    public static void SetTile(TileTemplate tile, TilePos tilePos)
+    public static void SetTile(TileTemplate tile, Int2D tilePos)
     {
         SetTile(tile, tilePos.X, tilePos.Y);
     }
@@ -44,7 +46,7 @@ public static class World
         _board[x,y] = tile.Instantiate(x, y);
     }
 
-    public static Tile GetTile(TilePos tilePos)
+    public static Tile GetTile(Int2D tilePos)
     {
         return _board[tilePos.X,tilePos.Y];
     }
@@ -60,9 +62,9 @@ public static class World
         {
             Wave++;
             
-            for (int x = 0; x < _board.GetLength(0); ++x)
+            for (int x = 0; x < BoardWidth; ++x)
             {
-                for (int y = 0; y < _board.GetLength(1); ++y)
+                for (int y = 0; y < BoardHeight; ++y)
                 {
                     _board[x, y].WaveEffect();
                 }
@@ -70,9 +72,9 @@ public static class World
         }
         
         
-        for (int x = 0; x < _board.GetLength(0); ++x)
+        for (int x = 0; x < BoardWidth; ++x)
         {
-            for (int y = 0; y < _board.GetLength(1); ++y)
+            for (int y = 0; y < BoardHeight; ++y)
             {
                 _board[x, y].Update();
             }
@@ -81,6 +83,10 @@ public static class World
         foreach (Minion m in Minions)
         {
             m.Update();
+        }
+        foreach (Minion m in Minions)
+        {
+            m.LateUpdate();
         }
         foreach (Minion m in MinionsToRemove)
         {
@@ -102,9 +108,9 @@ public static class World
 
     public static void Draw()
     {
-        for (int x = 0; x < _board.GetLength(0); ++x)
+        for (int x = 0; x < BoardWidth; ++x)
         {
-            for (int y = 0; y < _board.GetLength(1); ++y)
+            for (int y = 0; y < BoardHeight; ++y)
             {
                 _board[x, y].Draw(x*24, y*24);
             }
@@ -123,28 +129,43 @@ public static class World
         
     }
 
-    public static TilePos GetTilePosition(Vector2 position)
+    public static Int2D PosToTilePos(Vector2 position)
     {
         int x = (int) position.X      / 24;
         int y = (int)(position.Y - 8) / 24;
-        x = Math.Clamp(x, 0, _board.GetLength(0) - 1);
-        y = Math.Clamp(y, 0, _board.GetLength(1) - 1);
-        return new TilePos(x, y);
+        x = Math.Clamp(x, 0, BoardWidth - 1);
+        y = Math.Clamp(y, 0, BoardHeight - 1);
+        return new Int2D(x, y);
+    }
+    
+    public static Rectangle GetTileBounds(int x, int y)
+    {
+        Rectangle bounds = new Rectangle();
+        bounds.X = x * 24;
+        bounds.Y = y * 24 + 8;
+        bounds.Width = 24;
+        bounds.Height = 24;
+        return bounds;
     }
 
     public static Tile GetTileAtPos(Vector2 position)
     {
-        return GetTile(GetTilePosition(position));
+        return GetTile(PosToTilePos(position));
+    }
+
+    public static Vector2 GetTileCenter(int x, int y)
+    {
+        return new Vector2(x * 24 + 12, y * 24 + 20);
     }
 
     public static void Flip()
     {
-        Tile[,] boardBuf = new Tile[_board.GetLength(0), _board.GetLength(1)];
-        for (int x = 0; x < _board.GetLength(0); ++x)
+        Tile[,] boardBuf = new Tile[BoardWidth, BoardHeight];
+        for (int x = 0; x < BoardWidth; ++x)
         {
-            for (int y = 0; y < _board.GetLength(1); ++y)
+            for (int y = 0; y < BoardHeight; ++y)
             {
-                boardBuf[x,y] = _board[_board.GetLength(0)-(x+1),y];
+                boardBuf[x,y] = _board[BoardWidth-(x+1),y];
             }
         }
         Array.Copy(boardBuf, _board, boardBuf.Length);
@@ -158,12 +179,12 @@ public enum TeamName
     Neutral
 }
 
-public struct TilePos
+public record struct Int2D
 {
     public int X;
     public int Y;
 
-    public TilePos(int x, int y)
+    public Int2D(int x, int y)
     {
         X = x;
         Y = y;

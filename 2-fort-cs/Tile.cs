@@ -59,4 +59,9 @@ public class Tile
     public virtual void Hurt(float damage) { }
     
     public virtual void Destroy() { }
+
+    public Vector2 GetCenter()
+    {
+        return position;
+    }
 }

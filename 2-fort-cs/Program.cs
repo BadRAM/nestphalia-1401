@@ -60,7 +60,7 @@ static class Program
 	        
 	        if (IsMouseButtonDown(MouseButton.Left))
 	        {
-		        TilePos tilePos = World.GetTilePosition(GetMousePosition());
+		        Int2D tilePos = World.PosToTilePos(GetMousePosition());
 		        if (brush != World.GetTile(tilePos).Template)
 		        {
 			        World.SetTile(brush, tilePos);

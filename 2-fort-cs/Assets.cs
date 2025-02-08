@@ -10,7 +10,21 @@ public static class Assets
     {
         Projectiles.Add(new ProjectileTemplate(Resources.bullet, 5, 400));
         
-        Minions.Add(new MinionTemplate("TestMinion", Resources.wabbit, 20, 0, Projectiles[0], 32, 60, 50, true));
+        Minions.Add
+        (new MinionTemplate
+            (
+                "TestMinion", 
+                Resources.wabbit, 
+                20, 
+                0, 
+                Projectiles[0], 
+                32, 
+                60, 
+                50, 
+                false,
+                6
+            )
+        );
         
         Tiles.Add(new TileTemplate("Floor1", Resources.floor1));
         Tiles.Add(new TileTemplate("Floor2", Resources.floor2));

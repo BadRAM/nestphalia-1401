@@ -20,9 +20,9 @@ public static class Resources
         wabbit = LoadTexture("resources/wabbit_alpha.png");
         wall   = LoadTexture("resources/wall.png");
         floor1 = LoadTexture("resources/floor1.png");
-        floor2 = LoadTexture("resources/floor2.png");  
-        bullet = LoadTexture("resources/bullet.png");  
-        turret = LoadTexture("resources/turret.png");  
+        floor2 = LoadTexture("resources/floor2.png");
+        bullet = LoadTexture("resources/bullet.png");
+        turret = LoadTexture("resources/turret.png");
         spawner = LoadTexture("resources/spawner.png");
     }
 

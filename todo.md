@@ -2,17 +2,15 @@
 
 Programming todo:
 =================
-- Setup raylib environment
-- Tilemap rendering
-- Tilemap data structure
-- Minion movement/rendering (no pathfinding, behaves as flyers)
-- Tile health and destruction
-- Minion attacks
-- Towers and tower attacks
-- Fort save/load
+- Minion Collision
 - Fort editor
 - Minion pathfinding
-
+- Multitile structures
+- Outer Loop
+- Content
+- Melee attacks
+- Minion vs Minion melee
+- proper render order/z levels
 
 
 Design todo:
@@ -22,3 +20,10 @@ Design todo:
 
 Project management todo:
 ========================
+
+
+
+
+Circle Collision depen:
+ - If Circle center is within rect's X or Y bounds, depen it on that axis
+ - Else, depen it radially from nearest point
