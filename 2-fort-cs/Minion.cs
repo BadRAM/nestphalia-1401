@@ -92,24 +92,6 @@ public class Minion
             
             _target = World.GetTileCenter(_pathFinder.NextTile());
             Position = Position.MoveTowards(_target, Template.Speed / 60f);
-
-            
-
-            // if (Position == _target)
-            // {
-            //     if (Team == TeamName.Player)
-            //     {
-            //         _target = World.GetTileCenter(Random.Shared.Next(27, 47), Random.Shared.Next(1, 21));
-            //     }
-            //     else if (Team == TeamName.Enemy)
-            //     {
-            //         _target = World.GetTileCenter(Random.Shared.Next(1, 21), Random.Shared.Next(1, 21));
-            //     }
-            //     else
-            //     {
-            //         _target = World.GetTileCenter(Random.Shared.Next(1, 47), Random.Shared.Next(1, 21));
-            //     }
-            // }
         }
         
         PlanCollision();

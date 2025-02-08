@@ -19,9 +19,9 @@ static class Program
         brush = Assets.Tiles[0];
         
         World.Initialize();
-        Resources.LoadFort();
-        World.Flip();
-        Resources.LoadFort();
+        // Resources.LoadFort();
+        // World.Flip();
+        // Resources.LoadFort();
         
         
         while (!WindowShouldClose())

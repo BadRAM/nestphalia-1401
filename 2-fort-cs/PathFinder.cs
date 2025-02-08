@@ -71,25 +71,25 @@ public class PathFinder
             // left
             if (n.Pos.X-1 >= 0 && nodeGrid[n.Pos.X-1,n.Pos.Y] == null)
             {
-                nodesToConsider.Add(WeightedNode(n, n.Pos.X-1, n.Pos.Y));
+                nodesToConsider.Add(WeightedNode(n, n.Pos.X-1, n.Pos.Y, 1));
             }
             
             // right
             if (n.Pos.X+1 < World.BoardWidth && nodeGrid[n.Pos.X+1,n.Pos.Y] == null)
             {
-                nodesToConsider.Add(WeightedNode(n, n.Pos.X+1, n.Pos.Y));
+                nodesToConsider.Add(WeightedNode(n, n.Pos.X+1, n.Pos.Y, 1));
             }
             
             // up
             if (n.Pos.Y-1 >= 0 && nodeGrid[n.Pos.X,n.Pos.Y-1] == null)
             {
-                nodesToConsider.Add(WeightedNode(n, n.Pos.X, n.Pos.Y-1));
+                nodesToConsider.Add(WeightedNode(n, n.Pos.X, n.Pos.Y-1, 1));
             }
             
             // down
             if (n.Pos.Y+1 < World.BoardHeight && nodeGrid[n.Pos.X,n.Pos.Y+1] == null)
             {
-                nodesToConsider.Add(WeightedNode(n, n.Pos.X, n.Pos.Y+1));
+                nodesToConsider.Add(WeightedNode(n, n.Pos.X, n.Pos.Y+1, 1));
             }
             
             // top left
@@ -99,7 +99,7 @@ public class PathFinder
                 && !World.GetTile(n.Pos.X, n.Pos.Y-1).IsSolid() 
                 && nodeGrid[n.Pos.X - 1, n.Pos.Y - 1] == null)
             {
-                nodesToConsider.Add(WeightedNode(n, n.Pos.X-1, n.Pos.Y-1));
+                nodesToConsider.Add(WeightedNode(n, n.Pos.X-1, n.Pos.Y-1, 1.5f));
             }
             
             // top right
@@ -109,7 +109,7 @@ public class PathFinder
                 && !World.GetTile(n.Pos.X, n.Pos.Y-1).IsSolid() 
                 && nodeGrid[n.Pos.X + 1, n.Pos.Y - 1] == null)
             {
-                nodesToConsider.Add(WeightedNode(n, n.Pos.X+1, n.Pos.Y-1));
+                nodesToConsider.Add(WeightedNode(n, n.Pos.X+1, n.Pos.Y-1, 1.5f));
             }
             
             // bottom left
@@ -119,7 +119,7 @@ public class PathFinder
                 && !World.GetTile(n.Pos.X, n.Pos.Y+1).IsSolid() 
                 && nodeGrid[n.Pos.X - 1, n.Pos.Y + 1] == null)
             {
-                nodesToConsider.Add(WeightedNode(n, n.Pos.X-1, n.Pos.Y+1));
+                nodesToConsider.Add(WeightedNode(n, n.Pos.X-1, n.Pos.Y+1, 1.5f));
             }
             
             // bottom right
@@ -129,7 +129,7 @@ public class PathFinder
                 && !World.GetTile(n.Pos.X, n.Pos.Y+1).IsSolid() 
                 && nodeGrid[n.Pos.X + 1, n.Pos.Y + 1] == null)
             {
-                nodesToConsider.Add(WeightedNode(n, n.Pos.X+1, n.Pos.Y+1));
+                nodesToConsider.Add(WeightedNode(n, n.Pos.X+1, n.Pos.Y+1, 1.5f));
             }
             
             
@@ -146,16 +146,17 @@ public class PathFinder
         }
     }
 
-    private PathNode WeightedNode(PathNode prevNode, int x, int y)
+    private PathNode WeightedNode(PathNode prevNode, int x, int y, float weight)
     {
         PathNode n = new PathNode(new Int2D(x,y));
         n.PrevNode = prevNode;
         n.Weight = prevNode.Weight;
         n.Weight += Math.Abs(n.Pos.X - prevNode.Pos.X) + Math.Abs(n.Pos.Y - prevNode.Pos.Y);
         Tile tile = World.GetTile(x,y);
-        if (tile is Structure s && s.Team != Minion.Team)
+        if (tile is Structure s)
         {
             n.Weight += s.Health;
+            if (s.Team == Minion.Team) n.Weight = Single.MaxValue;
         }
         return n;
     }
