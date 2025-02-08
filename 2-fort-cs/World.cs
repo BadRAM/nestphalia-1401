@@ -26,10 +26,13 @@ public static class World
             }
         }
         
-        for (int i = 0; i < 4; i++)
-        {
-            Assets.Minions[0].Instantiate(new Vector2(i * 16, 192), TeamName.Neutral);
-        }
+        // for (int i = 0; i < 1; i++)
+        // {
+        //     Assets.Minions[0].Instantiate(new Vector2(i * 16, 192), TeamName.Neutral);
+        // }
+        //
+        // PathFinder pathFinder = new PathFinder(Minions[0]);
+        // pathFinder.FindPath(new Int2D(40, 20));
     }
     
     public static void SetTile(TileTemplate tile, Int2D tilePos)
@@ -157,6 +160,11 @@ public static class World
     {
         return new Vector2(x * 24 + 12, y * 24 + 20);
     }
+    
+    public static Vector2 GetTileCenter(Int2D tilePos)
+    {
+        return GetTileCenter(tilePos.X, tilePos.Y);
+    }
 
     public static void Flip()
     {
@@ -165,7 +173,7 @@ public static class World
         {
             for (int y = 0; y < BoardHeight; ++y)
             {
-                boardBuf[x,y] = _board[BoardWidth-(x+1),y];
+                boardBuf[x,y] = _board[BoardWidth-(x+1),y].Template.Instantiate(x,y);
             }
         }
         Array.Copy(boardBuf, _board, boardBuf.Length);

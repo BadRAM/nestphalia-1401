@@ -48,6 +48,7 @@ public class Minion
     private Vector2 _target;
     private float _lastFiredTime;
     private Vector2 _collisionOffset;
+    private PathFinder _pathFinder;
 
     public Minion(MinionTemplate template, Vector2 position, TeamName team)
     {
@@ -57,6 +58,7 @@ public class Minion
         Team = team;
         Health = Template.MaxHealth;
         IsAlive = true;
+        _pathFinder = new PathFinder(this);
     }
 
     public virtual void Update()
@@ -72,25 +74,44 @@ public class Minion
         }
         else
         {
-            Position = Position.MoveTowards(_target, Template.Speed / 60f);
-            if (Position == _target)
+            if (_pathFinder.TargetReached())
             {
                 if (Team == TeamName.Player)
                 {
-                    _target = World.GetTileCenter(Random.Shared.Next(27, 47), Random.Shared.Next(1, 21));
+                    _pathFinder.FindPath(new Int2D(Random.Shared.Next(27, 47), Random.Shared.Next(1, 21)));
                 }
                 else if (Team == TeamName.Enemy)
                 {
-                    _target = World.GetTileCenter(Random.Shared.Next(1, 21), Random.Shared.Next(1, 21));
+                    _pathFinder.FindPath(new Int2D(Random.Shared.Next(1, 21), Random.Shared.Next(1, 21)));
                 }
                 else
                 {
-                    _target = World.GetTileCenter(Random.Shared.Next(1, 47), Random.Shared.Next(1, 21));
+                    _pathFinder.FindPath(new Int2D(Random.Shared.Next(1, 47), Random.Shared.Next(1, 21)));
                 }
             }
+            
+            _target = World.GetTileCenter(_pathFinder.NextTile());
+            Position = Position.MoveTowards(_target, Template.Speed / 60f);
+
+            
+
+            // if (Position == _target)
+            // {
+            //     if (Team == TeamName.Player)
+            //     {
+            //         _target = World.GetTileCenter(Random.Shared.Next(27, 47), Random.Shared.Next(1, 21));
+            //     }
+            //     else if (Team == TeamName.Enemy)
+            //     {
+            //         _target = World.GetTileCenter(Random.Shared.Next(1, 21), Random.Shared.Next(1, 21));
+            //     }
+            //     else
+            //     {
+            //         _target = World.GetTileCenter(Random.Shared.Next(1, 47), Random.Shared.Next(1, 21));
+            //     }
+            // }
         }
         
-
         PlanCollision();
 
     }
@@ -100,11 +121,11 @@ public class Minion
         foreach (Minion m in World.Minions)
         {
             if (m == this) continue;
-            if (Raylib.CheckCollisionCircles(Position, Template.PhysicsRadius, m.Position, m.Template.PhysicsRadius))
-            {
-                Vector2 delta = Position - m.Position;
-                _collisionOffset += delta.Normalized() * Math.Min((Template.PhysicsRadius + m.Template.PhysicsRadius - delta.Length())/2, 1f);
-            }
+            if (m.Template.IsFlying != Template.IsFlying) continue;
+            if (!Raylib.CheckCollisionCircles(Position, Template.PhysicsRadius, m.Position, m.Template.PhysicsRadius)) continue;
+        
+            Vector2 delta = Position - m.Position;
+            _collisionOffset += delta.Normalized() * Math.Min((Template.PhysicsRadius + m.Template.PhysicsRadius - delta.Length())/2, 1f);
         }
 
         if (Template.IsFlying) return;
@@ -158,6 +179,14 @@ public class Minion
         if (Team == TeamName.Player) tint = Color.Blue;
         if (Team == TeamName.Enemy) tint = Color.Red;
         Raylib.DrawTexture(Template.Texture, (int)Position.X - Template.Texture.Width/2, (int)Position.Y - Template.Texture.Width/2, tint);
+        // Debug, shows path
+        Vector2 path = Position;
+        foreach (Int2D i in _pathFinder.Path)
+        {
+            Vector2 v = World.GetTileCenter(i);
+            Raylib.DrawLine((int)path.X, (int)path.Y, (int)v.X, (int)v.Y, Color.Lime);
+            path = v;
+        }
     }
 
     public virtual void Hurt(float damage)
