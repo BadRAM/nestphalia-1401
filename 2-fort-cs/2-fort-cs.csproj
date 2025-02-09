@@ -21,6 +21,12 @@
         </None>
     </ItemGroup>
     <ItemGroup>
+        <None Update="resources/**/*.fort">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        </None>
+    </ItemGroup>
+    <ItemGroup>
       <PackageReference Include="Raylib-CSharp-Vinculum" Version="5.0.1" />
     </ItemGroup>
 

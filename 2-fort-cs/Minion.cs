@@ -161,14 +161,15 @@ public class Minion
         if (Team == TeamName.Player) tint = Raylib.WHITE;
         if (Team == TeamName.Enemy) tint = Raylib.WHITE;
         Raylib.DrawTexture(Template.Texture, (int)Position.X - Template.Texture.width/2, (int)Position.Y - Template.Texture.width/2, tint);
-        // Debug, shows path
-        Vector2 path = Position;
-        foreach (Int2D i in _pathFinder.Path)
-        {
-            Vector2 v = World.GetTileCenter(i);
-            Raylib.DrawLine((int)path.X, (int)path.Y, (int)v.X, (int)v.Y, Raylib.WHITE);
-            path = v;
-        }
+        
+        // // Debug, shows path
+        // Vector2 path = Position;
+        // foreach (Int2D i in _pathFinder.Path)
+        // {
+        //     Vector2 v = World.GetTileCenter(i);
+        //     Raylib.DrawLine((int)path.X, (int)path.Y, (int)v.X, (int)v.Y, Raylib.WHITE);
+        //     path = v;
+        // }
     }
 
     public virtual void Hurt(float damage)

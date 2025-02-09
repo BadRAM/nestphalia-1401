@@ -1,28 +1,55 @@
-﻿using System.Numerics;
+﻿using System.Diagnostics;
+using System.Numerics;
 using static ZeroElectric.Vinculum.Raylib;
 namespace _2_fort_cs;
 
+public enum Scene
+{
+	Intro,
+	MainMenu,
+	Campaign,
+	Editor,
+	Battle
+}
+
 static class Program
 {
-	private static TileTemplate brush;
 	private static bool Paused;
+	public static Scene CurrentScene;
+	public static Campaign Campaign;
 	
     public static void Main()
     {
-        InitWindow(1152, 864, "2-fort");
+        InitWindow(1200, 900, "2-fort");
         SetTargetFPS(60);
         
         // Load a texture from the resources directory
         Resources.Load();
         Assets.Load();
-        brush = Assets.Tiles[0];
         
-        World.Initialize();
-        Resources.LoadFort();
-        World.Flip();
-        Resources.LoadFort();
+        IntroScene.Start();
+        while (!WindowShouldClose())
+        {
+	        switch (CurrentScene)
+	        {
+		        case Scene.Intro:
+			        IntroScene.Update();
+			        break;
+		        case Scene.MainMenu:
+			        MenuScene.Update();
+			        break;
+		        case Scene.Campaign:
+			        Campaign.Update();
+			        break;
+		        case Scene.Editor:
+			        EditorScene.Update();
+			        break;
+		        case Scene.Battle:
+			        BattleScene.Update();
+			        break;
+	        }
+        }
         
-        MenuScene.Start();
         
         /*
         while (!WindowShouldClose())

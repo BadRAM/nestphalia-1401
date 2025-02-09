@@ -14,6 +14,7 @@ public static class Resources
     public static Texture bullet;
     public static Texture turret;
     public static Texture spawner;
+    public static List<Fort> CampaignLevels = new List<Fort>();
     
     public static void Load()
     {
@@ -24,6 +25,15 @@ public static class Resources
         bullet = LoadTexture("resources/bullet.png");
         turret = LoadTexture("resources/turret.png");
         spawner = LoadTexture("resources/spawner.png");
+        
+        CampaignLevels.Add(LoadFort("/resources/level1.fort"));
+        CampaignLevels.Add(LoadFort("/resources/level2.fort"));
+        CampaignLevels.Add(LoadFort("/resources/level3.fort"));
+        CampaignLevels.Add(LoadFort("/resources/level4.fort"));
+        CampaignLevels.Add(LoadFort("/resources/level5.fort"));
+        CampaignLevels.Add(LoadFort("/resources/level6.fort"));
+        CampaignLevels.Add(LoadFort("/resources/level7.fort"));
+        CampaignLevels.Add(LoadFort("/resources/level8.fort"));
     }
 
     public static void Unload()
@@ -60,9 +70,9 @@ public static class Resources
         //if (right) World.Flip();
     }
 
-    public static Fort LoadFort()
+    public static Fort LoadFort(string path)
     {
-        string jsonString = File.ReadAllText(Directory.GetCurrentDirectory() + "/fort.json");
+        string jsonString = File.ReadAllText(Directory.GetCurrentDirectory() + path);
         Fort fort = JsonSerializer.Deserialize<Fort>(jsonString);
         return fort;
     }

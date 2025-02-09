@@ -1,54 +1,44 @@
 using ZeroElectric.Vinculum;
 using static ZeroElectric.Vinculum.Raylib;
+using ZeroElectric.Vinculum.Extensions;
 
 namespace _2_fort_cs;
 
 public static class MenuScene
 {
-    private static Button PlayButton;
-    private static Button SandboxButton;
-    private static Button HelpButton;
-    private static Button QuitButton;
+    private static bool _helpWindowOpen = false;
+
     
     public static void Start()
     {
-        PlayButton = new Button();
-        PlayButton.Label = "Play";
-        PlayButton.Bounds = new Rectangle(100, 100, 400, 40);
-        
-        SandboxButton = new Button();
-        SandboxButton.Label = "Sandbox";
-        SandboxButton.Bounds = new Rectangle(100, 150, 400, 40);
-        
-        HelpButton = new Button();
-        HelpButton.Label = "Help";
-        HelpButton.Bounds = new Rectangle(100, 200, 400, 40);
-        
-        QuitButton = new Button();
-        QuitButton.Label = "Quit";
-        QuitButton.Bounds = new Rectangle(100, 250, 400, 40);
+        _helpWindowOpen = false;
+        Program.CurrentScene = Scene.MainMenu;
+    }
 
-        while (!WindowShouldClose())
+    public static void Update()
+    {
+        BeginDrawing();
+        ClearBackground(GRAY);
+            
+        // Questionable pattern here, what happens when two begindrawing/enddrawing calls happen in a row?
+        if (RayGui.GuiButton(new Rectangle(400, 100, 400, 40), "Play") != 0)
         {
-            PlayButton.Update();
-            SandboxButton.Update();
-            HelpButton.Update();
-
-            if (QuitButton.Update()) break;
-            
-            BeginDrawing();
-            ClearBackground(BLACK);
-            
-            PlayButton.Draw();
-            SandboxButton.Draw();
-            HelpButton.Draw();
-            QuitButton.Draw();
-            
-            EndDrawing();
+            Program.Campaign = new Campaign();
+            if (File.Exists(Directory.GetCurrentDirectory() + "/save/campaign.sav"))
+            {
+                Program.Campaign = Campaign.Load();
+            }
+            Program.Campaign.Start();
         }
+        if (RayGui.GuiButton(new Rectangle(400, 150, 400, 40), "Sandbox") != 0) EditorScene.Start();
+        if (RayGui.GuiButton(new Rectangle(400, 200, 400, 40), "Help") != 0) _helpWindowOpen = !_helpWindowOpen;
+        if (RayGui.GuiButton(new Rectangle(400, 250, 400, 40), "Quit") != 0) return;
 
-        
-        
-        
+        if (_helpWindowOpen)
+        {
+            RayGui.GuiDummyRec(new Rectangle(550, 100, 400, 400), "TODO: Write help text");
+        }
+            
+        EndDrawing();
     }
 }
