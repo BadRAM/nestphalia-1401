@@ -1,12 +1,12 @@
 using System.Numerics;
-using Raylib_cs;
+using ZeroElectric.Vinculum;
 
 namespace _2_fort_cs;
 
 public class MinionTemplate
 {
     public string Name;
-    public Texture2D Texture;
+    public Texture Texture;
     public float MaxHealth;
     public float Armor;
     //public float Damage;
@@ -17,7 +17,7 @@ public class MinionTemplate
     public bool IsFlying;
     public float PhysicsRadius;
 
-    public MinionTemplate(string name, Texture2D texture, float maxHealth, float armor, ProjectileTemplate projectile, /*float damage,*/ float range, float rateOfFire, float speed, bool isFlying, float physicsRadius)
+    public MinionTemplate(string name, Texture texture, float maxHealth, float armor, ProjectileTemplate projectile, /*float damage,*/ float range, float rateOfFire, float speed, bool isFlying, float physicsRadius)
     {
         Name = name;
         Texture = texture;
@@ -157,16 +157,16 @@ public class Minion
 
     public virtual void Draw()
     {
-        Color tint = Color.White;
-        if (Team == TeamName.Player) tint = Color.Blue;
-        if (Team == TeamName.Enemy) tint = Color.Red;
-        Raylib.DrawTexture(Template.Texture, (int)Position.X - Template.Texture.Width/2, (int)Position.Y - Template.Texture.Width/2, tint);
+        Color tint = Raylib.WHITE;
+        if (Team == TeamName.Player) tint = Raylib.WHITE;
+        if (Team == TeamName.Enemy) tint = Raylib.WHITE;
+        Raylib.DrawTexture(Template.Texture, (int)Position.X - Template.Texture.width/2, (int)Position.Y - Template.Texture.width/2, tint);
         // Debug, shows path
         Vector2 path = Position;
         foreach (Int2D i in _pathFinder.Path)
         {
             Vector2 v = World.GetTileCenter(i);
-            Raylib.DrawLine((int)path.X, (int)path.Y, (int)v.X, (int)v.Y, Color.Lime);
+            Raylib.DrawLine((int)path.X, (int)path.Y, (int)v.X, (int)v.Y, Raylib.WHITE);
             path = v;
         }
     }

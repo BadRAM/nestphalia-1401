@@ -1,19 +1,19 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Raylib_cs;
-using static Raylib_cs.Raylib;
+using ZeroElectric.Vinculum;
+using static ZeroElectric.Vinculum.Raylib;
 
 namespace _2_fort_cs;
 
 public static class Resources
 {
-    public static Texture2D wabbit;
-    public static Texture2D wall;
-    public static Texture2D floor1;
-    public static Texture2D floor2;
-    public static Texture2D bullet;
-    public static Texture2D turret;
-    public static Texture2D spawner;
+    public static Texture wabbit;
+    public static Texture wall;
+    public static Texture floor1;
+    public static Texture floor2;
+    public static Texture bullet;
+    public static Texture turret;
+    public static Texture spawner;
     
     public static void Load()
     {

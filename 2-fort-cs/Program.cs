@@ -1,6 +1,5 @@
 ﻿using System.Numerics;
-using Raylib_cs;
-using static Raylib_cs.Raylib;
+using static ZeroElectric.Vinculum.Raylib;
 namespace _2_fort_cs;
 
 static class Program

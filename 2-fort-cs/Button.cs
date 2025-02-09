@@ -1,5 +1,5 @@
-using Raylib_cs;
-using static Raylib_cs.Raylib;
+using ZeroElectric.Vinculum;
+using static ZeroElectric.Vinculum.Raylib;
 
 namespace _2_fort_cs;
 
@@ -14,7 +14,7 @@ public class Button
     {
         if (CheckCollisionPointRec(GetMousePosition(), Bounds))
         {
-            if (IsMouseButtonPressed(MouseButton.Left))
+            if (IsMouseButtonPressed(MouseButton.MOUSE_BUTTON_LEFT))
             {
                 return true;
             }
@@ -24,7 +24,7 @@ public class Button
 
     public void Draw()
     {
-        DrawRectangleRec(Bounds, Color.DarkGreen);
-        DrawText(Label, (int)Bounds.X, (int)Bounds.Y, 20, Color.White);
+        DrawRectangleRec(Bounds, DARKGREEN);
+        DrawText(Label, (int)Bounds.X, (int)Bounds.Y, 20, WHITE);
     }
 }

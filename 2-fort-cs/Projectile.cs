@@ -1,15 +1,15 @@
 using System.Numerics;
-using Raylib_cs;
+using ZeroElectric.Vinculum;
 
 namespace _2_fort_cs;
 
 public class ProjectileTemplate
 {
-    public Texture2D Texture;
+    public Texture Texture;
     public float Damage;
     public float Speed;
 
-    public ProjectileTemplate(Texture2D texture, float damage, float speed)
+    public ProjectileTemplate(Texture texture, float damage, float speed)
     {
         Damage = damage;
         Speed = speed;
@@ -67,6 +67,6 @@ public class Projectile
 
     public virtual void Draw()
     {
-        Raylib.DrawTexture(Template.Texture, (int)Position.X - Template.Texture.Width/2, (int)Position.Y - Template.Texture.Width/2, Color.White);
+        Raylib.DrawTexture(Template.Texture, (int)Position.X - Template.Texture.width/2, (int)Position.Y - Template.Texture.width/2, Raylib.WHITE);
     }
 }

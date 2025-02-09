@@ -1,5 +1,5 @@
-using Raylib_cs;
-using static Raylib_cs.Raylib;
+using ZeroElectric.Vinculum;
+using static ZeroElectric.Vinculum.Raylib;
 
 namespace _2_fort_cs;
 
@@ -37,7 +37,7 @@ public static class MenuScene
             if (QuitButton.Update()) break;
             
             BeginDrawing();
-            ClearBackground(Color.Black);
+            ClearBackground(BLACK);
             
             PlayButton.Draw();
             SandboxButton.Draw();

@@ -1,4 +1,4 @@
-using Raylib_cs;
+using ZeroElectric.Vinculum;
 
 namespace _2_fort_cs;
 
@@ -8,7 +8,7 @@ public class SpawnerTemplate : StructureTemplate
     public int WaveSize;
     public float TimeBetweenSpawns;
     
-    public SpawnerTemplate(string name, Texture2D texture, float maxHealth, MinionTemplate minion, int waveSize, float timeBetweenSpawns) : base(name, texture, maxHealth)
+    public SpawnerTemplate(string name, Texture texture, float maxHealth, MinionTemplate minion, int waveSize, float timeBetweenSpawns) : base(name, texture, maxHealth)
     {
         Minion = minion;
         WaveSize = waveSize;

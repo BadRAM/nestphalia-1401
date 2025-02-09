@@ -9,10 +9,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Raylib-cs" Version="7.0.1" />
-    </ItemGroup>
-
-    <ItemGroup>
         <None Update="resources/**/*.png">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
@@ -23,6 +19,9 @@
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
         </None>
+    </ItemGroup>
+    <ItemGroup>
+      <PackageReference Include="Raylib-CSharp-Vinculum" Version="5.0.1" />
     </ItemGroup>
 
 </Project>

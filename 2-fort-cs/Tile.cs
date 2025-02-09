@@ -1,14 +1,14 @@
 using System.Numerics;
-using Raylib_cs;
+using ZeroElectric.Vinculum;
 
 namespace _2_fort_cs;
 
 public class TileTemplate
 {
     public string Name;
-    public Texture2D Texture;
+    public Texture Texture;
 
-    public TileTemplate(string name, Texture2D texture)
+    public TileTemplate(string name, Texture texture)
     {
         Name = name;
         Texture = texture;
@@ -39,7 +39,7 @@ public class Tile
     
     public virtual void Draw(int x, int y)
     {
-        Raylib.DrawTexture(Template.Texture, x, y, Color.White);
+        Raylib.DrawTexture(Template.Texture, x, y, Raylib.WHITE);
     }
     
     public virtual bool IsSolid()

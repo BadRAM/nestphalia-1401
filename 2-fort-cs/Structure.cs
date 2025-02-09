@@ -1,4 +1,4 @@
-using Raylib_cs;
+using ZeroElectric.Vinculum;
 
 namespace _2_fort_cs;
 
@@ -6,7 +6,7 @@ public class StructureTemplate : TileTemplate
 {
     public float MaxHealth;
 
-    public StructureTemplate(string name, Texture2D texture, float maxHealth) : base(name, texture)
+    public StructureTemplate(string name, Texture texture, float maxHealth) : base(name, texture)
     {
         MaxHealth = maxHealth;
     }
