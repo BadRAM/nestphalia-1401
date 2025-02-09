@@ -9,7 +9,7 @@ public class Campaign
     [JsonInclude] public float Money;
     [JsonInclude] public float Battles;
     [JsonInclude] public int Level;
-    [JsonInclude] public List<TileTemplate> Inventory;
+    [JsonInclude] public List<FloorTileTemplate> Inventory;
     [JsonInclude] public Fort Fort1;
     [JsonInclude] public Fort Fort2;
     [JsonInclude] public Fort Fort3;
@@ -39,7 +39,7 @@ public class Campaign
         Raylib.BeginDrawing();
         Raylib.ClearBackground(Raylib.BLACK);
         
-        if (RayGui.GuiButton(new Rectangle(20,  50, 200, 40), "Edit Fort 1") != 0) EditorScene.Start();
+        if (RayGui.GuiButton(new Rectangle(20,   50, 200, 40), "Edit Fort 1") != 0) EditorScene.Start();
         if (RayGui.GuiButton(new Rectangle(20,  100, 200, 40), "Edit Fort 2") != 0) EditorScene.Start();
         if (RayGui.GuiButton(new Rectangle(20,  150, 200, 40), "Edit Fort 3") != 0) EditorScene.Start();
         if (RayGui.GuiButton(new Rectangle(960,  50, 200, 40), "Level 8") != 0) BattleScene.Start(Fort1, Resources.CampaignLevels[7]);

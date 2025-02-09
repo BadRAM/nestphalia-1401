@@ -7,7 +7,8 @@ public static class World
 {
     public const int BoardWidth = 48;
     public const int BoardHeight = 22;
-    private static Tile[,] _board = new Tile[BoardWidth, BoardHeight];
+    private static FloorTile[,] _floor = new FloorTile[BoardWidth, BoardHeight];
+    private static Structure?[,] _board = new Structure?[BoardWidth, BoardHeight];
     public static List<Minion> Minions = new List<Minion>();
     public static List<Minion> MinionsToRemove = new List<Minion>();
     public static List<Projectile> Projectiles = new List<Projectile>();
@@ -15,19 +16,20 @@ public static class World
     public static float WaveDuration = 10f;
     public static float FirstWaveTime = 0f;
     public static int Wave = 0;
-
+    
     public static void Initialize()
     {
         Minions.Clear();
         Projectiles.Clear();
-        FirstWaveTime = (float)Raylib.GetTime();
+        FirstWaveTime = (float)Raylib.GetTime() - 5f;
         Wave = 0;
         
         for (int x = 0; x < BoardWidth; x++)
         {
             for (int y = 0; y < BoardHeight; y++)
             {
-                _board[x,y] = (x%2 != y%2) ? Assets.Tiles[0].Instantiate(x,y) : Assets.Tiles[1].Instantiate(x,y);
+                _floor[x,y] = (x%2 != y%2) ? Assets.FloorTiles[0].Instantiate(x,y) : Assets.FloorTiles[1].Instantiate(x,y);
+                _board[x,y] = null;
             }
         }
         
@@ -40,26 +42,22 @@ public static class World
         // pathFinder.FindPath(new Int2D(40, 20));
     }
     
-    public static void SetTile(TileTemplate tile, Int2D tilePos)
+    public static void SetTile(StructureTemplate? tile, int x, int y)
+    {
+        _board[x,y] = tile?.Instantiate(x, y);
+    }
+    
+    public static void SetTile(StructureTemplate? tile, Int2D tilePos)
     {
         SetTile(tile, tilePos.X, tilePos.Y);
     }
-    
-    public static void SetTile(TileTemplate tile, int x, int y)
-    {
-        if (_board[x,y] != null)
-        {
-            _board[x,y].Destroy();
-        }
-        _board[x,y] = tile.Instantiate(x, y);
-    }
 
-    public static Tile GetTile(Int2D tilePos)
+    public static Structure? GetTile(Int2D tilePos)
     {
         return _board[tilePos.X,tilePos.Y];
     }
     
-    public static Tile GetTile(int x, int y)
+    public static Structure? GetTile(int x, int y)
     {
         return _board[x,y];
     }
@@ -74,17 +72,16 @@ public static class World
             {
                 for (int y = 0; y < BoardHeight; ++y)
                 {
-                    _board[x, y].WaveEffect();
+                    _board[x, y]?.WaveEffect();
                 }
             }
         }
-        
         
         for (int x = 0; x < BoardWidth; ++x)
         {
             for (int y = 0; y < BoardHeight; ++y)
             {
-                _board[x, y].Update();
+                _board[x, y]?.Update();
             }
         }
         
@@ -102,7 +99,6 @@ public static class World
         }
         MinionsToRemove.Clear();
         
-
         foreach (Projectile p in Projectiles)
         {
             p.Update();
@@ -120,7 +116,8 @@ public static class World
         {
             for (int y = 0; y < BoardHeight; ++y)
             {
-                _board[x, y].Draw(x*24, y*24);
+                _floor[x,y].Draw(x*24, y*24);
+                _board[x,y]?.Draw(x*24, y*24);
             }
         }
         
@@ -133,8 +130,6 @@ public static class World
         {
             p.Draw();
         }
-        
-        
     }
 
     public static Int2D PosToTilePos(Vector2 position)
@@ -156,7 +151,7 @@ public static class World
         return bounds;
     }
 
-    public static Tile GetTileAtPos(Vector2 position)
+    public static Structure? GetTileAtPos(Vector2 position)
     {
         return GetTile(PosToTilePos(position));
     }
@@ -173,12 +168,12 @@ public static class World
 
     public static void Flip()
     {
-        Tile[,] boardBuf = new Tile[BoardWidth, BoardHeight];
+        Structure?[,] boardBuf = new Structure?[BoardWidth, BoardHeight];
         for (int x = 0; x < BoardWidth; ++x)
         {
             for (int y = 0; y < BoardHeight; ++y)
             {
-                boardBuf[x,y] = _board[BoardWidth-(x+1),y].Template.Instantiate(x,y);
+                boardBuf[x,y] = _board[BoardWidth-(x+1),y]?.Template.Instantiate(x,y);
             }
         }
         Array.Copy(boardBuf, _board, boardBuf.Length);

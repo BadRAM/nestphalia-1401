@@ -6,7 +6,7 @@ public static class EditorScene
     
     public static void Start()
     {
-        
+        Program.CurrentScene = Scene.Editor;
     }
 
     public static void Update()

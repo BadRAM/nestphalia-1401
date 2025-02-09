@@ -14,17 +14,21 @@ public static class Resources
     public static Texture bullet;
     public static Texture turret;
     public static Texture spawner;
+    public static Texture flag1;
+    public static Texture flag2;
     public static List<Fort> CampaignLevels = new List<Fort>();
     
     public static void Load()
     {
-        wabbit = LoadTexture("resources/wabbit_alpha.png");
-        wall   = LoadTexture("resources/wall.png");
-        floor1 = LoadTexture("resources/floor1.png");
-        floor2 = LoadTexture("resources/floor2.png");
-        bullet = LoadTexture("resources/bullet.png");
-        turret = LoadTexture("resources/turret.png");
+        wabbit  = LoadTexture("resources/wabbit_alpha.png");
+        wall    = LoadTexture("resources/wall.png");
+        floor1  = LoadTexture("resources/floor1.png");
+        floor2  = LoadTexture("resources/floor2.png");
+        bullet  = LoadTexture("resources/bullet.png");
+        turret  = LoadTexture("resources/turret.png");
         spawner = LoadTexture("resources/spawner.png");
+        flag1   = LoadTexture("resources/spawner.png");
+        flag2   = LoadTexture("resources/spawner.png");
         
         CampaignLevels.Add(LoadFort("/resources/level1.fort"));
         CampaignLevels.Add(LoadFort("/resources/level2.fort"));

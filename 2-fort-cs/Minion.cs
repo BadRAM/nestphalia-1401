@@ -63,8 +63,8 @@ public class Minion
 
     public virtual void Update()
     {
-        Tile t = World.GetTileAtPos(Position.MoveTowards(_target, Template.Range));
-        if (t.IsSolid() && t.GetTeam() != Team)
+        Structure? t = World.GetTileAtPos(Position.MoveTowards(_target, Template.Range));
+        if (t != null && t.IsSolid() && t.GetTeam() != Team)
         {
             if (Raylib.GetTime() - _lastFiredTime > 60/Template.RateOfFire)
             {
@@ -117,8 +117,8 @@ public class Minion
         {
             for (int y = tilePos.Y-1; y < tilePos.Y+3; ++y)
             {
-                // guard against out of bounds and non solid tiles
-                if (x >= 0 && x < World.BoardWidth && y >= 0 && y < World.BoardHeight && !World.GetTile(x,y).IsSolid()) continue;
+                // guard against out of bounds and non-solid tiles
+                if (x >= 0 && x < World.BoardWidth && y >= 0 && y < World.BoardHeight && !(World.GetTile(x,y)?.IsSolid() ?? false)) continue;
                 Vector2 c = World.GetTileCenter(x, y);
                 Rectangle b = World.GetTileBounds(x, y);
                 if (!Raylib.CheckCollisionCircleRec(Position, Template.PhysicsRadius, b)) continue;
@@ -158,18 +158,18 @@ public class Minion
     public virtual void Draw()
     {
         Color tint = Raylib.WHITE;
-        if (Team == TeamName.Player) tint = Raylib.WHITE;
-        if (Team == TeamName.Enemy) tint = Raylib.WHITE;
+        if (Team == TeamName.Player) tint = Raylib.BLUE;
+        if (Team == TeamName.Enemy) tint = Raylib.RED;
         Raylib.DrawTexture(Template.Texture, (int)Position.X - Template.Texture.width/2, (int)Position.Y - Template.Texture.width/2, tint);
         
-        // // Debug, shows path
-        // Vector2 path = Position;
-        // foreach (Int2D i in _pathFinder.Path)
-        // {
-        //     Vector2 v = World.GetTileCenter(i);
-        //     Raylib.DrawLine((int)path.X, (int)path.Y, (int)v.X, (int)v.Y, Raylib.WHITE);
-        //     path = v;
-        // }
+        // Debug, shows path
+        Vector2 path = Position;
+        foreach (Int2D i in _pathFinder.Path)
+        {
+            Vector2 v = World.GetTileCenter(i);
+            Raylib.DrawLine((int)path.X, (int)path.Y, (int)v.X, (int)v.Y, Raylib.LIME);
+            path = v;
+        }
     }
 
     public virtual void Hurt(float damage)

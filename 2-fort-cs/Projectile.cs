@@ -59,7 +59,7 @@ public class Projectile
             Position = Position.MoveTowards(TargetPos, Template.Speed / 60f);
             if (Position == TargetPos)
             {
-                World.GetTileAtPos(Position).Hurt(Template.Damage);
+                World.GetTileAtPos(Position)?.Hurt(Template.Damage);
                 World.ProjectilesToRemove.Add(this);
             }
         }

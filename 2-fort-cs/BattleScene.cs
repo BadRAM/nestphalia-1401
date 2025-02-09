@@ -32,8 +32,8 @@ public static class BattleScene
         // ----- WORLD UPDATE PHASE -----
 
         World.Update();
-	        
-	        
+        
+        
         // ----- DRAW PHASE -----
         BeginDrawing();
         ClearBackground(BLACK);
