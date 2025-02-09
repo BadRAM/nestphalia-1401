@@ -19,13 +19,16 @@ static class Program
         brush = Assets.Tiles[0];
         
         World.Initialize();
-        // Resources.LoadFort();
-        // World.Flip();
-        // Resources.LoadFort();
+        Resources.LoadFort();
+        World.Flip();
+        Resources.LoadFort();
         
+        MenuScene.Start();
         
+        /*
         while (!WindowShouldClose())
         {
+	        /*
 	        // ----- INPUT + GUI PHASE -----
 	        if (IsKeyPressed(KeyboardKey.One))
 	        {
@@ -79,17 +82,17 @@ static class Program
 			        m.SetTarget(t);
 		        }
 	        }
-
+			
 	        if (IsKeyPressed(KeyboardKey.Space))
 	        {
 		        SetTargetFPS(300);
 	        }
-
+			
 	        if (IsKeyReleased(KeyboardKey.Space))
 	        {
 		        SetTargetFPS(60);
 	        }
-
+			
 	        if (IsKeyPressed(KeyboardKey.P))
 	        {
 		        Paused = !Paused;
@@ -116,9 +119,11 @@ static class Program
             DrawText($"Projectiles: {World.Projectiles.Count}", 12, 64, 20, Color.White);
             
 			//DrawTexture(Resources.wabbit, 400, 200, Color.White);
-
+			
             EndDrawing();
+            
         }
+        */
 
 	    Resources.Unload();
         

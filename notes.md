@@ -1,8 +1,15 @@
-Tile Data Structures
-====================
+Screen Hierarchy:
+=================
 
-Tiles need to store:
-- type
-- isWall
-- health
-- 
+Logo/Load
+ |
+ V
+Main Menu
+|-Campaign
+| |-Editor
+| |-Battle Select
+|   |-Battle
+|-Sandbox Editor
+|-Help
+V-Credits
+Quit

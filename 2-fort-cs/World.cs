@@ -18,6 +18,11 @@ public static class World
 
     public static void Initialize()
     {
+        Minions.Clear();
+        Projectiles.Clear();
+        FirstWaveTime = (float)Raylib.GetTime();
+        Wave = 0;
+        
         for (int x = 0; x < BoardWidth; x++)
         {
             for (int y = 0; y < BoardHeight; y++)

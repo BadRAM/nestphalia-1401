@@ -34,7 +34,7 @@ public class PathFinder
     {
         DesiredTarget = Target;
         Path.Clear();
-        Console.WriteLine($"{Minion.Template.Name} pathing from {World.PosToTilePos(Minion.Position)} to {DesiredTarget}");
+        // Console.WriteLine($"{Minion.Template.Name} pathing from {World.PosToTilePos(Minion.Position)} to {DesiredTarget}");
 
         PathNode?[,] nodeGrid = new PathNode[World.BoardWidth,World.BoardHeight];
         
@@ -136,7 +136,7 @@ public class PathFinder
             nodesToConsider.Sort();
         }
         
-        Console.WriteLine($"Found path in {count} loops, final node weight {n.Weight}");
+        // Console.WriteLine($"Found path in {count} loops, final node weight {n.Weight}");
 
         while (true)
         {
@@ -151,7 +151,7 @@ public class PathFinder
         PathNode n = new PathNode(new Int2D(x,y));
         n.PrevNode = prevNode;
         n.Weight = prevNode.Weight;
-        n.Weight += Math.Abs(n.Pos.X - prevNode.Pos.X) + Math.Abs(n.Pos.Y - prevNode.Pos.Y);
+        n.Weight += weight;
         Tile tile = World.GetTile(x,y);
         if (tile is Structure s)
         {

@@ -2,15 +2,15 @@
 
 Programming todo:
 =================
-- Minion Collision
+- Main Menu
 - Fort editor
-- Minion pathfinding
+- Win/Lose condition
 - Multitile structures
 - Outer Loop
 - Content
-- Melee attacks
 - Minion vs Minion melee
 - proper render order/z levels
+- Fix minion collision with wall corners
 
 
 Design todo:
@@ -20,10 +20,3 @@ Design todo:
 
 Project management todo:
 ========================
-
-
-
-
-Circle Collision depen:
- - If Circle center is within rect's X or Y bounds, depen it on that axis
- - Else, depen it radially from nearest point

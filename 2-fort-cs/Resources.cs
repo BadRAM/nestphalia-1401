@@ -36,12 +36,7 @@ public static class Resources
         UnloadTexture(turret);
     }
 
-    public class Fort
-    {
-        [JsonInclude] public string Name = "Fort";
-        [JsonInclude] public string Comment = "It's a fort!";
-        [JsonInclude] public string[] Board = new string[20*20];
-    }
+
 
     public static void SaveFort()
     {
@@ -65,17 +60,10 @@ public static class Resources
         //if (right) World.Flip();
     }
 
-    public static void LoadFort()
+    public static Fort LoadFort()
     {
         string jsonString = File.ReadAllText(Directory.GetCurrentDirectory() + "/fort.json");
         Fort fort = JsonSerializer.Deserialize<Fort>(jsonString);
-        
-        for (int x = 0; x < 20; x++)
-        {
-            for (int y = 0; y < 20; y++)
-            {
-                World.SetTile(Assets.GetTileByName(fort.Board[x+y*20]), x+1,y+1);
-            }
-        }
+        return fort;
     }
 }
