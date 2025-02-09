@@ -2,8 +2,8 @@ Screen Hierarchy:
 =================
 
 Logo/Load
- |
- V
+|
+V
 Main Menu
 |-Campaign
 | |-Editor
