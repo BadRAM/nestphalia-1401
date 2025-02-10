@@ -2,11 +2,15 @@
 
 Programming todo:
 =================
-- Win/Lose condition
-- Fort editor
-- Multitile structures
+- Disable collision with friendly hives
 - Outer Loop
 - Content
+ - Content is locked behind progression
+  - Structures
+
+------ postlaunch content
+- Minion hatred and fear
+- Multitile structures
 - Active ability towers
 - Minion vs Minion melee
 - proper render order/z levels

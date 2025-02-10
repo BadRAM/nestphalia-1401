@@ -55,7 +55,8 @@ public class Structure
 
     public virtual void Draw(int x, int y)
     {
-        Raylib.DrawTexture(Template.Texture, x, y, Raylib.WHITE);
+        int t = 127 + (int)(128 * (Health / Template.MaxHealth));
+        Raylib.DrawTexture(Template.Texture, x, y, new Color(t,t,t,255));
     }
 
     public virtual bool IsSolid()

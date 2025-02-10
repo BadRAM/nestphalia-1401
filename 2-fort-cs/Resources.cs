@@ -8,7 +8,15 @@ namespace _2_fort_cs;
 public static class Resources
 {
     public static Texture wabbit;
+    public static Texture ant;
+    public static Texture smant;
+    public static Texture snail;
+    public static Texture bee;
+    public static Texture beetle;
     public static Texture wall;
+    public static Texture wall2;
+    public static Texture doorOpen;
+    public static Texture doorClosed;
     public static Texture floor1;
     public static Texture floor2;
     public static Texture bullet;
@@ -16,19 +24,29 @@ public static class Resources
     public static Texture spawner;
     public static Texture flag1;
     public static Texture flag2;
+    public static Texture blank;
     public static List<Fort> CampaignLevels = new List<Fort>();
     
     public static void Load()
     {
         wabbit  = LoadTexture("resources/wabbit_alpha.png");
+        ant     = LoadTexture("resources/ant.png");
+        smant   = LoadTexture("resources/smant.png");
+        snail   = LoadTexture("resources/snail.png");
+        bee     = LoadTexture("resources/bee.png");
+        beetle  = LoadTexture("resources/beetle.png");
         wall    = LoadTexture("resources/wall.png");
+        wall2   = LoadTexture("resources/wall2.png");
+        doorClosed = LoadTexture("resources/doorClosed.png");
+        doorOpen = LoadTexture("resources/doorOpen.png");
         floor1  = LoadTexture("resources/floor1.png");
         floor2  = LoadTexture("resources/floor2.png");
         bullet  = LoadTexture("resources/bullet.png");
         turret  = LoadTexture("resources/turret.png");
         spawner = LoadTexture("resources/spawner.png");
-        flag1   = LoadTexture("resources/spawner.png");
-        flag2   = LoadTexture("resources/spawner.png");
+        flag1   = LoadTexture("resources/flag1.png");
+        flag2   = LoadTexture("resources/flag2.png");
+        blank   = LoadTexture("resources/clear.png");
         
         CampaignLevels.Add(LoadFort("/resources/level1.fort"));
         CampaignLevels.Add(LoadFort("/resources/level2.fort"));
@@ -49,8 +67,6 @@ public static class Resources
         UnloadTexture(bullet);
         UnloadTexture(turret);
     }
-
-
 
     public static void SaveFort(string fortName)
     {

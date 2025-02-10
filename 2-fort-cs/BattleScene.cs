@@ -16,10 +16,10 @@ public static class BattleScene
             return;
         }
 
-        World.Initialize();
-        enemyFort.Load();
+        World.Initialize(false);
+        enemyFort.LoadToBoard();
         World.Flip();
-        playerFort.Load();
+        playerFort.LoadToBoard();
 
         Program.CurrentScene = Scene.Battle;
     }
@@ -27,11 +27,19 @@ public static class BattleScene
     public static void Update()
     {
         // ----- INPUT + GUI PHASE -----
-	        
-	        
+        
+        
         // ----- WORLD UPDATE PHASE -----
 
         World.Update();
+
+        TeamName winner = CheckWinner();
+        if (winner != TeamName.None)
+        {
+            Console.WriteLine($"{winner.ToString()} wins the match!");
+            Program.Campaign.ReportBattleOutcome(winner == TeamName.Player);
+            Program.Campaign.Start();
+        }
         
         
         // ----- DRAW PHASE -----
@@ -45,9 +53,35 @@ public static class BattleScene
         DrawText($"Wave: {World.Wave}", 12, 32, 20, WHITE);
         DrawText($"Minions: {World.Minions.Count}", 12, 48, 20, WHITE);
         // DrawText($"Projectiles: {World.Projectiles.Count}", 12, 64, 20, WHITE);
-            
-        //DrawTexture(Resources.wabbit, 400, 200, Color.White);
-			
+        
         EndDrawing();
+    }
+
+    private static TeamName CheckWinner()
+    {
+        bool playerDead = true;
+        bool enemyDead = true;
+        
+        for (int x = 0; x < World.BoardWidth; x++)
+        {
+            for (int y = 0; y < World.BoardHeight; y++)
+            {
+                if (World.GetTile(x,y) is Spawner)
+                {
+                    if (x < 24)
+                    {
+                        playerDead = false;
+                    }
+                    else
+                    {
+                        enemyDead = false;
+                    }
+                }
+            }
+        }
+
+        if (playerDead) return TeamName.Enemy;
+        if (enemyDead) return TeamName.Player;
+        return TeamName.None;
     }
 }

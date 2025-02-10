@@ -32,9 +32,9 @@ public class MinionTemplate
         PhysicsRadius = physicsRadius;
     }
 
-    public void Instantiate(Vector2 position, TeamName team)
+    public void Instantiate(Vector2 position, TeamName team, Int2D targetTile)
     {
-        World.Minions.Add(new Minion(this, position, team));
+        World.Minions.Add(new Minion(this, position, team, targetTile));
     }
 }
 
@@ -46,24 +46,29 @@ public class Minion
     public bool IsAlive;
     public TeamName Team;
     private Vector2 _target;
+    protected Int2D _targetTile;
     private float _lastFiredTime;
     private Vector2 _collisionOffset;
     private PathFinder _pathFinder;
 
-    public Minion(MinionTemplate template, Vector2 position, TeamName team)
+    public Minion(MinionTemplate template, Vector2 position, TeamName team, Int2D targetTile)
     {
         Template = template;
         Position = position;
         _target = position;
+        _targetTile = targetTile;
         Team = team;
         Health = Template.MaxHealth;
         IsAlive = true;
         _pathFinder = new PathFinder(this);
+        _pathFinder.FindPath(_targetTile);
     }
 
     public virtual void Update()
     {
-        Structure? t = World.GetTileAtPos(Position.MoveTowards(_target, Template.Range));
+        Structure? t = World.GetTileAtPos(Position.MoveTowards(_target, Template.Range)); // TODO: make this respect minion range
+        if (Template.IsFlying && t != World.GetTile(_targetTile)) t = null; // cheeky intercept so flyers ignore all but their target.
+
         if (t != null && t.IsSolid() && t.GetTeam() != Team)
         {
             if (Raylib.GetTime() - _lastFiredTime > 60/Template.RateOfFire)
@@ -72,22 +77,20 @@ public class Minion
                 _lastFiredTime = (float)Raylib.GetTime();
             }
         }
+        else if (Template.IsFlying)
+        {
+            _target = World.GetTileCenter(_targetTile);
+            Position = Position.MoveTowards(_target, Template.Speed / 60f);
+            if (Position == _target)
+            {
+                Retarget();
+            }
+        }
         else
         {
             if (_pathFinder.TargetReached())
             {
-                if (Team == TeamName.Player)
-                {
-                    _pathFinder.FindPath(new Int2D(Random.Shared.Next(27, 47), Random.Shared.Next(1, 21)));
-                }
-                else if (Team == TeamName.Enemy)
-                {
-                    _pathFinder.FindPath(new Int2D(Random.Shared.Next(1, 21), Random.Shared.Next(1, 21)));
-                }
-                else
-                {
-                    _pathFinder.FindPath(new Int2D(Random.Shared.Next(1, 47), Random.Shared.Next(1, 21)));
-                }
+                Retarget();
             }
             
             _target = World.GetTileCenter(_pathFinder.NextTile());
@@ -95,7 +98,30 @@ public class Minion
         }
         
         PlanCollision();
+    }
 
+    private void Retarget()
+    {
+        List<Int2D> targets = new List<Int2D>();
+        
+        for (int x = 0; x < World.BoardWidth; ++x)
+        {
+            for (int y = 0; y < World.BoardHeight; ++y)
+            {
+                if (World.GetTile(x,y) != null && World.GetTile(x,y).Team != Team)
+                {
+                    targets.Add(new Int2D(x,y));
+                }
+            }
+        }
+
+        if (targets.Count == 0)
+        {
+            return;
+        }
+
+        _targetTile = targets[Random.Shared.Next(targets.Count)];
+        _pathFinder.FindPath(_targetTile);
     }
 
     private void PlanCollision()
@@ -107,7 +133,7 @@ public class Minion
             if (!Raylib.CheckCollisionCircles(Position, Template.PhysicsRadius, m.Position, m.Template.PhysicsRadius)) continue;
         
             Vector2 delta = Position - m.Position;
-            _collisionOffset += delta.Normalized() * Math.Min((Template.PhysicsRadius + m.Template.PhysicsRadius - delta.Length())/2, 1f);
+            _collisionOffset += delta.Normalized() * Math.Min((Template.PhysicsRadius + m.Template.PhysicsRadius - delta.Length())/2, 0.5f);
         }
 
         if (Template.IsFlying) return;
@@ -117,8 +143,14 @@ public class Minion
         {
             for (int y = tilePos.Y-1; y < tilePos.Y+3; ++y)
             {
-                // guard against out of bounds and non-solid tiles
-                if (x >= 0 && x < World.BoardWidth && y >= 0 && y < World.BoardHeight && !(World.GetTile(x,y)?.IsSolid() ?? false)) continue;
+                // guard against out of bounds, non-solid tiles, and friendly hives
+                if (x < 0 || 
+                    x >= World.BoardWidth || 
+                    y < 0 || 
+                    y >= World.BoardHeight || 
+                    !(World.GetTile(x,y)?.IsSolid() ?? false) ||
+                    (World.GetTile(x,y) is Spawner && World.GetTile(x,y).Team == Team)
+                    ) continue;
                 Vector2 c = World.GetTileCenter(x, y);
                 Rectangle b = World.GetTileBounds(x, y);
                 if (!Raylib.CheckCollisionCircleRec(Position, Template.PhysicsRadius, b)) continue;
@@ -163,26 +195,24 @@ public class Minion
         Raylib.DrawTexture(Template.Texture, (int)Position.X - Template.Texture.width/2, (int)Position.Y - Template.Texture.width/2, tint);
         
         // Debug, shows path
-        Vector2 path = Position;
-        foreach (Int2D i in _pathFinder.Path)
+        if (Raylib.CheckCollisionPointCircle(Raylib.GetMousePosition(), Position, Template.PhysicsRadius))
         {
-            Vector2 v = World.GetTileCenter(i);
-            Raylib.DrawLine((int)path.X, (int)path.Y, (int)v.X, (int)v.Y, Raylib.LIME);
-            path = v;
+            Vector2 path = Position;
+            foreach (Int2D i in _pathFinder.Path)
+            {
+                Vector2 v = World.GetTileCenter(i);
+                Raylib.DrawLine((int)path.X, (int)path.Y, (int)v.X, (int)v.Y, Raylib.LIME);
+                path = v;
+            }
         }
     }
 
     public virtual void Hurt(float damage)
     {
-        Health -= damage;
+        Health -= Math.Max(1, damage - Template.Armor);
         if (Health <= 0)
         {
             World.MinionsToRemove.Add(this);
         }
-    }
-
-    public void SetTarget(Vector2 target)
-    {
-        _target = target;
     }
 }

@@ -20,19 +20,24 @@ public static class MenuScene
         BeginDrawing();
         ClearBackground(GRAY);
             
-        // Questionable pattern here, what happens when two begindrawing/enddrawing calls happen in a row?
         if (RayGui.GuiButton(new Rectangle(400, 100, 400, 40), "Play") != 0)
         {
             Program.Campaign = new Campaign();
-            if (File.Exists(Directory.GetCurrentDirectory() + "/save/campaign.sav"))
+            if (File.Exists(Directory.GetCurrentDirectory() + "/campaign.sav"))
             {
                 Program.Campaign = Campaign.Load();
             }
             Program.Campaign.Start();
         }
-        if (RayGui.GuiButton(new Rectangle(400, 150, 400, 40), "Sandbox") != 0) EditorScene.Start();
-        if (RayGui.GuiButton(new Rectangle(400, 200, 400, 40), "Help") != 0) _helpWindowOpen = !_helpWindowOpen;
-        if (RayGui.GuiButton(new Rectangle(400, 250, 400, 40), "Quit") != 0) CloseWindow();
+
+        if (RayGui.GuiButton(new Rectangle(400, 150, 400, 40), "Sandbox load") != 0)
+        {
+            Fort f = Resources.LoadFort("/creativeFort.fort");
+            EditorScene.Start(f, true);
+        }
+        if (RayGui.GuiButton(new Rectangle(400, 200, 400, 40), "Sandbox new") != 0) EditorScene.Start(creativeMode:true);
+        if (RayGui.GuiButton(new Rectangle(400, 250, 400, 40), "Help") != 0) _helpWindowOpen = !_helpWindowOpen;
+        if (RayGui.GuiButton(new Rectangle(400, 300, 400, 40), "Quit") != 0) CloseWindow();
 
         if (_helpWindowOpen)
         {

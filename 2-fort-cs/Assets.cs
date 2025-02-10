@@ -13,11 +13,13 @@ public static class Assets
         
         FloorTiles.Add(new FloorTileTemplate("Floor1", Resources.floor1));
         FloorTiles.Add(new FloorTileTemplate("Floor2", Resources.floor2));
+        FloorTiles.Add(new FloorTileTemplate("Blank", Resources.blank));
         
         
         Structures.Add(new StructureTemplate("Mud Wall", Resources.wall, 100, 10, 0));
-        Structures.Add(new StructureTemplate("Stone Wall", Resources.wall, 500, 100, 4));
+        Structures.Add(new StructureTemplate("Stone Wall", Resources.wall2, 500, 100, 6));
         
+        Structures.Add(new DoorTemplate("Gate", Resources.doorClosed, Resources.doorOpen, 60, 100, 2, 48));
         
         Structures.Add
         (
@@ -25,27 +27,42 @@ public static class Assets
             (
                 "Watchtower", 
                 Resources.turret, 
-                200, 
+                80, 
                 100, 
-                0,
+                1,
                 100,
-                new ProjectileTemplate(Resources.bullet, 5, 400), 
-                60
+                new ProjectileTemplate(Resources.bullet, 10, 400), 
+                40
             )
         );
+        
+        // Structures.Add
+        // (
+        //     new TurretTemplate
+        //     (
+        //         "Mortar",
+        //         Resources.turret,
+        //         200,
+        //         300,
+        //         0,
+        //         100,
+        //         new ProjectileTemplate(Resources.bullet, 50, 200), 
+        //         30
+        //     )
+        // );
         
         Structures.Add
         (
             new TurretTemplate
             (
-                "Bomb Mortar",
+                "Machinegunner",
                 Resources.turret,
-                200,
-                300,
-                0,
+                160,
+                400,
+                4,
                 100,
                 new ProjectileTemplate(Resources.bullet, 5, 400), 
-                30
+                400
             )
         );
         
@@ -56,29 +73,14 @@ public static class Assets
                 "Sniper",
                 Resources.turret,
                 200,
-                500,
-                0,
                 1000,
-                new ProjectileTemplate(Resources.bullet, 50, 400), 
-                10
+                7,
+                600,
+                new ProjectileTemplate(Resources.bullet, 60, 800), 
+                30,
+                TurretTemplate.TargetSelector.Random
             )
         );
-        
-        Structures.Add
-        (
-            new TurretTemplate
-            (
-                "Machinegunner",
-                Resources.turret,
-                200,
-                300,
-                0,
-                100,
-                new ProjectileTemplate(Resources.bullet, 5, 400), 
-                300
-            )
-        );
-        
         
         Structures.Add
         (
@@ -86,23 +88,24 @@ public static class Assets
             (
                 "Anthill", 
                 Resources.spawner, 
-                200, 
+                80, 
                 100, 
                 0, 
                 new MinionTemplate
                 (
                     "Ant", 
-                    Resources.wabbit, 
-                    10, 
+                    Resources.smant, 
+                    15, 
                     0, 
                     new ProjectileTemplate(Resources.bullet, 5, 400), 
                     32, 
                     30, 
-                    50, 
+                    60, 
                     false,
                     3
                 ), 
                 5, 
+                1f,
                 0.25f
             )
         );
@@ -113,16 +116,16 @@ public static class Assets
             (
                 "Snail Warren", 
                 Resources.spawner, 
-                200, 
+                80, 
                 300,
                 3,
                 new MinionTemplate
                 (
                     "Snail", 
-                    Resources.wabbit, 
+                    Resources.snail, 
                     50, 
                     5, 
-                    new ProjectileTemplate(Resources.bullet, 5, 400), 
+                    new ProjectileTemplate(Resources.bullet, 15, 400), 
                     32, 
                     20, 
                     25, 
@@ -130,10 +133,10 @@ public static class Assets
                     6
                 ), 
                 2, 
+                0.5f,
                 1f
             )
         );
-        
         
         Structures.Add
         (
@@ -141,23 +144,24 @@ public static class Assets
             (
                 "Beehive", 
                 Resources.spawner, 
-                200, 
-                100, 
-                0, 
+                80, 
+                500, 
+                5, 
                 new MinionTemplate
                 (
                     "Bee", 
-                    Resources.wabbit, 
-                    10, 
+                    Resources.bee, 
+                    20, 
                     0, 
                     new ProjectileTemplate(Resources.bullet, 5, 400), 
-                    32, 
-                    30, 
-                    50, 
+                    32,
+                    40,
+                    40,
                     true,
                     5
                 ), 
                 5, 
+                1f,
                 0.25f
             )
         );  
@@ -169,25 +173,54 @@ public static class Assets
                 "Beetle Burrow", 
                 Resources.spawner, 
                 200, 
-                100, 
-                0, 
+                2500, 
+                8, 
                 new MinionTemplate
                 (
                     "Beetle", 
-                    Resources.wabbit, 
+                    Resources.beetle, 
+                    100, 
                     10, 
-                    0, 
-                    new ProjectileTemplate(Resources.bullet, 5, 400), 
+                    new ProjectileTemplate(Resources.bullet, 60, 400), 
                     32, 
                     30, 
-                    50, 
+                    45, 
                     false,
-                    6
+                    10
                 ), 
-                5, 
+                1, 
+                0.25f,
+                6f
+            )
+        );
+        
+        Structures.Add
+        (
+            new SpawnerTemplate
+            (
+                "TinyAnthill",
+                Resources.spawner,
+                80,
+                50,
+                99,
+                new MinionTemplate
+                (
+                    "Ant",
+                    Resources.wabbit,
+                    10,
+                    0,
+                    new ProjectileTemplate(Resources.bullet, 5, 400),
+                    32,
+                    30,
+                    50,
+                    false,
+                    3
+                ), 
+                0,
+                0,
                 0.25f
             )
-        );        
+        );
     }
 
     public static StructureTemplate? GetTileByName(string name)

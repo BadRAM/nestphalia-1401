@@ -13,25 +13,38 @@ public static class World
     public static List<Minion> MinionsToRemove = new List<Minion>();
     public static List<Projectile> Projectiles = new List<Projectile>();
     public static List<Projectile> ProjectilesToRemove = new List<Projectile>();
-    public static float WaveDuration = 10f;
+    public static float WaveDuration = 15f;
     public static float FirstWaveTime = 0f;
     public static int Wave = 0;
     
-    public static void Initialize()
+    public static void Initialize(bool sandbox)
     {
         Minions.Clear();
         Projectiles.Clear();
         FirstWaveTime = (float)Raylib.GetTime() - 5f;
         Wave = 0;
-        
+
         for (int x = 0; x < BoardWidth; x++)
         {
             for (int y = 0; y < BoardHeight; y++)
             {
-                _floor[x,y] = (x%2 != y%2) ? Assets.FloorTiles[0].Instantiate(x,y) : Assets.FloorTiles[1].Instantiate(x,y);
+                if (sandbox && x > 21)
+                {
+                    _floor[x, y] = Assets.FloorTiles[2].Instantiate(x, y);
+                }
+                else if (sandbox && (x == 0 || x == 21 || y == 0 || y == 21))
+                {
+                    _floor[x, y] = Assets.FloorTiles[1].Instantiate(x, y);
+                }
+                else
+                {
+                    _floor[x,y] = (x%2 != y%2) ? Assets.FloorTiles[0].Instantiate(x,y) : Assets.FloorTiles[1].Instantiate(x,y);
+                }
                 _board[x,y] = null;
             }
         }
+    
+
         
         // for (int i = 0; i < 1; i++)
         // {
@@ -184,7 +197,8 @@ public enum TeamName
 {
     Player,
     Enemy,
-    Neutral
+    Neutral,
+    None
 }
 
 public record struct Int2D
