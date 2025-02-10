@@ -52,10 +52,11 @@ public static class Resources
 
 
 
-    public static void SaveFort()
+    public static void SaveFort(string fortName)
     {
         //if (right) World.Flip();
         Fort fort = new Fort();
+        fort.Name = fortName;
 
         Directory.GetCurrentDirectory();
         
@@ -63,13 +64,13 @@ public static class Resources
         {
             for (int y = 0; y < 20; y++)
             {
-                fort.Board[x+y*20] = World.GetTile(x+1,y+1).Template.Name;
+                fort.Board[x+y*20] = World.GetTile(x+1,y+1)?.Template.Name ?? "";
             }
         }
         
         string jsonString = JsonSerializer.Serialize(fort);
         Console.WriteLine($"JSON fort looks like: {jsonString}");
-        File.WriteAllText(Directory.GetCurrentDirectory() + "/fort.json", jsonString);
+        File.WriteAllText(Directory.GetCurrentDirectory() + $"/{fortName}.fort", jsonString);
         
         //if (right) World.Flip();
     }

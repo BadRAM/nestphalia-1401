@@ -8,7 +8,7 @@ public class SpawnerTemplate : StructureTemplate
     public int WaveSize;
     public float TimeBetweenSpawns;
     
-    public SpawnerTemplate(string name, Texture texture, float maxHealth, MinionTemplate minion, int waveSize, float timeBetweenSpawns) : base(name, texture, maxHealth)
+    public SpawnerTemplate(string name, Texture texture, float maxHealth, float price, int levelRequirement, MinionTemplate minion, int waveSize, float timeBetweenSpawns) : base(name, texture, maxHealth, price, levelRequirement)
     {
         Minion = minion;
         WaveSize = waveSize;

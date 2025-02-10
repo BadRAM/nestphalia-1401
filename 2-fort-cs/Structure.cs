@@ -8,12 +8,16 @@ public class StructureTemplate
     public string Name;
     public Texture Texture;
     public float MaxHealth;
+    public int LevelRequirement;
+    public float Price;
     
-    public StructureTemplate(string name, Texture texture, float maxHealth)
+    public StructureTemplate(string name, Texture texture, float maxHealth, float price, int levelRequirement = 0)
     {
         Name = name;
         Texture = texture;
         MaxHealth = maxHealth;
+        Price = price;
+        LevelRequirement = levelRequirement;
     }
     
     public virtual Structure Instantiate(int x, int y)

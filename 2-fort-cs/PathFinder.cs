@@ -25,16 +25,15 @@ public class PathFinder
 
         public int CompareTo(PathNode? other)
         {
-            return Weight.CompareTo(other.Weight);
+            return Weight.CompareTo(other?.Weight);
         }
     }
-    
     
     public void FindPath(Int2D Target)
     {
         DesiredTarget = Target;
         Path.Clear();
-        // Console.WriteLine($"{Minion.Template.Name} pathing from {World.PosToTilePos(Minion.Position)} to {DesiredTarget}");
+        Console.WriteLine($"{Minion.Template.Name} pathing from {World.PosToTilePos(Minion.Position)} to {DesiredTarget}");
 
         PathNode?[,] nodeGrid = new PathNode[World.BoardWidth,World.BoardHeight];
         
@@ -48,8 +47,6 @@ public class PathFinder
         {
             count++;
             
-            n = nodesToConsider[0];
-            
             // Abort if we ran out of options.
             if (nodesToConsider.Count == 0)
             {
@@ -57,6 +54,19 @@ public class PathFinder
                 Console.WriteLine("Couldn't find a path!");
                 break;
             }
+            
+            float minWeight = float.MaxValue;
+            int mindex = 0;
+            for (int i = 0; i < nodesToConsider.Count; i++)
+            {
+                if (nodesToConsider[i].Weight < minWeight)
+                {
+                    minWeight = nodesToConsider[i].Weight;
+                    mindex = i;
+                }
+            }
+            n = nodesToConsider[mindex];
+            nodesToConsider.RemoveAt(mindex);
             
             // Break if we're done
             if (n.Pos == DesiredTarget) break;
@@ -132,11 +142,10 @@ public class PathFinder
                 nodesToConsider.Add(WeightedNode(n, n.Pos.X+1, n.Pos.Y+1, 1.5f));
             }
             
-            
-            nodesToConsider.Sort();
+            //nodesToConsider.Sort();
         }
         
-        // Console.WriteLine($"Found path in {count} loops, final node weight {n.Weight}");
+        Console.WriteLine($"Found path in {count} loops, final node weight {n.Weight}");
 
         while (true)
         {

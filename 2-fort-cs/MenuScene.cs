@@ -32,7 +32,7 @@ public static class MenuScene
         }
         if (RayGui.GuiButton(new Rectangle(400, 150, 400, 40), "Sandbox") != 0) EditorScene.Start();
         if (RayGui.GuiButton(new Rectangle(400, 200, 400, 40), "Help") != 0) _helpWindowOpen = !_helpWindowOpen;
-        if (RayGui.GuiButton(new Rectangle(400, 250, 400, 40), "Quit") != 0) return;
+        if (RayGui.GuiButton(new Rectangle(400, 250, 400, 40), "Quit") != 0) CloseWindow();
 
         if (_helpWindowOpen)
         {

@@ -43,7 +43,7 @@ public static class BattleScene
         //DrawText($"Minion 0's wherabouts: X={World.Minions[0].Position.X} Y={World.Minions[0].Position.Y}", 12, 12, 20, Color.White);
         DrawText($"FPS: {GetFPS()}", 12, 16, 20, WHITE);
         DrawText($"Wave: {World.Wave}", 12, 32, 20, WHITE);
-        // DrawText($"Minions: {World.Minions.Count}", 12, 48, 20, WHITE);
+        DrawText($"Minions: {World.Minions.Count}", 12, 48, 20, WHITE);
         // DrawText($"Projectiles: {World.Projectiles.Count}", 12, 64, 20, WHITE);
             
         //DrawTexture(Resources.wabbit, 400, 200, Color.White);

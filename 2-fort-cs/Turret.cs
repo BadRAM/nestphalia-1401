@@ -10,7 +10,7 @@ public class TurretTemplate : StructureTemplate
     // public float Damage;
     public float RateOfFire;
 
-    public TurretTemplate(string name, Texture texture, float maxHealth, float range, ProjectileTemplate projectile, float rateOfFire) : base(name, texture, maxHealth)
+    public TurretTemplate(string name, Texture texture, float maxHealth, float price, int levelRequirement, float range, ProjectileTemplate projectile, float rateOfFire) : base(name, texture, maxHealth, price, levelRequirement)
     {
         Range = range;
         Projectile = projectile;

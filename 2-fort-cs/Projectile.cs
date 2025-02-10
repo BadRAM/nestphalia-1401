@@ -22,7 +22,7 @@ public class Projectile
     public ProjectileTemplate Template;
     public Vector2 Position;
     public bool MinionTargetted; // if true, go towards minion, if false go towards pos
-    public Minion TargetMinion;
+    public Minion? TargetMinion;
     public Vector2 TargetPos;
     public bool Destroy;
 
