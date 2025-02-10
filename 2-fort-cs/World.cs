@@ -13,7 +13,7 @@ public static class World
     public static List<Minion> MinionsToRemove = new List<Minion>();
     public static List<Projectile> Projectiles = new List<Projectile>();
     public static List<Projectile> ProjectilesToRemove = new List<Projectile>();
-    public static float WaveDuration = 15f;
+    public static float WaveDuration = 20f;
     public static float FirstWaveTime = 0f;
     public static int Wave = 0;
     

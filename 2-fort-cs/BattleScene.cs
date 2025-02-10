@@ -36,7 +36,7 @@ public static class BattleScene
         TeamName winner = CheckWinner();
         if (winner != TeamName.None)
         {
-            Console.WriteLine($"{winner.ToString()} wins the match!");
+            Console.WriteLine($"{winner.ToString()} wins the battle!");
             Program.Campaign.ReportBattleOutcome(winner == TeamName.Player);
             Program.Campaign.Start();
         }
@@ -45,9 +45,9 @@ public static class BattleScene
         // ----- DRAW PHASE -----
         BeginDrawing();
         ClearBackground(BLACK);
-			
+        
         World.Draw();
-			
+        
         //DrawText($"Minion 0's wherabouts: X={World.Minions[0].Position.X} Y={World.Minions[0].Position.Y}", 12, 12, 20, Color.White);
         DrawText($"FPS: {GetFPS()}", 12, 16, 20, WHITE);
         DrawText($"Wave: {World.Wave}", 12, 32, 20, WHITE);

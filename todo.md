@@ -2,13 +2,8 @@
 
 Programming todo:
 =================
-- Disable collision with friendly hives
-- Outer Loop
-- Content
- - Content is locked behind progression
-  - Structures
-
------- postlaunch content
+- Different sprites for different towers
+- Minions face the direction they're moving
 - Minion hatred and fear
 - Multitile structures
 - Active ability towers
@@ -25,5 +20,4 @@ Design todo:
 
 Project management todo:
 ========================
-
 

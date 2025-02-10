@@ -85,7 +85,7 @@ public static class Resources
         }
         
         string jsonString = JsonSerializer.Serialize(fort);
-        Console.WriteLine($"JSON fort looks like: {jsonString}");
+        //Console.WriteLine($"JSON fort looks like: {jsonString}");
         File.WriteAllText(Directory.GetCurrentDirectory() + $"/{fortName}.fort", jsonString);
         
         //if (right) World.Flip();

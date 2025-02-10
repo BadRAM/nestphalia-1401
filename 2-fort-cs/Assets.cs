@@ -19,7 +19,7 @@ public static class Assets
         Structures.Add(new StructureTemplate("Mud Wall", Resources.wall, 100, 10, 0));
         Structures.Add(new StructureTemplate("Stone Wall", Resources.wall2, 500, 100, 6));
         
-        Structures.Add(new DoorTemplate("Gate", Resources.doorClosed, Resources.doorOpen, 60, 100, 2, 48));
+        Structures.Add(new DoorTemplate("Gate", Resources.doorClosed, Resources.doorOpen, 60, 100, 2, 32));
         
         Structures.Add
         (
@@ -100,7 +100,7 @@ public static class Assets
                     new ProjectileTemplate(Resources.bullet, 5, 400), 
                     32, 
                     30, 
-                    60, 
+                    80, 
                     false,
                     3
                 ), 
@@ -128,7 +128,7 @@ public static class Assets
                     new ProjectileTemplate(Resources.bullet, 15, 400), 
                     32, 
                     20, 
-                    25, 
+                    45, 
                     false,
                     6
                 ), 
@@ -156,7 +156,7 @@ public static class Assets
                     new ProjectileTemplate(Resources.bullet, 5, 400), 
                     32,
                     40,
-                    40,
+                    60,
                     true,
                     5
                 ), 
@@ -184,7 +184,7 @@ public static class Assets
                     new ProjectileTemplate(Resources.bullet, 60, 400), 
                     32, 
                     30, 
-                    45, 
+                    55, 
                     false,
                     10
                 ), 
