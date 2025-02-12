@@ -21,7 +21,13 @@ public static class Resources
     public static Texture floor2;
     public static Texture bullet;
     public static Texture turret;
+    public static Texture turret2;
+    public static Texture turret3;
+    //public static Texture turret4;
     public static Texture spawner;
+    public static Texture spawner2;
+    public static Texture spawner3;
+    public static Texture spawner4;
     public static Texture flag1;
     public static Texture flag2;
     public static Texture blank;
@@ -43,7 +49,13 @@ public static class Resources
         floor2  = LoadTexture("resources/floor2.png");
         bullet  = LoadTexture("resources/bullet.png");
         turret  = LoadTexture("resources/turret.png");
+        turret2  = LoadTexture("resources/turret2.png");
+        turret3  = LoadTexture("resources/turret3.png");
+        //turret4  = LoadTexture("resources/turret4.png");
         spawner = LoadTexture("resources/spawner.png");
+        spawner2 = LoadTexture("resources/spawner2.png");
+        spawner3 = LoadTexture("resources/spawner3.png");
+        spawner4 = LoadTexture("resources/spawner4.png");
         flag1   = LoadTexture("resources/flag1.png");
         flag2   = LoadTexture("resources/flag2.png");
         blank   = LoadTexture("resources/clear.png");

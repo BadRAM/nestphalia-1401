@@ -56,7 +56,7 @@ public static class Assets
             new TurretTemplate
             (
                 "Machinegunner",
-                Resources.turret,
+                Resources.turret2,
                 160,
                 400,
                 4,
@@ -71,7 +71,7 @@ public static class Assets
             new TurretTemplate
             (
                 "Sniper",
-                Resources.turret,
+                Resources.turret3,
                 200,
                 1000,
                 7,
@@ -115,7 +115,7 @@ public static class Assets
             new SpawnerTemplate
             (
                 "Snail Warren", 
-                Resources.spawner, 
+                Resources.spawner2, 
                 80, 
                 300,
                 3,
@@ -143,7 +143,7 @@ public static class Assets
             new SpawnerTemplate
             (
                 "Beehive", 
-                Resources.spawner, 
+                Resources.spawner3, 
                 80, 
                 500, 
                 5, 
@@ -171,7 +171,7 @@ public static class Assets
             new SpawnerTemplate
             (
                 "Beetle Burrow", 
-                Resources.spawner, 
+                Resources.spawner4, 
                 200, 
                 2500, 
                 8, 

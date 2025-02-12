@@ -73,15 +73,19 @@ public class Turret : Structure
             }
             else if (_template.TargetMode == TurretTemplate.TargetSelector.Random)
             {
-                for (int i = 0; i < 10; i++)
+                List<Minion> ValidTargets = new List<Minion>();
+                foreach (Minion m in World.Minions)
                 {
-                    Minion r = World.Minions[Random.Shared.Next(World.Minions.Count)];
-                    if (r.Team != Team && Vector2.Distance(r.Position, position) < _template.Range)
+                    if (m.Team != Team && Vector2.Distance(m.Position, position) < _template.Range)
                     {
-                        World.Projectiles.Add(new Projectile(_template.Projectile, position, r));
-                        lastFireTime = (float)Raylib.GetTime();
-                        break;
+                        ValidTargets.Add(m);
                     }
+                }
+
+                if (ValidTargets.Count > 0)
+                {
+                    World.Projectiles.Add(new Projectile(_template.Projectile, position, ValidTargets[Random.Shared.Next(ValidTargets.Count)]));
+                    lastFireTime = (float)Raylib.GetTime();
                 }
             }
         }
