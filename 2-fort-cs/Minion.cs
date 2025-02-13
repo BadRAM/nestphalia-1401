@@ -71,7 +71,7 @@ public class Minion
         
         // else, move towards next tile on path.
         
-        // if we're at our final destination, ask for a new path.
+        // if we're at our final destination, ask for a new path. (Don't ask for a new path if we already have)
         
         
         
