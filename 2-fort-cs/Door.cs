@@ -5,10 +5,10 @@ namespace _2_fort_cs;
 
 public class DoorTemplate : StructureTemplate
 {
-    public float Range;
+    public double Range;
     public Texture OpenTexture;
     
-    public DoorTemplate(string name, Texture texture, Texture openTexture, float maxHealth, float price, int levelRequirement, float range) : base(name, texture, maxHealth, price, levelRequirement)
+    public DoorTemplate(string name, Texture texture, Texture openTexture, double maxHealth, double price, int levelRequirement, double range) : base(name, texture, maxHealth, price, levelRequirement)
     {
         OpenTexture = openTexture;
         Range = range;
@@ -40,14 +40,14 @@ public class Door : Structure
             {
                 if (m.Team == Team)
                 {
-                    if (Raylib.CheckCollisionCircles(position, _template.Range, m.Position, m.Template.PhysicsRadius))
+                    if (Raylib.CheckCollisionCircles(position, (float)_template.Range, m.Position, (float)m.Template.PhysicsRadius))
                     {
                         _isOpen = true;
                     }
                 }
                 else
                 {
-                    if (Raylib.CheckCollisionCircleRec(m.Position, m.Template.PhysicsRadius, World.GetTileBounds(X, Y)))
+                    if (Raylib.CheckCollisionCircleRec(m.Position, (float)m.Template.PhysicsRadius, World.GetTileBounds(X, Y)))
                     {
                         _isOpen = true;
                     }
@@ -58,7 +58,7 @@ public class Door : Structure
         {
             foreach (Minion m in World.Minions)
             {
-                if (m.Team == Team && Raylib.CheckCollisionCircles(position, _template.Range, m.Position, m.Template.PhysicsRadius))
+                if (m.Team == Team && Raylib.CheckCollisionCircles(position, (float)_template.Range, m.Position, (float)m.Template.PhysicsRadius))
                 {
                     _isOpen = true;
                 }

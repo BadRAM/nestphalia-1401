@@ -52,6 +52,7 @@ public static class BattleScene
         DrawText($"FPS: {GetFPS()}", 12, 16, 20, WHITE);
         DrawText($"Wave: {World.Wave}", 12, 32, 20, WHITE);
         DrawText($"Minions: {World.Minions.Count}", 12, 48, 20, WHITE);
+        DrawText($"Path Queue Length: {PathFinder.GetQueueLength()}", 12, 64, 20, WHITE);
         // DrawText($"Projectiles: {World.Projectiles.Count}", 12, 64, 20, WHITE);
         
         EndDrawing();

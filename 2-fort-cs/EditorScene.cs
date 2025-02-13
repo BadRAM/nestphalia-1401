@@ -102,25 +102,25 @@ public static class EditorScene
 
         if (_creativeMode)
         {
-            if (RayGui.GuiButton(new Rectangle(10, 620, 400, 200), "Save") != 0) Resources.SaveFort("creativeFort");
+            if (RayGui.GuiButton(new Rectangle(10, 550, 400, 50), "Save") != 0) Resources.SaveFort("creativeFort");
         }
         else
         {
-            if (RayGui.GuiButton(new Rectangle(10, 620, 400, 200), "Save and Exit") != 0)
+            if (RayGui.GuiButton(new Rectangle(10, 550, 400, 50), "Save and Exit") != 0)
             {
                 _fort.SaveBoard();
                 Program.Campaign.Start();
             }
         }
 
-        if (RayGui.GuiButton(new Rectangle(650, 10, 500, 50), "Erase") != 0) _brush = null;
+        if (RayGui.GuiButton(new Rectangle(650, 10, 500, 36), "Erase") != 0) _brush = null;
 
         //Console.WriteLine(RayGui.GuiTextBox(new Rectangle(10, 620, 400, 200), "Fort Name:", 12, true));
         int y = 0;
         for (int i = 0; i < Assets.Structures.Count; i++)
         {
             if (!_creativeMode && Assets.Structures[i].LevelRequirement > Program.Campaign.Level) continue;
-            if (RayGui.GuiButton(new Rectangle(650, y * 50 + 60, 500, 50), Assets.Structures[i].Name) != 0)
+            if (RayGui.GuiButton(new Rectangle(650, y * 40 + 60, 500, 36), Assets.Structures[i].Name) != 0)
             {
                 _brush = Assets.Structures[i];
             }
@@ -129,16 +129,16 @@ public static class EditorScene
 
         if (!_creativeMode)
         {
-            DrawText($"Bug Dollars: ${Program.Campaign.Money}", 200, 600, 10, WHITE);
+            DrawText($"Bug Dollars: ${Program.Campaign.Money}", 200, 540, 10, WHITE);
         }
 
         if (_brush == null)
         {
-            DrawText($"ERASING", 10, 600, 10, WHITE);
+            DrawText($"ERASING", 10, 540, 10, WHITE);
         }
         else
         {
-            DrawText($"Placing {_brush.Name}", 10, 600, 10, WHITE);
+            DrawText($"Placing {_brush.Name}", 10, 540, 10, WHITE);
         }
 
         

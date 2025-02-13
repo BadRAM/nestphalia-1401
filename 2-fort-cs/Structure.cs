@@ -7,11 +7,11 @@ public class StructureTemplate
 {
     public string Name;
     public Texture Texture;
-    public float MaxHealth;
+    public double MaxHealth;
     public int LevelRequirement;
-    public float Price;
+    public double Price;
     
-    public StructureTemplate(string name, Texture texture, float maxHealth, float price, int levelRequirement = 0)
+    public StructureTemplate(string name, Texture texture, double maxHealth, double price, int levelRequirement = 0)
     {
         Name = name;
         Texture = texture;
@@ -33,7 +33,7 @@ public class Structure
     private protected int Y;
     private protected Vector2 position;
     
-    public float Health;
+    public double Health;
     public TeamName Team;
 
     public Structure(StructureTemplate template, int x, int y)
@@ -51,6 +51,8 @@ public class Structure
 
     public virtual void Update() { }
 
+    public virtual void PreWaveEffect() { }
+    
     public virtual void WaveEffect() { }
 
     public virtual void Draw(int x, int y)
@@ -69,7 +71,7 @@ public class Structure
         return Team;
     }
 
-    public virtual void Hurt(float damage)
+    public virtual void Hurt(double damage)
     {
         Health -= damage;
         if (Health <= 0)

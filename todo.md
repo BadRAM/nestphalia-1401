@@ -2,7 +2,6 @@
 
 Programming todo:
 =================
-- Better texture & asset loading
 - Proper time compensation, fix the various lag bugs
 - Better UI
  - Edit mode
@@ -11,13 +10,20 @@ Programming todo:
   - 
 - Fort sharing
 - Minions face the direction they're moving
+- Collision detection pruning
+- Population limit?
+----- Version 0.3 releases here -----
+- Better texture & asset loading
 - Minion hatred and fear
+- More better UI
+ - Menus with designed layouts and backgrounds
+ - Sprite buttons
+ - Tile Icons in edit mode
 - More utility structures
 - Minion vs Minion melee
 - proper render order/z levels
 - Fix minion collision with wall corners
 - Pause button that works
-
 
 ----- Postponed to team bug fort 2 -----
 - Multitile structures
@@ -28,8 +34,10 @@ Design todo:
 ============
 - Final bug fort 1 content update
  - Towers
-  - AOE tower - Bomb mortar?
+  - AOE tower - Bomb mortar? Gas?
   - Slow tower - 
+  - Lightning tower?
+  - 
  - Minions
   - Grasshopper
   - Frog

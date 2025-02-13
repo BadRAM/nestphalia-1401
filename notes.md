@@ -33,3 +33,5 @@ bee
 beetle
 sniper
 heavy wall
+
+framerate on the bunker wave 3: 32

@@ -6,10 +6,10 @@ namespace _2_fort_cs;
 public class ProjectileTemplate
 {
     public Texture Texture;
-    public float Damage;
-    public float Speed;
+    public double Damage;
+    public double Speed;
 
-    public ProjectileTemplate(Texture texture, float damage, float speed)
+    public ProjectileTemplate(Texture texture, double damage, double speed)
     {
         Damage = damage;
         Speed = speed;
@@ -47,7 +47,7 @@ public class Projectile
     {
         if (MinionTargetted)
         {
-            Position = Position.MoveTowards(TargetMinion.Position, Template.Speed / 60f);
+            Position = Position.MoveTowards(TargetMinion.Position, Template.Speed * Time.DeltaTime);
             if (Position == TargetMinion.Position)
             {
                 TargetMinion.Hurt(Template.Damage);
@@ -56,7 +56,7 @@ public class Projectile
         }
         else
         {
-            Position = Position.MoveTowards(TargetPos, Template.Speed / 60f);
+            Position = Position.MoveTowards(TargetPos, Template.Speed * Time.DeltaTime);
             if (Position == TargetPos)
             {
                 World.GetTileAtPos(Position)?.Hurt(Template.Damage);

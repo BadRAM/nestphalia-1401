@@ -6,8 +6,8 @@ namespace _2_fort_cs;
 
 public class Campaign
 {
-    [JsonInclude] public float Money = 1000;
-    [JsonInclude] public float Battles;
+    [JsonInclude] public double Money = 1000;
+    [JsonInclude] public double Battles;
     [JsonInclude] public int Level;
     [JsonInclude] public List<FloorTileTemplate> Inventory = new List<FloorTileTemplate>();
     [JsonInclude] public Fort Fort1 = new Fort();
@@ -49,7 +49,7 @@ public class Campaign
         
         Raylib.DrawText(_outcomeText, 10, 400, 16, Raylib.WHITE);
 
-        Raylib.DrawText($"Bug Dollars: ${Money}", 10, 600, 16, Raylib.WHITE);
+        Raylib.DrawText($"Bug Dollars: ${Money}", 10, 350, 16, Raylib.WHITE);
 
         
         if (RayGui.GuiButton(new Rectangle(20,   50, 200, 40), "Edit Fort") != 0) EditorScene.Start(Fort1);
@@ -66,8 +66,8 @@ public class Campaign
 
         if (_selectedLevel != -1)
         {
-            Raylib.DrawText($"{Resources.CampaignLevels[_selectedLevel].Name}\nTravel cost: {_selectedLevel * 250} \nPrize: {(_selectedLevel+1) * 1000}", 960, 550, 16, Raylib.WHITE);
-            if (Money >= _selectedLevel * 250 && RayGui.GuiButton(new Rectangle(960, 650, 200, 40), "To Battle!") != 0)
+            Raylib.DrawText($"{Resources.CampaignLevels[_selectedLevel].Name}\nTravel cost: {_selectedLevel * 250} \nPrize: {(_selectedLevel+1) * 1000}", 760, 400, 16, Raylib.WHITE);
+            if (Money >= _selectedLevel * 250 && RayGui.GuiButton(new Rectangle(760, 500, 200, 40), "To Battle!") != 0)
             {
                 Money -= _selectedLevel * 250;
                 BattleScene.Start(Fort1, Resources.CampaignLevels[_selectedLevel]);

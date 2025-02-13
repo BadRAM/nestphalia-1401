@@ -20,7 +20,7 @@ static class Program
 	
     public static void Main()
     {
-        InitWindow(1200, 900, "2-fort");
+        InitWindow(1200, 600, "2-fort");
         SetTargetFPS(60);
         
         // Load a texture from the resources directory
@@ -30,6 +30,8 @@ static class Program
         IntroScene.Start();
         while (!WindowShouldClose())
         {
+	        Time.UpdateTime();
+
 	        switch (CurrentScene)
 	        {
 		        case Scene.Intro:

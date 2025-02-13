@@ -13,15 +13,17 @@ public static class World
     public static List<Minion> MinionsToRemove = new List<Minion>();
     public static List<Projectile> Projectiles = new List<Projectile>();
     public static List<Projectile> ProjectilesToRemove = new List<Projectile>();
-    public static float WaveDuration = 20f;
-    public static float FirstWaveTime = 0f;
+    public static double WaveDuration = 20;
+    public static bool PreWave;
+    public static double PreWaveOffset = 1;
+    public static double FirstWaveTime = 0;
     public static int Wave = 0;
     
     public static void Initialize(bool sandbox)
     {
         Minions.Clear();
         Projectiles.Clear();
-        FirstWaveTime = (float)Raylib.GetTime() - 5f;
+        FirstWaveTime = Time.Scaled;
         Wave = 0;
 
         for (int x = 0; x < BoardWidth; x++)
@@ -43,8 +45,6 @@ public static class World
                 _board[x,y] = null;
             }
         }
-    
-
         
         // for (int i = 0; i < 1; i++)
         // {
@@ -77,18 +77,37 @@ public static class World
     
     public static void Update()
     {
-        if (Raylib.GetTime() - FirstWaveTime > WaveDuration * Wave)
+        if (PreWave)
         {
-            Wave++;
-            
-            for (int x = 0; x < BoardWidth; ++x)
+            if (Time.Scaled - (FirstWaveTime + PreWaveOffset) > WaveDuration * Wave)
             {
-                for (int y = 0; y < BoardHeight; ++y)
+                Wave++;
+                PreWave = false;
+                for (int x = 0; x < BoardWidth; ++x)
                 {
-                    _board[x, y]?.WaveEffect();
+                    for (int y = 0; y < BoardHeight; ++y)
+                    {
+                        _board[x, y]?.WaveEffect();
+                    }
                 }
             }
         }
+        else
+        {
+            if (Time.Scaled - FirstWaveTime > WaveDuration * Wave)
+            {
+                PreWave = true;
+                for (int x = 0; x < BoardWidth; ++x)
+                {
+                    for (int y = 0; y < BoardHeight; ++y)
+                    {
+                        _board[x, y]?.PreWaveEffect();
+                    }
+                }
+            }
+        }
+        
+        PathFinder.ServeQueue(10);
         
         for (int x = 0; x < BoardWidth; ++x)
         {
@@ -98,9 +117,14 @@ public static class World
             }
         }
         
+        Minions = Minions.OrderBy(o=>o.Position.X).ToList();
         foreach (Minion m in Minions)
         {
             m.Update();
+        }
+        for (int i = 0; i < Minions.Count; i++)
+        {
+            Minions[i].PlanCollision(i);
         }
         foreach (Minion m in Minions)
         {

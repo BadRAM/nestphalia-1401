@@ -105,8 +105,8 @@ public static class Assets
                     3
                 ), 
                 5, 
-                1f,
-                0.25f
+                1,
+                0.25
             )
         );
         
@@ -133,8 +133,8 @@ public static class Assets
                     6
                 ), 
                 2, 
-                0.5f,
-                1f
+                0.5,
+                1
             )
         );
         
@@ -161,8 +161,8 @@ public static class Assets
                     5
                 ), 
                 5, 
-                1f,
-                0.25f
+                1,
+                0.25
             )
         );  
         
@@ -189,8 +189,8 @@ public static class Assets
                     10
                 ), 
                 1, 
-                0.25f,
-                6f
+                0.25,
+                6
             )
         );
         
@@ -218,7 +218,7 @@ public static class Assets
                 ), 
                 0,
                 0,
-                0.25f
+                0.25
             )
         );
     }

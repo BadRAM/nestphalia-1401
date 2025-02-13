@@ -14,13 +14,13 @@ public class TurretTemplate : StructureTemplate
         Flyer
     }
     
-    public float Range;
+    public double Range;
     public ProjectileTemplate Projectile;
     // public float Damage;
-    public float RateOfFire;
+    public double RateOfFire;
     public TargetSelector TargetMode;
 
-    public TurretTemplate(string name, Texture texture, float maxHealth, float price, int levelRequirement, float range, ProjectileTemplate projectile, float rateOfFire, TargetSelector targetMode = TargetSelector.Nearest) : base(name, texture, maxHealth, price, levelRequirement)
+    public TurretTemplate(string name, Texture texture, double maxHealth, double price, int levelRequirement, double range, ProjectileTemplate projectile, double rateOfFire, TargetSelector targetMode = TargetSelector.Nearest) : base(name, texture, maxHealth, price, levelRequirement)
     {
         Range = range;
         Projectile = projectile;
@@ -37,7 +37,7 @@ public class TurretTemplate : StructureTemplate
 
 public class Turret : Structure
 {
-    private float lastFireTime;
+    private double lastFireTime;
     private TurretTemplate _template;
     
     public Turret(TurretTemplate template, int x, int y) : base(template, x, y)
@@ -48,16 +48,16 @@ public class Turret : Structure
     public override void Update()
     {
         base.Update();
-        if (Raylib.GetTime() - lastFireTime > 60f/_template.RateOfFire)
+        if (Time.Scaled - lastFireTime > 60/_template.RateOfFire)
         {
             if (_template.TargetMode == TurretTemplate.TargetSelector.Nearest)
             {
                 Minion? nearest = null;
-                float minDist = float.MaxValue;
+                double minDist = double.MaxValue;
                 for (int i = 0; i < World.Minions.Count; i++)
                 {
                     if (World.Minions[i].Team == Team) continue;
-                    float d = Vector2.Distance(World.Minions[i].Position, position);
+                    double d = Vector2.Distance(World.Minions[i].Position, position);
                     if (d < minDist)
                     {
                         minDist = d;
@@ -68,7 +68,7 @@ public class Turret : Structure
                 if (minDist < _template.Range && nearest != null)
                 {
                     World.Projectiles.Add(new Projectile(_template.Projectile, position, nearest));
-                    lastFireTime = (float)Raylib.GetTime();
+                    lastFireTime = Time.Scaled;
                 }
             }
             else if (_template.TargetMode == TurretTemplate.TargetSelector.Random)
@@ -85,7 +85,7 @@ public class Turret : Structure
                 if (ValidTargets.Count > 0)
                 {
                     World.Projectiles.Add(new Projectile(_template.Projectile, position, ValidTargets[Random.Shared.Next(ValidTargets.Count)]));
-                    lastFireTime = (float)Raylib.GetTime();
+                    lastFireTime = Time.Scaled;
                 }
             }
         }

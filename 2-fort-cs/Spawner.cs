@@ -6,10 +6,10 @@ public class SpawnerTemplate : StructureTemplate
 {
     public MinionTemplate Minion;
     public int WaveSize;
-    public float WaveGrowth;
-    public float TimeBetweenSpawns;
+    public double WaveGrowth;
+    public double TimeBetweenSpawns;
     
-    public SpawnerTemplate(string name, Texture texture, float maxHealth, float price, int levelRequirement, MinionTemplate minion, int waveSize, float waveGrowth, float timeBetweenSpawns) : base(name, texture, maxHealth, price, levelRequirement)
+    public SpawnerTemplate(string name, Texture texture, double maxHealth, double price, int levelRequirement, MinionTemplate minion, int waveSize, double waveGrowth, double timeBetweenSpawns) : base(name, texture, maxHealth, price, levelRequirement)
     {
         Minion = minion;
         WaveSize = waveSize;
@@ -26,29 +26,38 @@ public class SpawnerTemplate : StructureTemplate
 public class Spawner : Structure
 {
     private SpawnerTemplate _template;
-    private float _lastSpawnTime;
+    private double _lastSpawnTime;
     private int _spawnsRemaining;
     private Int2D _targetTile;
+    private Path _path;
     
     public Spawner(SpawnerTemplate template, int x, int y) : base(template, x, y)
     {
         _template = template;
+        _path = new Path(new Int2D(x, y), new Int2D(x, y), Team);
     }
     
     public override void Update()
     {
         base.Update();
-        if (_spawnsRemaining > 0 && Raylib.GetTime() - _lastSpawnTime > _template.TimeBetweenSpawns)
+        if (_spawnsRemaining > 0 && Time.Scaled - _lastSpawnTime > _template.TimeBetweenSpawns)
         {
-            _template.Minion.Instantiate(position, Team, _targetTile);
+            _template.Minion.Instantiate(position, Team, _path.Clone());
             _spawnsRemaining--;
-            _lastSpawnTime = (float)Raylib.GetTime();
+            _lastSpawnTime = Time.Scaled;
         }
     }
 
-    public override void WaveEffect()
+    public override void PreWaveEffect()
     {
         Retarget();
+        _path.Reset();
+        _path.Destination = _targetTile;
+        PathFinder.RequestPath(_path);
+    }
+    
+    public override void WaveEffect()
+    {
         _spawnsRemaining += _template.WaveSize + (int)(World.Wave * _template.WaveGrowth);
     }
 
