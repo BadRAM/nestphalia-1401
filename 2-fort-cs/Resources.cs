@@ -19,69 +19,18 @@ public class SpriteResource
 
 public static class Resources
 {
-    //public static Texture MissingTexture;
-    public static Texture wabbit;
-    public static Texture ant;
-    public static Texture smant;
-    public static Texture snail;
-    public static Texture bee;
-    public static Texture beetle;
-    public static Texture wall;
-    public static Texture wall2;
-    public static Texture doorOpen;
-    public static Texture doorClosed;
-    public static Texture floor1;
-    public static Texture floor2;
-    public static Texture bullet;
-    public static Texture turret;
-    public static Texture turret2;
-    public static Texture turret3;
-    //public static Texture turret4;
-    public static Texture spawner;
-    public static Texture spawner2;
-    public static Texture spawner3;
-    public static Texture spawner4;
-    public static Texture flag1;
-    public static Texture flag2;
-    public static Texture blank;
-    // public static List<SpriteResource> Sprites;
+    public static Texture MissingTexture;
+    public static List<SpriteResource> Sprites = new List<SpriteResource>();
     public static List<Fort> CampaignLevels = new List<Fort>();
     
     public static void Load()
     {
-        // MissingTexture = LoadTexture()
-        //
-        // string[] forts = Directory.GetFiles(Directory.GetCurrentDirectory() + "/forts/");
-        //
-        // foreach (string path in Directory.GetFiles(Directory.GetCurrentDirectory() + "/resources/sprites"))
-        // {
-        //     Sprites.Add(new SpriteResource(Path.GetFileNameWithoutExtension(path), LoadTexture("resources/sprites/" + Path.GetFileName(path))));
-        // }
+        MissingTexture = LoadTexture("resources/sprites/missingtex.png");
         
-        wabbit     = LoadTexture("resources/wabbit_alpha.png");
-        ant        = LoadTexture("resources/ant.png");
-        smant      = LoadTexture("resources/smant.png");
-        snail      = LoadTexture("resources/snail.png");
-        bee        = LoadTexture("resources/bee.png");
-        beetle     = LoadTexture("resources/beetle.png");
-        wall       = LoadTexture("resources/wall.png");
-        wall2      = LoadTexture("resources/wall2.png");
-        doorClosed = LoadTexture("resources/doorClosed.png");
-        doorOpen   = LoadTexture("resources/doorOpen.png");
-        floor1     = LoadTexture("resources/floor1.png");
-        floor2     = LoadTexture("resources/floor2.png");
-        bullet     = LoadTexture("resources/bullet.png");
-        turret     = LoadTexture("resources/turret.png");
-        turret2    = LoadTexture("resources/turret2.png");
-        turret3    = LoadTexture("resources/turret3.png");
-        //turret4  = LoadTexture("resources/turret4.png");
-        spawner    = LoadTexture("resources/spawner.png");
-        spawner2   = LoadTexture("resources/spawner2.png");
-        spawner3   = LoadTexture("resources/spawner3.png");
-        spawner4   = LoadTexture("resources/spawner4.png");
-        flag1      = LoadTexture("resources/flag1.png");
-        flag2      = LoadTexture("resources/flag2.png");
-        blank      = LoadTexture("resources/clear.png");
+        foreach (string path in Directory.GetFiles(Directory.GetCurrentDirectory() + "/resources/sprites"))
+        {
+            Sprites.Add(new SpriteResource(Path.GetFileNameWithoutExtension(path), LoadTexture("resources/sprites/" + Path.GetFileName(path))));
+        }
         
         CampaignLevels.Add(LoadFort("/resources/level1.fort"));
         CampaignLevels.Add(LoadFort("/resources/level2.fort"));
@@ -93,19 +42,18 @@ public static class Resources
         CampaignLevels.Add(LoadFort("/resources/level8.fort"));
     }
     
-    // public static Texture GetTextureByName(string name)
-    // {
-    //     return Sprites.FirstOrDefault(x => x.Name == name);
-    // }
+    public static Texture GetTextureByName(string name)
+    {
+        SpriteResource? s = Sprites.FirstOrDefault(x => x.Name == name);
+        return s?.Tex ?? MissingTexture;
+    }
 
     public static void Unload()
     {
-        // UnloadTexture(wabbit);
-        // UnloadTexture(wall);
-        // UnloadTexture(floor1);
-        // UnloadTexture(floor2);
-        // UnloadTexture(bullet);
-        // UnloadTexture(turret);
+        foreach (SpriteResource spriteResource in Sprites)
+        {
+            UnloadTexture(spriteResource.Tex);
+        }
     }
 
     public static void SaveFort(string fortName)
