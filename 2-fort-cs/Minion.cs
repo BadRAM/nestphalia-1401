@@ -32,9 +32,9 @@ public class MinionTemplate
         PhysicsRadius = physicsRadius;
     }
 
-    public void Instantiate(Vector2 position, TeamName team, Path path)
+    public void Instantiate(Vector2 position, TeamName team, NavPath navPath)
     {
-        World.Minions.Add(new Minion(this, position, team, path));
+        World.Minions.Add(new Minion(this, position, team, navPath));
     }
 }
 
@@ -49,9 +49,9 @@ public class Minion
     //protected Int2D _targetTile;
     private double _lastFiredTime;
     public Vector2 CollisionOffset;
-    private Path _path;
+    private NavPath _navPath;
 
-    public Minion(MinionTemplate template, Vector2 position, TeamName team, Path path)
+    public Minion(MinionTemplate template, Vector2 position, TeamName team, NavPath navPath)
     {
         Template = template;
         Position = position;
@@ -60,7 +60,7 @@ public class Minion
         Team = team;
         Health = Template.MaxHealth;
         IsAlive = true;
-        _path = path;
+        _navPath = navPath;
         //_path = new PathFinder(this);
         //_path.FindPath(_targetTile);
     }
@@ -73,11 +73,8 @@ public class Minion
         
         // if we're at our final destination, ask for a new path. (Don't ask for a new path if we already have)
         
-        
-        
-        
         Structure? t = World.GetTileAtPos(Position.MoveTowards(_target, Template.Range)); // TODO: make this respect minion range
-        if (Template.IsFlying && t != World.GetTile(_path.Destination)) t = null; // cheeky intercept so flyers ignore all but their target.
+        if (Template.IsFlying && t != World.GetTile(_navPath.Destination)) t = null; // cheeky intercept so flyers ignore all but their target.
 
         if (t != null && t.IsSolid() && t.GetTeam() != Team)
         {
@@ -89,7 +86,7 @@ public class Minion
         }
         else if (Template.IsFlying)
         {
-            _target = World.GetTileCenter(_path.Destination);
+            _target = World.GetTileCenter(_navPath.Destination);
             Position = Position.MoveTowards(_target, Template.Speed * Time.DeltaTime);
             if (Position == _target)
             {
@@ -98,12 +95,12 @@ public class Minion
         }
         else
         {
-            if (_path.Found && _path.TargetReached(Position))
+            if (_navPath.Found && _navPath.TargetReached(Position))
             {
                 Retarget();
             }
             
-            _target = World.GetTileCenter(_path.NextTile(Position));
+            _target = World.GetTileCenter(_navPath.NextTile(Position));
             Position = Position.MoveTowards(_target, Template.Speed * Time.DeltaTime);
         }
     }
@@ -194,18 +191,18 @@ public class Minion
             return;
         }
 
-        _path.Found = false;
-        _path.Waypoints.Clear();
-        _path.Start = World.PosToTilePos(Position);
-        _path.Destination = targets[Random.Shared.Next(targets.Count)];
+        _navPath.Found = false;
+        _navPath.Waypoints.Clear();
+        _navPath.Start = World.PosToTilePos(Position);
+        _navPath.Destination = targets[Random.Shared.Next(targets.Count)];
 
         if (Template.IsFlying)
         {
-            _path.Found = true;
+            _navPath.Found = true;
         }
         else
         {
-            PathFinder.RequestPath(_path);
+            PathFinder.RequestPath(_navPath);
         }
     }
 
@@ -214,22 +211,26 @@ public class Minion
         Color tint = Raylib.WHITE;
         if (Team == TeamName.Player) tint = Raylib.BLUE;
         if (Team == TeamName.Enemy) tint = Raylib.RED;
-        Raylib.DrawTexture(Template.Texture, (int)Position.X - Template.Texture.width/2, (int)Position.Y - Template.Texture.width/2, tint);
+        Vector2 pos = new Vector2((int)Position.X - Template.Texture.width / 2, (int)Position.Y - Template.Texture.width / 2);
+        bool flip = _target.X > pos.X;
+        Rectangle source = new Rectangle(flip ? Template.Texture.width : 0, 0, flip ? Template.Texture.width : -Template.Texture.width, Template.Texture.height);
+        //Raylib.DrawTexture(Template.Texture, (int)Position.X - Template.Texture.width/2, (int)Position.Y - Template.Texture.width/2, tint);
+        Raylib.DrawTextureRec(Template.Texture, source, pos, tint);
         
         // Debug, shows path
         if (Raylib.CheckCollisionPointCircle(Raylib.GetMousePosition(), Position, Template.PhysicsRadius))
         {
             Vector2 path = Position;
-            foreach (Int2D i in _path.Waypoints)
+            foreach (Int2D i in _navPath.Waypoints)
             {
                 Vector2 v = World.GetTileCenter(i);
                 Raylib.DrawLine((int)path.X, (int)path.Y, (int)v.X, (int)v.Y, Raylib.LIME);
                 path = v;
             }
 
-            if (_path.Waypoints.Count == 0)
+            if (_navPath.Waypoints.Count == 0)
             {
-                Vector2 v = World.GetTileCenter(_path.Destination);
+                Vector2 v = World.GetTileCenter(_navPath.Destination);
                 Raylib.DrawLine((int)path.X, (int)path.Y, (int)v.X, (int)v.Y, Raylib.LIME);
             }
         }

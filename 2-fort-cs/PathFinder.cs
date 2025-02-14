@@ -4,7 +4,7 @@ namespace _2_fort_cs;
 
 public static class PathFinder
 {
-    private static List<Path> _pathQueue = new List<Path>();
+    private static List<NavPath> _pathQueue = new List<NavPath>();
     
     private class PathNode : IComparable<PathNode>
     {
@@ -24,9 +24,9 @@ public static class PathFinder
         }
     }
 
-    public static void RequestPath(Path path)
+    public static void RequestPath(NavPath navPath)
     {
-        _pathQueue.Add(path);
+        _pathQueue.Add(navPath);
     }
 
     public static void ServeQueue(int max)
@@ -39,9 +39,9 @@ public static class PathFinder
         }
     }
     
-    public static void FindPath(Path path)
+    public static void FindPath(NavPath navPath)
     {
-        if (path.Found)
+        if (navPath.Found)
         {
             Console.WriteLine($"FindPath called on a path that's already found, something's wrong.");
             return;
@@ -53,7 +53,7 @@ public static class PathFinder
         
         List<PathNode> nodesToConsider = new List<PathNode>();
         
-        PathNode n = new PathNode(path.Start);
+        PathNode n = new PathNode(navPath.Start);
         nodesToConsider.Add(n);
         
         int count = 0;
@@ -64,7 +64,7 @@ public static class PathFinder
             // Abort if we ran out of options.
             if (nodesToConsider.Count == 0)
             {
-                n = new PathNode(path.Start);
+                n = new PathNode(navPath.Start);
                 Console.WriteLine("Couldn't find a path!");
                 break;
             }
@@ -83,7 +83,7 @@ public static class PathFinder
             nodesToConsider.RemoveAt(mindex);
             
             // Break if we're done
-            if (n.Pos == path.Destination) break;
+            if (n.Pos == navPath.Destination) break;
             
             // set cheapest node into grid
             nodeGrid[n.Pos.X,n.Pos.Y] = n;
@@ -95,28 +95,28 @@ public static class PathFinder
             // left
             if (n.Pos.X-1 >= 0 && nodeGrid[n.Pos.X-1,n.Pos.Y] == null)
             {
-                PathNode? nn = WeightedNode(n, n.Pos.X-1, n.Pos.Y, 1, path.Team);
+                PathNode? nn = WeightedNode(n, n.Pos.X-1, n.Pos.Y, 1, navPath.Team);
                 if (nn != null) nodesToConsider.Add(nn);
             }
             
             // right
             if (n.Pos.X+1 < World.BoardWidth && nodeGrid[n.Pos.X+1,n.Pos.Y] == null)
             {
-                PathNode? nn = WeightedNode(n, n.Pos.X+1, n.Pos.Y, 1, path.Team);
+                PathNode? nn = WeightedNode(n, n.Pos.X+1, n.Pos.Y, 1, navPath.Team);
                 if (nn != null) nodesToConsider.Add(nn);
             }
             
             // up
             if (n.Pos.Y-1 >= 0 && nodeGrid[n.Pos.X,n.Pos.Y-1] == null)
             {
-                PathNode? nn = WeightedNode(n, n.Pos.X, n.Pos.Y-1, 1, path.Team);
+                PathNode? nn = WeightedNode(n, n.Pos.X, n.Pos.Y-1, 1, navPath.Team);
                 if (nn != null) nodesToConsider.Add(nn);
             }
             
             // down
             if (n.Pos.Y+1 < World.BoardHeight && nodeGrid[n.Pos.X,n.Pos.Y+1] == null)
             {
-                PathNode? nn = WeightedNode(n, n.Pos.X, n.Pos.Y+1, 1, path.Team);
+                PathNode? nn = WeightedNode(n, n.Pos.X, n.Pos.Y+1, 1, navPath.Team);
                 if (nn != null) nodesToConsider.Add(nn);
             }
             
@@ -127,7 +127,7 @@ public static class PathFinder
                 && !(World.GetTile(n.Pos.X, n.Pos.Y-1)?.IsSolid() ?? false)
                 && nodeGrid[n.Pos.X - 1, n.Pos.Y - 1] == null)
             {
-                PathNode? nn = WeightedNode(n, n.Pos.X-1, n.Pos.Y-1, 1.5f, path.Team);
+                PathNode? nn = WeightedNode(n, n.Pos.X-1, n.Pos.Y-1, 1.5f, navPath.Team);
                 if (nn != null) nodesToConsider.Add(nn);
             }
             
@@ -138,7 +138,7 @@ public static class PathFinder
                 && !(World.GetTile(n.Pos.X, n.Pos.Y-1)?.IsSolid() ?? false)
                 && nodeGrid[n.Pos.X + 1, n.Pos.Y - 1] == null)
             {
-                PathNode? nn = WeightedNode(n, n.Pos.X+1, n.Pos.Y-1, 1.5f, path.Team);
+                PathNode? nn = WeightedNode(n, n.Pos.X+1, n.Pos.Y-1, 1.5f, navPath.Team);
                 if (nn != null) nodesToConsider.Add(nn);
             }
             
@@ -149,7 +149,7 @@ public static class PathFinder
                 && !(World.GetTile(n.Pos.X, n.Pos.Y+1)?.IsSolid() ?? false)
                 && nodeGrid[n.Pos.X - 1, n.Pos.Y + 1] == null)
             {
-                PathNode? nn = WeightedNode(n, n.Pos.X-1, n.Pos.Y+1, 1.5f, path.Team);
+                PathNode? nn = WeightedNode(n, n.Pos.X-1, n.Pos.Y+1, 1.5f, navPath.Team);
                 if (nn != null) nodesToConsider.Add(nn);
             }
             
@@ -160,7 +160,7 @@ public static class PathFinder
                 && !(World.GetTile(n.Pos.X, n.Pos.Y+1)?.IsSolid() ?? false)
                 && nodeGrid[n.Pos.X + 1, n.Pos.Y + 1] == null)
             {
-                PathNode? nn = WeightedNode(n, n.Pos.X+1, n.Pos.Y+1, 1.5f, path.Team);
+                PathNode? nn = WeightedNode(n, n.Pos.X+1, n.Pos.Y+1, 1.5f, navPath.Team);
                 if (nn != null) nodesToConsider.Add(nn);
             }
         }
@@ -169,12 +169,12 @@ public static class PathFinder
 
         while (true)
         {
-            path.Waypoints.Insert(0, n.Pos);
+            navPath.Waypoints.Insert(0, n.Pos);
             if (n.PrevNode == null) break;
             n = n.PrevNode;
         }
 
-        path.Found = true;
+        navPath.Found = true;
     }
 
     private static PathNode? WeightedNode(PathNode prevNode, int x, int y, double weight, TeamName team)
@@ -200,7 +200,7 @@ public static class PathFinder
     }
 }
 
-public class Path
+public class NavPath
 {
     public bool Found = false; 
     public Int2D Start;
@@ -208,7 +208,7 @@ public class Path
     public TeamName Team;
     public List<Int2D> Waypoints = new List<Int2D>();
 
-    public Path(Int2D start, Int2D destination, TeamName team)
+    public NavPath(Int2D start, Int2D destination, TeamName team)
     {
         Start = start;
         Destination = destination;
@@ -233,9 +233,9 @@ public class Path
         return World.PosToTilePos(position) == Destination;
     }
     
-    public Path Clone()
+    public NavPath Clone()
     {
-        Path p = new Path(Start, Destination, Team);
+        NavPath p = new NavPath(Start, Destination, Team);
         p.Found = Found;
         p.Waypoints = new List<Int2D>(Waypoints);
         return p;

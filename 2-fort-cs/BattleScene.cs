@@ -7,6 +7,8 @@ public static class BattleScene
 {
     // public static Fort PlayerFort;
     // public static Fort EnemyFort;
+    public static bool Pause;
+    public static bool CustomBattle;
 
     public static void Start(Fort playerFort, Fort enemyFort)
     {
@@ -27,18 +29,37 @@ public static class BattleScene
     public static void Update()
     {
         // ----- INPUT + GUI PHASE -----
-        
+
+        if (IsKeyPressed(KeyboardKey.KEY_P))
+        {
+            Pause = !Pause;
+            Time.TimeScale = Pause ? 0 : 1;
+        }
         
         // ----- WORLD UPDATE PHASE -----
 
-        World.Update();
-
+        if (!Pause)
+        {
+            World.Update();
+        }
+        
         TeamName winner = CheckWinner();
         if (winner != TeamName.None)
         {
-            Console.WriteLine($"{winner.ToString()} wins the battle!");
-            Program.Campaign.ReportBattleOutcome(winner == TeamName.Player);
-            Program.Campaign.Start();
+            if (CustomBattle)
+            {
+                CustomBattleMenu.Start();
+                CustomBattleMenu.OutcomeMessage =
+                    (winner == TeamName.Player
+                        ? CustomBattleMenu.PlayerFort?.Name ?? ""
+                        : CustomBattleMenu.EnemyFort?.Name ?? "") + " won the battle!";
+            }
+            else
+            {
+                Console.WriteLine($"{winner.ToString()} wins the battle!");
+                Program.Campaign.ReportBattleOutcome(winner == TeamName.Player);
+                Program.Campaign.Start();
+            }
         }
         
         
@@ -54,6 +75,7 @@ public static class BattleScene
         DrawText($"Minions: {World.Minions.Count}", 12, 48, 20, WHITE);
         DrawText($"Path Queue Length: {PathFinder.GetQueueLength()}", 12, 64, 20, WHITE);
         // DrawText($"Projectiles: {World.Projectiles.Count}", 12, 64, 20, WHITE);
+        if (Pause) DrawText("PAUSED", 520, 250, 40, WHITE);
         
         EndDrawing();
     }

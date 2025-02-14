@@ -21,6 +21,22 @@ public class SpawnerTemplate : StructureTemplate
     {
         return new Spawner(this, x, y);
     }
+    
+    public override string GetDescription()
+    {
+        return $"{Name}\n" +
+               $"${Price}\n" +
+               $"HP: {MaxHealth}\n" +
+               $"Wave Size: {WaveSize} + {WaveGrowth} per wave\n" +
+               $"Spawn Delay: {TimeBetweenSpawns}\n\n" +
+               $"{Minion.Name}\n" +
+               $"HP: {Minion.MaxHealth}\n" +
+               (Minion.Armor == 0 ? "" : $"Armor: {Minion.Armor}\n") +
+               (Minion.IsFlying ? "Flyer\n" : "") +
+               $"Speed: {Minion.Speed}\n" +
+               $"Damage: {Minion.Projectile.Damage} ({Minion.Projectile.Damage / (Minion.RateOfFire / 60)}/s)\n" +
+               $"Size: {Minion.PhysicsRadius*2}";
+    }
 }
 
 public class Spawner : Structure
@@ -29,12 +45,12 @@ public class Spawner : Structure
     private double _lastSpawnTime;
     private int _spawnsRemaining;
     private Int2D _targetTile;
-    private Path _path;
+    private NavPath _navPath;
     
     public Spawner(SpawnerTemplate template, int x, int y) : base(template, x, y)
     {
         _template = template;
-        _path = new Path(new Int2D(x, y), new Int2D(x, y), Team);
+        _navPath = new NavPath(new Int2D(x, y), new Int2D(x, y), Team);
     }
     
     public override void Update()
@@ -42,7 +58,7 @@ public class Spawner : Structure
         base.Update();
         if (_spawnsRemaining > 0 && Time.Scaled - _lastSpawnTime > _template.TimeBetweenSpawns)
         {
-            _template.Minion.Instantiate(position, Team, _path.Clone());
+            _template.Minion.Instantiate(position, Team, _navPath.Clone());
             _spawnsRemaining--;
             _lastSpawnTime = Time.Scaled;
         }
@@ -51,9 +67,9 @@ public class Spawner : Structure
     public override void PreWaveEffect()
     {
         Retarget();
-        _path.Reset();
-        _path.Destination = _targetTile;
-        PathFinder.RequestPath(_path);
+        _navPath.Reset();
+        _navPath.Destination = _targetTile;
+        PathFinder.RequestPath(_navPath);
     }
     
     public override void WaveEffect()

@@ -9,6 +9,8 @@ public static class EditorScene
     private static bool _creativeMode = false;
     private static StructureTemplate? _brush;
     private static Fort _fort;
+    private static string _saveMessage;
+    private static string _fortStats;
     
     public static void Start(Fort? fortToLoad = null, bool creativeMode = false)
     {
@@ -17,6 +19,7 @@ public static class EditorScene
         
         Program.CurrentScene = Scene.Editor;
         World.Initialize(true);
+        World.Camera.offset = new Vector2(300, 0);
         _fort.LoadToBoard();
     }
 
@@ -60,7 +63,7 @@ public static class EditorScene
 	        
         if (IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT))
         {
-            Int2D tilePos = World.PosToTilePos(GetMousePosition());
+            Int2D tilePos = World.GetMouseTilePos();
             
             if (tilePos.X >= 1 && tilePos.X < 21 && tilePos.Y >= 1 && tilePos.Y < 21 
                 && _brush != World.GetTile(tilePos)?.Template)
@@ -89,7 +92,7 @@ public static class EditorScene
 	        
         if (IsMouseButtonDown(MouseButton.MOUSE_BUTTON_RIGHT))
         {
-            Int2D tilePos = World.PosToTilePos(GetMousePosition());
+            Int2D tilePos = World.GetMouseTilePos();
             if (tilePos.X >= 1 && tilePos.X < 21 && tilePos.Y >= 1 && tilePos.Y < 21)
             {
                 _brush = World.GetTile(tilePos)?.Template;
@@ -102,25 +105,45 @@ public static class EditorScene
 
         if (_creativeMode)
         {
-            if (RayGui.GuiButton(new Rectangle(10, 550, 400, 50), "Save") != 0) Resources.SaveFort("creativeFort");
+            if (RayGui.GuiButton(new Rectangle(10, 550, 280, 50), "Exit") != 0) MenuScene.Start();
         }
         else
         {
-            if (RayGui.GuiButton(new Rectangle(10, 550, 400, 50), "Save and Exit") != 0)
+            if (RayGui.GuiButton(new Rectangle(10, 550, 280, 50), "Save and Exit") != 0)
             {
                 _fort.SaveBoard();
                 Program.Campaign.Start();
             }
         }
+        
+        if (RayGui.GuiButton(new Rectangle(300, 550, 280, 50), "Save to file") != 0)
+        {
+            int number = 1;
+            while (true)
+            {
+                if (!File.Exists(Directory.GetCurrentDirectory() + $"/forts/fort{number}.fort"))
+                {
+                    Resources.SaveFort($"forts/fort{number}");
+                    _saveMessage = $"Saved fort as fort{number}.fort";
+                    break;
+                }
+                if (number >= 999)
+                {
+                    _saveMessage = "Couldn't save!";
+                    break;
+                }
+                number++;
+            }
+        }
 
-        if (RayGui.GuiButton(new Rectangle(650, 10, 500, 36), "Erase") != 0) _brush = null;
+        if (RayGui.GuiButton(new Rectangle(890, 10, 300, 36), "Erase") != 0) _brush = null;
 
         //Console.WriteLine(RayGui.GuiTextBox(new Rectangle(10, 620, 400, 200), "Fort Name:", 12, true));
         int y = 0;
         for (int i = 0; i < Assets.Structures.Count; i++)
         {
             if (!_creativeMode && Assets.Structures[i].LevelRequirement > Program.Campaign.Level) continue;
-            if (RayGui.GuiButton(new Rectangle(650, y * 40 + 60, 500, 36), Assets.Structures[i].Name) != 0)
+            if (RayGui.GuiButton(new Rectangle(890, y * 40 + 60, 300, 36), Assets.Structures[i].Name) != 0)
             {
                 _brush = Assets.Structures[i];
             }
@@ -129,19 +152,50 @@ public static class EditorScene
 
         if (!_creativeMode)
         {
-            DrawText($"Bug Dollars: ${Program.Campaign.Money}", 200, 540, 10, WHITE);
+            DrawText($"Bug Dollars: ${Program.Campaign.Money}", 10, 520, 10, WHITE);
         }
 
         if (_brush == null)
         {
-            DrawText($"ERASING", 10, 540, 10, WHITE);
+            DrawText($"ERASING", 10, 10, 10, WHITE);
         }
         else
         {
-            DrawText($"Placing {_brush.Name}", 10, 540, 10, WHITE);
+            DrawText($"Placing {_brush.GetDescription()}", 10, 10, 10, WHITE);
         }
-
+        
+        DrawText(_saveMessage, 10, 480, 10, WHITE);
+        DrawText(GetFortStats(), 10, 350, 10, WHITE);
         
         EndDrawing();
+    }
+
+    private static string GetFortStats()
+    {
+        int structureCount = 0;
+        int turretCount = 0;
+        int utilityCount = 0;
+        int nestCount = 0;
+        double totalCost = 0;
+        
+        for (int x = 0; x < World.BoardWidth; ++x)
+        {
+            for (int y = 0; y < World.BoardHeight; ++y)
+            {
+                Structure? t = World.GetTile(x, y);
+                if (t == null) continue;
+                structureCount++;
+                totalCost += t.Template.Price;
+                if (t is Turret) turretCount++;
+                if (t is Door) utilityCount++;
+                if (t is Spawner) nestCount++;
+            }
+        }
+        
+        return $"{turretCount} Towers\n" +
+               $"{utilityCount} Utility\n" +
+               $"{nestCount} Nests\n" +
+               $"{structureCount} Total\n" +
+               $"{totalCost} Cost";
     }
 }

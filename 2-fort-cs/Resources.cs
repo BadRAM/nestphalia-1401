@@ -5,8 +5,21 @@ using static ZeroElectric.Vinculum.Raylib;
 
 namespace _2_fort_cs;
 
+public class SpriteResource
+{
+    public string Name;
+    public Texture Tex;
+
+    public SpriteResource(string name, Texture tex)
+    {
+        Name = name;
+        Tex = tex;
+    }
+}
+
 public static class Resources
 {
+    //public static Texture MissingTexture;
     public static Texture wabbit;
     public static Texture ant;
     public static Texture smant;
@@ -31,34 +44,44 @@ public static class Resources
     public static Texture flag1;
     public static Texture flag2;
     public static Texture blank;
+    // public static List<SpriteResource> Sprites;
     public static List<Fort> CampaignLevels = new List<Fort>();
     
     public static void Load()
     {
-        wabbit  = LoadTexture("resources/wabbit_alpha.png");
-        ant     = LoadTexture("resources/ant.png");
-        smant   = LoadTexture("resources/smant.png");
-        snail   = LoadTexture("resources/snail.png");
-        bee     = LoadTexture("resources/bee.png");
-        beetle  = LoadTexture("resources/beetle.png");
-        wall    = LoadTexture("resources/wall.png");
-        wall2   = LoadTexture("resources/wall2.png");
+        // MissingTexture = LoadTexture()
+        //
+        // string[] forts = Directory.GetFiles(Directory.GetCurrentDirectory() + "/forts/");
+        //
+        // foreach (string path in Directory.GetFiles(Directory.GetCurrentDirectory() + "/resources/sprites"))
+        // {
+        //     Sprites.Add(new SpriteResource(Path.GetFileNameWithoutExtension(path), LoadTexture("resources/sprites/" + Path.GetFileName(path))));
+        // }
+        
+        wabbit     = LoadTexture("resources/wabbit_alpha.png");
+        ant        = LoadTexture("resources/ant.png");
+        smant      = LoadTexture("resources/smant.png");
+        snail      = LoadTexture("resources/snail.png");
+        bee        = LoadTexture("resources/bee.png");
+        beetle     = LoadTexture("resources/beetle.png");
+        wall       = LoadTexture("resources/wall.png");
+        wall2      = LoadTexture("resources/wall2.png");
         doorClosed = LoadTexture("resources/doorClosed.png");
-        doorOpen = LoadTexture("resources/doorOpen.png");
-        floor1  = LoadTexture("resources/floor1.png");
-        floor2  = LoadTexture("resources/floor2.png");
-        bullet  = LoadTexture("resources/bullet.png");
-        turret  = LoadTexture("resources/turret.png");
-        turret2  = LoadTexture("resources/turret2.png");
-        turret3  = LoadTexture("resources/turret3.png");
+        doorOpen   = LoadTexture("resources/doorOpen.png");
+        floor1     = LoadTexture("resources/floor1.png");
+        floor2     = LoadTexture("resources/floor2.png");
+        bullet     = LoadTexture("resources/bullet.png");
+        turret     = LoadTexture("resources/turret.png");
+        turret2    = LoadTexture("resources/turret2.png");
+        turret3    = LoadTexture("resources/turret3.png");
         //turret4  = LoadTexture("resources/turret4.png");
-        spawner = LoadTexture("resources/spawner.png");
-        spawner2 = LoadTexture("resources/spawner2.png");
-        spawner3 = LoadTexture("resources/spawner3.png");
-        spawner4 = LoadTexture("resources/spawner4.png");
-        flag1   = LoadTexture("resources/flag1.png");
-        flag2   = LoadTexture("resources/flag2.png");
-        blank   = LoadTexture("resources/clear.png");
+        spawner    = LoadTexture("resources/spawner.png");
+        spawner2   = LoadTexture("resources/spawner2.png");
+        spawner3   = LoadTexture("resources/spawner3.png");
+        spawner4   = LoadTexture("resources/spawner4.png");
+        flag1      = LoadTexture("resources/flag1.png");
+        flag2      = LoadTexture("resources/flag2.png");
+        blank      = LoadTexture("resources/clear.png");
         
         CampaignLevels.Add(LoadFort("/resources/level1.fort"));
         CampaignLevels.Add(LoadFort("/resources/level2.fort"));
@@ -69,15 +92,20 @@ public static class Resources
         CampaignLevels.Add(LoadFort("/resources/level7.fort"));
         CampaignLevels.Add(LoadFort("/resources/level8.fort"));
     }
+    
+    // public static Texture GetTextureByName(string name)
+    // {
+    //     return Sprites.FirstOrDefault(x => x.Name == name);
+    // }
 
     public static void Unload()
     {
-        UnloadTexture(wabbit);
-        UnloadTexture(wall);
-        UnloadTexture(floor1);
-        UnloadTexture(floor2);
-        UnloadTexture(bullet);
-        UnloadTexture(turret);
+        // UnloadTexture(wabbit);
+        // UnloadTexture(wall);
+        // UnloadTexture(floor1);
+        // UnloadTexture(floor2);
+        // UnloadTexture(bullet);
+        // UnloadTexture(turret);
     }
 
     public static void SaveFort(string fortName)
@@ -85,7 +113,7 @@ public static class Resources
         //if (right) World.Flip();
         Fort fort = new Fort();
         fort.Name = fortName;
-
+        
         Directory.GetCurrentDirectory();
         
         for (int x = 0; x < 20; x++)
@@ -103,9 +131,9 @@ public static class Resources
         //if (right) World.Flip();
     }
 
-    public static Fort LoadFort(string path)
+    public static Fort LoadFort(string filename)
     {
-        string jsonString = File.ReadAllText(Directory.GetCurrentDirectory() + path);
+        string jsonString = File.ReadAllText(Directory.GetCurrentDirectory() + filename);
         Fort fort = JsonSerializer.Deserialize<Fort>(jsonString);
         return fort;
     }

@@ -18,9 +18,14 @@ public static class World
     public static double PreWaveOffset = 1;
     public static double FirstWaveTime = 0;
     public static int Wave = 0;
+    public static Camera2D Camera;
     
     public static void Initialize(bool sandbox)
     {
+        Camera.target = new Vector2(0, 0);
+        Camera.offset = new Vector2(0, 0);
+        Camera.rotation = 0;
+        Camera.zoom = 1;
         Minions.Clear();
         Projectiles.Clear();
         FirstWaveTime = Time.Scaled;
@@ -149,6 +154,8 @@ public static class World
 
     public static void Draw()
     {
+        Raylib.BeginMode2D(Camera);
+        
         for (int x = 0; x < BoardWidth; ++x)
         {
             for (int y = 0; y < BoardHeight; ++y)
@@ -167,6 +174,8 @@ public static class World
         {
             p.Draw();
         }
+        
+        Raylib.EndMode2D();
     }
 
     public static Int2D PosToTilePos(Vector2 position)
@@ -176,6 +185,11 @@ public static class World
         x = Math.Clamp(x, 0, BoardWidth - 1);
         y = Math.Clamp(y, 0, BoardHeight - 1);
         return new Int2D(x, y);
+    }
+
+    public static Int2D GetMouseTilePos()
+    {
+        return PosToTilePos(Raylib.GetScreenToWorld2D(Raylib.GetMousePosition(), Camera));
     }
     
     public static Rectangle GetTileBounds(int x, int y)

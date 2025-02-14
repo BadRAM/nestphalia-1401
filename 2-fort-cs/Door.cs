@@ -25,7 +25,6 @@ public class Door : Structure
     private bool _isOpen = false;
     private DoorTemplate _template;
     
-    
     public Door(DoorTemplate template, int x, int y) : base(template, x, y)
     {
         _template = template;
@@ -65,7 +64,6 @@ public class Door : Structure
                 }
             }
         }
-
     }
 
     public override bool IsSolid()

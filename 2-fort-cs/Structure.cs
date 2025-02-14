@@ -24,6 +24,13 @@ public class StructureTemplate
     {
         return new Structure(this, x, y);
     }
+    
+    public virtual string GetDescription()
+    {
+        return $"{Name}\n" +
+               $"${Price}\n" +
+               $"HP: {MaxHealth}";
+    }
 }
 
 public class Structure

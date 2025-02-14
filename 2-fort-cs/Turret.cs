@@ -33,6 +33,15 @@ public class TurretTemplate : StructureTemplate
     {
         return new Turret(this, x, y);
     }
+    
+    public override string GetDescription()
+    {
+        return $"{Name}\n" +
+               $"${Price}\n" +
+               $"HP: {MaxHealth}\n" +
+               $"Damage: {Projectile.Damage} ({Projectile.Damage / (RateOfFire / 60)}/s)\n" +
+               $"Range: {Range}";
+    }
 }
 
 public class Turret : Structure

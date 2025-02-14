@@ -9,6 +9,7 @@ public enum Scene
 	MainMenu,
 	Campaign,
 	Editor,
+	CustomBattleSetup,
 	Battle
 }
 
@@ -46,6 +47,9 @@ static class Program
 		        case Scene.Editor:
 			        EditorScene.Update();
 			        break;
+		        case Scene.CustomBattleSetup:
+			        CustomBattleMenu.Update();
+			        break;		       
 		        case Scene.Battle:
 			        BattleScene.Update();
 			        break;

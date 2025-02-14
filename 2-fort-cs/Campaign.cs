@@ -74,6 +74,11 @@ public class Campaign
             }
         }
         
+        if (RayGui.GuiButton(new Rectangle(10, 550, 280, 50), "Quit") != 0)
+        {
+            MenuScene.Start();
+        }
+        
         Raylib.EndDrawing();
     }
     

@@ -2,23 +2,16 @@
 
 Programming todo:
 =================
-- Proper time compensation, fix the various lag bugs
-- Better UI
- - Edit mode
-  - Selected tile info panel
-  - RMB to erase
-  - 
-- Fort sharing
-- Minions face the direction they're moving
-- Collision detection pruning
-- Population limit?
------ Version 0.3 releases here -----
-- Better texture & asset loading
+----- Version 0.5 releases here -----
 - Minion hatred and fear
+- Better texture & asset loading
+- Population limit?
 - More better UI
  - Menus with designed layouts and backgrounds
  - Sprite buttons
  - Tile Icons in edit mode
+ - Support for multiple resolutions?
+ - Zoom and battle camera controls?
 - More utility structures
 - Minion vs Minion melee
 - proper render order/z levels

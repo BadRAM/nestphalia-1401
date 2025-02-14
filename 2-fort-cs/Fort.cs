@@ -19,6 +19,36 @@ public class Fort
         }
     }
 
+    public string FortSummary()
+    {
+        int structureCount = 0;
+        int turretCount = 0;
+        int utilityCount = 0;
+        int nestCount = 0;
+        double totalCost = 0;
+        
+        for (int x = 0; x < 20; ++x)
+        {
+            for (int y = 0; y < 20; ++y)
+            {
+                StructureTemplate? t = Assets.GetTileByName(Board[x+y*20]);
+                if (t == null) continue;
+                structureCount++;
+                totalCost += t.Price;
+                if (t is TurretTemplate) turretCount++;
+                if (t is DoorTemplate) utilityCount++;
+                if (t is SpawnerTemplate) nestCount++;
+            }
+        }
+
+        return $"{Name}\n" +
+               $"${totalCost}\n" +
+               $"{turretCount} Towers\n" +
+               $"{utilityCount} Utility\n" +
+               $"{nestCount} Nests\n" +
+               $"{structureCount} Total";
+    }
+
     // Updates this fort object to reflect the current player side fort in the world.
     public void SaveBoard()
     {
