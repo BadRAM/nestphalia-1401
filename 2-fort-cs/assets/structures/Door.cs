@@ -8,15 +8,15 @@ public class DoorTemplate : StructureTemplate
     public double Range;
     public Texture OpenTexture;
     
-    public DoorTemplate(string name, Texture texture, Texture openTexture, double maxHealth, double price, int levelRequirement, double range) : base(name, texture, maxHealth, price, levelRequirement)
+    public DoorTemplate(string name, Texture texture, Texture openTexture, double maxHealth, double price, int levelRequirement, double baseHate, double range) : base(name, texture, maxHealth, price, levelRequirement, baseHate)
     {
         OpenTexture = openTexture;
         Range = range;
     }
     
-    public override Door Instantiate(int x, int y)
+    public override Door Instantiate(Team team, int x, int y)
     {
-        return new Door(this, x, y);
+        return new Door(this, team, x, y);
     }
 }
 
@@ -25,7 +25,7 @@ public class Door : Structure
     private bool _isOpen = false;
     private DoorTemplate _template;
     
-    public Door(DoorTemplate template, int x, int y) : base(template, x, y)
+    public Door(DoorTemplate template, Team team, int x, int y) : base(template, team, x, y)
     {
         _template = template;
     }
@@ -64,6 +64,8 @@ public class Door : Structure
                 }
             }
         }
+
+        Z = position.Y - (_isOpen ? 24 : 0);
     }
 
     public override bool IsSolid()
@@ -71,9 +73,11 @@ public class Door : Structure
         return !_isOpen;
     }
 
-    public override void Draw(int x, int y)
+    public override void Draw()
     {
         int t = 127 + (int)(128 * (Health / Template.MaxHealth));
+        int x = (int)(position.X - 12);
+        int y = (int)(position.Y - (Template.Texture.height - 12));
         Raylib.DrawTexture(_isOpen ? _template.OpenTexture : _template.Texture, x, y, new Color(t,t,t,255));
     }
 }

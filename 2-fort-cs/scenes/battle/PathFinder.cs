@@ -4,7 +4,7 @@ namespace _2_fort_cs;
 
 public static class PathFinder
 {
-    private static List<NavPath> _pathQueue = new List<NavPath>();
+    private static Queue<NavPath> _pathQueue = new Queue<NavPath>();
     
     private class PathNode : IComparable<PathNode>
     {
@@ -26,7 +26,7 @@ public static class PathFinder
 
     public static void RequestPath(NavPath navPath)
     {
-        _pathQueue.Add(navPath);
+        _pathQueue.Enqueue(navPath);
     }
 
     public static void ServeQueue(int max)
@@ -34,8 +34,7 @@ public static class PathFinder
         for (int i = 0; i < max; i++)
         {
             if (_pathQueue.Count == 0)  return;
-            FindPath(_pathQueue[0]);
-            _pathQueue.RemoveAt(0);
+            FindPath(_pathQueue.Dequeue());
         }
     }
     
@@ -177,12 +176,13 @@ public static class PathFinder
         navPath.Found = true;
     }
 
-    private static PathNode? WeightedNode(PathNode prevNode, int x, int y, double weight, TeamName team)
+    private static PathNode? WeightedNode(PathNode prevNode, int x, int y, double weight, Team team)
     {
         PathNode n = new PathNode(new Int2D(x, y));
         n.PrevNode = prevNode;
         n.Weight = prevNode.Weight;
         n.Weight += weight;
+        n.Weight += team.GetFearOf(x, y) * 0.2;
         Structure? structure = World.GetTile(x, y);
         if (structure != null && !(structure is Door && structure.Team == team) &&
             !(structure is Spawner && structure.Team == team))
@@ -205,10 +205,10 @@ public class NavPath
     public bool Found = false; 
     public Int2D Start;
     public Int2D Destination;
-    public TeamName Team;
+    public Team Team;
     public List<Int2D> Waypoints = new List<Int2D>();
 
-    public NavPath(Int2D start, Int2D destination, TeamName team)
+    public NavPath(Int2D start, Int2D destination, Team team)
     {
         Start = start;
         Destination = destination;

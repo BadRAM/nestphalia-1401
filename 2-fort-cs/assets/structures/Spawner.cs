@@ -9,7 +9,7 @@ public class SpawnerTemplate : StructureTemplate
     public double WaveGrowth;
     public double TimeBetweenSpawns;
     
-    public SpawnerTemplate(string name, Texture texture, double maxHealth, double price, int levelRequirement, MinionTemplate minion, int waveSize, double waveGrowth, double timeBetweenSpawns) : base(name, texture, maxHealth, price, levelRequirement)
+    public SpawnerTemplate(string name, Texture texture, double maxHealth, double price, int levelRequirement, double baseHate, MinionTemplate minion, int waveSize, double waveGrowth, double timeBetweenSpawns) : base(name, texture, maxHealth, price, levelRequirement, baseHate)
     {
         Minion = minion;
         WaveSize = waveSize;
@@ -17,9 +17,9 @@ public class SpawnerTemplate : StructureTemplate
         TimeBetweenSpawns = timeBetweenSpawns;
     }
 
-    public override Spawner Instantiate(int x, int y)
+    public override Spawner Instantiate(Team team, int x, int y)
     {
-        return new Spawner(this, x, y);
+        return new Spawner(this, team, x, y);
     }
     
     public override string GetDescription()
@@ -47,10 +47,10 @@ public class Spawner : Structure
     private Int2D _targetTile;
     private NavPath _navPath;
     
-    public Spawner(SpawnerTemplate template, int x, int y) : base(template, x, y)
+    public Spawner(SpawnerTemplate template, Team team, int x, int y) : base(template, team, x, y)
     {
         _template = template;
-        _navPath = new NavPath(new Int2D(x, y), new Int2D(x, y), Team);
+        _navPath = new NavPath(new Int2D(x, y), new Int2D(x, y), team);
     }
     
     public override void Update()
@@ -69,7 +69,10 @@ public class Spawner : Structure
         Retarget();
         _navPath.Reset();
         _navPath.Destination = _targetTile;
-        PathFinder.RequestPath(_navPath);
+        if (!_template.Minion.IsFlying)
+        {
+            PathFinder.RequestPath(_navPath);
+        }
     }
     
     public override void WaveEffect()
@@ -84,7 +87,7 @@ public class Spawner : Structure
 
     private void Retarget()
     {
-        List<Int2D> targets = new List<Int2D>();
+        List<Sortable<Int2D>> targets = new List<Sortable<Int2D>>();
         
         for (int x = 0; x < World.BoardWidth; ++x)
         {
@@ -92,16 +95,23 @@ public class Spawner : Structure
             {
                 if (World.GetTile(x,y) != null && World.GetTile(x,y).Team != Team)
                 {
-                    targets.Add(new Int2D(x,y));
+                    if (Team.GetHateFor(x,y) > 0)
+                    {
+                        targets.Add(new Sortable<Int2D>(Team.GetHateFor(x,y), new Int2D(x,y)));
+                    }
                 }
             }
         }
+
+        targets = targets.OrderByDescending(o => o.Order).ToList();
 
         if (targets.Count == 0)
         {
             return;
         }
 
-        _targetTile = targets[Random.Shared.Next(targets.Count)];
+        int i = Utils.WeightedRandom(targets.Count);
+        _targetTile = targets[i].Value;
+        //_targetTile = targets[0].Value;
     }
 }

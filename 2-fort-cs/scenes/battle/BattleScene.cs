@@ -10,19 +10,16 @@ public static class BattleScene
     public static bool Pause;
     public static bool CustomBattle;
 
-    public static void Start(Fort playerFort, Fort enemyFort)
+    public static void Start(Fort leftFort, Fort rightFort)
     {
-        if (playerFort == null || enemyFort == null)
+        if (leftFort == null || rightFort == null)
         {
             Console.WriteLine("Null fort!");
             return;
         }
 
-        World.Initialize(false);
-        enemyFort.LoadToBoard();
-        World.Flip();
-        playerFort.LoadToBoard();
-
+        World.InitializeBattle(leftFort, rightFort);
+        
         Program.CurrentScene = Scene.Battle;
     }
 

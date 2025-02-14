@@ -18,9 +18,9 @@ public static class EditorScene
         _fort = fortToLoad ?? new Fort();
         
         Program.CurrentScene = Scene.Editor;
-        World.Initialize(true);
+        World.InitializeEditor();
         World.Camera.offset = new Vector2(300, 0);
-        _fort.LoadToBoard();
+        _fort.LoadToBoard(false);
     }
 
     public static void Update()
@@ -70,7 +70,7 @@ public static class EditorScene
             {
                 if (_creativeMode)
                 {
-                    World.SetTile(_brush, tilePos);
+                    World.SetTile(_brush, World.LeftTeam, tilePos);
                 }
                 else
                 {
@@ -80,7 +80,7 @@ public static class EditorScene
                         {
                             Program.Campaign.Money += World.GetTile(tilePos).Template.Price;
                         }
-                        World.SetTile(_brush, tilePos);
+                        World.SetTile(_brush, World.LeftTeam, tilePos);
                         if (_brush != null)
                         {
                             Program.Campaign.Money -= _brush.Price;

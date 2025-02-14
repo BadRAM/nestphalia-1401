@@ -25,6 +25,10 @@ static class Program
         SetTargetFPS(60);
         
         // Load a texture from the resources directory
+        if (!Directory.Exists(Directory.GetCurrentDirectory() + "/forts/"))
+        {
+	        Directory.CreateDirectory(Directory.GetCurrentDirectory() + "/forts/");
+        }
         Resources.Load();
         Assets.Load();
         
@@ -56,8 +60,10 @@ static class Program
 	        }
         }
 
+        Console.WriteLine("Quitting time!");
+        
 	    Resources.Unload();
         
-        CloseWindow();
+        //CloseWindow();
     }
 }

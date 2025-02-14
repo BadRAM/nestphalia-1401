@@ -8,21 +8,23 @@ public class StructureTemplate
     public string Name;
     public Texture Texture;
     public double MaxHealth;
-    public int LevelRequirement;
     public double Price;
+    public int LevelRequirement;
+    public double BaseHate;
     
-    public StructureTemplate(string name, Texture texture, double maxHealth, double price, int levelRequirement = 0)
+    public StructureTemplate(string name, Texture texture, double maxHealth, double price, int levelRequirement, double baseHate)
     {
         Name = name;
         Texture = texture;
         MaxHealth = maxHealth;
         Price = price;
         LevelRequirement = levelRequirement;
+        BaseHate = baseHate;
     }
     
-    public virtual Structure Instantiate(int x, int y)
+    public virtual Structure Instantiate(Team team, int x, int y)
     {
-        return new Structure(this, x, y);
+        return new Structure(this, team, x, y);
     }
     
     public virtual string GetDescription()
@@ -33,7 +35,7 @@ public class StructureTemplate
     }
 }
 
-public class Structure
+public class Structure : ISprite
 {
     public StructureTemplate Template;
     private protected int X;
@@ -41,19 +43,20 @@ public class Structure
     private protected Vector2 position;
     
     public double Health;
-    public TeamName Team;
+    public Team Team;
 
-    public Structure(StructureTemplate template, int x, int y)
+    public double Z { get; set; }
+
+    public Structure(StructureTemplate template, Team team, int x, int y)
     {
         Template = template;
         X = x;
         Y = y;
         position = new Vector2(x*24+12, y*24+20);
+        Z = position.Y;
         
         Health = template.MaxHealth;
-        Team = TeamName.Neutral;
-        if (x <= 22) Team = TeamName.Player;
-        if (x >= 26) Team = TeamName.Enemy;
+        Team = team;
     }
 
     public virtual void Update() { }
@@ -62,9 +65,11 @@ public class Structure
     
     public virtual void WaveEffect() { }
 
-    public virtual void Draw(int x, int y)
+    public virtual void Draw()
     {
         int t = 127 + (int)(128 * (Health / Template.MaxHealth));
+        int x = (int)(position.X - 12);
+        int y = (int)(position.Y - (Template.Texture.height - 12));
         Raylib.DrawTexture(Template.Texture, x, y, new Color(t,t,t,255));
     }
 
@@ -73,22 +78,27 @@ public class Structure
         return true;
     }
 
-    public TeamName GetTeam()
-    {
-        return Team;
-    }
-
     public virtual void Hurt(double damage)
     {
         Health -= damage;
         if (Health <= 0)
         {
-            World.SetTile(null, X, Y);
+            Destroy();
         }
+    }
+
+    public virtual void Destroy()
+    {
+        World.SetTile(null, Team, X, Y);
     }
     
     public Vector2 GetCenter()
     {
         return position;
+    }
+
+    public Int2D GetTilePos()
+    {
+        return new Int2D(X, Y);
     }
 }

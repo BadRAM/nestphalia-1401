@@ -13,10 +13,10 @@ public static class Assets
         FloorTiles.Add(new FloorTileTemplate("Floor2", Resources.GetTextureByName("floor2")));
         FloorTiles.Add(new FloorTileTemplate("Blank", Resources.GetTextureByName("clear")));
         
-        Structures.Add(new StructureTemplate("Mud Wall", Resources.GetTextureByName("wall"), 100, 10, 0));
-        Structures.Add(new StructureTemplate("Stone Wall", Resources.GetTextureByName("wall2"), 500, 100, 6));
+        Structures.Add(new StructureTemplate("Mud Wall", Resources.GetTextureByName("wall"), 100, 10, 0, -10));
+        Structures.Add(new StructureTemplate("Stone Wall", Resources.GetTextureByName("wall2"), 500, 100, 6, -10));
         
-        Structures.Add(new DoorTemplate("Gate", Resources.GetTextureByName("doorClosed"), Resources.GetTextureByName("doorOpen"), 60, 100, 2, 32));
+        Structures.Add(new DoorTemplate("Gate", Resources.GetTextureByName("doorClosed"), Resources.GetTextureByName("doorOpen"), 60, 100, 2, 5, 32));
         
         Structures.Add
         (
@@ -27,6 +27,7 @@ public static class Assets
                 80, 
                 100, 
                 1,
+                5,
                 100,
                 new ProjectileTemplate(Resources.GetTextureByName("bullet"), 10, 400), 
                 40
@@ -57,6 +58,7 @@ public static class Assets
                 160,
                 400,
                 4,
+                5,
                 100,
                 new ProjectileTemplate(Resources.GetTextureByName("bullet"), 5, 400), 
                 400
@@ -72,6 +74,7 @@ public static class Assets
                 200,
                 1000,
                 7,
+                5,
                 600,
                 new ProjectileTemplate(Resources.GetTextureByName("bullet"), 60, 800), 
                 30,
@@ -88,6 +91,7 @@ public static class Assets
                 80, 
                 100, 
                 0, 
+                50,
                 new MinionTemplate
                 (
                     "Ant", 
@@ -116,6 +120,7 @@ public static class Assets
                 80, 
                 300,
                 3,
+                50,
                 new MinionTemplate
                 (
                     "Snail", 
@@ -144,6 +149,7 @@ public static class Assets
                 80, 
                 500, 
                 5, 
+                50,
                 new MinionTemplate
                 (
                     "Bee", 
@@ -172,6 +178,7 @@ public static class Assets
                 200, 
                 2500, 
                 8, 
+                50,
                 new MinionTemplate
                 (
                     "Beetle", 
@@ -200,6 +207,7 @@ public static class Assets
                 80,
                 50,
                 99,
+                50,
                 new MinionTemplate
                 (
                     "Ant",

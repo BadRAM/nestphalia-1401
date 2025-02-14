@@ -8,13 +8,20 @@ public class Fort
     [JsonInclude] public string Comment = "It's a fort!";
     [JsonInclude] public string[] Board = new string[20 * 20];
     
-    public void LoadToBoard()
+    public void LoadToBoard(bool rightSide)
     {
         for (int x = 0; x < 20; x++)
         {
             for (int y = 0; y < 20; y++)
             {
-                World.SetTile(Assets.GetTileByName(Board[x+y*20]), x+1,y+1);
+                if (rightSide)
+                {
+                    World.SetTile(Assets.GetTileByName(Board[x+y*20]), World.RightTeam, 46-x,y+1);
+                }
+                else
+                {
+                    World.SetTile(Assets.GetTileByName(Board[x+y*20]), World.LeftTeam, x+1,y+1);
+                }
             }
         }
     }

@@ -1,4 +1,5 @@
 using System.Numerics;
+using CommunityToolkit.HighPerformance.Helpers;
 using ZeroElectric.Vinculum;
 
 namespace _2_fort_cs;
@@ -32,26 +33,30 @@ public class MinionTemplate
         PhysicsRadius = physicsRadius;
     }
 
-    public void Instantiate(Vector2 position, TeamName team, NavPath navPath)
+    public void Instantiate(Vector2 position, Team team, NavPath navPath)
     {
-        World.Minions.Add(new Minion(this, position, team, navPath));
+        Minion m = new Minion(this, team, position, navPath);
+        World.Minions.Add(m);
+        World.Sprites.Add(m);
     }
 }
 
-public class Minion
+public class Minion : ISprite
 {
     public MinionTemplate Template;
+    public Team Team;
+    private NavPath _navPath;
     public Vector2 Position;
     public double Health;
     public bool IsAlive;
-    public TeamName Team;
+    // public TeamName Team;
     private Vector2 _target;
     //protected Int2D _targetTile;
     private double _lastFiredTime;
     public Vector2 CollisionOffset;
-    private NavPath _navPath;
+    public double Z { get; set; }
 
-    public Minion(MinionTemplate template, Vector2 position, TeamName team, NavPath navPath)
+    public Minion(MinionTemplate template, Team team, Vector2 position, NavPath navPath)
     {
         Template = template;
         Position = position;
@@ -63,6 +68,7 @@ public class Minion
         _navPath = navPath;
         //_path = new PathFinder(this);
         //_path.FindPath(_targetTile);
+        Z = Position.Y;
     }
     
     public virtual void Update()
@@ -72,15 +78,17 @@ public class Minion
         // else, move towards next tile on path.
         
         // if we're at our final destination, ask for a new path. (Don't ask for a new path if we already have)
+
+        if (!Template.IsFlying) _target = World.GetTileCenter(_navPath.NextTile(Position));
         
         Structure? t = World.GetTileAtPos(Position.MoveTowards(_target, Template.Range)); // TODO: make this respect minion range
         if (Template.IsFlying && t != World.GetTile(_navPath.Destination)) t = null; // cheeky intercept so flyers ignore all but their target.
 
-        if (t != null && t.IsSolid() && t.GetTeam() != Team)
+        if (t != null && t.IsSolid() && t.Team != Team)
         {
             if (Time.Scaled - _lastFiredTime > 60/Template.RateOfFire)
             {
-                World.Projectiles.Add(new Projectile(Template.Projectile, Position, Position.MoveTowards(_target, Template.Range)));
+                Template.Projectile.Instantiate(t, this);
                 _lastFiredTime = Time.Scaled;
             }
         }
@@ -100,9 +108,9 @@ public class Minion
                 Retarget();
             }
             
-            _target = World.GetTileCenter(_navPath.NextTile(Position));
             Position = Position.MoveTowards(_target, Template.Speed * Time.DeltaTime);
         }
+        Z = Position.Y + (Template.IsFlying ? 240 : 0);
     }
     
     // Should this be here, or in World? maybe somewhere else entirely, like a physics functions class?
@@ -173,7 +181,8 @@ public class Minion
 
     private void Retarget()
     {
-        List<Int2D> targets = new List<Int2D>();
+        //SortedList<double, Int2D> targets = new SortedList<double, Int2D>();
+        List<Sortable<Int2D>> targets = new List<Sortable<Int2D>>();
         
         for (int x = 0; x < World.BoardWidth; ++x)
         {
@@ -181,20 +190,38 @@ public class Minion
             {
                 if (World.GetTile(x,y) != null && World.GetTile(x,y).Team != Team)
                 {
-                    targets.Add(new Int2D(x,y));
+                    targets.Add(new Sortable<Int2D>(-Vector2.Distance(Position, World.GetTileCenter(x,y)), new Int2D(x,y)));
+                    // targets.Add(new PotentialTarget(-Vector2.Distance(Position, World.GetTileCenter(x,y)), new Int2D(x,y)));
                 }
             }
         }
+        
+        targets = targets.OrderByDescending(x=>x.Order).ToList();
+        
+         if (targets.Count > 32)
+         {
+             targets.RemoveRange(32, targets.Count-32);
+         }
+
+         foreach (Sortable<Int2D> t in targets)
+         {
+             t.Order += Team.GetHateFor(t.Value);
+         }
+         targets = targets.OrderByDescending(x=>x.Order).ToList();
 
         if (targets.Count == 0)
         {
+            Console.WriteLine($"{Template.Name} wants to retarget but can't see any valid targets!");
             return;
         }
 
         _navPath.Found = false;
         _navPath.Waypoints.Clear();
         _navPath.Start = World.PosToTilePos(Position);
-        _navPath.Destination = targets[Random.Shared.Next(targets.Count)];
+        int i = Math.Min(targets.Count, 16);
+        i = Math.Min(Random.Shared.Next(i), Random.Shared.Next(i));
+        _navPath.Destination = targets[i].Value;
+        // _navPath.Destination = targets[0].Value;
 
         if (Template.IsFlying)
         {
@@ -208,14 +235,11 @@ public class Minion
 
     public virtual void Draw()
     {
-        Color tint = Raylib.WHITE;
-        if (Team == TeamName.Player) tint = Raylib.BLUE;
-        if (Team == TeamName.Enemy) tint = Raylib.RED;
         Vector2 pos = new Vector2((int)Position.X - Template.Texture.width / 2, (int)Position.Y - Template.Texture.width / 2);
         bool flip = _target.X > pos.X;
         Rectangle source = new Rectangle(flip ? Template.Texture.width : 0, 0, flip ? Template.Texture.width : -Template.Texture.width, Template.Texture.height);
         //Raylib.DrawTexture(Template.Texture, (int)Position.X - Template.Texture.width/2, (int)Position.Y - Template.Texture.width/2, tint);
-        Raylib.DrawTextureRec(Template.Texture, source, pos, tint);
+        Raylib.DrawTextureRec(Template.Texture, source, pos, Team.UnitTint);
         
         // Debug, shows path
         if (Raylib.CheckCollisionPointCircle(Raylib.GetMousePosition(), Position, Template.PhysicsRadius))
@@ -235,12 +259,24 @@ public class Minion
             }
         }
     }
-
-    public virtual void Hurt(double damage)
+    
+    public virtual void Hurt(Projectile damageSource)
     {
-        Health -= Math.Max(1, damage - Template.Armor);
+        // guard against second bullet in same frame.
+        if (Health <= 0) return;
+
+        Health -= Math.Max(1, damageSource.Template.Damage - Template.Armor);
         if (Health <= 0)
         {
+            Team.AddFearOf(Template.MaxHealth, World.PosToTilePos(Position));
+            //Console.WriteLine($"{Template.Name} killed by {damageSource.Source.GetType().Name} which is " + (damageSource.Source is Structure ? "" : "not ") + "a structure, assigning hate...");
+            if (damageSource.Source is Structure s)
+            {
+                //Console.WriteLine($"{Template.Name} killed by {s.Template.Name}, assigning hate...");
+                Int2D pos = s.GetTilePos();
+                Team.AddHateFor(Template.MaxHealth/10, pos.X, pos.Y);
+            }
+            // TODO: Add hate to origin structure when killed by minion
             World.MinionsToRemove.Add(this);
         }
     }

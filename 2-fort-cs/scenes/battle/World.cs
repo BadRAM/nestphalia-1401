@@ -13,14 +13,17 @@ public static class World
     public static List<Minion> MinionsToRemove = new List<Minion>();
     public static List<Projectile> Projectiles = new List<Projectile>();
     public static List<Projectile> ProjectilesToRemove = new List<Projectile>();
+    public static List<ISprite> Sprites = new List<ISprite>();
     public static double WaveDuration = 20;
     public static bool PreWave;
     public static double PreWaveOffset = 1;
     public static double FirstWaveTime = 0;
     public static int Wave = 0;
     public static Camera2D Camera;
+    public static Team LeftTeam;
+    public static Team RightTeam;
     
-    public static void Initialize(bool sandbox)
+    private static void Initialize()
     {
         Camera.target = new Vector2(0, 0);
         Camera.offset = new Vector2(0, 0);
@@ -28,18 +31,28 @@ public static class World
         Camera.zoom = 1;
         Minions.Clear();
         Projectiles.Clear();
+        Sprites.Clear();
         FirstWaveTime = Time.Scaled;
         Wave = 0;
+        
+        LeftTeam = new Team("Player", false, Raylib.BLUE);
+        RightTeam = new Team("Enemy", true, Raylib.RED);
+    }
 
+    public static void InitializeEditor()
+    {
+        Initialize();
+        
+        // set up floor tile checkerboard
         for (int x = 0; x < BoardWidth; x++)
         {
             for (int y = 0; y < BoardHeight; y++)
             {
-                if (sandbox && x > 21)
+                if (x > 21)
                 {
                     _floor[x, y] = Assets.FloorTiles[2].Instantiate(x, y);
                 }
-                else if (sandbox && (x == 0 || x == 21 || y == 0 || y == 21))
+                else if (x == 0 || x == 21 || y == 0 || y == 21)
                 {
                     _floor[x, y] = Assets.FloorTiles[1].Instantiate(x, y);
                 }
@@ -50,24 +63,47 @@ public static class World
                 _board[x,y] = null;
             }
         }
+    }
+
+    public static void InitializeBattle(Fort leftFort, Fort rightFort)
+    {
+        Initialize();
         
-        // for (int i = 0; i < 1; i++)
-        // {
-        //     Assets.Minions[0].Instantiate(new Vector2(i * 16, 192), TeamName.Neutral);
-        // }
-        //
-        // PathFinder pathFinder = new PathFinder(Minions[0]);
-        // pathFinder.FindPath(new Int2D(40, 20));
+        // set up floor tile checkerboard
+        for (int x = 0; x < BoardWidth; x++)
+        {
+            for (int y = 0; y < BoardHeight; y++)
+            {
+                _floor[x,y] = (x%2 != y%2) ? Assets.FloorTiles[0].Instantiate(x,y) : Assets.FloorTiles[1].Instantiate(x,y);
+                _board[x,y] = null;
+            }
+        }
+        
+        // Load forts to board
+        leftFort.LoadToBoard(false);
+        rightFort.LoadToBoard(true);
+        
+        // Tell teams they can generate fear and hate
+        LeftTeam.Initialize();
+        RightTeam.Initialize();
     }
     
-    public static void SetTile(StructureTemplate? tile, int x, int y)
+    public static void SetTile(StructureTemplate? tile, Team team, int x, int y)
     {
-        _board[x,y] = tile?.Instantiate(x, y);
+        if (_board[x, y] != null)
+        {
+            Sprites.Remove(_board[x, y]!);
+        }
+        _board[x,y] = tile?.Instantiate(team, x, y);
+        if (_board[x, y] != null)
+        {
+            Sprites.Add(_board[x,y]!);
+        }
     }
     
-    public static void SetTile(StructureTemplate? tile, Int2D tilePos)
+    public static void SetTile(StructureTemplate? tile, Team team, Int2D tilePos)
     {
-        SetTile(tile, tilePos.X, tilePos.Y);
+        SetTile(tile, team, tilePos.X, tilePos.Y);
     }
 
     public static Structure? GetTile(Int2D tilePos)
@@ -138,6 +174,7 @@ public static class World
         foreach (Minion m in MinionsToRemove)
         {
             Minions.Remove(m);
+            Sprites.Remove(m);
         }
         MinionsToRemove.Clear();
         
@@ -148,6 +185,7 @@ public static class World
         foreach (Projectile p in ProjectilesToRemove)
         {
             Projectiles.Remove(p);
+            Sprites.Remove(p);
         }
         ProjectilesToRemove.Clear();
     }
@@ -161,18 +199,28 @@ public static class World
             for (int y = 0; y < BoardHeight; ++y)
             {
                 _floor[x,y].Draw(x*24, y*24);
-                _board[x,y]?.Draw(x*24, y*24);
+                //_board[x,y]?.Draw(x*24, y*24);
+                //Vector2 pos = GetTileCenter(x, y);
+                //Raylib.DrawCircle((int)pos.X, (int)pos.Y, (int)(LeftTeam.GetHateFor(x,y)/20), Raylib.RED);
+                //Raylib.DrawCircle((int)pos.X, (int)pos.Y, (int)LeftTeam.GetFearOf(x,y), Raylib.BLUE);
             }
         }
         
-        foreach (Minion m in Minions)
+        // foreach (Minion m in Minions)
+        // {
+        //     m.Draw();
+        // }
+        //
+        // foreach (Projectile p in Projectiles)
+        // {
+        //     p.Draw();
+        // }
+
+        Sprites = Sprites.OrderBy(o => o.Z).ToList();
+
+        foreach (ISprite s in Sprites)
         {
-            m.Draw();
-        }
-        
-        foreach (Projectile p in Projectiles)
-        {
-            p.Draw();
+            s.Draw();
         }
         
         Raylib.EndMode2D();
@@ -217,18 +265,18 @@ public static class World
         return GetTileCenter(tilePos.X, tilePos.Y);
     }
 
-    public static void Flip()
-    {
-        Structure?[,] boardBuf = new Structure?[BoardWidth, BoardHeight];
-        for (int x = 0; x < BoardWidth; ++x)
-        {
-            for (int y = 0; y < BoardHeight; ++y)
-            {
-                boardBuf[x,y] = _board[BoardWidth-(x+1),y]?.Template.Instantiate(x,y);
-            }
-        }
-        Array.Copy(boardBuf, _board, boardBuf.Length);
-    }
+    // public static void Flip()
+    // {
+    //     Structure?[,] boardBuf = new Structure?[BoardWidth, BoardHeight];
+    //     for (int x = 0; x < BoardWidth; ++x)
+    //     {
+    //         for (int y = 0; y < BoardHeight; ++y)
+    //         {
+    //             boardBuf[x,y] = _board[BoardWidth-(x+1),y]?.Template.Instantiate(x,y);
+    //         }
+    //     }
+    //     Array.Copy(boardBuf, _board, boardBuf.Length);
+    // }
 }
 
 public enum TeamName

@@ -20,7 +20,7 @@ public class TurretTemplate : StructureTemplate
     public double RateOfFire;
     public TargetSelector TargetMode;
 
-    public TurretTemplate(string name, Texture texture, double maxHealth, double price, int levelRequirement, double range, ProjectileTemplate projectile, double rateOfFire, TargetSelector targetMode = TargetSelector.Nearest) : base(name, texture, maxHealth, price, levelRequirement)
+    public TurretTemplate(string name, Texture texture, double maxHealth, double price, int levelRequirement, double baseHate, double range, ProjectileTemplate projectile, double rateOfFire, TargetSelector targetMode = TargetSelector.Nearest) : base(name, texture, maxHealth, price, levelRequirement, baseHate)
     {
         Range = range;
         Projectile = projectile;
@@ -29,9 +29,9 @@ public class TurretTemplate : StructureTemplate
         TargetMode = targetMode;
     }
     
-    public override Turret Instantiate(int x, int y)
+    public override Turret Instantiate(Team team, int x, int y)
     {
-        return new Turret(this, x, y);
+        return new Turret(this, team, x, y);
     }
     
     public override string GetDescription()
@@ -49,7 +49,7 @@ public class Turret : Structure
     private double lastFireTime;
     private TurretTemplate _template;
     
-    public Turret(TurretTemplate template, int x, int y) : base(template, x, y)
+    public Turret(TurretTemplate template, Team team, int x, int y) : base(template, team, x, y)
     {
         _template = template;
     }
@@ -76,7 +76,7 @@ public class Turret : Structure
 
                 if (minDist < _template.Range && nearest != null)
                 {
-                    World.Projectiles.Add(new Projectile(_template.Projectile, position, nearest));
+                    _template.Projectile.Instantiate(nearest, this);
                     lastFireTime = Time.Scaled;
                 }
             }
@@ -93,7 +93,7 @@ public class Turret : Structure
 
                 if (ValidTargets.Count > 0)
                 {
-                    World.Projectiles.Add(new Projectile(_template.Projectile, position, ValidTargets[Random.Shared.Next(ValidTargets.Count)]));
+                    _template.Projectile.Instantiate(ValidTargets[Random.Shared.Next(ValidTargets.Count)], this);
                     lastFireTime = Time.Scaled;
                 }
             }
