@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Numerics;
 using ZeroElectric.Vinculum;
 
@@ -9,8 +10,9 @@ public class TurretTemplate : StructureTemplate
     {
         Nearest,
         Random,
-        Highest,
-        Lowest,
+        RandomFocus,
+        Strongest,
+        Weakest,
         Flyer
     }
     
@@ -18,15 +20,20 @@ public class TurretTemplate : StructureTemplate
     public ProjectileTemplate Projectile;
     // public float Damage;
     public double RateOfFire;
+    // public TurretTargetSelector TargetSelector;
     public TargetSelector TargetMode;
+    public bool CanHitFlying;
+    public bool CanHitGround;
 
-    public TurretTemplate(string name, Texture texture, double maxHealth, double price, int levelRequirement, double baseHate, double range, ProjectileTemplate projectile, double rateOfFire, TargetSelector targetMode = TargetSelector.Nearest) : base(name, texture, maxHealth, price, levelRequirement, baseHate)
+    public TurretTemplate(string name, Texture texture, double maxHealth, double price, int levelRequirement, double baseHate, double range, ProjectileTemplate projectile, double rateOfFire, TargetSelector targetMode, bool canHitGround, bool canHitFlying) : base(name, texture, maxHealth, price, levelRequirement, baseHate)
     {
         Range = range;
         Projectile = projectile;
         //Damage = damage;
         RateOfFire = rateOfFire;
         TargetMode = targetMode;
+        CanHitGround = canHitGround;
+        CanHitFlying = canHitFlying;
     }
     
     public override Turret Instantiate(Team team, int x, int y)
@@ -48,6 +55,7 @@ public class Turret : Structure
 {
     private double lastFireTime;
     private TurretTemplate _template;
+    private Minion? _target;
     
     public Turret(TurretTemplate template, Team team, int x, int y) : base(template, team, x, y)
     {
@@ -57,46 +65,79 @@ public class Turret : Structure
     public override void Update()
     {
         base.Update();
+        
         if (Time.Scaled - lastFireTime > 60/_template.RateOfFire)
         {
-            if (_template.TargetMode == TurretTemplate.TargetSelector.Nearest)
+            switch (_template.TargetMode)
             {
-                Minion? nearest = null;
-                double minDist = double.MaxValue;
-                for (int i = 0; i < World.Minions.Count; i++)
-                {
-                    if (World.Minions[i].Team == Team) continue;
-                    double d = Vector2.Distance(World.Minions[i].Position, position);
-                    if (d < minDist)
-                    {
-                        minDist = d;
-                        nearest = World.Minions[i];
-                    }
-                }
-
-                if (minDist < _template.Range && nearest != null)
-                {
-                    _template.Projectile.Instantiate(nearest, this);
-                    lastFireTime = Time.Scaled;
-                }
+                case TurretTemplate.TargetSelector.Nearest:
+                    _target = FindTargetNearest();
+                    break;
+                case TurretTemplate.TargetSelector.Random:
+                    _target = FindTargetRandom();
+                    break;
+                default:
+                    throw new NotImplementedException();
             }
-            else if (_template.TargetMode == TurretTemplate.TargetSelector.Random)
+            
+            if (_target != null && _target.Health <= 0)
             {
-                List<Minion> ValidTargets = new List<Minion>();
-                foreach (Minion m in World.Minions)
-                {
-                    if (m.Team != Team && Vector2.Distance(m.Position, position) < _template.Range)
-                    {
-                        ValidTargets.Add(m);
-                    }
-                }
+                _target = null;
+            }
 
-                if (ValidTargets.Count > 0)
-                {
-                    _template.Projectile.Instantiate(ValidTargets[Random.Shared.Next(ValidTargets.Count)], this);
-                    lastFireTime = Time.Scaled;
-                }
+            if (_target != null)
+            {
+                _template.Projectile.Instantiate(_target, this);
+                lastFireTime = Time.Scaled;
             }
         }
+    }
+
+    private Minion? FindTargetNearest()
+    {
+        Minion? nearest = null;
+        double minDist = double.MaxValue;
+        for (int i = 0; i < World.Minions.Count; i++)
+        {
+            Minion m = World.Minions[i];
+            if (m.Team == Team) continue;
+            if ((m.Template.IsFlying && !_template.CanHitFlying) || (!m.Template.IsFlying && !_template.CanHitGround)) continue;
+            double d = Vector2.Distance(World.Minions[i].Position, position);
+            if (d < _template.Range && d < minDist)
+            {
+                minDist = d;
+                nearest = m;
+            }
+        }
+
+        return nearest;
+    }
+
+    private Minion? FindTargetRandom()
+    {
+        Minion? random = null;
+        List<Minion> ValidTargets = new List<Minion>();
+        foreach (Minion m in World.Minions)
+        {
+            if ((m.Template.IsFlying && !_template.CanHitFlying) || (!m.Template.IsFlying && !_template.CanHitGround)) continue;
+            if (m.Team != Team && Vector2.Distance(m.Position, position) < _template.Range)
+            {
+                ValidTargets.Add(m);
+            }
+        }
+
+        if (ValidTargets.Count > 0)
+        {
+            random = ValidTargets[Random.Shared.Next(ValidTargets.Count)];
+        }
+        
+        return random;
+    }
+
+    private Minion? FindTargetRandomFocus()
+    {
+        Minion? random = _target;
+        if (random != null && random.Health > 0) return random;
+        return FindTargetRandom();
     }
 }

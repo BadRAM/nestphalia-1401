@@ -16,7 +16,7 @@ public class SpawnerTemplate : StructureTemplate
         WaveGrowth = waveGrowth;
         TimeBetweenSpawns = timeBetweenSpawns;
     }
-
+    
     public override Spawner Instantiate(Team team, int x, int y)
     {
         return new Spawner(this, team, x, y);

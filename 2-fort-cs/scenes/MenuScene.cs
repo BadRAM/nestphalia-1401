@@ -40,7 +40,12 @@ public static class MenuScene
         if (RayGui.GuiButton(new Rectangle(400, 250, 400, 40), "Custom Battle") != 0) CustomBattleMenu.Start();
         if (RayGui.GuiButton(new Rectangle(400, 300, 400, 40), "Sandbox") != 0) EditorScene.Start(creativeMode:true);
         //if (RayGui.GuiButton(new Rectangle(400, 350, 400, 40), "Help") != 0) _helpWindowOpen = !_helpWindowOpen;
-        if (RayGui.GuiButton(new Rectangle(400, 400, 400, 40), "Quit") != 0) CloseWindow();
+        if (RayGui.GuiButton(new Rectangle(400, 400, 400, 40), "Quit") != 0)
+        {
+            EndDrawing();
+            CloseWindow();
+            return;
+        }
 
         if (_helpWindowOpen)
         {

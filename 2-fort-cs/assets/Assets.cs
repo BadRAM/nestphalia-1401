@@ -30,24 +30,31 @@ public static class Assets
                 5,
                 100,
                 new ProjectileTemplate(Resources.GetTextureByName("bullet"), 10, 400), 
-                40
+                40,
+                TurretTemplate.TargetSelector.Nearest,
+                true,
+                true
             )
         );
         
-        // Structures.Add
-        // (
-        //     new TurretTemplate
-        //     (
-        //         "Mortar",
-        //         Resources.turret,
-        //         200,
-        //         300,
-        //         0,
-        //         100,
-        //         new ProjectileTemplate(Resources.bullet, 50, 200), 
-        //         30
-        //     )
-        // );
+        Structures.Add
+        (
+            new TurretTemplate
+            (
+                "Mortar",
+                Resources.GetTextureByName("mortar"),
+                200,
+                300,
+                0,
+                5,
+                72,
+                new MortarShellTemplate(Resources.GetTextureByName("bullet"), 10, 0.8, 96, 48), 
+                30,
+                TurretTemplate.TargetSelector.Random,
+                true,
+                false
+            )
+        );
         
         Structures.Add
         (
@@ -61,7 +68,10 @@ public static class Assets
                 5,
                 100,
                 new ProjectileTemplate(Resources.GetTextureByName("bullet"), 5, 400), 
-                400
+                400,
+                TurretTemplate.TargetSelector.Nearest,
+                true,
+                true
             )
         );
         
@@ -78,7 +88,9 @@ public static class Assets
                 600,
                 new ProjectileTemplate(Resources.GetTextureByName("bullet"), 60, 800), 
                 30,
-                TurretTemplate.TargetSelector.Random
+                TurretTemplate.TargetSelector.Random,
+                true,
+                true
             )
         );
         
