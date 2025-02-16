@@ -2,21 +2,21 @@
 
 Programming todo:
 =================
------ Version 0.5 releases here -----
-- Minion hatred and fear
-- Better texture & asset loading
+- Mortar turret and projectile
 - Population limit?
 - More better UI
  - Menus with designed layouts and backgrounds
  - Sprite buttons
  - Tile Icons in edit mode
- - Support for multiple resolutions?
- - Zoom and battle camera controls?
+ - Make menus fit resolution
+ - Clamp world to screen
 - More utility structures
+- Minion melee attack animation
+- Minion state machine
 - Minion vs Minion melee
-- proper render order/z levels
 - Fix minion collision with wall corners
-- Pause button that works
+- Assets from json
+- Splash screen
 
 ----- Postponed to team bug fort 2 -----
 - Multitile structures
@@ -44,6 +44,11 @@ Design todo:
   - Worm
   - Stinkbug
   - Scorpion
+ - Utility
+  - Strong door
+  - Fast floor
+  - Slow floor
+  - Honey pot
 
 
 - Workers?

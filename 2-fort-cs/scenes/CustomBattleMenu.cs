@@ -23,14 +23,15 @@ public static class CustomBattleMenu
         
         string[] forts = Directory.GetFiles(Directory.GetCurrentDirectory() + "/forts/");
 
-        if (RayGui.GuiButton(new Rectangle(900, 10, 280, 26), _loadingPlayerSide ? "Selecting Left Fort" : "Selecting Right Fort") != 0)
+        if (RayGui.GuiButton(new Rectangle(Screen.HCenter+300, Screen.VCenter-290, 280, 26), _loadingPlayerSide ? "Selecting Left Fort" : "Selecting Right Fort") != 0)
         {
             _loadingPlayerSide = !_loadingPlayerSide;
         }
 
+        
         for (int i = 0; i < forts.Length; i++)
         {
-            if (RayGui.GuiButton(new Rectangle(10, 10 + i*30, 280, 26), Path.GetFileName(forts[i])) != 0)
+            if (RayGui.GuiButton(new Rectangle(Screen.HCenter-600, Screen.VCenter + i*30 - 300, 280, 26), Path.GetFileName(forts[i])) != 0)
             {
                 Console.WriteLine("Loading " + Path.GetFileName(forts[i]));
                 if (_loadingPlayerSide)
@@ -51,18 +52,18 @@ public static class CustomBattleMenu
 
         string vs = (PlayerFort != null ? PlayerFort.Name : "???") + " VS " +
                     (EnemyFort  != null ? EnemyFort.Name  : "???");
-        Raylib.DrawText(vs, 400, 10, 20, Raylib.WHITE);
-        Raylib.DrawText(PlayerFort?.Comment ?? "", 400, 40, 10, Raylib.WHITE);
-        Raylib.DrawText(EnemyFort?.Comment ?? "", 500, 40, 10, Raylib.WHITE);
-        Raylib.DrawText(OutcomeMessage, 400, 500, 20, Raylib.WHITE);
+        Raylib.DrawText(vs, Screen.HCenter - 200, Screen.VCenter - 290, 20, Raylib.WHITE);
+        Raylib.DrawText(PlayerFort?.Comment ?? "", Screen.HCenter - 200, Screen.VCenter - 260, 10, Raylib.WHITE);
+        Raylib.DrawText(EnemyFort?.Comment ?? "", Screen.HCenter - 100, Screen.VCenter - 260, 10, Raylib.WHITE);
+        Raylib.DrawText(OutcomeMessage, Screen.HCenter - 100, Screen.VCenter + 100, 20, Raylib.WHITE);
         
-        if (RayGui.GuiButton(new Rectangle(10, 550, 280, 50), "Back") != 0)
+        if (RayGui.GuiButton(new Rectangle(Screen.HCenter-600, Screen.VCenter+250, 280, 50), "Back") != 0)
         {
             MenuScene.Start();
         }
         
         if (PlayerFort != null && EnemyFort != null &&
-            RayGui.GuiButton(new Rectangle(900, 550, 280, 50), "Begin!") != 0)
+            RayGui.GuiButton(new Rectangle(Screen.HCenter + 300, Screen.VCenter+250, 280, 50), "Begin!") != 0)
         {
             BattleScene.Start(PlayerFort, EnemyFort);
             BattleScene.CustomBattle = true;

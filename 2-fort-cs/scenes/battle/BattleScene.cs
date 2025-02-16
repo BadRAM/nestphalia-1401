@@ -1,3 +1,4 @@
+using System.Numerics;
 using ZeroElectric.Vinculum;
 using static ZeroElectric.Vinculum.Raylib;
 
@@ -31,6 +32,58 @@ public static class BattleScene
         {
             Pause = !Pause;
             Time.TimeScale = Pause ? 0 : 1;
+        }
+
+        if (IsKeyDown(KeyboardKey.KEY_A))
+        {
+            World.Camera.offset.X -= 4;
+        }
+        if (IsKeyDown(KeyboardKey.KEY_D))
+        {
+            World.Camera.offset.X += 4;
+        }
+        if (IsKeyDown(KeyboardKey.KEY_W))
+        {
+            World.Camera.offset.Y -= 4;
+        }
+        if (IsKeyDown(KeyboardKey.KEY_S))
+        {
+            World.Camera.offset.Y += 4;
+        }
+        
+        if (IsKeyPressed(KeyboardKey.KEY_F))
+        {
+            SetTargetFPS(10000);
+        }
+        if (IsKeyReleased(KeyboardKey.KEY_F))
+        {
+            SetTargetFPS(60);
+        }
+        
+        if (IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT))
+        {
+            World.Camera.offset += GetMouseDelta();
+        }
+
+        
+        // Snipped from raylib example
+        float wheel = GetMouseWheelMove();
+        if (wheel != 0)
+        {
+            // Get the world point that is under the mouse
+            Vector2 mouseWorldPos = GetScreenToWorld2D(GetMousePosition(), World.Camera);
+
+            // Set the offset to where the mouse is
+            World.Camera.offset = GetMousePosition();
+
+            // Set the target to match, so that the camera maps the world space point 
+            // under the cursor to the screen space point under the cursor at any zoom
+            World.Camera.target = mouseWorldPos;
+
+            // Zoom increment
+            // float scaleFactor = 1.0f + 0.25f;
+            // if (wheel < 0) scaleFactor = 1.0f/scaleFactor;
+            World.Camera.zoom = Math.Clamp(World.Camera.zoom + wheel * 0.5f, 0.5f, 4f);
         }
         
         // ----- WORLD UPDATE PHASE -----
@@ -70,7 +123,8 @@ public static class BattleScene
         DrawText($"FPS: {GetFPS()}", 12, 16, 20, WHITE);
         DrawText($"Wave: {World.Wave}", 12, 32, 20, WHITE);
         DrawText($"Minions: {World.Minions.Count}", 12, 48, 20, WHITE);
-        DrawText($"Path Queue Length: {PathFinder.GetQueueLength()}", 12, 64, 20, WHITE);
+        // DrawText($"Path Queue Length: {PathFinder.GetQueueLength()}", 12, 64, 20, WHITE);
+        DrawText($"Zoom: {World.Camera.zoom}", 12, 64, 20, WHITE);
         // DrawText($"Projectiles: {World.Projectiles.Count}", 12, 64, 20, WHITE);
         if (Pause) DrawText("PAUSED", 520, 250, 40, WHITE);
         

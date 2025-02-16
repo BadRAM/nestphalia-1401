@@ -20,9 +20,9 @@ public static class MenuScene
         BeginDrawing();
         ClearBackground(GRAY);
         
-        DrawText("2fort BUG GAME", 400, 100, 48, WHITE);
+        DrawText("2fort BUG GAME", Screen.HCenter-200, Screen.VCenter-250, 48, WHITE);
             
-        if (RayGui.GuiButton(new Rectangle(400, 200, 400, 40), "Play") != 0)
+        if (RayGui.GuiButton(new Rectangle(Screen.HCenter-200, Screen.VCenter-150, 400, 40), "Play") != 0)
         {
             Program.Campaign = new Campaign();
             if (File.Exists(Directory.GetCurrentDirectory() + "/campaign.sav"))
@@ -37,10 +37,10 @@ public static class MenuScene
         //     Fort f = Resources.LoadFort("/creativeFort.fort");
         //     EditorScene.Start(f, true);
         // }
-        if (RayGui.GuiButton(new Rectangle(400, 250, 400, 40), "Custom Battle") != 0) CustomBattleMenu.Start();
-        if (RayGui.GuiButton(new Rectangle(400, 300, 400, 40), "Sandbox") != 0) EditorScene.Start(creativeMode:true);
+        if (RayGui.GuiButton(new Rectangle(Screen.HCenter-200, Screen.VCenter-100, 400, 40), "Custom Battle") != 0) CustomBattleMenu.Start();
+        if (RayGui.GuiButton(new Rectangle(Screen.HCenter-200, Screen.VCenter-50, 400, 40), "Sandbox") != 0) EditorScene.Start(creativeMode:true);
         //if (RayGui.GuiButton(new Rectangle(400, 350, 400, 40), "Help") != 0) _helpWindowOpen = !_helpWindowOpen;
-        if (RayGui.GuiButton(new Rectangle(400, 400, 400, 40), "Quit") != 0)
+        if (RayGui.GuiButton(new Rectangle(Screen.HCenter-200, Screen.VCenter+50, 400, 40), "Quit") != 0)
         {
             EndDrawing();
             CloseWindow();

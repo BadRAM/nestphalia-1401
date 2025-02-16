@@ -19,48 +19,16 @@ public static class EditorScene
         
         Program.CurrentScene = Scene.Editor;
         World.InitializeEditor();
-        World.Camera.offset = new Vector2(300, 0);
+        World.Camera.offset = new Vector2(Screen.HCenter, Screen.VCenter);
         _fort.LoadToBoard(false);
     }
 
     public static void Update()
     {
         // ----- INPUT + GUI PHASE -----
-        // if (IsKeyPressed(KeyboardKey.KEY_ONE))
-        // {
-        //     _brush = Assets.Tiles[0];
-        // }
-        // if (IsKeyPressed(KeyboardKey.KEY_TWO))
-        // {
-        //     _brush = Assets.Tiles[2];
-        // }
-        // if (IsKeyPressed(KeyboardKey.KEY_THREE))
-        // {
-        //     _brush = Assets.Tiles[3];
-        // }
-        // if (IsKeyPressed(KeyboardKey.KEY_FOUR))
-        // {
-        //     _brush = Assets.Tiles[4];
-        // }
-        // if (IsKeyPressed(KeyboardKey.KEY_FIVE))
-        // {
-        //     _brush = Assets.Tiles[0];
-        // }
-	        
-        // if (IsKeyPressed(KeyboardKey.KEY_F))
-        // {
-        //     World.Flip();
-        // }
-	       //  
-        // if (IsKeyPressed(KeyboardKey.KEY_S))
-        // {
-        //     Resources.SaveFort("fortname");
-        // }
-        if (IsKeyPressed(KeyboardKey.KEY_L))
-        {
-            
-        }
-	        
+        
+        World.Camera.offset = new Vector2(Screen.HCenter-300, Screen.VCenter - 300);
+
         if (IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT))
         {
             Int2D tilePos = World.GetMouseTilePos();
@@ -105,18 +73,18 @@ public static class EditorScene
 
         if (_creativeMode)
         {
-            if (RayGui.GuiButton(new Rectangle(10, 550, 280, 50), "Exit") != 0) MenuScene.Start();
+            if (RayGui.GuiButton(new Rectangle(Screen.HCenter-600, Screen.VCenter+250, 280, 50), "Exit") != 0) MenuScene.Start();
         }
         else
         {
-            if (RayGui.GuiButton(new Rectangle(10, 550, 280, 50), "Save and Exit") != 0)
+            if (RayGui.GuiButton(new Rectangle(Screen.HCenter-600, Screen.VCenter+250, 280, 50), "Save and Exit") != 0)
             {
                 _fort.SaveBoard();
                 Program.Campaign.Start();
             }
         }
         
-        if (RayGui.GuiButton(new Rectangle(300, 550, 280, 50), "Save to file") != 0)
+        if (RayGui.GuiButton(new Rectangle(Screen.HCenter-300, Screen.VCenter+250, 280, 50), "Save to file") != 0)
         {
             int number = 1;
             while (true)
@@ -136,14 +104,14 @@ public static class EditorScene
             }
         }
 
-        if (RayGui.GuiButton(new Rectangle(890, 10, 300, 36), "Erase") != 0) _brush = null;
+        if (RayGui.GuiButton(new Rectangle(Screen.HCenter+300, Screen.VCenter-300, 300, 36), "Erase") != 0) _brush = null;
 
         //Console.WriteLine(RayGui.GuiTextBox(new Rectangle(10, 620, 400, 200), "Fort Name:", 12, true));
         int y = 0;
         for (int i = 0; i < Assets.Structures.Count; i++)
         {
             if (!_creativeMode && Assets.Structures[i].LevelRequirement > Program.Campaign.Level) continue;
-            if (RayGui.GuiButton(new Rectangle(890, y * 40 + 60, 300, 36), Assets.Structures[i].Name) != 0)
+            if (RayGui.GuiButton(new Rectangle(Screen.HCenter+300, Screen.VCenter + y * 40 - 250, 300, 36), Assets.Structures[i].Name) != 0)
             {
                 _brush = Assets.Structures[i];
             }
@@ -152,20 +120,20 @@ public static class EditorScene
 
         if (!_creativeMode)
         {
-            DrawText($"Bug Dollars: ${Program.Campaign.Money}", 10, 520, 10, WHITE);
+            DrawText($"Bug Dollars: ${Program.Campaign.Money}", Screen.HCenter-590, Screen.VCenter-290, 10, WHITE);
         }
 
         if (_brush == null)
         {
-            DrawText($"ERASING", 10, 10, 10, WHITE);
+            DrawText($"ERASING", Screen.HCenter-590, Screen.VCenter-290, 10, WHITE);
         }
         else
         {
-            DrawText($"Placing {_brush.GetDescription()}", 10, 10, 10, WHITE);
+            DrawText($"Placing {_brush.GetDescription()}", Screen.HCenter-590, Screen.VCenter-290, 10, WHITE);
         }
         
-        DrawText(_saveMessage, 10, 480, 10, WHITE);
-        DrawText(GetFortStats(), 10, 350, 10, WHITE);
+        DrawText(_saveMessage, Screen.HCenter-590, Screen.VCenter+180, 10, WHITE);
+        DrawText(GetFortStats(), Screen.HCenter-590, Screen.VCenter+50, 10, WHITE);
         
         EndDrawing();
     }

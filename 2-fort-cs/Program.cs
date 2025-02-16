@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Numerics;
+using ZeroElectric.Vinculum;
 using static ZeroElectric.Vinculum.Raylib;
 namespace _2_fort_cs;
 
@@ -21,8 +22,14 @@ static class Program
 	
     public static void Main()
     {
+	    SetWindowMinSize(1200, 600);
+	    
+	    SetWindowState(ConfigFlags.FLAG_WINDOW_RESIZABLE);
+	    
         InitWindow(1200, 600, "2-fort");
         SetTargetFPS(60);
+        
+        Screen.UpdateBounds();
         
         // Load a texture from the resources directory
         if (!Directory.Exists(Directory.GetCurrentDirectory() + "/forts/"))
@@ -36,6 +43,11 @@ static class Program
         while (!WindowShouldClose())
         {
 	        Time.UpdateTime();
+
+	        if (IsWindowResized())
+	        {
+		        Screen.UpdateBounds();
+	        }
 
 	        switch (CurrentScene)
 	        {

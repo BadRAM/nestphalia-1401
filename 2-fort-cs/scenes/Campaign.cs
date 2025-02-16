@@ -47,34 +47,34 @@ public class Campaign
         Raylib.BeginDrawing();
         Raylib.ClearBackground(Raylib.BLACK);
         
-        Raylib.DrawText(_outcomeText, 10, 400, 16, Raylib.WHITE);
+        Raylib.DrawText(_outcomeText, Screen.HCenter-590, Screen.VCenter+100, 16, Raylib.WHITE);
 
-        Raylib.DrawText($"Bug Dollars: ${Money}", 10, 350, 16, Raylib.WHITE);
+        Raylib.DrawText($"Bug Dollars: ${Money}", Screen.HCenter-590, Screen.VCenter+50, 16, Raylib.WHITE);
 
         
-        if (RayGui.GuiButton(new Rectangle(20,   50, 200, 40), "Edit Fort") != 0) EditorScene.Start(Fort1);
+        if (RayGui.GuiButton(new Rectangle(Screen.HCenter-600,   Screen.VCenter-300, 200, 40), "Edit Fort") != 0) EditorScene.Start(Fort1);
         // if (RayGui.GuiButton(new Rectangle(20,  100, 200, 40), "Edit Fort 2") != 0) EditorScene.Start(Fort2);
         // if (RayGui.GuiButton(new Rectangle(20,  150, 200, 40), "Edit Fort 3") != 0) EditorScene.Start(Fort3);
-        if (Level >= 7 && RayGui.GuiButton(new Rectangle(960,  50, 200, 40), Resources.CampaignLevels[7].Name) != 0) _selectedLevel = 7;
-        if (Level >= 6 && RayGui.GuiButton(new Rectangle(960, 100, 200, 40), Resources.CampaignLevels[6].Name) != 0) _selectedLevel = 6;
-        if (Level >= 5 && RayGui.GuiButton(new Rectangle(960, 150, 200, 40), Resources.CampaignLevels[5].Name) != 0) _selectedLevel = 5;
-        if (Level >= 4 && RayGui.GuiButton(new Rectangle(960, 200, 200, 40), Resources.CampaignLevels[4].Name) != 0) _selectedLevel = 4;
-        if (Level >= 3 && RayGui.GuiButton(new Rectangle(960, 250, 200, 40), Resources.CampaignLevels[3].Name) != 0) _selectedLevel = 3;
-        if (Level >= 2 && RayGui.GuiButton(new Rectangle(960, 300, 200, 40), Resources.CampaignLevels[2].Name) != 0) _selectedLevel = 2;
-        if (Level >= 1 && RayGui.GuiButton(new Rectangle(960, 350, 200, 40), Resources.CampaignLevels[1].Name) != 0) _selectedLevel = 1;
-        if (Level >= 0 && RayGui.GuiButton(new Rectangle(960, 400, 200, 40), Resources.CampaignLevels[0].Name) != 0) _selectedLevel = 0;
+        if (Level >= 7 && RayGui.GuiButton(new Rectangle(Screen.HCenter+360, Screen.VCenter-250, 200, 40), Resources.CampaignLevels[7].Name) != 0) _selectedLevel = 7;
+        if (Level >= 6 && RayGui.GuiButton(new Rectangle(Screen.HCenter+360, Screen.VCenter-200, 200, 40), Resources.CampaignLevels[6].Name) != 0) _selectedLevel = 6;
+        if (Level >= 5 && RayGui.GuiButton(new Rectangle(Screen.HCenter+360, Screen.VCenter-150, 200, 40), Resources.CampaignLevels[5].Name) != 0) _selectedLevel = 5;
+        if (Level >= 4 && RayGui.GuiButton(new Rectangle(Screen.HCenter+360, Screen.VCenter-100, 200, 40), Resources.CampaignLevels[4].Name) != 0) _selectedLevel = 4;
+        if (Level >= 3 && RayGui.GuiButton(new Rectangle(Screen.HCenter+360, Screen.VCenter- 50, 200, 40), Resources.CampaignLevels[3].Name) != 0) _selectedLevel = 3;
+        if (Level >= 2 && RayGui.GuiButton(new Rectangle(Screen.HCenter+360, Screen.VCenter    , 200, 40), Resources.CampaignLevels[2].Name) != 0) _selectedLevel = 2;
+        if (Level >= 1 && RayGui.GuiButton(new Rectangle(Screen.HCenter+360, Screen.VCenter+ 50, 200, 40), Resources.CampaignLevels[1].Name) != 0) _selectedLevel = 1;
+        if (Level >= 0 && RayGui.GuiButton(new Rectangle(Screen.HCenter+360, Screen.VCenter+100, 200, 40), Resources.CampaignLevels[0].Name) != 0) _selectedLevel = 0;
 
         if (_selectedLevel != -1)
         {
-            Raylib.DrawText($"{Resources.CampaignLevels[_selectedLevel].Name}\nTravel cost: {_selectedLevel * 250} \nPrize: {(_selectedLevel+1) * 1000}", 760, 400, 16, Raylib.WHITE);
-            if (Money >= _selectedLevel * 250 && RayGui.GuiButton(new Rectangle(760, 500, 200, 40), "To Battle!") != 0)
+            Raylib.DrawText($"{Resources.CampaignLevels[_selectedLevel].Name}\nTravel cost: {_selectedLevel * 250} \nPrize: {(_selectedLevel+1) * 1000}", Screen.HCenter+160, Screen.VCenter+100, 16, Raylib.WHITE);
+            if (Money >= _selectedLevel * 250 && RayGui.GuiButton(new Rectangle(Screen.HCenter+160, Screen.VCenter+200, 200, 40), "To Battle!") != 0)
             {
                 Money -= _selectedLevel * 250;
                 BattleScene.Start(Fort1, Resources.CampaignLevels[_selectedLevel]);
             }
         }
         
-        if (RayGui.GuiButton(new Rectangle(10, 550, 280, 50), "Quit") != 0)
+        if (RayGui.GuiButton(new Rectangle(Screen.HCenter-600, Screen.VCenter+250, 280, 50), "Quit") != 0)
         {
             MenuScene.Start();
         }
