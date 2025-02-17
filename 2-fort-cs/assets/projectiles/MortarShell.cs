@@ -33,6 +33,7 @@ public class MortarShell : Projectile
     private Vector2 _targetPos;
     private double _timeFired;
     private MortarShellTemplate _template;
+    private Team _team;
     
     public MortarShell(MortarShellTemplate template, Vector2 position, object target, object source) : base(template, position, target, source)
     {
@@ -51,6 +52,10 @@ public class MortarShell : Projectile
         {
             _targetPos = vec;
         }
+        if (source is Structure sourceStructure)
+        {
+            _team = sourceStructure.Team;
+        }
     }
     
     public override void Update()
@@ -66,7 +71,7 @@ public class MortarShell : Projectile
         {
             foreach (Minion minion in World.Minions)
             {
-                if (!minion.Template.IsFlying &&
+                if (!minion.Template.IsFlying && minion.Team != _team &&
                     Raylib.CheckCollisionCircles(_targetPos, _template.BlastRadius, minion.Position, minion.Template.PhysicsRadius))
                 {
                     minion.Hurt(this);

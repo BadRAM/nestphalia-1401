@@ -53,7 +53,7 @@ public class TurretTemplate : StructureTemplate
 
 public class Turret : Structure
 {
-    private double lastFireTime;
+    private double _timeLastFired;
     private TurretTemplate _template;
     private Minion? _target;
     
@@ -66,7 +66,7 @@ public class Turret : Structure
     {
         base.Update();
         
-        if (Time.Scaled - lastFireTime > 60/_template.RateOfFire)
+        if (Time.Scaled - _timeLastFired > 60/_template.RateOfFire)
         {
             switch (_template.TargetMode)
             {
@@ -88,7 +88,7 @@ public class Turret : Structure
             if (_target != null)
             {
                 _template.Projectile.Instantiate(_target, this);
-                lastFireTime = Time.Scaled;
+                _timeLastFired = Time.Scaled;
             }
         }
     }

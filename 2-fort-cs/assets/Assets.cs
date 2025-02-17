@@ -98,6 +98,23 @@ public static class Assets
         
         Structures.Add
         (
+            new MinefieldTemplate
+            (
+                "Minefield",
+                Resources.GetTextureByName("mine"),
+                100,
+                100,
+                0,
+                0,
+                3,
+                new MortarShellTemplate(Resources.GetTextureByName("mine"), 50, 0.4, 0, 32),
+                12,
+                4
+            )
+        );
+        
+        Structures.Add
+        (
             new SpawnerTemplate
             (
                 "Anthill", 

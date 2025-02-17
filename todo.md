@@ -2,23 +2,25 @@
 
 Programming todo:
 =================
-- Mortar turret and projectile
+- Landmine
 - Population limit?
 - More better UI
+ - Quit button from pause menu
  - Menus with designed layouts and backgrounds
  - Sprite buttons
  - Tile Icons in edit mode
  - Make menus fit resolution
  - Clamp world to screen
+ - Post battle screen
 - More utility structures
 - Minion melee attack animation
 - Minion state machine
-- Minion vs Minion melee
 - Fix minion collision with wall corners
-- Assets from json
 - Splash screen
 
 ----- Postponed to team bug fort 2 -----
+- Assets from json
+- Minion vs Minion melee
 - Multitile structures
 - Active ability towers?
 
@@ -38,7 +40,7 @@ Design todo:
   - Centipede
   - Roach
   - Earwig
-  - Spider
+  - Spider - Produces spiderlings while alive, turns into many spiderlings when killed
   - Fly
   - Flea
   - Worm
@@ -49,6 +51,7 @@ Design todo:
   - Fast floor
   - Slow floor
   - Honey pot
+  - Minefield
 
 
 - Workers?
