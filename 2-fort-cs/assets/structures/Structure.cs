@@ -11,6 +11,14 @@ public class StructureTemplate
     public double Price;
     public int LevelRequirement;
     public double BaseHate;
+    public StructureClass Class;
+
+    public enum StructureClass
+    {
+        Utility,
+        Tower,
+        Nest
+    }
     
     public StructureTemplate(string name, Texture texture, double maxHealth, double price, int levelRequirement, double baseHate)
     {
@@ -20,6 +28,7 @@ public class StructureTemplate
         Price = price;
         LevelRequirement = levelRequirement;
         BaseHate = baseHate;
+        Class = StructureClass.Utility;
     }
     
     public virtual Structure Instantiate(Team team, int x, int y)

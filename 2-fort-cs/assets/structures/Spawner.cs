@@ -15,6 +15,7 @@ public class SpawnerTemplate : StructureTemplate
         WaveSize = waveSize;
         WaveGrowth = waveGrowth;
         TimeBetweenSpawns = timeBetweenSpawns;
+        Class = StructureClass.Nest;
     }
     
     public override Spawner Instantiate(Team team, int x, int y)

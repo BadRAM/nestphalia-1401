@@ -72,12 +72,12 @@ public class Minefield : Structure
     {
         for (int i = 0; i < Math.Min(_chargesLeft, _drawPoints.Length); i++)
         {
-            int x = (int)(_drawPoints[i].X + position.X - Template.Texture.width/2);
-            int y = (int)(_drawPoints[i].Y + position.Y - Template.Texture.height/2);
-            Raylib.DrawTexture(Template.Texture, x, y, Raylib.WHITE);
+            int x = (int)(_drawPoints[i].X + position.X - _template.Bomb.Texture.width/2);
+            int y = (int)(_drawPoints[i].Y + position.Y - _template.Bomb.Texture.height/2);
+            Raylib.DrawTexture(_template.Bomb.Texture, x, y, Raylib.WHITE);
         }
     }
-
+    
     public override bool IsSolid()
     {
         return false;

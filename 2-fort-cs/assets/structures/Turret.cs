@@ -34,6 +34,7 @@ public class TurretTemplate : StructureTemplate
         TargetMode = targetMode;
         CanHitGround = canHitGround;
         CanHitFlying = canHitFlying;
+        Class = StructureClass.Tower;
     }
     
     public override Turret Instantiate(Team team, int x, int y)

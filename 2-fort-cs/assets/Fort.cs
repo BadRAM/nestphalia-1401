@@ -42,9 +42,9 @@ public class Fort
                 if (t == null) continue;
                 structureCount++;
                 totalCost += t.Price;
-                if (t is TurretTemplate) turretCount++;
-                if (t is DoorTemplate) utilityCount++;
-                if (t is SpawnerTemplate) nestCount++;
+                if (t.Class == StructureTemplate.StructureClass.Utility) utilityCount++;
+                if (t.Class == StructureTemplate.StructureClass.Tower) turretCount++;
+                if (t.Class == StructureTemplate.StructureClass.Nest) nestCount++;
             }
         }
 

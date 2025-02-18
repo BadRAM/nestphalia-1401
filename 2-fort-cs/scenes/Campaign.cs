@@ -55,30 +55,29 @@ public class Campaign
         Raylib.DrawTextEx(Resources.Font, $"Bug Dollars: ${Money}", new Vector2(Screen.HCenter-590, Screen.VCenter+50), 12, 1, Raylib.WHITE);
 
         
-        if (RayGui.GuiButton(new Rectangle(Screen.HCenter-600,   Screen.VCenter-300, 200, 40), "Edit Fort") != 0) EditorScene.Start(Fort1);
+        if (GUI.ButtonWide(Screen.HCenter-600,   Screen.VCenter-300, "Edit Fort")) EditorScene.Start(Fort1);
         // if (RayGui.GuiButton(new Rectangle(20,  100, 200, 40), "Edit Fort 2") != 0) EditorScene.Start(Fort2);
         // if (RayGui.GuiButton(new Rectangle(20,  150, 200, 40), "Edit Fort 3") != 0) EditorScene.Start(Fort3);
-        if (Level >= 15 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter-300, Resources.CampaignLevels[15].Name)) _selectedLevel = 15;
-        if (Level >= 14 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter-260, Resources.CampaignLevels[14].Name)) _selectedLevel = 14;
-        if (Level >= 13 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter-220, Resources.CampaignLevels[13].Name)) _selectedLevel = 13;
-        if (Level >= 12 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter-180, Resources.CampaignLevels[12].Name)) _selectedLevel = 12;
-        if (Level >= 11 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter-140, Resources.CampaignLevels[11].Name)) _selectedLevel = 11;
-        if (Level >= 10 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter-100, Resources.CampaignLevels[10].Name)) _selectedLevel = 10;
-        if (Level >=  9 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter- 60, Resources.CampaignLevels[ 9].Name)) _selectedLevel =  9;
-        if (Level >=  8 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter- 20, Resources.CampaignLevels[ 8].Name)) _selectedLevel =  8;
-        if (Level >=  7 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter+ 20, Resources.CampaignLevels[ 7].Name)) _selectedLevel =  7;
-        if (Level >=  6 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter+ 60, Resources.CampaignLevels[ 6].Name)) _selectedLevel =  6;
-        if (Level >=  5 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter+100, Resources.CampaignLevels[ 5].Name)) _selectedLevel =  5;
-        if (Level >=  4 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter+140, Resources.CampaignLevels[ 4].Name)) _selectedLevel =  4;
-        if (Level >=  3 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter+180, Resources.CampaignLevels[ 3].Name)) _selectedLevel =  3;
-        if (Level >=  2 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter+220, Resources.CampaignLevels[ 2].Name)) _selectedLevel =  2;
-        if (Level >=  1 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter+260, Resources.CampaignLevels[ 1].Name)) _selectedLevel =  1;
-        if (Level >=  0 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter+300, Resources.CampaignLevels[ 0].Name)) _selectedLevel =  0;
+        if (Level >= 14 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter-300, Resources.CampaignLevels[14].Name)) _selectedLevel = 14;
+        if (Level >= 13 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter-260, Resources.CampaignLevels[13].Name)) _selectedLevel = 13;
+        if (Level >= 12 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter-220, Resources.CampaignLevels[12].Name)) _selectedLevel = 12;
+        if (Level >= 11 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter-180, Resources.CampaignLevels[11].Name)) _selectedLevel = 11;
+        if (Level >= 10 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter-140, Resources.CampaignLevels[10].Name)) _selectedLevel = 10;
+        if (Level >=  9 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter-100, Resources.CampaignLevels[ 9].Name)) _selectedLevel =  9;
+        if (Level >=  8 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter- 60, Resources.CampaignLevels[ 8].Name)) _selectedLevel =  8;
+        if (Level >=  7 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter- 20, Resources.CampaignLevels[ 7].Name)) _selectedLevel =  7;
+        if (Level >=  6 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter+ 20, Resources.CampaignLevels[ 6].Name)) _selectedLevel =  6;
+        if (Level >=  5 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter+ 60, Resources.CampaignLevels[ 5].Name)) _selectedLevel =  5;
+        if (Level >=  4 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter+100, Resources.CampaignLevels[ 4].Name)) _selectedLevel =  4;
+        if (Level >=  3 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter+140, Resources.CampaignLevels[ 3].Name)) _selectedLevel =  3;
+        if (Level >=  2 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter+180, Resources.CampaignLevels[ 2].Name)) _selectedLevel =  2;
+        if (Level >=  1 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter+220, Resources.CampaignLevels[ 1].Name)) _selectedLevel =  1;
+        if (Level >=  0 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter+260, Resources.CampaignLevels[ 0].Name)) _selectedLevel =  0;
 
         if (_selectedLevel != -1)
         {
-            Raylib.DrawTextEx(Resources.Font, $"{Resources.CampaignLevels[_selectedLevel].Name}\nTravel cost: {_selectedLevel * 250} \nPrize: {(_selectedLevel+1) * 1000}", new Vector2(Screen.HCenter+160, Screen.VCenter+100), 12, 1, Raylib.WHITE);
-            if (Money >= _selectedLevel * 250 && RayGui.GuiButton(new Rectangle(Screen.HCenter+160, Screen.VCenter+200, 200, 40), "To Battle!") != 0)
+            GUI.DrawTextLeft(Screen.HCenter-140, Screen.VCenter-30, $"{Resources.CampaignLevels[_selectedLevel].Name}\nTravel cost: {_selectedLevel * 250} \nPrize: {(_selectedLevel+1) * 1000}");
+            if (Money >= _selectedLevel * 250 && GUI.ButtonWide(Screen.HCenter-150, Screen.VCenter+20, "To Battle!"))
             {
                 Money -= _selectedLevel * 250;
                 BattleScene.CustomBattle = false;
@@ -86,7 +85,7 @@ public class Campaign
             }
         }
         
-        if (RayGui.GuiButton(new Rectangle(Screen.HCenter-600, Screen.VCenter+250, 280, 50), "Quit") != 0)
+        if (GUI.ButtonWide(Screen.HCenter-600, Screen.VCenter+260, "Quit"))
         {
             MenuScene.Start();
         }

@@ -2,18 +2,14 @@
 
 Programming todo:
 =================
-- Landmine
-- Population limit?
+- Your bugs don't like minefields
 - More better UI
- - Quit button from pause menu
  - Menus with designed layouts and backgrounds
- - Sprite buttons
- - Tile Icons in edit mode
- - Make menus fit resolution
- - Clamp world to screen
  - Post battle screen
 - New Structures/Minions
  - Lightning Tower
+ - Glue Paper
+ - Hazard sign (Enemies disregard, your bugs strongly avoid)
  - Grasshopper
  - Spider
  - Sapper Beetle

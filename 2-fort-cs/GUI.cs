@@ -6,14 +6,14 @@ namespace _2_fort_cs;
 
 public static class GUI
 {
-    public static Texture ButtonWideTexture;
-    public static Texture ButtonNarrowTexture;
+    private static Texture _buttonWideTexture;
+    private static Texture _buttonNarrowTexture;
     public static Font Font;
 
     public static void Initialize()
     {
-        ButtonWideTexture = Resources.GetTextureByName("button_wide");
-        ButtonNarrowTexture = Resources.GetTextureByName("button_narrow");
+        _buttonWideTexture = Resources.GetTextureByName("button_wide");
+        _buttonNarrowTexture = Resources.GetTextureByName("button_narrow");
     }
 
     public static void DrawTextCentered(int x, int y, string text, float size = 12, Color? color = null)
@@ -38,7 +38,7 @@ public static class GUI
         bool press = !enabled || (hover && IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT));
         
         Rectangle subSprite = new Rectangle(0, !press ? !hover ? 0 : 40 : 80, 300, 40);
-        DrawTextureRec(ButtonWideTexture, subSprite, new Vector2(x,y), WHITE);
+        DrawTextureRec(_buttonWideTexture, subSprite, new Vector2(x,y), WHITE);
         DrawTextCentered(x+150, y+20, text);
         
         return enabled && hover && IsMouseButtonReleased(MouseButton.MOUSE_BUTTON_LEFT);
@@ -50,7 +50,7 @@ public static class GUI
         bool press = !enabled || (hover && IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT));
         
         Rectangle subSprite = new Rectangle(0, !press ? !hover ? 0 : 40 : 80, 100, 40);
-        DrawTextureRec(ButtonNarrowTexture, subSprite, new Vector2(x,y), WHITE);
+        DrawTextureRec(_buttonNarrowTexture, subSprite, new Vector2(x,y), WHITE);
         DrawTextCentered(x+50, y+20, text);
         
         return enabled && hover && IsMouseButtonReleased(MouseButton.MOUSE_BUTTON_LEFT);

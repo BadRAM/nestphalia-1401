@@ -1,26 +1,58 @@
 using System.Numerics;
 using ZeroElectric.Vinculum;
+using static _2_fort_cs.GUI;
 using static ZeroElectric.Vinculum.Raylib;
 
 namespace _2_fort_cs;
 
 public static class EditorScene
 {
-    private static bool _creativeMode = false;
+    private static bool _sandboxMode = false;
     private static StructureTemplate? _brush;
     private static Fort _fort;
     private static string _saveMessage;
     private static string _fortStats;
+    private static bool _newUtil;
+    private static bool _newTower;
+    private static bool _newNest;
+    private static bool _nestCapped;
+    private static StructureTemplate.StructureClass _structureClass;
     
     public static void Start(Fort? fortToLoad = null, bool creativeMode = false)
     {
-        _creativeMode = creativeMode;
+        _sandboxMode = creativeMode;
         _fort = fortToLoad ?? new Fort();
         
         Program.CurrentScene = Scene.Editor;
         World.InitializeEditor();
         World.Camera.offset = new Vector2(Screen.HCenter, Screen.VCenter);
         _fort.LoadToBoard(false);
+        
+        _newUtil = false;
+        _newTower = false;
+        _newNest = false;
+
+        if (!_sandboxMode)
+        {
+            foreach (StructureTemplate template in Assets.Structures)
+            {
+                if (template.LevelRequirement == Program.Campaign.Level)
+                {
+                    switch (template.Class)
+                    {
+                        case StructureTemplate.StructureClass.Utility:
+                            _newUtil = true;
+                            break;
+                        case StructureTemplate.StructureClass.Tower:
+                            _newTower = true;
+                            break;
+                        case StructureTemplate.StructureClass.Nest:
+                            _newNest = true;
+                            break;
+                    }
+                }
+            }
+        }
     }
 
     public static void Update()
@@ -36,13 +68,13 @@ public static class EditorScene
             if (tilePos.X >= 1 && tilePos.X < 21 && tilePos.Y >= 1 && tilePos.Y < 21 
                 && _brush != World.GetTile(tilePos)?.Template)
             {
-                if (_creativeMode)
+                if (_sandboxMode)
                 {
                     World.SetTile(_brush, World.LeftTeam, tilePos);
                 }
                 else
                 {
-                    if (_brush == null || _brush.Price < Program.Campaign.Money)
+                    if (_brush == null || (_brush.Price < Program.Campaign.Money && (_brush.Class != StructureTemplate.StructureClass.Nest || !_nestCapped)))
                     {
                         if (World.GetTile(tilePos) != null)
                         {
@@ -57,34 +89,34 @@ public static class EditorScene
                 }
             }
         }
-	        
+        
         if (IsMouseButtonDown(MouseButton.MOUSE_BUTTON_RIGHT))
         {
             Int2D tilePos = World.GetMouseTilePos();
             if (tilePos.X >= 1 && tilePos.X < 21 && tilePos.Y >= 1 && tilePos.Y < 21)
             {
                 _brush = World.GetTile(tilePos)?.Template;
-            }        
+            }
         }
         
         BeginDrawing();
-        ClearBackground(Raylib.BLACK);
+        ClearBackground(BLACK);
         World.Draw();
 
-        if (_creativeMode)
+        if (_sandboxMode)
         {
-            if (RayGui.GuiButton(new Rectangle(Screen.HCenter-600, Screen.VCenter+250, 280, 50), "Exit") != 0) MenuScene.Start();
+            if (ButtonWide(Screen.HCenter-600, Screen.VCenter+260, "Exit")) MenuScene.Start();
         }
         else
         {
-            if (RayGui.GuiButton(new Rectangle(Screen.HCenter-600, Screen.VCenter+250, 280, 50), "Save and Exit") != 0)
+            if (ButtonWide(Screen.HCenter-600, Screen.VCenter+260, "Save and Exit"))
             {
                 _fort.SaveBoard();
                 Program.Campaign.Start();
             }
         }
         
-        if (RayGui.GuiButton(new Rectangle(Screen.HCenter-300, Screen.VCenter+250, 280, 50), "Save to file") != 0)
+        if (ButtonWide(Screen.HCenter-300, Screen.VCenter+260, "Save to file"))
         {
             int number = 1;
             while (true)
@@ -104,34 +136,45 @@ public static class EditorScene
             }
         }
 
-        if (RayGui.GuiButton(new Rectangle(Screen.HCenter+300, Screen.VCenter-300, 300, 36), "Erase") != 0) _brush = null;
+        if (ButtonNarrow(Screen.HCenter+200, Screen.VCenter-300, "Erase", _brush != null)) _brush = null;
+        if (ButtonNarrow(Screen.HCenter+300, Screen.VCenter-300, (_newUtil ? "NEW! " : "") + "Utility", _structureClass != StructureTemplate.StructureClass.Utility)) _structureClass = StructureTemplate.StructureClass.Utility;
+        if (ButtonNarrow(Screen.HCenter+400, Screen.VCenter-300, (_newTower ? "NEW! " : "") + "Tower", _structureClass != StructureTemplate.StructureClass.Tower)) _structureClass = StructureTemplate.StructureClass.Tower;
+        if (ButtonNarrow(Screen.HCenter+500, Screen.VCenter-300, (_newNest ? "NEW! " : "") + "Nest", _structureClass != StructureTemplate.StructureClass.Nest)) _structureClass = StructureTemplate.StructureClass.Nest;
 
         //Console.WriteLine(RayGui.GuiTextBox(new Rectangle(10, 620, 400, 200), "Fort Name:", 12, true));
         int y = 0;
         for (int i = 0; i < Assets.Structures.Count; i++)
         {
-            if (!_creativeMode && Assets.Structures[i].LevelRequirement > Program.Campaign.Level) continue;
-            if (RayGui.GuiButton(new Rectangle(Screen.HCenter+300, Screen.VCenter + y * 40 - 250, 300, 36), Assets.Structures[i].Name) != 0)
+            StructureTemplate s = Assets.Structures[i];
+            if ((!_sandboxMode && s.LevelRequirement > Program.Campaign.Level) || s.Class != _structureClass) continue;
+            string label = ((!_sandboxMode && s.LevelRequirement == Program.Campaign.Level) ? "NEW! " : "") + s.Name + " - $" + s.Price;
+            if (ButtonWide(Screen.HCenter+300, Screen.VCenter + y * 40 - 250, label, _brush != s))
             {
-                _brush = Assets.Structures[i];
+                _brush = s;
             }
+            DrawTexture(s.Texture, Screen.HCenter + 320, Screen.VCenter + y * 40 - 246, WHITE);
             y++;
         }
 
-        if (!_creativeMode)
+        if (!_sandboxMode)
         {
-            DrawTextEx(Resources.Font, $"Bug Dollars: ${Program.Campaign.Money}", new Vector2(Screen.HCenter-590, Screen.VCenter+ 200), 12, 1, WHITE);
+            DrawTextLeft(Screen.HCenter-590, Screen.VCenter+ 200, $"Bug Dollars: ${Program.Campaign.Money}");
+            //DrawTextEx(Resources.Font, $"Bug Dollars: ${Program.Campaign.Money}", new Vector2(Screen.HCenter-590, Screen.VCenter+ 200), 12, 1, WHITE);
         }
 
         if (_brush == null)
         {
-            DrawTextEx(Resources.Font, $"ERASING", new Vector2(Screen.HCenter-590, Screen.VCenter-290), 12, 1, WHITE);
+            DrawTextLeft(Screen.HCenter-590, Screen.VCenter-290, "ERASING");
+            //DrawTextEx(Resources.Font, $"ERASING", new Vector2(Screen.HCenter-590, Screen.VCenter-290), 12, 1, WHITE);
         }
         else
         {
-            DrawTextEx(Resources.Font, $"Placing {_brush.GetDescription()}", new Vector2(Screen.HCenter-590, Screen.VCenter-290), 12, 1, WHITE);
+            DrawTextLeft(Screen.HCenter-590, Screen.VCenter-290, $"Placing {_brush.GetDescription()}");
+            //DrawTextEx(Resources.Font, $"Placing {_brush.GetDescription()}", new Vector2(Screen.HCenter-590, Screen.VCenter-290), 12, 1, WHITE);
         }
         
+        DrawTextLeft(Screen.HCenter-590, Screen.VCenter+180, _saveMessage);
+        DrawTextLeft(Screen.HCenter-590, Screen.VCenter+50, GetFortStats());
         DrawTextEx(Resources.Font, _saveMessage, new Vector2(Screen.HCenter-590, Screen.VCenter+180), 12, 1, WHITE);
         DrawTextEx(Resources.Font, GetFortStats(), new Vector2(Screen.HCenter-590, Screen.VCenter+50), 12, 1, WHITE);
         
@@ -154,15 +197,20 @@ public static class EditorScene
                 if (t == null) continue;
                 structureCount++;
                 totalCost += t.Template.Price;
-                if (t is Turret) turretCount++;
-                if (t is Door) utilityCount++;
-                if (t is Spawner) nestCount++;
+                if (t.Template.Class == StructureTemplate.StructureClass.Utility) utilityCount++;
+                if (t.Template.Class == StructureTemplate.StructureClass.Tower) turretCount++;
+                if (t.Template.Class == StructureTemplate.StructureClass.Nest) nestCount++;
             }
+        }
+
+        if (!_sandboxMode)
+        {
+            _nestCapped = nestCount >= Program.Campaign.Level * 2 + 10;
         }
         
         return $"{turretCount} Towers\n" +
                $"{utilityCount} Utility\n" +
-               $"{nestCount} Nests\n" +
+               nestCount + (_sandboxMode ? "" : "/"+(Program.Campaign.Level*2+10)) + " Nests\n" +
                $"{structureCount} Total\n" +
                $"{totalCost} Cost";
     }

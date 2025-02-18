@@ -101,7 +101,7 @@ public static class Assets
             new MinefieldTemplate
             (
                 "Minefield",
-                Resources.GetTextureByName("mine"),
+                Resources.GetTextureByName("minefield"),
                 100,
                 100,
                 0,
