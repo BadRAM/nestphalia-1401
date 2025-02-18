@@ -38,6 +38,9 @@ static class Program
         }
         Resources.Load();
         Assets.Load();
+        Screen.Initialize();
+        GUI.Initialize();
+        
         
         IntroScene.Start();
         while (!WindowShouldClose())

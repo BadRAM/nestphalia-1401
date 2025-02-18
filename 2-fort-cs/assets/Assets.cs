@@ -106,10 +106,10 @@ public static class Assets
                 100,
                 0,
                 0,
-                3,
+                4,
                 new MortarShellTemplate(Resources.GetTextureByName("mine"), 50, 0.4, 0, 32),
                 12,
-                4
+                5
             )
         );
         

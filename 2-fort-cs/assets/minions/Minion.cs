@@ -242,7 +242,7 @@ public class Minion : ISprite
         Raylib.DrawTextureRec(Template.Texture, source, pos, Team.UnitTint);
         
         // Debug, shows path
-        if (Raylib.CheckCollisionPointCircle(Raylib.GetMousePosition(), Position, Template.PhysicsRadius))
+        if (Raylib.CheckCollisionPointCircle(Raylib.GetScreenToWorld2D(Raylib.GetMousePosition(), World.Camera), Position, Template.PhysicsRadius))
         {
             Vector2 path = Position;
             foreach (Int2D i in _navPath.Waypoints)

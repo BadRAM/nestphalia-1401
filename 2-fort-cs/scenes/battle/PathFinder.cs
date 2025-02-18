@@ -184,7 +184,8 @@ public static class PathFinder
         n.Weight += weight;
         n.Weight += team.GetFearOf(x, y) * 0.2;
         Structure? structure = World.GetTile(x, y);
-        if (structure != null && !(structure is Door && structure.Team == team) &&
+        if (!structure?.IsSolid() ?? true) return n;
+        if (!(structure is Door && structure.Team == team) &&
             !(structure is Spawner && structure.Team == team))
         {
             n.Weight += structure.Health;

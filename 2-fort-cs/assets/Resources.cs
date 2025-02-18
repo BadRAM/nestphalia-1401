@@ -22,10 +22,15 @@ public static class Resources
     public static Texture MissingTexture;
     public static List<SpriteResource> Sprites = new List<SpriteResource>();
     public static List<Fort> CampaignLevels = new List<Fort>();
+    public static Font Font;
     
     public static void Load()
     {
         MissingTexture = LoadTexture("resources/sprites/missingtex.png");
+        Font = LoadFont("resources/pixantiqua.png");
+        RayGui.GuiSetFont(Font);
+        RayGui.GuiSetStyle(0, 16, 12);
+
         
         foreach (string path in Directory.GetFiles(Directory.GetCurrentDirectory() + "/resources/sprites"))
         {
@@ -40,6 +45,14 @@ public static class Resources
         CampaignLevels.Add(LoadFort("/resources/level6.fort"));
         CampaignLevels.Add(LoadFort("/resources/level7.fort"));
         CampaignLevels.Add(LoadFort("/resources/level8.fort"));
+        CampaignLevels.Add(LoadFort("/resources/level9.fort"));
+        CampaignLevels.Add(LoadFort("/resources/level10.fort"));
+        CampaignLevels.Add(LoadFort("/resources/level11.fort"));
+        CampaignLevels.Add(LoadFort("/resources/level12.fort"));
+        CampaignLevels.Add(LoadFort("/resources/level13.fort"));
+        CampaignLevels.Add(LoadFort("/resources/level14.fort"));
+        CampaignLevels.Add(LoadFort("/resources/level15.fort"));
+        CampaignLevels.Add(LoadFort("/resources/level16.fort"));
     }
     
     public static Texture GetTextureByName(string name)

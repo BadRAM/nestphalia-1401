@@ -12,6 +12,12 @@ Programming todo:
  - Make menus fit resolution
  - Clamp world to screen
  - Post battle screen
+- New Structures/Minions
+ - Lightning Tower
+ - Grasshopper
+ - Spider
+ - Sapper Beetle
+ - Frog
 - More utility structures
 - Minion melee attack animation
 - Minion state machine
@@ -46,6 +52,7 @@ Design todo:
   - Worm
   - Stinkbug
   - Scorpion
+  - Lightning bug
  - Utility
   - Strong door
   - Fast floor

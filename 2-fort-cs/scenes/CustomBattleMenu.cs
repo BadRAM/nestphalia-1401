@@ -1,18 +1,20 @@
+using System.Numerics;
 using ZeroElectric.Vinculum;
 
 namespace _2_fort_cs;
 
 public static class CustomBattleMenu
 {
-    public static Fort? PlayerFort;
-    public static Fort? EnemyFort;
-    private static bool _loadingPlayerSide = true;
+    public static Fort? LeftFort;
+    public static Fort? RightFort;
+    private static bool _loadingLeftSide = true;
     public static string OutcomeMessage;
 
     public static void Start()
     {
         Program.CurrentScene = Scene.CustomBattleSetup;
-        _loadingPlayerSide = true;
+        Screen.RegenerateBackground();
+        _loadingLeftSide = true;
         OutcomeMessage = "";
     }
 
@@ -20,52 +22,54 @@ public static class CustomBattleMenu
     {
         Raylib.BeginDrawing();
         Raylib.ClearBackground(Raylib.GRAY);
+        Screen.DrawBackground(Raylib.DARKGRAY);
+
         
         string[] forts = Directory.GetFiles(Directory.GetCurrentDirectory() + "/forts/");
 
-        if (RayGui.GuiButton(new Rectangle(Screen.HCenter+300, Screen.VCenter-290, 280, 26), _loadingPlayerSide ? "Selecting Left Fort" : "Selecting Right Fort") != 0)
+        if (GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter-300, _loadingLeftSide ? "Selecting Left Fort" : "Selecting Right Fort"))
         {
-            _loadingPlayerSide = !_loadingPlayerSide;
+            _loadingLeftSide = !_loadingLeftSide;
         }
-
         
         for (int i = 0; i < forts.Length; i++)
         {
-            if (RayGui.GuiButton(new Rectangle(Screen.HCenter-600, Screen.VCenter + i*30 - 300, 280, 26), Path.GetFileName(forts[i])) != 0)
+            if (GUI.ButtonWide(Screen.HCenter-600, Screen.VCenter + i*40 - 300, Path.GetFileName(forts[i])))
             {
                 Console.WriteLine("Loading " + Path.GetFileName(forts[i]));
-                if (_loadingPlayerSide)
+                if (_loadingLeftSide)
                 {
-                    PlayerFort = Resources.LoadFort("/forts/" + Path.GetFileName(forts[i]));
-                    PlayerFort.Name = Path.GetFileNameWithoutExtension(forts[i]);
-                    PlayerFort.Comment = PlayerFort.FortSummary();
+                    LeftFort = Resources.LoadFort("/forts/" + Path.GetFileName(forts[i]));
+                    LeftFort.Name = Path.GetFileNameWithoutExtension(forts[i]);
+                    LeftFort.Comment = LeftFort.FortSummary();
                 }
                 else
                 {
-                    EnemyFort = Resources.LoadFort("/forts/" + Path.GetFileName(forts[i]));
-                    EnemyFort.Name = Path.GetFileNameWithoutExtension(forts[i]);
-                    EnemyFort.Comment = EnemyFort.FortSummary();
+                    RightFort = Resources.LoadFort("/forts/" + Path.GetFileName(forts[i]));
+                    RightFort.Name = Path.GetFileNameWithoutExtension(forts[i]);
+                    RightFort.Comment = RightFort.FortSummary();
                 }
-                _loadingPlayerSide = !_loadingPlayerSide;
+                _loadingLeftSide = !_loadingLeftSide;
             }
         }
 
-        string vs = (PlayerFort != null ? PlayerFort.Name : "???") + " VS " +
-                    (EnemyFort  != null ? EnemyFort.Name  : "???");
-        Raylib.DrawText(vs, Screen.HCenter - 200, Screen.VCenter - 290, 20, Raylib.WHITE);
-        Raylib.DrawText(PlayerFort?.Comment ?? "", Screen.HCenter - 200, Screen.VCenter - 260, 10, Raylib.WHITE);
-        Raylib.DrawText(EnemyFort?.Comment ?? "", Screen.HCenter - 100, Screen.VCenter - 260, 10, Raylib.WHITE);
-        Raylib.DrawText(OutcomeMessage, Screen.HCenter - 100, Screen.VCenter + 100, 20, Raylib.WHITE);
+        string vs = (LeftFort != null ? LeftFort.Name : "???") + " VS " +
+                    (RightFort  != null ? RightFort.Name  : "???");
         
-        if (RayGui.GuiButton(new Rectangle(Screen.HCenter-600, Screen.VCenter+250, 280, 50), "Back") != 0)
+        GUI.DrawTextCentered(Screen.HCenter, Screen.VCenter-250, vs, 24);
+        GUI.DrawTextLeft(Screen.HCenter - 100, Screen.VCenter - 100, LeftFort?.Comment ?? "");
+        GUI.DrawTextLeft(Screen.HCenter + 100, Screen.VCenter - 100, RightFort?.Comment ?? "");
+        GUI.DrawTextCentered(Screen.HCenter, Screen.VCenter + 100, OutcomeMessage, 24);
+
+        if (GUI.ButtonWide(Screen.HCenter + 300, Screen.VCenter + 260, "Back"))
         {
             MenuScene.Start();
         }
         
-        if (PlayerFort != null && EnemyFort != null &&
-            RayGui.GuiButton(new Rectangle(Screen.HCenter + 300, Screen.VCenter+250, 280, 50), "Begin!") != 0)
+        if (LeftFort != null && RightFort != null &&
+            GUI.ButtonWide(Screen.HCenter-150, Screen.VCenter + 260, "Begin!"))
         {
-            BattleScene.Start(PlayerFort, EnemyFort);
+            BattleScene.Start(LeftFort, RightFort);
             BattleScene.CustomBattle = true;
         }
         

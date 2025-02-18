@@ -34,12 +34,15 @@ public class MortarShell : Projectile
     private double _timeFired;
     private MortarShellTemplate _template;
     private Team _team;
+    private Texture _explosion;
+    private double _timeExploded = 0;
     
     public MortarShell(MortarShellTemplate template, Vector2 position, object target, object source) : base(template, position, target, source)
     {
         _template = template;
         _timeFired = Time.Scaled;
         _startPos = position;
+        _explosion = Resources.GetTextureByName("explosion32");
         if (target is Minion minion)
         {
             _targetPos = minion.Position;
@@ -60,6 +63,15 @@ public class MortarShell : Projectile
     
     public override void Update()
     {
+        if (_timeExploded != 0)
+        {
+            if (Time.Scaled - _timeExploded > 1)
+            {
+                World.ProjectilesToRemove.Add(this);
+            }
+            return;
+        }
+        
         double t = (Time.Scaled - _timeFired) / _template.ArcDuration;
         double arcOffset = Math.Sin(t * Math.PI) * _template.ArcHeight;
         
@@ -77,19 +89,35 @@ public class MortarShell : Projectile
                     minion.Hurt(this);
                 }
             }
-            World.ProjectilesToRemove.Add(this);
+            _timeExploded = Time.Scaled;
         }
     }
 
-    // public override void Draw()
-    // {
-    //     base.Draw();
-    //     //Raylib.DrawLine(_startPos.X,);
-    //     Raylib.DrawLineEx(_startPos, _targetPos, 1, Raylib.RED);
-    //     
-    //     double t = (Time.Scaled - _timeFired) / _template.ArcDuration;
-    //
-    //     Vector2 groundPoint = Vector2.Lerp(_startPos, _targetPos, (float)t);
-    //     Raylib.DrawLineEx(groundPoint, Position, 1, Raylib.GREEN);
-    // }
+    public override void Draw()
+    {
+        if (_timeExploded == 0)
+        {
+            base.Draw();
+        }
+        else
+        {
+            int frame = (int)Math.Floor((Time.Scaled - _timeExploded) / 0.1);
+            Rectangle src = new Rectangle(frame * 32, 0, 32, 32);
+            if (src.X >= _explosion.width)
+            {
+                return;
+            }
+            Vector2 pos = Position - new Vector2(16, 16);
+            Raylib.DrawTextureRec(_explosion, src, pos, Raylib.WHITE);
+        }
+        
+        // base.Draw();
+        // //Raylib.DrawLine(_startPos.X,);
+        // Raylib.DrawLineEx(_startPos, _targetPos, 1, Raylib.RED);
+        //
+        // double t = (Time.Scaled - _timeFired) / _template.ArcDuration;
+        //
+        // Vector2 groundPoint = Vector2.Lerp(_startPos, _targetPos, (float)t);
+        // Raylib.DrawLineEx(groundPoint, Position, 1, Raylib.GREEN);
+    }
 }

@@ -120,20 +120,20 @@ public static class EditorScene
 
         if (!_creativeMode)
         {
-            DrawText($"Bug Dollars: ${Program.Campaign.Money}", Screen.HCenter-590, Screen.VCenter-290, 10, WHITE);
+            DrawTextEx(Resources.Font, $"Bug Dollars: ${Program.Campaign.Money}", new Vector2(Screen.HCenter-590, Screen.VCenter+ 200), 12, 1, WHITE);
         }
 
         if (_brush == null)
         {
-            DrawText($"ERASING", Screen.HCenter-590, Screen.VCenter-290, 10, WHITE);
+            DrawTextEx(Resources.Font, $"ERASING", new Vector2(Screen.HCenter-590, Screen.VCenter-290), 12, 1, WHITE);
         }
         else
         {
-            DrawText($"Placing {_brush.GetDescription()}", Screen.HCenter-590, Screen.VCenter-290, 10, WHITE);
+            DrawTextEx(Resources.Font, $"Placing {_brush.GetDescription()}", new Vector2(Screen.HCenter-590, Screen.VCenter-290), 12, 1, WHITE);
         }
         
-        DrawText(_saveMessage, Screen.HCenter-590, Screen.VCenter+180, 10, WHITE);
-        DrawText(GetFortStats(), Screen.HCenter-590, Screen.VCenter+50, 10, WHITE);
+        DrawTextEx(Resources.Font, _saveMessage, new Vector2(Screen.HCenter-590, Screen.VCenter+180), 12, 1, WHITE);
+        DrawTextEx(Resources.Font, GetFortStats(), new Vector2(Screen.HCenter-590, Screen.VCenter+50), 12, 1, WHITE);
         
         EndDrawing();
     }

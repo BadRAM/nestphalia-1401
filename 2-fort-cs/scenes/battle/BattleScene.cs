@@ -1,5 +1,6 @@
 using System.Numerics;
 using ZeroElectric.Vinculum;
+using static _2_fort_cs.GUI;
 using static ZeroElectric.Vinculum.Raylib;
 
 namespace _2_fort_cs;
@@ -10,9 +11,12 @@ public static class BattleScene
     // public static Fort EnemyFort;
     public static bool Pause;
     public static bool CustomBattle;
+    private static int _skips; 
 
     public static void Start(Fort leftFort, Fort rightFort)
     {
+        Pause = false;
+        
         if (leftFort == null || rightFort == null)
         {
             Console.WriteLine("Null fort!");
@@ -51,15 +55,6 @@ public static class BattleScene
             World.Camera.offset.Y += 4;
         }
         
-        if (IsKeyPressed(KeyboardKey.KEY_F))
-        {
-            SetTargetFPS(10000);
-        }
-        if (IsKeyReleased(KeyboardKey.KEY_F))
-        {
-            SetTargetFPS(60);
-        }
-        
         if (IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT))
         {
             World.Camera.offset += GetMouseDelta();
@@ -91,18 +86,32 @@ public static class BattleScene
         if (!Pause)
         {
             World.Update();
+
+            _skips = 0;
+            if (IsKeyDown(KeyboardKey.KEY_F))
+            {
+                double startTime = GetTime();
+                while (GetTime() - startTime < 0.016)
+                {
+                    Time.UpdateTime();
+                    World.Update();
+                    _skips++;
+                }
+            }
         }
         
         TeamName winner = CheckWinner();
         if (winner != TeamName.None)
         {
+            SetTargetFPS(60);
+
             if (CustomBattle)
             {
                 CustomBattleMenu.Start();
                 CustomBattleMenu.OutcomeMessage =
                     (winner == TeamName.Player
-                        ? CustomBattleMenu.PlayerFort?.Name ?? ""
-                        : CustomBattleMenu.EnemyFort?.Name ?? "") + " won the battle!";
+                        ? CustomBattleMenu.LeftFort?.Name ?? ""
+                        : CustomBattleMenu.RightFort?.Name ?? "") + " won the battle!";
             }
             else
             {
@@ -120,13 +129,39 @@ public static class BattleScene
         World.Draw();
         
         //DrawText($"Minion 0's wherabouts: X={World.Minions[0].Position.X} Y={World.Minions[0].Position.Y}", 12, 12, 20, Color.White);
-        DrawText($"FPS: {GetFPS()}", 12, 16, 20, WHITE);
-        DrawText($"Wave: {World.Wave}", 12, 32, 20, WHITE);
-        DrawText($"Minions: {World.Minions.Count}", 12, 48, 20, WHITE);
-        // DrawText($"Path Queue Length: {PathFinder.GetQueueLength()}", 12, 64, 20, WHITE);
-        DrawText($"Zoom: {World.Camera.zoom}", 12, 64, 20, WHITE);
-        // DrawText($"Projectiles: {World.Projectiles.Count}", 12, 64, 20, WHITE);
-        if (Pause) DrawText("PAUSED", 520, 250, 40, WHITE);
+        
+        DrawTextLeft(12, 16, $"FPS: {GetFPS()}");
+        DrawTextLeft(12, 32, $"Wave: {World.Wave}");
+        DrawTextLeft(12, 48, $"Bugs: {World.Minions.Count}");
+        DrawTextLeft(12, 64, $"Zoom: {World.Camera.zoom}");
+        
+        if (IsKeyDown(KeyboardKey.KEY_F))
+        {
+            DrawRectangle(0,0,Screen.Left,Screen.Bottom,new Color(0,0,0,128));
+            DrawTextCentered(Screen.HCenter, Screen.VCenter, $"{_skips+1}X SPEED", 48);
+        }
+        
+        if (Pause)
+        {
+            DrawRectangle(0,0,Screen.Left,Screen.Bottom,new Color(0,0,0,128));
+            DrawTextCentered(Screen.HCenter, Screen.VCenter, "PAUSED", 48);
+            if (ButtonNarrow(Screen.HCenter-50, Screen.VCenter + 30, "Quit"))
+            {
+                SetTargetFPS(60);
+
+                if (CustomBattle)
+                {
+                    CustomBattleMenu.Start();
+                    CustomBattleMenu.OutcomeMessage = "";
+                }
+                else
+                {
+                    Program.Campaign.ReportBattleOutcome(winner == TeamName.Enemy);
+                    Program.Campaign.Start();
+                }
+            }
+            //DrawTextEx(Resources.Font, "PAUSED", new Vector2(Screen.HCenter, Screen.VCenter), 48, 4, WHITE);
+        }
         
         EndDrawing();
     }

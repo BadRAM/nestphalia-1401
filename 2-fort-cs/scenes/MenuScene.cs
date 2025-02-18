@@ -1,6 +1,9 @@
+using System.Numerics;
 using ZeroElectric.Vinculum;
 using static ZeroElectric.Vinculum.Raylib;
 using ZeroElectric.Vinculum.Extensions;
+using static _2_fort_cs.GUI;
+using static _2_fort_cs.Screen;
 
 namespace _2_fort_cs;
 
@@ -13,16 +16,19 @@ public static class MenuScene
     {
         _helpWindowOpen = false;
         Program.CurrentScene = Scene.MainMenu;
+        RegenerateBackground();
     }
 
     public static void Update()
     {
         BeginDrawing();
         ClearBackground(GRAY);
+        DrawBackground(GRAY);
         
-        DrawText("2fort BUG GAME", Screen.HCenter-200, Screen.VCenter-250, 48, WHITE);
+        DrawTextCentered(HCenter, VCenter-200, "BUGSBUGSBUGS", 48);
+        //DrawTextEx(Resources.Font, "BUGSBUGSBUGS", new Vector2(HCenter-200, VCenter-200), 48, 4, WHITE);
             
-        if (RayGui.GuiButton(new Rectangle(Screen.HCenter-200, Screen.VCenter-150, 400, 40), "Play") != 0)
+        if (ButtonWide(HCenter-150, VCenter-80, "Start"))
         {
             Program.Campaign = new Campaign();
             if (File.Exists(Directory.GetCurrentDirectory() + "/campaign.sav"))
@@ -37,15 +43,24 @@ public static class MenuScene
         //     Fort f = Resources.LoadFort("/creativeFort.fort");
         //     EditorScene.Start(f, true);
         // }
-        if (RayGui.GuiButton(new Rectangle(Screen.HCenter-200, Screen.VCenter-100, 400, 40), "Custom Battle") != 0) CustomBattleMenu.Start();
-        if (RayGui.GuiButton(new Rectangle(Screen.HCenter-200, Screen.VCenter-50, 400, 40), "Sandbox") != 0) EditorScene.Start(creativeMode:true);
-        //if (RayGui.GuiButton(new Rectangle(400, 350, 400, 40), "Help") != 0) _helpWindowOpen = !_helpWindowOpen;
-        if (RayGui.GuiButton(new Rectangle(Screen.HCenter-200, Screen.VCenter+50, 400, 40), "Quit") != 0)
+        if (ButtonWide(HCenter-150, VCenter-40, "Custom Battle")) CustomBattleMenu.Start();
+        if (ButtonWide(HCenter-150, VCenter, "Sandbox")) EditorScene.Start(creativeMode:true);
+        if (ButtonWide(HCenter-150, VCenter+40, "Quit")) 
         {
             EndDrawing();
             CloseWindow();
             return;
         }
+        
+        //if (RayGui.GuiButton(new Rectangle(Screen.HCenter-200, Screen.VCenter-100, 400, 40), "Custom Battle") != 0) CustomBattleMenu.Start();
+        // if (RayGui.GuiButton(new Rectangle(Screen.HCenter-150, Screen.VCenter-50, 400, 40), "Sandbox") != 0) EditorScene.Start(creativeMode:true);
+        //if (RayGui.GuiButton(new Rectangle(400, 350, 400, 40), "Help") != 0) _helpWindowOpen = !_helpWindowOpen;
+        // if (RayGui.GuiButton(new Rectangle(Screen.HCenter-200, Screen.VCenter+50, 400, 40), "Quit") != 0)
+        // {
+        //     EndDrawing();
+        //     CloseWindow();
+        //     return;
+        // }
 
         if (_helpWindowOpen)
         {
