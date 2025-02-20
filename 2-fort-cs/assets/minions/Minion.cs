@@ -50,11 +50,11 @@ public class Minion : ISprite
     public double Health;
     public bool IsAlive;
     // public TeamName Team;
-    private Vector2 _target;
+    protected Vector2 Target;
     //protected Int2D _targetTile;
     private double _lastFiredTime;
     private Vector2 _collisionOffset;
-    private bool _glued;
+    public bool Glued;
     
     public double Z { get; set; }
 
@@ -62,7 +62,7 @@ public class Minion : ISprite
     {
         Template = template;
         Position = position;
-        _target = position;
+        Target = position;
         //_targetTile = targetTile;
         Team = team;
         Health = Template.MaxHealth;
@@ -74,7 +74,7 @@ public class Minion : ISprite
         }
         else
         {
-            NavPath = new NavPath(World.PosToTilePos(position), World.PosToTilePos(position), Team);
+            NavPath = new NavPath(Team);
             Retarget();
         }
         //_path = new PathFinder(this);
@@ -98,11 +98,11 @@ public class Minion : ISprite
         
         double adjustedSpeed = Template.Speed;
         Structure? structure = World.GetTileAtPos(Position);
-        if (_glued || (structure?.Team == Team && structure is Minefield)) adjustedSpeed *= 0.5;
+        if (Glued || (!Template.IsFlying && structure?.Team == Team && structure is Minefield)) adjustedSpeed *= 0.5;
 
-        if (!Template.IsFlying) _target = World.GetTileCenter(NavPath.NextTile(Position));
+        if (!Template.IsFlying) Target = World.GetTileCenter(NavPath.NextTile(Position));
         
-        Structure? t = World.GetTileAtPos(Position.MoveTowards(_target, Template.Range)); // TODO: make this respect minion range
+        Structure? t = World.GetTileAtPos(Position.MoveTowards(Target, Template.Range)); // TODO: make this respect minion range
         if (Template.IsFlying && t != World.GetTile(NavPath.Destination)) t = null; // cheeky intercept so flyers ignore all but their target.
 
         if (t != null && t.PhysSolid(Team) && t.Team != Team)
@@ -115,9 +115,9 @@ public class Minion : ISprite
         }
         else if (Template.IsFlying)
         {
-            _target = World.GetTileCenter(NavPath.Destination);
-            Position = Position.MoveTowards(_target, adjustedSpeed * Time.DeltaTime);
-            if (Position == _target)
+            Target = World.GetTileCenter(NavPath.Destination);
+            Position = Position.MoveTowards(Target, adjustedSpeed * Time.DeltaTime);
+            if (Position == Target)
             {
                 Retarget();
             }
@@ -129,7 +129,7 @@ public class Minion : ISprite
                 Retarget();
             }
             
-            Position = Position.MoveTowards(_target, adjustedSpeed * Time.DeltaTime);
+            Position = Position.MoveTowards(Target, adjustedSpeed * Time.DeltaTime);
         }
         Z = Position.Y + (Template.IsFlying ? 240 : 0);
     }
@@ -206,7 +206,7 @@ public class Minion : ISprite
         _collisionOffset = Vector2.Zero;
     }
 
-    private void Retarget()
+    protected void Retarget()
     {
         //SortedList<double, Int2D> targets = new SortedList<double, Int2D>();
         List<Sortable<Int2D>> targets = new List<Sortable<Int2D>>();
@@ -263,7 +263,7 @@ public class Minion : ISprite
     public virtual void Draw()
     {
         Vector2 pos = new Vector2((int)Position.X - Template.Texture.width / 2, (int)Position.Y - Template.Texture.width / 2);
-        bool flip = _target.X > pos.X;
+        bool flip = Target.X > pos.X;
         Rectangle source = new Rectangle(flip ? Template.Texture.width : 0, 0, flip ? Template.Texture.width : -Template.Texture.width, Template.Texture.height);
         //Raylib.DrawTexture(Template.Texture, (int)Position.X - Template.Texture.width/2, (int)Position.Y - Template.Texture.width/2, tint);
         Raylib.DrawTextureRec(Template.Texture, source, pos, Team.UnitTint);

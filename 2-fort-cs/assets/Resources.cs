@@ -23,11 +23,16 @@ public static class Resources
     public static List<SpriteResource> Sprites = new List<SpriteResource>();
     public static List<Fort> CampaignLevels = new List<Fort>();
     public static Font Font;
+    private static Font _accessibleFont;
+    private static Font _defaultFont;
+    private static bool _fontAccessibility;
     
     public static void Load()
     {
         MissingTexture = LoadTexture("resources/sprites/missingtex.png");
-        Font = LoadFont("resources/pixantiqua.png");
+        _accessibleFont = LoadFont("resources/pixelplay16.png");
+        _defaultFont = LoadFont("resources/alagard.png");
+        Font = _defaultFont;
         RayGui.GuiSetFont(Font);
         RayGui.GuiSetStyle(0, 16, 12);
 
@@ -67,6 +72,12 @@ public static class Resources
         {
             UnloadTexture(spriteResource.Tex);
         }
+    }
+
+    public static void ToggleFontAccessibility()
+    {
+        _fontAccessibility = !_fontAccessibility;
+        Font = _fontAccessibility ? _accessibleFont : _defaultFont;   
     }
 
     public static void SaveFort(string fortName)

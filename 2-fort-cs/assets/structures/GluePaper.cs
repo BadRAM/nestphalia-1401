@@ -1,0 +1,61 @@
+using System.Numerics;
+using System.Security.Cryptography;
+using ZeroElectric.Vinculum;
+
+namespace _2_fort_cs;
+
+public class GluePaperTemplate : StructureTemplate
+{
+    public GluePaperTemplate(string name, Texture texture, double maxHealth, double price, int levelRequirement, double baseHate) : base(name, texture, maxHealth, price, levelRequirement, baseHate)
+    {
+        //Class = StructureClass.Tower;
+    }
+
+    public override GluePaper Instantiate(Team team, int x, int y)
+    {
+        return new GluePaper(this, team, x, y);
+    }
+}
+
+
+public class GluePaper : Structure
+{
+    private GluePaperTemplate _template;
+    
+    public GluePaper(GluePaperTemplate template, Team team, int x, int y) : base(template, team, x, y)
+    {
+        _template = template;
+        Z = position.Y - 24;
+    }
+
+    public override void Update()
+    {
+        base.Update();
+        
+        foreach (Minion minion in World.Minions)
+        {
+            if (minion.Team != Team 
+                && !minion.Template.IsFlying 
+                && !minion.Glued
+                && World.PosToTilePos(minion.Position) == new Int2D(X,Y))
+            {
+                minion.Glued = true;
+                Health -= minion.Health/2.0;
+                if (Health <= 0)
+                {
+                    Destroy();
+                }
+            }
+        }
+    }
+
+    public override bool NavSolid(Team team)
+    {
+        return team == Team;
+    }
+
+    public override bool PhysSolid(Team team)
+    {
+        return false;
+    }
+}

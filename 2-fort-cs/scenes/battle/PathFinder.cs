@@ -215,6 +215,11 @@ public class NavPath
     public Team Team;
     public List<Int2D> Waypoints = new List<Int2D>();
 
+    public NavPath(Team team)
+    {
+        Team = team;
+    }
+    
     public NavPath(Int2D start, Int2D destination, Team team)
     {
         Start = start;

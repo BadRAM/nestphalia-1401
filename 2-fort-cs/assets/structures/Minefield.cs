@@ -62,8 +62,8 @@ public class Minefield : Structure
                 _template.Bomb.Instantiate(position, this);
                 position = World.GetTileCenter(X, Y);
                 _timeLastTriggered = Time.Scaled;
-                if (_chargesLeft <= 0) Destroy();
                 Health = Math.Max(_chargesLeft, Health);
+                if (_chargesLeft <= 0) Destroy();
                 break;
             }
         }

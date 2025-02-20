@@ -50,9 +50,11 @@ public class Campaign
         Raylib.ClearBackground(Raylib.BLACK);
         Screen.DrawBackground(Raylib.DARKBROWN);
         
-        Raylib.DrawTextEx(Resources.Font, _outcomeText, new Vector2(Screen.HCenter-590, Screen.VCenter+100), 12, 1, Raylib.WHITE);
+        GUI.DrawTextLeft(Screen.HCenter-590, Screen.VCenter+100, _outcomeText);
+        // Raylib.DrawTextEx(Resources.Font, _outcomeText, new Vector2(Screen.HCenter-590, Screen.VCenter+100), 12, 1, Raylib.WHITE);
 
-        Raylib.DrawTextEx(Resources.Font, $"Bug Dollars: ${Money}", new Vector2(Screen.HCenter-590, Screen.VCenter+50), 12, 1, Raylib.WHITE);
+        GUI.DrawTextLeft(Screen.HCenter-590, Screen.VCenter+50, $"Bug Dollars: ${Money}");
+        // Raylib.DrawTextEx(Resources.Font, $"Bug Dollars: ${Money}", new Vector2(Screen.HCenter-590, Screen.VCenter+50), 12, 1, Raylib.WHITE);
 
         
         if (GUI.ButtonWide(Screen.HCenter-600,   Screen.VCenter-300, "Edit Fort")) EditorScene.Start(Fort1);

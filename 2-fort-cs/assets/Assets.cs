@@ -17,6 +17,7 @@ public static class Assets
         Structures.Add(new StructureTemplate("Stone Wall", Resources.GetTextureByName("wall2"), 500, 100, 6, -10));
         
         Structures.Add(new StructureTemplate("Honey Pot", Resources.GetTextureByName("honeypot"), 100, 10, 0, 100));
+        Structures.Add(new GluePaperTemplate("Glue Paper", Resources.GetTextureByName("stickypaper"), 100, 10, 0, 100));
         Structures.Add(new HazardSignTemplate("Hazard Sign", Resources.GetTextureByName("hazard_sign"), 30, 10, 0, Double.MinValue));
 
         Structures.Add(new DoorTemplate("Gate", Resources.GetTextureByName("doorClosed"), Resources.GetTextureByName("doorOpen"), 60, 100, 2, 5, 32));

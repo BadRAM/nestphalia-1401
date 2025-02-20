@@ -51,7 +51,8 @@ public class Spawner : Structure
     public Spawner(SpawnerTemplate template, Team team, int x, int y) : base(template, team, x, y)
     {
         _template = template;
-        _navPath = new NavPath(new Int2D(x, y), new Int2D(x, y), team);
+        _navPath = new NavPath(team);
+        _navPath.Start = new Int2D(x, y);
     }
     
     public override void Update()
@@ -80,17 +81,17 @@ public class Spawner : Structure
     {
         _spawnsRemaining += _template.WaveSize + (int)(World.Wave * _template.WaveGrowth);
     }
-
+    
     public override bool NavSolid(Team team)
     {
         return team != Team;
     }
-
+    
     public override bool PhysSolid(Team team)
     {
         return team != Team;
     }
-
+    
     private void Retarget()
     {
         List<Sortable<Int2D>> targets = new List<Sortable<Int2D>>();
@@ -108,14 +109,14 @@ public class Spawner : Structure
                 }
             }
         }
-
+        
         targets = targets.OrderByDescending(o => o.Order).ToList();
-
+        
         if (targets.Count == 0)
         {
             return;
         }
-
+        
         int i = Utils.WeightedRandom(targets.Count);
         _targetTile = targets[i].Value;
         //_targetTile = targets[0].Value;

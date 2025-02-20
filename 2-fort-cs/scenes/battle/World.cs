@@ -65,6 +65,21 @@ public static class World
         }
     }
 
+    public static void InitializePreview()
+    {
+        Initialize();
+        
+        // set up floor tile checkerboard
+        for (int x = 0; x < BoardWidth; x++)
+        {
+            for (int y = 0; y < BoardHeight; y++)
+            {
+                _floor[x,y] = (x%2 != y%2) ? Assets.FloorTiles[0].Instantiate(x,y) : Assets.FloorTiles[1].Instantiate(x,y);
+                _board[x,y] = null;
+            }
+        }
+    }
+    
     public static void InitializeBattle(Fort leftFort, Fort rightFort)
     {
         Initialize();

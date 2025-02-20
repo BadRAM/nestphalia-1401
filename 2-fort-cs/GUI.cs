@@ -9,27 +9,28 @@ public static class GUI
     private static Texture _buttonWideTexture;
     private static Texture _buttonNarrowTexture;
     public static Font Font;
-
+    const int FontSize = 16;
+    
     public static void Initialize()
     {
         _buttonWideTexture = Resources.GetTextureByName("button_wide");
         _buttonNarrowTexture = Resources.GetTextureByName("button_narrow");
     }
 
-    public static void DrawTextCentered(int x, int y, string text, float size = 12, Color? color = null)
+    public static void DrawTextCentered(int x, int y, string text, float size = FontSize, Color? color = null)
     {
         Color c = color ?? new Color(255, 255, 255, 255);
         
-        Vector2 pos = new Vector2((int)(x-MeasureTextEx(Resources.Font, text, size, size/12).X/2), (int)(y-size/2));
+        Vector2 pos = new Vector2((int)(x-MeasureTextEx(Resources.Font, text, size, size/FontSize).X/2), (int)(y-size/2));
         
-        DrawTextEx(Resources.Font, text, pos, size, size/12, c);
+        DrawTextEx(Resources.Font, text, pos, size, size/FontSize, c);
     }
 
-    public static void DrawTextLeft(int x, int y, string text, float size = 12, Color? color = null)
+    public static void DrawTextLeft(int x, int y, string text, float size = FontSize, Color? color = null)
     {
         Color c = color ?? new Color(255, 255, 255, 255);
         
-        DrawTextEx(Resources.Font, text, new Vector2(x,y), size, size/12, c);
+        DrawTextEx(Resources.Font, text, new Vector2(x,y), size, size/FontSize, c);
     }
     
     public static bool ButtonWide(int x, int y, string text, bool enabled = true)

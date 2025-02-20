@@ -20,6 +20,7 @@ public static class EditorScene
     
     public static void Start(Fort? fortToLoad = null, bool creativeMode = false)
     {
+        _saveMessage = "";
         _sandboxMode = creativeMode;
         _fort = fortToLoad ?? new Fort();
         
@@ -59,7 +60,7 @@ public static class EditorScene
     {
         // ----- INPUT + GUI PHASE -----
         
-        World.Camera.offset = new Vector2(Screen.HCenter-300, Screen.VCenter - 300);
+        World.Camera.offset = new Vector2(Screen.HCenter-264, Screen.VCenter-264);
 
         if (IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT))
         {
@@ -116,7 +117,7 @@ public static class EditorScene
             }
         }
         
-        if (ButtonWide(Screen.HCenter-300, Screen.VCenter+260, "Save to file"))
+        if (ButtonWide(Screen.HCenter-600, Screen.VCenter+220, "Save to file"))
         {
             int number = 1;
             while (true)
@@ -136,7 +137,7 @@ public static class EditorScene
             }
         }
 
-        if (ButtonNarrow(Screen.HCenter+200, Screen.VCenter-300, "Erase", _brush != null)) _brush = null;
+        if (ButtonNarrow(Screen.HCenter+150, Screen.VCenter+260, "Erase", _brush != null)) _brush = null;
         if (ButtonNarrow(Screen.HCenter+300, Screen.VCenter-300, (_newUtil ? "NEW! " : "") + "Utility", _structureClass != StructureTemplate.StructureClass.Utility)) _structureClass = StructureTemplate.StructureClass.Utility;
         if (ButtonNarrow(Screen.HCenter+400, Screen.VCenter-300, (_newTower ? "NEW! " : "") + "Tower", _structureClass != StructureTemplate.StructureClass.Tower)) _structureClass = StructureTemplate.StructureClass.Tower;
         if (ButtonNarrow(Screen.HCenter+500, Screen.VCenter-300, (_newNest ? "NEW! " : "") + "Nest", _structureClass != StructureTemplate.StructureClass.Nest)) _structureClass = StructureTemplate.StructureClass.Nest;
@@ -159,24 +160,37 @@ public static class EditorScene
         if (!_sandboxMode)
         {
             DrawTextLeft(Screen.HCenter-590, Screen.VCenter+ 200, $"Bug Dollars: ${Program.Campaign.Money}");
-            //DrawTextEx(Resources.Font, $"Bug Dollars: ${Program.Campaign.Money}", new Vector2(Screen.HCenter-590, Screen.VCenter+ 200), 12, 1, WHITE);
         }
-
+        
         if (_brush == null)
         {
             DrawTextLeft(Screen.HCenter-590, Screen.VCenter-290, "ERASING");
-            //DrawTextEx(Resources.Font, $"ERASING", new Vector2(Screen.HCenter-590, Screen.VCenter-290), 12, 1, WHITE);
         }
         else
         {
             DrawTextLeft(Screen.HCenter-590, Screen.VCenter-290, $"Placing {_brush.GetDescription()}");
-            //DrawTextEx(Resources.Font, $"Placing {_brush.GetDescription()}", new Vector2(Screen.HCenter-590, Screen.VCenter-290), 12, 1, WHITE);
+        }
+
+
+
+        if (CheckCollisionPointRec(GetMousePosition(), new Rectangle(Screen.HCenter-264, Screen.VCenter-264, 528, 528)))
+        {
+            BeginMode2D(World.Camera);
+            Vector2 mousePos = World.GetTileCenter(World.GetMouseTilePos());
+            if (_brush is TurretTemplate t)
+            {
+                DrawCircleLines((int)mousePos.X, (int)mousePos.Y, (int)t.Range, new Color(200, 50, 50, 255));
+                DrawCircle((int)mousePos.X, (int)mousePos.Y, (int)t.Range, new Color(200, 50, 50, 64));
+            }
+            if (_brush != null)
+            {
+                DrawTexture(_brush.Texture, (int)mousePos.X-12, (int)mousePos.Y-(_brush.Texture.height - 12), new Color(128, 128, 255, 128));
+            }
+            EndMode2D();
         }
         
         DrawTextLeft(Screen.HCenter-590, Screen.VCenter+180, _saveMessage);
         DrawTextLeft(Screen.HCenter-590, Screen.VCenter+50, GetFortStats());
-        DrawTextEx(Resources.Font, _saveMessage, new Vector2(Screen.HCenter-590, Screen.VCenter+180), 12, 1, WHITE);
-        DrawTextEx(Resources.Font, GetFortStats(), new Vector2(Screen.HCenter-590, Screen.VCenter+50), 12, 1, WHITE);
         
         EndDrawing();
     }

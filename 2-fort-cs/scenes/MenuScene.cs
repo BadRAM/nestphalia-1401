@@ -25,7 +25,7 @@ public static class MenuScene
         ClearBackground(GRAY);
         DrawBackground(GRAY);
         
-        DrawTextCentered(HCenter, VCenter-200, "BUGSBUGSBUGS", 48);
+        DrawTextCentered(HCenter, VCenter-200, "NESTPHALIA 1401", 48);
         //DrawTextEx(Resources.Font, "BUGSBUGSBUGS", new Vector2(HCenter-200, VCenter-200), 48, 4, WHITE);
             
         if (ButtonWide(HCenter-150, VCenter-80, "Start"))
@@ -51,6 +51,8 @@ public static class MenuScene
             CloseWindow();
             return;
         }
+
+        if (ButtonNarrow(HCenter + 500, VCenter + 260, "Font")) Resources.ToggleFontAccessibility();
         
         //if (RayGui.GuiButton(new Rectangle(Screen.HCenter-200, Screen.VCenter-100, 400, 40), "Custom Battle") != 0) CustomBattleMenu.Start();
         // if (RayGui.GuiButton(new Rectangle(Screen.HCenter-150, Screen.VCenter-50, 400, 40), "Sandbox") != 0) EditorScene.Start(creativeMode:true);
