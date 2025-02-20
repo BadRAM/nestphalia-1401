@@ -17,8 +17,10 @@ public static class Assets
         Structures.Add(new StructureTemplate("Stone Wall", Resources.GetTextureByName("wall2"), 500, 100, 6, -10));
         
         Structures.Add(new StructureTemplate("Honey Pot", Resources.GetTextureByName("honeypot"), 100, 10, 0, 100));
+        Structures.Add(new HazardSignTemplate("Hazard Sign", Resources.GetTextureByName("hazard_sign"), 30, 10, 0, Double.MinValue));
 
         Structures.Add(new DoorTemplate("Gate", Resources.GetTextureByName("doorClosed"), Resources.GetTextureByName("doorOpen"), 60, 100, 2, 5, 32));
+        Structures.Add(new DoorTemplate("Vault Door", Resources.GetTextureByName("vault_door_closed"), Resources.GetTextureByName("vault_door_open"), 250, 1000, 2, 5, 32));
         
         Structures.Add
         (
@@ -105,7 +107,7 @@ public static class Assets
                 100,
                 100,
                 0,
-                0,
+                Double.MinValue, 
                 4,
                 new MortarShellTemplate(Resources.GetTextureByName("mine"), 50, 0.4, 0, 32),
                 12,
@@ -225,6 +227,50 @@ public static class Assets
                 ), 
                 1, 
                 0.25,
+                6
+            )
+        );
+        
+        Structures.Add
+        (
+            new SpawnerTemplate
+            (
+                "Spider Nest", 
+                Resources.GetTextureByName("spawner4"), 
+                200, 
+                2500, 
+                8, 
+                50,
+                new BroodMinionTemplate
+                (
+                    "Spider Broodmother", 
+                    Resources.GetTextureByName("spidermom"), 
+                    100, 
+                    0, 
+                    new ProjectileTemplate(Resources.GetTextureByName("bullet"), 20, 400), 
+                    32, 
+                    30, 
+                    40, 
+                    false,
+                    10,
+                    1,
+                    24,
+                    new MinionTemplate
+                    (
+                        "Spiderling", 
+                        Resources.GetTextureByName("spiderling"), 
+                        15, 
+                        0, 
+                        new ProjectileTemplate(Resources.GetTextureByName("bullet"), 5, 400), 
+                        32, 
+                        30, 
+                        50, 
+                        false,
+                        2
+                    )
+                ), 
+                1, 
+                0.5,
                 6
             )
         );

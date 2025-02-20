@@ -12,7 +12,7 @@ public class StructureTemplate
     public int LevelRequirement;
     public double BaseHate;
     public StructureClass Class;
-
+    
     public enum StructureClass
     {
         Utility,
@@ -82,7 +82,13 @@ public class Structure : ISprite
         Raylib.DrawTexture(Template.Texture, x, y, new Color(t,t,t,255));
     }
 
-    public virtual bool IsSolid()
+
+    public virtual bool NavSolid(Team team)
+    {
+        return true;
+    }
+    
+    public virtual bool PhysSolid(Team team)
     {
         return true;
     }

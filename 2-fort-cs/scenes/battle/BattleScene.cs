@@ -133,7 +133,8 @@ public static class BattleScene
         DrawTextLeft(12, 16, $"FPS: {GetFPS()}");
         DrawTextLeft(12, 32, $"Wave: {World.Wave}");
         DrawTextLeft(12, 48, $"Bugs: {World.Minions.Count}");
-        DrawTextLeft(12, 64, $"Zoom: {World.Camera.zoom}");
+        DrawTextLeft(12, 64, $"Sprites: {World.Sprites.Count}");
+        DrawTextLeft(12, 80, $"Zoom: {World.Camera.zoom}");
         
         if (IsKeyDown(KeyboardKey.KEY_F))
         {

@@ -11,7 +11,8 @@ public enum Scene
 	Campaign,
 	Editor,
 	CustomBattleSetup,
-	Battle
+	Battle,
+	PostBattle
 }
 
 static class Program
@@ -71,6 +72,9 @@ static class Program
 			        break;		       
 		        case Scene.Battle:
 			        BattleScene.Update();
+			        break;
+		        case Scene.PostBattle:
+			        PostBattleScene.Update();
 			        break;
 	        }
         }

@@ -16,6 +16,7 @@ public class MinefieldTemplate : StructureTemplate
         Bomb = bomb;
         Range = range;
         Cooldown = cooldown;
+        Class = StructureClass.Tower;
     }
 
     public override Minefield Instantiate(Team team, int x, int y)
@@ -51,7 +52,7 @@ public class Minefield : Structure
         if (Time.Scaled - _timeLastTriggered < _template.Cooldown) return;
         foreach (Minion minion in World.Minions)
         {
-            if (minion.Team != Team && 
+            if (minion.Team != Team && !minion.Template.IsFlying &&
                 Raylib.CheckCollisionCircles(
                     position, (float)_template.Range, 
                     minion.Position,minion.Template.PhysicsRadius))
@@ -77,8 +78,13 @@ public class Minefield : Structure
             Raylib.DrawTexture(_template.Bomb.Texture, x, y, Raylib.WHITE);
         }
     }
-    
-    public override bool IsSolid()
+
+    public override bool NavSolid(Team team)
+    {
+        return team == Team;
+    }
+
+    public override bool PhysSolid(Team team)
     {
         return false;
     }

@@ -81,9 +81,14 @@ public class Spawner : Structure
         _spawnsRemaining += _template.WaveSize + (int)(World.Wave * _template.WaveGrowth);
     }
 
-    public override bool IsSolid()
+    public override bool NavSolid(Team team)
     {
-        return true;
+        return team != Team;
+    }
+
+    public override bool PhysSolid(Team team)
+    {
+        return team != Team;
     }
 
     private void Retarget()

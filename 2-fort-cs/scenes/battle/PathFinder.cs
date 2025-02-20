@@ -122,8 +122,8 @@ public static class PathFinder
             // top left
             if (   n.Pos.X - 1 > 0 
                 && n.Pos.Y - 1 > 0 
-                && !(World.GetTile(n.Pos.X-1, n.Pos.Y)?.IsSolid() ?? false)
-                && !(World.GetTile(n.Pos.X, n.Pos.Y-1)?.IsSolid() ?? false)
+                && !(World.GetTile(n.Pos.X-1, n.Pos.Y)?.NavSolid(navPath.Team) ?? false)
+                && !(World.GetTile(n.Pos.X, n.Pos.Y-1)?.NavSolid(navPath.Team) ?? false)
                 && nodeGrid[n.Pos.X - 1, n.Pos.Y - 1] == null)
             {
                 PathNode? nn = WeightedNode(n, n.Pos.X-1, n.Pos.Y-1, 1.5f, navPath.Team);
@@ -133,8 +133,8 @@ public static class PathFinder
             // top right
             if (   n.Pos.X + 1 < World.BoardWidth 
                 && n.Pos.Y - 1 > 0 
-                && !(World.GetTile(n.Pos.X+1, n.Pos.Y)?.IsSolid() ?? false)
-                && !(World.GetTile(n.Pos.X, n.Pos.Y-1)?.IsSolid() ?? false)
+                && !(World.GetTile(n.Pos.X+1, n.Pos.Y)?.NavSolid(navPath.Team) ?? false)
+                && !(World.GetTile(n.Pos.X, n.Pos.Y-1)?.NavSolid(navPath.Team) ?? false)
                 && nodeGrid[n.Pos.X + 1, n.Pos.Y - 1] == null)
             {
                 PathNode? nn = WeightedNode(n, n.Pos.X+1, n.Pos.Y-1, 1.5f, navPath.Team);
@@ -144,8 +144,8 @@ public static class PathFinder
             // bottom left
             if (   n.Pos.X - 1 > 0 
                 && n.Pos.Y + 1 < World.BoardHeight 
-                && !(World.GetTile(n.Pos.X-1, n.Pos.Y)?.IsSolid() ?? false)
-                && !(World.GetTile(n.Pos.X, n.Pos.Y+1)?.IsSolid() ?? false)
+                && !(World.GetTile(n.Pos.X-1, n.Pos.Y)?.NavSolid(navPath.Team) ?? false)
+                && !(World.GetTile(n.Pos.X, n.Pos.Y+1)?.NavSolid(navPath.Team) ?? false)
                 && nodeGrid[n.Pos.X - 1, n.Pos.Y + 1] == null)
             {
                 PathNode? nn = WeightedNode(n, n.Pos.X-1, n.Pos.Y+1, 1.5f, navPath.Team);
@@ -155,8 +155,8 @@ public static class PathFinder
             // bottom right
             if (   n.Pos.X + 1 < World.BoardWidth 
                 && n.Pos.Y + 1 < World.BoardHeight
-                && !(World.GetTile(n.Pos.X+1, n.Pos.Y)?.IsSolid() ?? false)
-                && !(World.GetTile(n.Pos.X, n.Pos.Y+1)?.IsSolid() ?? false)
+                && !(World.GetTile(n.Pos.X+1, n.Pos.Y)?.NavSolid(navPath.Team) ?? false)
+                && !(World.GetTile(n.Pos.X, n.Pos.Y+1)?.NavSolid(navPath.Team) ?? false)
                 && nodeGrid[n.Pos.X + 1, n.Pos.Y + 1] == null)
             {
                 PathNode? nn = WeightedNode(n, n.Pos.X+1, n.Pos.Y+1, 1.5f, navPath.Team);
@@ -184,13 +184,19 @@ public static class PathFinder
         n.Weight += weight;
         n.Weight += team.GetFearOf(x, y) * 0.2;
         Structure? structure = World.GetTile(x, y);
-        if (!structure?.IsSolid() ?? true) return n;
-        if (!(structure is Door && structure.Team == team) &&
-            !(structure is Spawner && structure.Team == team))
+        if (structure is Minefield && structure.Team == team)
         {
             n.Weight += structure.Health;
-            if (structure.Team == team) return null;
+            return n;
         }
+        else if (structure is HazardSign && structure.Team == team)
+        {
+            n.Weight += 1000000;
+            return n;
+        }
+        if (!structure?.NavSolid(team) ?? true) return n;
+        n.Weight += structure.Health;
+        if (structure.Team == team) return null;
 
         return n;
     }

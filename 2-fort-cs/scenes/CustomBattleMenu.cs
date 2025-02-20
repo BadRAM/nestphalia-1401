@@ -31,6 +31,9 @@ public static class CustomBattleMenu
         {
             _loadingLeftSide = !_loadingLeftSide;
         }
+
+        if (LeftFort != null  && GUI.ButtonWide(Screen.HCenter + 300, Screen.VCenter - 260, $"Edit {LeftFort.Name}" )) EditorScene.Start(LeftFort,  true);
+        if (RightFort != null && GUI.ButtonWide(Screen.HCenter + 300, Screen.VCenter - 220, $"Edit {RightFort.Name}")) EditorScene.Start(RightFort, true);
         
         for (int i = 0; i < forts.Length; i++)
         {

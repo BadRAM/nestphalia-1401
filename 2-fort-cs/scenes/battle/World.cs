@@ -159,10 +159,11 @@ public static class World
         }
         
         Minions = Minions.OrderBy(o=>o.Position.X).ToList();
-        foreach (Minion m in Minions)
+        for (int index = 0; index < Minions.Count; index++)
         {
-            m.Update();
+            Minions[index].Update();
         }
+
         for (int i = 0; i < Minions.Count; i++)
         {
             Minions[i].PlanCollision(i);

@@ -2,7 +2,6 @@
 
 Programming todo:
 =================
-- Your bugs don't like minefields
 - More better UI
  - Menus with designed layouts and backgrounds
  - Post battle screen

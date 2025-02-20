@@ -68,7 +68,12 @@ public class Door : Structure
         Z = position.Y - (_isOpen ? 24 : 0);
     }
 
-    public override bool IsSolid()
+    public override bool NavSolid(Team team)
+    {
+        return team != Team;
+    }
+
+    public override bool PhysSolid(Team team)
     {
         return !_isOpen;
     }

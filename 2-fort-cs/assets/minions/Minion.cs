@@ -33,7 +33,7 @@ public class MinionTemplate
         PhysicsRadius = physicsRadius;
     }
 
-    public void Instantiate(Vector2 position, Team team, NavPath navPath)
+    public virtual void Instantiate(Vector2 position, Team team, NavPath? navPath)
     {
         Minion m = new Minion(this, team, position, navPath);
         World.Minions.Add(m);
@@ -45,7 +45,7 @@ public class Minion : ISprite
 {
     public MinionTemplate Template;
     public Team Team;
-    private NavPath _navPath;
+    protected NavPath NavPath;
     public Vector2 Position;
     public double Health;
     public bool IsAlive;
@@ -53,10 +53,12 @@ public class Minion : ISprite
     private Vector2 _target;
     //protected Int2D _targetTile;
     private double _lastFiredTime;
-    public Vector2 CollisionOffset;
+    private Vector2 _collisionOffset;
+    private bool _glued;
+    
     public double Z { get; set; }
 
-    public Minion(MinionTemplate template, Team team, Vector2 position, NavPath navPath)
+    public Minion(MinionTemplate template, Team team, Vector2 position, NavPath? navPath)
     {
         Template = template;
         Position = position;
@@ -65,7 +67,16 @@ public class Minion : ISprite
         Team = team;
         Health = Template.MaxHealth;
         IsAlive = true;
-        _navPath = navPath;
+
+        if (navPath != null)
+        {
+            NavPath = navPath;
+        }
+        else
+        {
+            NavPath = new NavPath(World.PosToTilePos(position), World.PosToTilePos(position), Team);
+            Retarget();
+        }
         //_path = new PathFinder(this);
         //_path.FindPath(_targetTile);
         Z = Position.Y;
@@ -79,12 +90,22 @@ public class Minion : ISprite
         
         // if we're at our final destination, ask for a new path. (Don't ask for a new path if we already have)
 
-        if (!Template.IsFlying) _target = World.GetTileCenter(_navPath.NextTile(Position));
+        if (Position.X < -24 || Position.X > World.BoardWidth * 24 + 24 || Position.Y < -24 || Position.Y > World.BoardHeight * 24 + 24)
+        {
+            Console.WriteLine($"{Template.Name} had an adventure and was returned to board center.");
+            Position = new Vector2(World.BoardWidth * 12, World.BoardHeight * 12);
+        }
+        
+        double adjustedSpeed = Template.Speed;
+        Structure? structure = World.GetTileAtPos(Position);
+        if (_glued || (structure?.Team == Team && structure is Minefield)) adjustedSpeed *= 0.5;
+
+        if (!Template.IsFlying) _target = World.GetTileCenter(NavPath.NextTile(Position));
         
         Structure? t = World.GetTileAtPos(Position.MoveTowards(_target, Template.Range)); // TODO: make this respect minion range
-        if (Template.IsFlying && t != World.GetTile(_navPath.Destination)) t = null; // cheeky intercept so flyers ignore all but their target.
+        if (Template.IsFlying && t != World.GetTile(NavPath.Destination)) t = null; // cheeky intercept so flyers ignore all but their target.
 
-        if (t != null && t.IsSolid() && t.Team != Team)
+        if (t != null && t.PhysSolid(Team) && t.Team != Team)
         {
             if (Time.Scaled - _lastFiredTime > 60/Template.RateOfFire)
             {
@@ -94,8 +115,8 @@ public class Minion : ISprite
         }
         else if (Template.IsFlying)
         {
-            _target = World.GetTileCenter(_navPath.Destination);
-            Position = Position.MoveTowards(_target, Template.Speed * Time.DeltaTime);
+            _target = World.GetTileCenter(NavPath.Destination);
+            Position = Position.MoveTowards(_target, adjustedSpeed * Time.DeltaTime);
             if (Position == _target)
             {
                 Retarget();
@@ -103,12 +124,12 @@ public class Minion : ISprite
         }
         else
         {
-            if (_navPath.Found && _navPath.TargetReached(Position))
+            if (NavPath.Found && NavPath.TargetReached(Position))
             {
                 Retarget();
             }
             
-            Position = Position.MoveTowards(_target, Template.Speed * Time.DeltaTime);
+            Position = Position.MoveTowards(_target, adjustedSpeed * Time.DeltaTime);
         }
         Z = Position.Y + (Template.IsFlying ? 240 : 0);
     }
@@ -122,10 +143,16 @@ public class Minion : ISprite
             if (World.Minions[i].Position.X - Position.X > Template.PhysicsRadius + 12) break;
             if (World.Minions[i].Template.IsFlying != Template.IsFlying) continue;
             if (!Raylib.CheckCollisionCircles(Position, Template.PhysicsRadius, World.Minions[i].Position, World.Minions[i].Template.PhysicsRadius)) continue;
+            if (Position == World.Minions[i].Position)
+            {
+                                 _collisionOffset += new Vector2((float)(Random.Shared.NextDouble() - 0.5), (float)(Random.Shared.NextDouble() - 0.5));
+                World.Minions[i]._collisionOffset += new Vector2((float)(Random.Shared.NextDouble() - 0.5), (float)(Random.Shared.NextDouble() - 0.5));
+                continue;
+            }
         
             Vector2 delta = Position - World.Minions[i].Position;
-                             CollisionOffset += delta.Normalized() * Math.Min((Template.PhysicsRadius + World.Minions[i].Template.PhysicsRadius - delta.Length())/2, 0.5f);
-            World.Minions[i].CollisionOffset -= delta.Normalized() * Math.Min((Template.PhysicsRadius + World.Minions[i].Template.PhysicsRadius - delta.Length())/2, 0.5f);
+                             _collisionOffset += delta.Normalized() * Math.Min((Template.PhysicsRadius + World.Minions[i].Template.PhysicsRadius - delta.Length())/2, 0.5f);
+            World.Minions[i]._collisionOffset -= delta.Normalized() * Math.Min((Template.PhysicsRadius + World.Minions[i].Template.PhysicsRadius - delta.Length())/2, 0.5f);
         }
 
         if (Template.IsFlying) return;
@@ -140,7 +167,7 @@ public class Minion : ISprite
                     x >= World.BoardWidth || 
                     y < 0 || 
                     y >= World.BoardHeight || 
-                    !(World.GetTile(x,y)?.IsSolid() ?? false) ||
+                    !(World.GetTile(x,y)?.PhysSolid(Team) ?? false) ||
                     (World.GetTile(x,y) is Spawner && World.GetTile(x,y).Team == Team)
                     ) continue;
                 Vector2 c = World.GetTileCenter(x, y);
@@ -151,12 +178,12 @@ public class Minion : ISprite
                     {
                         // Find desired Y for above or below cases
                         double desiredY = Position.Y > c.Y ? b.Y + b.Height + Template.PhysicsRadius : b.Y - Template.PhysicsRadius;
-                        CollisionOffset.Y = (float)desiredY - Position.Y;
+                        _collisionOffset.Y = (float)desiredY - Position.Y;
                     }
                     else if (Position.Y > b.Y && Position.Y < b.Y + b.Height) // Circle Center is in tile Y band 
                     {
                         double desiredX = Position.X > c.X ? b.X + b.Width + Template.PhysicsRadius : b.X - Template.PhysicsRadius;
-                        CollisionOffset.X = (float)desiredX - Position.X;
+                        _collisionOffset.X = (float)desiredX - Position.X;
                     }
                     // else // Circle Center is in tile corner region
                     // {
@@ -175,8 +202,8 @@ public class Minion : ISprite
     
     public void LateUpdate()
     {
-        Position += CollisionOffset;
-        CollisionOffset = Vector2.Zero;
+        Position += _collisionOffset;
+        _collisionOffset = Vector2.Zero;
     }
 
     private void Retarget()
@@ -198,16 +225,16 @@ public class Minion : ISprite
         
         targets = targets.OrderByDescending(x=>x.Order).ToList();
         
-         if (targets.Count > 32)
-         {
-             targets.RemoveRange(32, targets.Count-32);
-         }
+        if (targets.Count > 32)
+        { 
+            targets.RemoveRange(32, targets.Count-32);
+        }
 
-         foreach (Sortable<Int2D> t in targets)
-         {
-             t.Order += Team.GetHateFor(t.Value);
-         }
-         targets = targets.OrderByDescending(x=>x.Order).ToList();
+        foreach (Sortable<Int2D> t in targets)
+        {
+            t.Order += Team.GetHateFor(t.Value);
+        }
+        targets = targets.OrderByDescending(x=>x.Order).ToList();
 
         if (targets.Count == 0)
         {
@@ -215,21 +242,21 @@ public class Minion : ISprite
             return;
         }
 
-        _navPath.Found = false;
-        _navPath.Waypoints.Clear();
-        _navPath.Start = World.PosToTilePos(Position);
+        NavPath.Found = false;
+        NavPath.Waypoints.Clear();
+        NavPath.Start = World.PosToTilePos(Position);
         int i = Math.Min(targets.Count, 16);
         i = Math.Min(Random.Shared.Next(i), Random.Shared.Next(i));
-        _navPath.Destination = targets[i].Value;
+        NavPath.Destination = targets[i].Value;
         // _navPath.Destination = targets[0].Value;
 
         if (Template.IsFlying)
         {
-            _navPath.Found = true;
+            NavPath.Found = true;
         }
         else
         {
-            PathFinder.RequestPath(_navPath);
+            PathFinder.RequestPath(NavPath);
         }
     }
 
@@ -245,16 +272,16 @@ public class Minion : ISprite
         if (Raylib.CheckCollisionPointCircle(Raylib.GetScreenToWorld2D(Raylib.GetMousePosition(), World.Camera), Position, Template.PhysicsRadius))
         {
             Vector2 path = Position;
-            foreach (Int2D i in _navPath.Waypoints)
+            foreach (Int2D i in NavPath.Waypoints)
             {
                 Vector2 v = World.GetTileCenter(i);
                 Raylib.DrawLine((int)path.X, (int)path.Y, (int)v.X, (int)v.Y, Raylib.LIME);
                 path = v;
             }
 
-            if (_navPath.Waypoints.Count == 0)
+            if (NavPath.Waypoints.Count == 0)
             {
-                Vector2 v = World.GetTileCenter(_navPath.Destination);
+                Vector2 v = World.GetTileCenter(NavPath.Destination);
                 Raylib.DrawLine((int)path.X, (int)path.Y, (int)v.X, (int)v.Y, Raylib.LIME);
             }
         }
@@ -277,7 +304,12 @@ public class Minion : ISprite
                 Team.AddHateFor(Template.MaxHealth/10, pos.X, pos.Y);
             }
             // TODO: Add hate to origin structure when killed by minion
-            World.MinionsToRemove.Add(this);
+            Die();
         }
+    }
+
+    public virtual void Die()
+    {
+        World.MinionsToRemove.Add(this);
     }
 }
