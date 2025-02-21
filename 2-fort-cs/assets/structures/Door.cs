@@ -8,7 +8,7 @@ public class DoorTemplate : StructureTemplate
     public double Range;
     public Texture OpenTexture;
     
-    public DoorTemplate(string name, Texture texture, Texture openTexture, double maxHealth, double price, int levelRequirement, double baseHate, double range) : base(name, texture, maxHealth, price, levelRequirement, baseHate)
+    public DoorTemplate(string id, string name, string description, Texture texture, Texture openTexture, double maxHealth, double price, int levelRequirement, double baseHate, double range) : base(id, name, description, texture, maxHealth, price, levelRequirement, baseHate)
     {
         OpenTexture = openTexture;
         Range = range;
@@ -37,7 +37,7 @@ public class Door : Structure
             _isOpen = false;
             foreach (Minion m in World.Minions)
             {
-                if (m.Template.IsFlying) continue;
+                if (m.IsFlying) continue;
                 if (m.Team == Team)
                 {
                     if (Raylib.CheckCollisionCircles(position, (float)_template.Range, m.Position, m.Template.PhysicsRadius))
@@ -58,7 +58,7 @@ public class Door : Structure
         {
             foreach (Minion m in World.Minions)
             {
-                if (!m.Template.IsFlying && m.Team == Team && Raylib.CheckCollisionCircles(position, (float)_template.Range, m.Position, m.Template.PhysicsRadius))
+                if (!m.IsFlying && m.Team == Team && Raylib.CheckCollisionCircles(position, (float)_template.Range, m.Position, m.Template.PhysicsRadius))
                 {
                     _isOpen = true;
                 }

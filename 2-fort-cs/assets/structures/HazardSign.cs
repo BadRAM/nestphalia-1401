@@ -4,7 +4,7 @@ namespace _2_fort_cs;
 
 public class HazardSignTemplate : StructureTemplate
 {
-    public HazardSignTemplate(string name, Texture texture, double maxHealth, double price, int levelRequirement, double baseHate) : base(name, texture, maxHealth, price, levelRequirement, baseHate) {}
+    public HazardSignTemplate(string id, string name, string description, Texture texture, double maxHealth, double price, int levelRequirement, double baseHate) : base(id, name, description, texture, maxHealth, price, levelRequirement, baseHate) {}
 
     public override Structure Instantiate(Team team, int x, int y)
     {

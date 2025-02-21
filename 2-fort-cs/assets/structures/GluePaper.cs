@@ -6,7 +6,7 @@ namespace _2_fort_cs;
 
 public class GluePaperTemplate : StructureTemplate
 {
-    public GluePaperTemplate(string name, Texture texture, double maxHealth, double price, int levelRequirement, double baseHate) : base(name, texture, maxHealth, price, levelRequirement, baseHate)
+    public GluePaperTemplate(string id, string name, string description, Texture texture, double maxHealth, double price, int levelRequirement, double baseHate) : base(id, name, description, texture, maxHealth, price, levelRequirement, baseHate)
     {
         //Class = StructureClass.Tower;
     }
@@ -35,7 +35,7 @@ public class GluePaper : Structure
         foreach (Minion minion in World.Minions)
         {
             if (minion.Team != Team 
-                && !minion.Template.IsFlying 
+                && !minion.IsFlying
                 && !minion.Glued
                 && World.PosToTilePos(minion.Position) == new Int2D(X,Y))
             {

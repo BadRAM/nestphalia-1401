@@ -6,30 +6,30 @@ namespace _2_fort_cs;
 
 public class MinionTemplate
 {
+    public string ID; // Minions don't really need this since they're defined as a part of their nests, which already have IDs
     public string Name;
+    public string Description;
     public Texture Texture;
     public double MaxHealth;
     public double Armor;
-    //public float Damage;
+    public double Damage;
     public ProjectileTemplate Projectile;
-    public double Range;
-    public double RateOfFire;
+    public double AttackCooldown;
     public double Speed;
-    public bool IsFlying;
     public float PhysicsRadius; // This is a float because Raylib.CheckCircleOverlap() wants floats
 
-    public MinionTemplate(string name, Texture texture, double maxHealth, double armor, ProjectileTemplate projectile, /*float damage,*/ double range, double rateOfFire, double speed, bool isFlying, float physicsRadius)
+    public MinionTemplate(string id, string name, string description, Texture texture, double maxHealth, double armor, double damage, double speed, float physicsRadius, double attackCooldown = 1)
     {
+        ID = id;
         Name = name;
+        Description = description;
         Texture = texture;
         MaxHealth = maxHealth;
         Armor = armor;
-        //Damage = damage;
-        Projectile = projectile;
-        Range = range;
-        RateOfFire = rateOfFire;
+        Damage = damage;
+        Projectile = new ProjectileTemplate(Resources.GetTextureByName("minion_bullet"), damage, 400);
+        AttackCooldown = attackCooldown;
         Speed = speed;
-        IsFlying = isFlying;
         PhysicsRadius = physicsRadius;
     }
 
@@ -38,6 +38,11 @@ public class MinionTemplate
         Minion m = new Minion(this, team, position, navPath);
         World.Minions.Add(m);
         World.Sprites.Add(m);
+    }
+    
+    public virtual string GetStats()
+    {
+        return "Function under construction";
     }
 }
 
@@ -49,12 +54,11 @@ public class Minion : ISprite
     public Vector2 Position;
     public double Health;
     public bool IsAlive;
-    // public TeamName Team;
     protected Vector2 Target;
-    //protected Int2D _targetTile;
     private double _lastFiredTime;
     private Vector2 _collisionOffset;
     public bool Glued;
+    public bool IsFlying;
     
     public double Z { get; set; }
 
@@ -85,53 +89,41 @@ public class Minion : ISprite
     public virtual void Update()
     {
         // if the next tile in our path is adjacent and solid, then attack it
-        
-        // else, move towards next tile on path.
-        
-        // if we're at our final destination, ask for a new path. (Don't ask for a new path if we already have)
-
-        if (Position.X < -24 || Position.X > World.BoardWidth * 24 + 24 || Position.Y < -24 || Position.Y > World.BoardHeight * 24 + 24)
+        Target = World.GetTileCenter(NavPath.NextTile(Position));
+        if (!TryAttack())
         {
-            Console.WriteLine($"{Template.Name} had an adventure and was returned to board center.");
-            Position = new Vector2(World.BoardWidth * 12, World.BoardHeight * 12);
-        }
-        
-        double adjustedSpeed = Template.Speed;
-        Structure? structure = World.GetTileAtPos(Position);
-        if (Glued || (!Template.IsFlying && structure?.Team == Team && structure is Minefield)) adjustedSpeed *= 0.5;
-
-        if (!Template.IsFlying) Target = World.GetTileCenter(NavPath.NextTile(Position));
-        
-        Structure? t = World.GetTileAtPos(Position.MoveTowards(Target, Template.Range)); // TODO: make this respect minion range
-        if (Template.IsFlying && t != World.GetTile(NavPath.Destination)) t = null; // cheeky intercept so flyers ignore all but their target.
-
-        if (t != null && t.PhysSolid(Team) && t.Team != Team)
-        {
-            if (Time.Scaled - _lastFiredTime > 60/Template.RateOfFire)
-            {
-                Template.Projectile.Instantiate(t, this);
-                _lastFiredTime = Time.Scaled;
-            }
-        }
-        else if (Template.IsFlying)
-        {
-            Target = World.GetTileCenter(NavPath.Destination);
-            Position = Position.MoveTowards(Target, adjustedSpeed * Time.DeltaTime);
-            if (Position == Target)
-            {
-                Retarget();
-            }
-        }
-        else
-        {
+            // if we're at our final destination, ask for a new path. (Don't ask for a new path if we already have)
             if (NavPath.Found && NavPath.TargetReached(Position))
             {
                 Retarget();
+                PathFinder.RequestPath(NavPath);
             }
-            
-            Position = Position.MoveTowards(Target, adjustedSpeed * Time.DeltaTime);
+            // else, move towards next tile on path.
+            Position = Position.MoveTowards(Target, AdjustedSpeed() * Time.DeltaTime);
         }
-        Z = Position.Y + (Template.IsFlying ? 240 : 0);
+    }
+
+    // Attempts to attack, returns true if attack target is valid 
+    protected virtual bool TryAttack()
+    {
+        if (Vector2.Distance(Position, Target) > 24) return false;
+        Structure? t = World.GetTileAtPos(Target);
+        if (t == null || t.Team == Team) return false;
+        if (Time.Scaled - _lastFiredTime > Template.AttackCooldown)
+        {
+            Template.Projectile.Instantiate(t, this);
+            _lastFiredTime = Time.Scaled;
+        }
+        return true;
+    }
+        
+    // Returns move speed adjusted for glue, mine anxiety, etc.
+    public double AdjustedSpeed()
+    {
+        double adjustedSpeed = Template.Speed;
+        Structure? structure = World.GetTileAtPos(Position);
+        if (Glued || (!IsFlying && structure?.Team == Team && structure is Minefield)) adjustedSpeed *= 0.5;
+        return adjustedSpeed;
     }
     
     // Should this be here, or in World? maybe somewhere else entirely, like a physics functions class?
@@ -141,7 +133,7 @@ public class Minion : ISprite
         {
             // Abort loop if we're outside of our X band
             if (World.Minions[i].Position.X - Position.X > Template.PhysicsRadius + 12) break;
-            if (World.Minions[i].Template.IsFlying != Template.IsFlying) continue;
+            if (World.Minions[i].IsFlying != IsFlying) continue;
             if (!Raylib.CheckCollisionCircles(Position, Template.PhysicsRadius, World.Minions[i].Position, World.Minions[i].Template.PhysicsRadius)) continue;
             if (Position == World.Minions[i].Position)
             {
@@ -149,13 +141,13 @@ public class Minion : ISprite
                 World.Minions[i]._collisionOffset += new Vector2((float)(Random.Shared.NextDouble() - 0.5), (float)(Random.Shared.NextDouble() - 0.5));
                 continue;
             }
-        
+            
             Vector2 delta = Position - World.Minions[i].Position;
                              _collisionOffset += delta.Normalized() * Math.Min((Template.PhysicsRadius + World.Minions[i].Template.PhysicsRadius - delta.Length())/2, 0.5f);
             World.Minions[i]._collisionOffset -= delta.Normalized() * Math.Min((Template.PhysicsRadius + World.Minions[i].Template.PhysicsRadius - delta.Length())/2, 0.5f);
         }
 
-        if (Template.IsFlying) return;
+        if (IsFlying) return;
         Int2D tilePos = World.PosToTilePos(Position);
         
         for (int x = tilePos.X-1; x < tilePos.X+3; ++x)
@@ -249,19 +241,12 @@ public class Minion : ISprite
         i = Math.Min(Random.Shared.Next(i), Random.Shared.Next(i));
         NavPath.Destination = targets[i].Value;
         // _navPath.Destination = targets[0].Value;
-
-        if (Template.IsFlying)
-        {
-            NavPath.Found = true;
-        }
-        else
-        {
-            PathFinder.RequestPath(NavPath);
-        }
     }
 
     public virtual void Draw()
     {
+        Z = Position.Y + (IsFlying ? 240 : 0);
+
         Vector2 pos = new Vector2((int)Position.X - Template.Texture.width / 2, (int)Position.Y - Template.Texture.width / 2);
         bool flip = Target.X > pos.X;
         Rectangle source = new Rectangle(flip ? Template.Texture.width : 0, 0, flip ? Template.Texture.width : -Template.Texture.width, Template.Texture.height);

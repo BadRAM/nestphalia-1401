@@ -13,21 +13,23 @@ public static class Assets
         FloorTiles.Add(new FloorTileTemplate("Floor2", Resources.GetTextureByName("floor2")));
         FloorTiles.Add(new FloorTileTemplate("Blank", Resources.GetTextureByName("clear")));
         
-        Structures.Add(new StructureTemplate("Mud Wall", Resources.GetTextureByName("wall"), 100, 10, 0, -10));
-        Structures.Add(new StructureTemplate("Stone Wall", Resources.GetTextureByName("wall2"), 500, 100, 6, -10));
+        Structures.Add(new StructureTemplate("wall_mud", "Mud Wall", "", Resources.GetTextureByName("wall"), 100, 10, 0, -10));
+        Structures.Add(new StructureTemplate("wall_stone", "Stone Wall", "", Resources.GetTextureByName("wall2"), 500, 100, 6, -10));
         
-        Structures.Add(new StructureTemplate("Honey Pot", Resources.GetTextureByName("honeypot"), 100, 10, 0, 100));
-        Structures.Add(new GluePaperTemplate("Glue Paper", Resources.GetTextureByName("stickypaper"), 100, 10, 0, 100));
-        Structures.Add(new HazardSignTemplate("Hazard Sign", Resources.GetTextureByName("hazard_sign"), 30, 10, 0, Double.MinValue));
+        Structures.Add(new StructureTemplate("honey_pot", "Honey Pot", "", Resources.GetTextureByName("honeypot"), 100, 10, 0, 100));
+        Structures.Add(new GluePaperTemplate("glue_paper", "Glue Paper", "", Resources.GetTextureByName("stickypaper"), 100, 10, 0, 100));
+        Structures.Add(new HazardSignTemplate("hazard_sign","Hazard Sign", "", Resources.GetTextureByName("hazard_sign"), 30, 10, 0, Double.MinValue));
 
-        Structures.Add(new DoorTemplate("Gate", Resources.GetTextureByName("doorClosed"), Resources.GetTextureByName("doorOpen"), 60, 100, 2, 5, 32));
-        Structures.Add(new DoorTemplate("Vault Door", Resources.GetTextureByName("vault_door_closed"), Resources.GetTextureByName("vault_door_open"), 250, 1000, 2, 5, 32));
+        Structures.Add(new DoorTemplate("door_weak", "Gate", "", Resources.GetTextureByName("doorClosed"), Resources.GetTextureByName("doorOpen"), 60, 100, 2, 5, 32));
+        Structures.Add(new DoorTemplate("door_strong","Vault Door", "", Resources.GetTextureByName("vault_door_closed"), Resources.GetTextureByName("vault_door_open"), 250, 1000, 2, 5, 32));
         
         Structures.Add
         (
-            new TurretTemplate
+            new TowerTemplate
             (
-                "Watchtower", 
+                "tower_basic",
+                "Watchtower",
+                "",
                 Resources.GetTextureByName("turret"), 
                 80, 
                 100, 
@@ -36,7 +38,7 @@ public static class Assets
                 100,
                 new ProjectileTemplate(Resources.GetTextureByName("bullet"), 10, 400), 
                 40,
-                TurretTemplate.TargetSelector.Nearest,
+                TowerTemplate.TargetSelector.Nearest,
                 true,
                 true
             )
@@ -44,9 +46,11 @@ public static class Assets
         
         Structures.Add
         (
-            new TurretTemplate
+            new TowerTemplate
             (
+                "tower_mortar",
                 "Mortar",
+                "",
                 Resources.GetTextureByName("mortar"),
                 200,
                 300,
@@ -55,7 +59,7 @@ public static class Assets
                 72,
                 new MortarShellTemplate(Resources.GetTextureByName("bullet"), 10, 0.8, 96, 48), 
                 30,
-                TurretTemplate.TargetSelector.Random,
+                TowerTemplate.TargetSelector.Random,
                 true,
                 false
             )
@@ -63,9 +67,11 @@ public static class Assets
         
         Structures.Add
         (
-            new TurretTemplate
+            new TowerTemplate
             (
+                "tower_machinegun",
                 "Machinegunner",
+                "",
                 Resources.GetTextureByName("turret2"),
                 160,
                 400,
@@ -74,7 +80,7 @@ public static class Assets
                 100,
                 new ProjectileTemplate(Resources.GetTextureByName("bullet"), 5, 400), 
                 400,
-                TurretTemplate.TargetSelector.Nearest,
+                TowerTemplate.TargetSelector.Nearest,
                 true,
                 true
             )
@@ -82,9 +88,11 @@ public static class Assets
         
         Structures.Add
         (
-            new TurretTemplate
+            new TowerTemplate
             (
+                "tower_sniper",
                 "Sniper",
+                "",
                 Resources.GetTextureByName("turret3"),
                 200,
                 1000,
@@ -93,7 +101,7 @@ public static class Assets
                 600,
                 new ProjectileTemplate(Resources.GetTextureByName("bullet"), 60, 800), 
                 30,
-                TurretTemplate.TargetSelector.Random,
+                TowerTemplate.TargetSelector.Random,
                 true,
                 true
             )
@@ -103,7 +111,9 @@ public static class Assets
         (
             new MinefieldTemplate
             (
+                "minefield",
                 "Minefield",
+                "",
                 Resources.GetTextureByName("minefield"),
                 100,
                 100,
@@ -120,7 +130,9 @@ public static class Assets
         (
             new SpawnerTemplate
             (
+                "nest_ant",
                 "Anthill", 
+                "",
                 Resources.GetTextureByName("spawner"), 
                 80, 
                 100, 
@@ -128,15 +140,14 @@ public static class Assets
                 50,
                 new MinionTemplate
                 (
+                    "minion_ant",
                     "Ant", 
+                    "",
                     Resources.GetTextureByName("smant"), 
                     15, 
                     0, 
-                    new ProjectileTemplate(Resources.GetTextureByName("bullet"), 5, 400), 
-                    32, 
-                    30, 
+                    5, 
                     80, 
-                    false,
                     3
                 ), 
                 5, 
@@ -149,7 +160,9 @@ public static class Assets
         (
             new SpawnerTemplate
             (
+                "nest_snail",
                 "Snail Warren", 
+                "",
                 Resources.GetTextureByName("spawner2"), 
                 80, 
                 300,
@@ -157,15 +170,14 @@ public static class Assets
                 50,
                 new MinionTemplate
                 (
+                    "minion_snail",
                     "Snail", 
+                    "",
                     Resources.GetTextureByName("snail"), 
                     50, 
                     5, 
-                    new ProjectileTemplate(Resources.GetTextureByName("bullet"), 15, 400), 
-                    32, 
+                    15, 
                     20, 
-                    45, 
-                    false,
                     6
                 ), 
                 2, 
@@ -178,23 +190,24 @@ public static class Assets
         (
             new SpawnerTemplate
             (
+                "nest_bee",
                 "Beehive", 
+                "",
                 Resources.GetTextureByName("spawner3"), 
                 80, 
                 500, 
                 5, 
                 50,
-                new MinionTemplate
+                new FlyingMinionTemplate
                 (
-                    "Bee", 
+                    "minion_bee",
+                    "Bee",
+                    "",
                     Resources.GetTextureByName("bee"), 
                     20, 
                     0, 
-                    new ProjectileTemplate(Resources.GetTextureByName("bullet"), 5, 400), 
-                    32,
+                    5, 
                     40,
-                    60,
-                    true,
                     5
                 ), 
                 5, 
@@ -207,7 +220,9 @@ public static class Assets
         (
             new SpawnerTemplate
             (
+                "nest_beetle",
                 "Beetle Burrow", 
+                "",
                 Resources.GetTextureByName("spawner4"), 
                 200, 
                 2500, 
@@ -215,15 +230,14 @@ public static class Assets
                 50,
                 new MinionTemplate
                 (
+                    "minion_beetle",
                     "Beetle", 
+                    "",
                     Resources.GetTextureByName("beetle"), 
                     100, 
                     10, 
-                    new ProjectileTemplate(Resources.GetTextureByName("bullet"), 60, 400), 
-                    32, 
+                    60, 
                     30, 
-                    55, 
-                    false,
                     10
                 ), 
                 1, 
@@ -236,7 +250,9 @@ public static class Assets
         (
             new SpawnerTemplate
             (
+                "nest_spider",
                 "Spider Nest", 
+                "",
                 Resources.GetTextureByName("spawner4"), 
                 200, 
                 2500, 
@@ -244,29 +260,27 @@ public static class Assets
                 50,
                 new BroodMinionTemplate
                 (
-                    "Spider Broodmother", 
+                    "minion_spider",
+                    "Spider Broodmother",
+                    "",
                     Resources.GetTextureByName("spidermom"), 
                     100, 
                     0, 
-                    new ProjectileTemplate(Resources.GetTextureByName("bullet"), 20, 400), 
-                    32, 
+                    20, 
                     30, 
-                    40, 
-                    false,
                     10,
                     1,
                     24,
                     new MinionTemplate
                     (
+                        "minion_spiderling",
                         "Spiderling", 
+                        "",
                         Resources.GetTextureByName("spiderling"), 
                         15, 
                         0, 
-                        new ProjectileTemplate(Resources.GetTextureByName("bullet"), 5, 400), 
-                        32, 
+                         5, 
                         30, 
-                        50, 
-                        false,
                         2
                     )
                 ), 
@@ -280,7 +294,9 @@ public static class Assets
         (
             new SpawnerTemplate
             (
+                "nest_fake",
                 "TinyAnthill",
+                "",
                 Resources.GetTextureByName("spawner"),
                 80,
                 50,
@@ -288,15 +304,14 @@ public static class Assets
                 50,
                 new MinionTemplate
                 (
+                    "minion_fake",
                     "Ant",
+                    "",
                     Resources.GetTextureByName("wabbit"),
                     10,
                     0,
-                    new ProjectileTemplate(Resources.GetTextureByName("bullet"), 5, 400),
-                    32,
+                    5, 
                     30,
-                    50,
-                    false,
                     3
                 ), 
                 0,

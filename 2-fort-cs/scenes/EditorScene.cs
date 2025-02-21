@@ -168,7 +168,7 @@ public static class EditorScene
         }
         else
         {
-            DrawTextLeft(Screen.HCenter-590, Screen.VCenter-290, $"Placing {_brush.GetDescription()}");
+            DrawTextLeft(Screen.HCenter-590, Screen.VCenter-290, $"Placing {_brush.GetStats()}");
         }
 
 
@@ -177,7 +177,7 @@ public static class EditorScene
         {
             BeginMode2D(World.Camera);
             Vector2 mousePos = World.GetTileCenter(World.GetMouseTilePos());
-            if (_brush is TurretTemplate t)
+            if (_brush is TowerTemplate t)
             {
                 DrawCircleLines((int)mousePos.X, (int)mousePos.Y, (int)t.Range, new Color(200, 50, 50, 255));
                 DrawCircle((int)mousePos.X, (int)mousePos.Y, (int)t.Range, new Color(200, 50, 50, 64));

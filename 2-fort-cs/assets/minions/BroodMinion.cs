@@ -9,7 +9,8 @@ public class BroodMinionTemplate : MinionTemplate
     public int SpawnsOnDeath;
     public MinionTemplate SpawnedMinion;
     
-    public BroodMinionTemplate(string name, Texture texture, double maxHealth, double armor, ProjectileTemplate projectile, double range, double rateOfFire, double speed, bool isFlying, float physicsRadius, double spawnInterval, int spawnsOnDeath, MinionTemplate spawnedMinion) : base(name, texture, maxHealth, armor, projectile, range, rateOfFire, speed, isFlying, physicsRadius)
+    public BroodMinionTemplate(string id, string name, string description, Texture texture, double maxHealth, double armor, double damage, double speed, float physicsRadius, double spawnInterval, int spawnsOnDeath, MinionTemplate spawnedMinion, double attackCooldown = 1) 
+        : base(id, name, description, texture, maxHealth, armor, damage, speed, physicsRadius, attackCooldown)
     {
         SpawnInterval = spawnInterval;
         SpawnsOnDeath = spawnsOnDeath;

@@ -9,7 +9,7 @@ public class SpawnerTemplate : StructureTemplate
     public double WaveGrowth;
     public double TimeBetweenSpawns;
     
-    public SpawnerTemplate(string name, Texture texture, double maxHealth, double price, int levelRequirement, double baseHate, MinionTemplate minion, int waveSize, double waveGrowth, double timeBetweenSpawns) : base(name, texture, maxHealth, price, levelRequirement, baseHate)
+    public SpawnerTemplate(string id, string name, string description, Texture texture, double maxHealth, double price, int levelRequirement, double baseHate, MinionTemplate minion, int waveSize, double waveGrowth, double timeBetweenSpawns) : base(id, name, description, texture, maxHealth, price, levelRequirement, baseHate)
     {
         Minion = minion;
         WaveSize = waveSize;
@@ -23,7 +23,7 @@ public class SpawnerTemplate : StructureTemplate
         return new Spawner(this, team, x, y);
     }
     
-    public override string GetDescription()
+    public override string GetStats()
     {
         return $"{Name}\n" +
                $"${Price}\n" +
@@ -33,9 +33,8 @@ public class SpawnerTemplate : StructureTemplate
                $"{Minion.Name}\n" +
                $"HP: {Minion.MaxHealth}\n" +
                (Minion.Armor == 0 ? "" : $"Armor: {Minion.Armor}\n") +
-               (Minion.IsFlying ? "Flyer\n" : "") +
                $"Speed: {Minion.Speed}\n" +
-               $"Damage: {Minion.Projectile.Damage} ({Minion.Projectile.Damage / (Minion.RateOfFire / 60)}/s)\n" +
+               $"Damage: {Minion.Projectile.Damage} ({Minion.Projectile.Damage / Minion.AttackCooldown}/s)\n" +
                $"Size: {Minion.PhysicsRadius*2}";
     }
 }
@@ -71,7 +70,7 @@ public class Spawner : Structure
         Retarget();
         _navPath.Reset();
         _navPath.Destination = _targetTile;
-        if (!_template.Minion.IsFlying)
+        if (!(_template.Minion is FlyingMinionTemplate))
         {
             PathFinder.RequestPath(_navPath);
         }

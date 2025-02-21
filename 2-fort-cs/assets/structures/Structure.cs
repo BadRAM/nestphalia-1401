@@ -5,7 +5,9 @@ namespace _2_fort_cs;
 
 public class StructureTemplate
 {
+    public string ID;
     public string Name;
+    public string Description;
     public Texture Texture;
     public double MaxHealth;
     public double Price;
@@ -20,7 +22,7 @@ public class StructureTemplate
         Nest
     }
     
-    public StructureTemplate(string name, Texture texture, double maxHealth, double price, int levelRequirement, double baseHate)
+    public StructureTemplate(string id, string name, string description, Texture texture, double maxHealth, double price, int levelRequirement, double baseHate)
     {
         Name = name;
         Texture = texture;
@@ -28,6 +30,8 @@ public class StructureTemplate
         Price = price;
         LevelRequirement = levelRequirement;
         BaseHate = baseHate;
+        ID = id;
+        Description = description;
         Class = StructureClass.Utility;
     }
     
@@ -36,7 +40,7 @@ public class StructureTemplate
         return new Structure(this, team, x, y);
     }
     
-    public virtual string GetDescription()
+    public virtual string GetStats()
     {
         return $"{Name}\n" +
                $"${Price}\n" +

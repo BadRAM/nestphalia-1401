@@ -83,7 +83,7 @@ public class MortarShell : Projectile
         {
             foreach (Minion minion in World.Minions)
             {
-                if (!minion.Template.IsFlying && minion.Team != _team &&
+                if (!minion.IsFlying && minion.Team != _team &&
                     Raylib.CheckCollisionCircles(_targetPos, _template.BlastRadius, minion.Position, minion.Template.PhysicsRadius))
                 {
                     minion.Hurt(this);

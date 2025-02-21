@@ -10,7 +10,7 @@ public class MinefieldTemplate : StructureTemplate
     public double Range;
     public double Cooldown;
     
-    public MinefieldTemplate(string name, Texture texture, double maxHealth, double price, int levelRequirement, double baseHate, int maxCharges, ProjectileTemplate bomb, double range, double cooldown) : base(name, texture, maxHealth, price, levelRequirement, baseHate)
+    public MinefieldTemplate(string id, string name, string description, Texture texture, double maxHealth, double price, int levelRequirement, double baseHate, int maxCharges, ProjectileTemplate bomb, double range, double cooldown) : base(id, name, description, texture, maxHealth, price, levelRequirement, baseHate)
     {
         MaxCharges = maxCharges;
         Bomb = bomb;
@@ -52,7 +52,7 @@ public class Minefield : Structure
         if (Time.Scaled - _timeLastTriggered < _template.Cooldown) return;
         foreach (Minion minion in World.Minions)
         {
-            if (minion.Team != Team && !minion.Template.IsFlying &&
+            if (minion.Team != Team && !minion.IsFlying &&
                 Raylib.CheckCollisionCircles(
                     position, (float)_template.Range, 
                     minion.Position,minion.Template.PhysicsRadius))

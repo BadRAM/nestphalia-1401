@@ -4,7 +4,7 @@ using ZeroElectric.Vinculum;
 
 namespace _2_fort_cs;
 
-public class TurretTemplate : StructureTemplate
+public class TowerTemplate : StructureTemplate
 {
     public enum TargetSelector
     {
@@ -25,7 +25,8 @@ public class TurretTemplate : StructureTemplate
     public bool CanHitFlying;
     public bool CanHitGround;
 
-    public TurretTemplate(string name, Texture texture, double maxHealth, double price, int levelRequirement, double baseHate, double range, ProjectileTemplate projectile, double rateOfFire, TargetSelector targetMode, bool canHitGround, bool canHitFlying) : base(name, texture, maxHealth, price, levelRequirement, baseHate)
+    public TowerTemplate(string id, string name, string description, Texture texture, double maxHealth, double price, int levelRequirement, double baseHate, double range, ProjectileTemplate projectile, double rateOfFire, TargetSelector targetMode, bool canHitGround, bool canHitFlying) 
+        : base(id, name, description, texture, maxHealth, price, levelRequirement, baseHate)
     {
         Range = range;
         Projectile = projectile;
@@ -37,12 +38,12 @@ public class TurretTemplate : StructureTemplate
         Class = StructureClass.Tower;
     }
     
-    public override Turret Instantiate(Team team, int x, int y)
+    public override Tower Instantiate(Team team, int x, int y)
     {
-        return new Turret(this, team, x, y);
+        return new Tower(this, team, x, y);
     }
     
-    public override string GetDescription()
+    public override string GetStats()
     {
         return $"{Name}\n" +
                $"${Price}\n" +
@@ -52,13 +53,13 @@ public class TurretTemplate : StructureTemplate
     }
 }
 
-public class Turret : Structure
+public class Tower : Structure
 {
     private double _timeLastFired;
-    private TurretTemplate _template;
+    private TowerTemplate _template;
     private Minion? _target;
     
-    public Turret(TurretTemplate template, Team team, int x, int y) : base(template, team, x, y)
+    public Tower(TowerTemplate template, Team team, int x, int y) : base(template, team, x, y)
     {
         _template = template;
     }
@@ -71,10 +72,10 @@ public class Turret : Structure
         {
             switch (_template.TargetMode)
             {
-                case TurretTemplate.TargetSelector.Nearest:
+                case TowerTemplate.TargetSelector.Nearest:
                     _target = FindTargetNearest();
                     break;
-                case TurretTemplate.TargetSelector.Random:
+                case TowerTemplate.TargetSelector.Random:
                     _target = FindTargetRandom();
                     break;
                 default:
@@ -102,7 +103,7 @@ public class Turret : Structure
         {
             Minion m = World.Minions[i];
             if (m.Team == Team) continue;
-            if ((m.Template.IsFlying && !_template.CanHitFlying) || (!m.Template.IsFlying && !_template.CanHitGround)) continue;
+            if ((m.IsFlying && !_template.CanHitFlying) || (!m.IsFlying && !_template.CanHitGround)) continue;
             double d = Vector2.Distance(World.Minions[i].Position, position);
             if (d < _template.Range && d < minDist)
             {
@@ -120,7 +121,7 @@ public class Turret : Structure
         List<Minion> ValidTargets = new List<Minion>();
         foreach (Minion m in World.Minions)
         {
-            if ((m.Template.IsFlying && !_template.CanHitFlying) || (!m.Template.IsFlying && !_template.CanHitGround)) continue;
+            if ((m.IsFlying && !_template.CanHitFlying) || (!m.IsFlying && !_template.CanHitGround)) continue;
             if (m.Team != Team && Vector2.Distance(m.Position, position) < _template.Range)
             {
                 ValidTargets.Add(m);
