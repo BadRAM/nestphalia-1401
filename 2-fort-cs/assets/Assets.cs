@@ -214,7 +214,68 @@ public static class Assets
                 1,
                 0.25
             )
-        );  
+        );
+
+        Structures.Add
+        (
+            new SpawnerTemplate
+            (
+                "nest_sapper_beetle",
+                "Sapper Beetle Burrow",
+                "",
+                Resources.GetTextureByName("spawner4"),
+                200,
+                2500,
+                8,
+                50,
+                new SapperMinionTemplate
+                (
+                    "minion_sapper_beetle",
+                    "Beetle",
+                    "",
+                    Resources.GetTextureByName("beetle"),
+                    Resources.GetTextureByName("beetle"),
+                    50, 
+                    0, 
+                    200, 
+                    65, 
+                    10
+                ), 
+                1, 
+                0.25,
+                1
+            )
+        );
+        
+        Structures.Add
+        (
+            new SpawnerTemplate
+            (
+                "nest_grasshopper",
+                "Grasshopper Glade",
+                "",
+                Resources.GetTextureByName("spawner4"),
+                200,
+                2500,
+                8,
+                50,
+                new HopperMinionTemplate
+                (
+                    "minion_grasshopper",
+                    "Grasshopper",
+                    "",
+                    Resources.GetTextureByName("beetle"),
+                    50, 
+                    0, 
+                    10, 
+                    40, 
+                    6
+                ), 
+                1, 
+                0.25,
+                1
+            )
+        );
         
         Structures.Add
         (

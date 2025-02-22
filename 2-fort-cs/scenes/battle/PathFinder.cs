@@ -238,6 +238,20 @@ public class NavPath
 
         return Waypoints[0];
     }
+
+    public void Skip()
+    {
+        if (Waypoints.Count > 0) Waypoints.RemoveAt(0);
+    }
+
+    public Int2D? LookAhead(int index)
+    {
+        if (Waypoints.Count > index)
+        {
+            return Waypoints[index];
+        }
+        return null;
+    }
     
     public bool TargetReached(Vector2 position)
     {
@@ -252,7 +266,7 @@ public class NavPath
         p.Waypoints = new List<Int2D>(Waypoints);
         return p;
     }
-
+    
     public void Reset()
     {
         Destination = Start;

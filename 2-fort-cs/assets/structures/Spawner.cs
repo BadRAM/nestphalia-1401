@@ -1,3 +1,4 @@
+using System.Net.NetworkInformation;
 using ZeroElectric.Vinculum;
 
 namespace _2_fort_cs;
@@ -44,6 +45,7 @@ public class Spawner : Structure
     private SpawnerTemplate _template;
     private double _lastSpawnTime;
     private int _spawnsRemaining;
+    private int _nextWaveSpawnBonus;
     private Int2D _targetTile;
     private NavPath _navPath;
     
@@ -79,6 +81,13 @@ public class Spawner : Structure
     public override void WaveEffect()
     {
         _spawnsRemaining += _template.WaveSize + (int)(World.Wave * _template.WaveGrowth);
+        _spawnsRemaining += _nextWaveSpawnBonus;
+        _nextWaveSpawnBonus = 0;
+    }
+
+    public void AddSpawnBonus(int bonus)
+    {
+        _nextWaveSpawnBonus += bonus;
     }
     
     public override bool NavSolid(Team team)

@@ -95,7 +95,7 @@ public class Tower : Structure
         }
     }
 
-    private Minion? FindTargetNearest()
+    protected Minion? FindTargetNearest()
     {
         Minion? nearest = null;
         double minDist = double.MaxValue;
@@ -115,7 +115,7 @@ public class Tower : Structure
         return nearest;
     }
 
-    private Minion? FindTargetRandom()
+    protected Minion? FindTargetRandom()
     {
         Minion? random = null;
         List<Minion> ValidTargets = new List<Minion>();
@@ -136,7 +136,7 @@ public class Tower : Structure
         return random;
     }
 
-    private Minion? FindTargetRandomFocus()
+    protected Minion? FindTargetRandomFocus()
     {
         Minion? random = _target;
         if (random != null && random.Health > 0) return random;
