@@ -57,13 +57,7 @@ public class Minefield : Structure
                     position, (float)_template.Range, 
                     minion.Position,minion.Template.PhysicsRadius))
             {
-                _chargesLeft--;
-                position += _drawPoints[_chargesLeft];
-                _template.Bomb.Instantiate(position, this);
-                position = World.GetTileCenter(X, Y);
-                _timeLastTriggered = Time.Scaled;
-                Health = Math.Max(_chargesLeft, Health);
-                if (_chargesLeft <= 0) Destroy();
+                Trigger();
                 break;
             }
         }
@@ -77,6 +71,23 @@ public class Minefield : Structure
             int y = (int)(_drawPoints[i].Y + position.Y - _template.Bomb.Texture.height/2);
             Raylib.DrawTexture(_template.Bomb.Texture, x, y, Raylib.WHITE);
         }
+    }
+
+    private void Trigger()
+    {
+        _chargesLeft--;
+        position += _drawPoints[_chargesLeft];
+        _template.Bomb.Instantiate(position, this);
+        position = World.GetTileCenter(X, Y);
+        _timeLastTriggered = Time.Scaled;
+        Health = Math.Max(_chargesLeft, Health);
+        if (_chargesLeft <= 0) Destroy();
+    }
+
+    public override void Hurt(double damage)
+    {
+        base.Hurt(damage);
+        Trigger();
     }
 
     public override bool NavSolid(Team team)

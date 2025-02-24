@@ -108,7 +108,8 @@ public class Structure : ISprite
 
     public virtual void Destroy()
     {
-        World.SetTile(null, Team, X, Y);
+        World.DestroyTile(X, Y);
+        // World.SetTile(Rubble.RubbleTemplate, Team, X, Y);
     }
     
     public Vector2 GetCenter()

@@ -16,6 +16,7 @@ public static class EditorScene
     private static bool _newTower;
     private static bool _newNest;
     private static bool _nestCapped;
+    private static bool _beaconCapped;
     private static StructureTemplate.StructureClass _structureClass;
     
     public static void Start(Fort? fortToLoad = null, bool creativeMode = false)
@@ -28,6 +29,9 @@ public static class EditorScene
         World.InitializeEditor();
         World.Camera.offset = new Vector2(Screen.HCenter, Screen.VCenter);
         _fort.LoadToBoard(false);
+        
+        Screen.RegenerateBackground();
+
         
         _newUtil = false;
         _newTower = false;
@@ -75,7 +79,7 @@ public static class EditorScene
                 }
                 else
                 {
-                    if (_brush == null || (_brush.Price < Program.Campaign.Money && (_brush.Class != StructureTemplate.StructureClass.Nest || !_nestCapped)))
+                    if (_brush == null || (_brush.Price < Program.Campaign.Money && (_brush.Class != StructureTemplate.StructureClass.Nest || !_nestCapped) &&  (_brush is not ActiveAbilityBeaconTemplate || !_beaconCapped)))
                     {
                         if (World.GetTile(tilePos) != null)
                         {
@@ -102,6 +106,8 @@ public static class EditorScene
         
         BeginDrawing();
         ClearBackground(BLACK);
+        Screen.DrawBackground(GRAY);
+        
         World.Draw();
 
         if (_sandboxMode)
@@ -200,6 +206,7 @@ public static class EditorScene
         int structureCount = 0;
         int turretCount = 0;
         int utilityCount = 0;
+        int beaconCount = 0;
         int nestCount = 0;
         double totalCost = 0;
         
@@ -211,20 +218,23 @@ public static class EditorScene
                 if (t == null) continue;
                 structureCount++;
                 totalCost += t.Template.Price;
-                if (t.Template.Class == StructureTemplate.StructureClass.Utility) utilityCount++;
-                if (t.Template.Class == StructureTemplate.StructureClass.Tower) turretCount++;
-                if (t.Template.Class == StructureTemplate.StructureClass.Nest) nestCount++;
+                if (t is ActiveAbilityBeacon) beaconCount++;
+                else if (t.Template.Class == StructureTemplate.StructureClass.Utility) utilityCount++;
+                else if (t.Template.Class == StructureTemplate.StructureClass.Tower) turretCount++;
+                else if (t.Template.Class == StructureTemplate.StructureClass.Nest) nestCount++;
             }
         }
 
         if (!_sandboxMode)
         {
             _nestCapped = nestCount >= Program.Campaign.Level * 2 + 10;
+            _beaconCapped = beaconCount >= 3;
         }
         
         return $"{turretCount} Towers\n" +
                $"{utilityCount} Utility\n" +
                nestCount + (_sandboxMode ? "" : "/"+(Program.Campaign.Level*2+10)) + " Nests\n" +
+               beaconCount + (_sandboxMode ? "" : "/3") + " Beacons\n" +
                $"{structureCount} Total\n" +
                $"{totalCost} Cost";
     }

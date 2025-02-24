@@ -1,4 +1,5 @@
 using System.Numerics;
+using ZeroElectric.Vinculum;
 
 namespace _2_fort_cs;
 
@@ -31,18 +32,25 @@ public static class PathFinder
 
     public static void ServeQueue(int max)
     {
+        double startTime = Raylib.GetTime();
         for (int i = 0; i < max; i++)
         {
             if (_pathQueue.Count == 0)  return;
             FindPath(_pathQueue.Dequeue());
+            if (i == max-1)
+            {
+                Console.WriteLine($"Max path calc in {(Raylib.GetTime() - startTime) * 1000}ms");
+            }
         }
     }
     
-    public static void FindPath(NavPath navPath)
+    private static void FindPath(NavPath navPath)
     {
         if (navPath.Found)
         {
-            Console.WriteLine($"FindPath called on a path that's already found, something's wrong.");
+            int c = _pathQueue.Count;
+            _pathQueue = new Queue<NavPath>(_pathQueue.Distinct());
+            Console.WriteLine($"FindPath called on a path that's already found, something's wrong. Trimmed {c - _pathQueue.Count} duplicate path requests");
             return;
         }
         
@@ -184,6 +192,7 @@ public static class PathFinder
         n.Weight += weight;
         n.Weight += team.GetFearOf(x, y) * 0.2;
         Structure? structure = World.GetTile(x, y);
+        if (structure == null || structure is Rubble) return n;
         if (structure is Minefield && structure.Team == team)
         {
             n.Weight += structure.Health;
@@ -194,16 +203,21 @@ public static class PathFinder
             n.Weight += 1000000;
             return n;
         }
-        if (!structure?.NavSolid(team) ?? true) return n;
+        if (!structure.NavSolid(team)) return n;
         n.Weight += structure.Health;
-        if (structure.Team == team) return null;
-
+        if (structure.Team == team) n.Weight += 1000000; //return null;
+        
         return n;
     }
 
     public static int GetQueueLength()
     {
         return _pathQueue.Count;
+    }
+
+    public static void ClearQueue()
+    {
+        _pathQueue.Clear();
     }
 }
 
@@ -255,7 +269,7 @@ public class NavPath
     
     public bool TargetReached(Vector2 position)
     {
-        if (Waypoints.Count == 0) return true;
+        // if (Waypoints.Count == 0) return true;
         return World.PosToTilePos(position) == Destination;
     }
     

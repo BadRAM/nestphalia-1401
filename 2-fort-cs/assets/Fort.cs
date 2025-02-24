@@ -16,11 +16,11 @@ public class Fort
             {
                 if (rightSide)
                 {
-                    World.SetTile(Assets.GetTileByName(Board[x+y*20]), World.RightTeam, 46-x,y+1);
+                    World.SetTile(Assets.GetTileByID(Board[x+y*20]), World.RightTeam, 46-x,y+1);
                 }
                 else
                 {
-                    World.SetTile(Assets.GetTileByName(Board[x+y*20]), World.LeftTeam, x+1,y+1);
+                    World.SetTile(Assets.GetTileByID(Board[x+y*20]), World.LeftTeam, x+1,y+1);
                 }
             }
         }
@@ -38,7 +38,7 @@ public class Fort
         {
             for (int y = 0; y < 20; ++y)
             {
-                StructureTemplate? t = Assets.GetTileByName(Board[x+y*20]);
+                StructureTemplate? t = Assets.GetTileByID(Board[x+y*20]);
                 if (t == null) continue;
                 structureCount++;
                 totalCost += t.Price;
@@ -63,7 +63,7 @@ public class Fort
         {
             for (int y = 0; y < 20; y++)
             {
-                Board[x+y*20] = World.GetTile(x+1,y+1)?.Template.Name ?? "";
+                Board[x+y*20] = World.GetTile(x+1,y+1)?.Template.ID ?? "";
             }
         }
     }

@@ -23,10 +23,9 @@ public static class MenuScene
     {
         BeginDrawing();
         ClearBackground(GRAY);
-        DrawBackground(GRAY);
+        DrawBackground(LIGHTGRAY);
         
         DrawTextCentered(HCenter, VCenter-200, "NESTPHALIA 1401", 48);
-        //DrawTextEx(Resources.Font, "BUGSBUGSBUGS", new Vector2(HCenter-200, VCenter-200), 48, 4, WHITE);
             
         if (ButtonWide(HCenter-150, VCenter-80, "Start"))
         {
@@ -37,12 +36,7 @@ public static class MenuScene
             }
             Program.Campaign.Start();
         }
-
-        // if (RayGui.GuiButton(new Rectangle(400, 250, 400, 40), "Sandbox load") != 0)
-        // {
-        //     Fort f = Resources.LoadFort("/creativeFort.fort");
-        //     EditorScene.Start(f, true);
-        // }
+        
         if (ButtonWide(HCenter-150, VCenter-40, "Custom Battle")) CustomBattleMenu.Start();
         if (ButtonWide(HCenter-150, VCenter, "Sandbox")) EditorScene.Start(creativeMode:true);
         if (ButtonWide(HCenter-150, VCenter+40, "Quit")) 
@@ -54,15 +48,8 @@ public static class MenuScene
 
         if (ButtonNarrow(HCenter + 500, VCenter + 260, "Font")) Resources.ToggleFontAccessibility();
         
-        //if (RayGui.GuiButton(new Rectangle(Screen.HCenter-200, Screen.VCenter-100, 400, 40), "Custom Battle") != 0) CustomBattleMenu.Start();
-        // if (RayGui.GuiButton(new Rectangle(Screen.HCenter-150, Screen.VCenter-50, 400, 40), "Sandbox") != 0) EditorScene.Start(creativeMode:true);
-        //if (RayGui.GuiButton(new Rectangle(400, 350, 400, 40), "Help") != 0) _helpWindowOpen = !_helpWindowOpen;
-        // if (RayGui.GuiButton(new Rectangle(Screen.HCenter-200, Screen.VCenter+50, 400, 40), "Quit") != 0)
-        // {
-        //     EndDrawing();
-        //     CloseWindow();
-        //     return;
-        // }
+        
+        DrawTextLeft(HCenter-600, VCenter+280, "By BadRAM and rosettedotnet");
 
         if (_helpWindowOpen)
         {

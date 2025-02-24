@@ -55,10 +55,13 @@ public class Minion : ISprite
     public double Health;
     public bool IsAlive;
     protected Vector2 Target;
-    private double _lastFiredTime;
+    private bool _attacking;
+    private double _attackStartedTime;
+    // private double _lastFiredTime;
     private Vector2 _collisionOffset;
     public bool Glued;
     public bool IsFlying;
+    public bool Frenzy;
     
     public double Z { get; set; }
 
@@ -101,18 +104,26 @@ public class Minion : ISprite
             // else, move towards next tile on path.
             Position = Position.MoveTowards(Target, AdjustedSpeed() * Time.DeltaTime);
         }
+        
+        Frenzy = false;
     }
 
     // Attempts to attack, returns true if attack target is valid 
     protected virtual bool TryAttack()
     {
-        if (Vector2.Distance(Position, Target) > 24) return false;
+        if (Vector2.Distance(Position, Target) > 24 + Template.PhysicsRadius) { _attacking = false; return false;}
         Structure? t = World.GetTileAtPos(Target);
-        if (t == null || t.Team == Team) return false;
-        if (Time.Scaled - _lastFiredTime > Template.AttackCooldown)
+        if (t == null || t is Rubble || (!t.NavSolid(Team) && NavPath.NextTile(Position) != NavPath.Destination)) { _attacking = false; return false;}
+        if (t.Team == Team && !t.PhysSolid(Team)) { _attacking = false; return false;}
+        if (!_attacking)
+        {
+            _attacking = true;
+            _attackStartedTime = Time.Scaled;
+        }
+        if (Time.Scaled - _attackStartedTime >= (Frenzy ? Template.AttackCooldown/2 : Template.AttackCooldown))
         {
             Template.Projectile.Instantiate(t, this);
-            _lastFiredTime = Time.Scaled;
+            _attackStartedTime = Time.Scaled;
         }
         return true;
     }
@@ -123,6 +134,7 @@ public class Minion : ISprite
         double adjustedSpeed = Template.Speed;
         Structure? structure = World.GetTileAtPos(Position);
         if (Glued || (!IsFlying && structure?.Team == Team && structure is Minefield)) adjustedSpeed *= 0.5;
+        if (Frenzy) adjustedSpeed *= 2;
         return adjustedSpeed;
     }
     
@@ -207,7 +219,8 @@ public class Minion : ISprite
         {
             for (int y = 0; y < World.BoardHeight; ++y)
             {
-                if (World.GetTile(x,y) != null && World.GetTile(x,y).Team != Team)
+                Structure? s = World.GetTile(x, y);
+                if (s != null && s.Team != Team && s is not Rubble)
                 {
                     targets.Add(new Sortable<Int2D>(-Vector2.Distance(Position, World.GetTileCenter(x,y)), new Int2D(x,y)));
                     // targets.Add(new PotentialTarget(-Vector2.Distance(Position, World.GetTileCenter(x,y)), new Int2D(x,y)));
@@ -234,11 +247,11 @@ public class Minion : ISprite
             return;
         }
 
-        NavPath.Found = false;
-        NavPath.Waypoints.Clear();
         NavPath.Start = World.PosToTilePos(Position);
+        NavPath.Reset();
         int i = Math.Min(targets.Count, 16);
         i = Math.Min(Random.Shared.Next(i), Random.Shared.Next(i));
+        i = Utils.WeightedRandom(i);
         NavPath.Destination = targets[i].Value;
         // _navPath.Destination = targets[0].Value;
     }
@@ -296,5 +309,18 @@ public class Minion : ISprite
     public virtual void Die()
     {
         World.MinionsToRemove.Add(this);
+    }
+
+    public Int2D GetTargetTile()
+    {
+        return NavPath.Destination;
+    }
+
+    public virtual void SetTarget(Int2D target)
+    {
+        NavPath.Reset();
+        NavPath.Start = World.PosToTilePos(Position);
+        NavPath.Destination = target;
+        PathFinder.RequestPath(NavPath);
     }
 }

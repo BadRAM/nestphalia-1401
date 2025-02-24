@@ -70,5 +70,6 @@ public static class Screen
                 Raylib.DrawTexture(backgroundNoise[x][y] ? Tile1 : Tile2, x * 24, y * 24 - 12, tint);
             }
         }
+        Raylib.DrawRectangle(HCenter - 600, VCenter - 300, 1200, 600, new Color(10, 10, 10, 64));
     }
 }

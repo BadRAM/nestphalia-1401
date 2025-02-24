@@ -22,6 +22,7 @@ public static class World
     public static Camera2D Camera;
     public static Team LeftTeam;
     public static Team RightTeam;
+    public static bool BattleStarted;
     
     private static void Initialize()
     {
@@ -32,10 +33,13 @@ public static class World
         Minions.Clear();
         Projectiles.Clear();
         Sprites.Clear();
+        PathFinder.ClearQueue();
         FirstWaveTime = Time.Scaled;
         Wave = 0;
+        BattleStarted = false;
         
         LeftTeam = new Team("Player", false, Raylib.BLUE);
+        LeftTeam.IsPlayerControlled = true;
         RightTeam = new Team("Enemy", true, Raylib.RED);
     }
 
@@ -101,6 +105,8 @@ public static class World
         // Tell teams they can generate fear and hate
         LeftTeam.Initialize();
         RightTeam.Initialize();
+
+        BattleStarted = true;
     }
     
     public static void SetTile(StructureTemplate? tile, Team team, int x, int y)
@@ -119,6 +125,16 @@ public static class World
     public static void SetTile(StructureTemplate? tile, Team team, Int2D tilePos)
     {
         SetTile(tile, team, tilePos.X, tilePos.Y);
+    }
+
+    public static void DestroyTile(int x, int y)
+    {
+        if (_board[x, y] != null)
+        {
+            Sprites.Remove(_board[x, y]!);
+            _board[x,y] = new Rubble(_board[x, y]!.Template, _board[x, y]!.Team, x, y);
+            Sprites.Add(_board[x,y]!);
+        }
     }
 
     public static Structure? GetTile(Int2D tilePos)
@@ -163,7 +179,10 @@ public static class World
             }
         }
         
-        PathFinder.ServeQueue(10);
+        LeftTeam.Update();
+        RightTeam.Update();
+        
+        PathFinder.ServeQueue(5);
         
         for (int x = 0; x < BoardWidth; ++x)
         {
@@ -193,11 +212,13 @@ public static class World
             Sprites.Remove(m);
         }
         MinionsToRemove.Clear();
-        
-        foreach (Projectile p in Projectiles)
+
+        for (int index = 0; index < Projectiles.Count; index++)
         {
+            Projectile p = Projectiles[index];
             p.Update();
         }
+
         foreach (Projectile p in ProjectilesToRemove)
         {
             Projectiles.Remove(p);
@@ -215,22 +236,10 @@ public static class World
             for (int y = 0; y < BoardHeight; ++y)
             {
                 _floor[x,y].Draw(x*24, y*24);
-                //_board[x,y]?.Draw(x*24, y*24);
-                //Vector2 pos = GetTileCenter(x, y);
                 //Raylib.DrawCircle((int)pos.X, (int)pos.Y, (int)(LeftTeam.GetHateFor(x,y)/20), Raylib.RED);
                 //Raylib.DrawCircle((int)pos.X, (int)pos.Y, (int)LeftTeam.GetFearOf(x,y), Raylib.BLUE);
             }
         }
-        
-        // foreach (Minion m in Minions)
-        // {
-        //     m.Draw();
-        // }
-        //
-        // foreach (Projectile p in Projectiles)
-        // {
-        //     p.Draw();
-        // }
 
         Sprites = Sprites.OrderBy(o => o.Z).ToList();
 
@@ -240,6 +249,12 @@ public static class World
         }
         
         Raylib.EndMode2D();
+
+        if (BattleStarted)
+        {
+            LeftTeam.Draw();
+            RightTeam.Draw();
+        }
     }
 
     public static Int2D PosToTilePos(Vector2 position)
@@ -297,8 +312,8 @@ public static class World
 
 public enum TeamName
 {
-    Player,
-    Enemy,
+    Left,
+    Right,
     Neutral,
     None
 }

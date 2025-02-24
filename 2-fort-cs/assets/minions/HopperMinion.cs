@@ -23,8 +23,9 @@ public class HopperMinion : Minion
     private Vector2 _jumpStartPos;
     private Vector2 _jumpEndPos;
     private double _jumpStartTime;
-    private double _jumpDuration = 1;
-    private double _jumpHeight = 48;
+    private double _jumpDuration = 0.5;
+    private double _jumpChargeDuration = 0.5;
+    private double _jumpHeight = 24;
     
     public HopperMinion(MinionTemplate template, Team team, Vector2 position, NavPath? navPath) : base(template, team, position, navPath)
     {
@@ -36,10 +37,15 @@ public class HopperMinion : Minion
         // else, if the second from next tile is empty, hop to it
         // else, if the next tile is empty, walk to it.
         // else, attack next tile
+        Target = World.GetTileCenter(NavPath.NextTile(Position));
 
         if (_jumping)
         {
-            if (Time.Scaled - _jumpStartTime > _jumpDuration)
+            if (Time.Scaled - _jumpStartTime < _jumpChargeDuration)
+            {
+                return;
+            }
+            else if (Time.Scaled - _jumpStartTime > _jumpDuration + _jumpChargeDuration)
             {
                 IsFlying = false;
                 _jumping = false;
@@ -47,7 +53,9 @@ public class HopperMinion : Minion
             }
             else
             {
-                double t = (Time.Scaled - _jumpStartTime) / _jumpDuration;
+                IsFlying = true;
+
+                double t = (Time.Scaled - (_jumpStartTime + _jumpChargeDuration)) / _jumpDuration;
                 double arcOffset = Math.Sin(t * Math.PI) * _jumpHeight;
         
                 Position = Vector2.Lerp(_jumpStartPos, _jumpEndPos, (float)t);
@@ -56,25 +64,30 @@ public class HopperMinion : Minion
             }
         }
         
-        Target = World.GetTileCenter(NavPath.NextTile(Position));
         Int2D? ahead = NavPath.LookAhead(1);
-
+        
         if (ahead == null)
         {
             if (!TryAttack())
             {
-                Retarget();
-                PathFinder.RequestPath(NavPath);
+                if (NavPath.Found && NavPath.TargetReached(Position))
+                {
+                    Retarget();
+                    PathFinder.RequestPath(NavPath);
+                }
+                else
+                {
+                    Position = Position.MoveTowards(Target, AdjustedSpeed() * Time.DeltaTime);
+                }
             }
         }
         else
         {
             Structure? structureAhead = World.GetTile((Int2D)ahead);
-            if (structureAhead == null)
+            if (!(structureAhead?.PhysSolid(Team) ?? false))
             {
                 NavPath.Skip();
                 _jumping = true;
-                IsFlying = true;
                 _jumpStartPos = Position;
                 _jumpEndPos = World.GetTileCenter((Int2D)ahead);
                 _jumpStartTime = Time.Scaled;
@@ -87,12 +100,7 @@ public class HopperMinion : Minion
                 }
             }
         }
-    }
 
-    public override void Draw()
-    {
-        Console.WriteLine(":/");
-        base.Draw();
-        Raylib.DrawCircle((int)Position.X, (int)Position.Y, Template.PhysicsRadius, _jumping ? new Color(50, 200, 50, 64) : new Color(200, 50, 50, 64));
+        Frenzy = false;
     }
 }

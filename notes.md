@@ -17,7 +17,82 @@ Quit
 
 Level Rewards
 =============
-1 - Watchtower
+0
+Mud Wall
+Watchtower
+Anthill
+Hazard Sign
+1
+Gate
+2
+Machinegunner
+Minefield
+3
+Grasshopper Glade
+Rally Beacon
+4
+Mortar
+5
+Beehive
+Honey Pot
+6
+Repair Beacon
+Wooden Wall
+7
+Lightning Tower
+8
+Snail Warren
+Glue Paper
+9
+Brood Beacon
+10
+Stone Wall
+11
+Beetle Burrow
+12
+Frenzy Beacon
+13
+Spider Nest
+14
+Sniper
+15
+Frog Pond
+Vault Door
+
+
+
+Structure List
+==============
+Mud Wall
+Stone Wall
+Honey Pot
+Glue Paper
+Hazard Sign
+Gate
+Vault Door
+
+Watchtower
+Mortar
+Machinegunner
+Lightning Tower
+Sniper
+Minefield
+
+Rally Beacon
+Repair Beacon
+Frenzy Beacon
+Brood Beacon
+
+Anthill
+Snail Warren
+Beehive
+Beetle Burrow
+Grasshopper Glade
+Spider Nest
+Frog Pond
+
+
+<!-- 1 - Watchtower
 2 - Door
 3 - Snail
 4 - Mortar
@@ -41,5 +116,5 @@ Mortar
 Lightning tower
 Honeypot
 Grasshopper
-Dung Beetle
+Dung Beetle -->
 

@@ -92,7 +92,7 @@ public static class Resources
         {
             for (int y = 0; y < 20; y++)
             {
-                fort.Board[x+y*20] = World.GetTile(x+1,y+1)?.Template.Name ?? "";
+                fort.Board[x+y*20] = World.GetTile(x+1,y+1)?.Template.ID ?? "";
             }
         }
         

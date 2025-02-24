@@ -7,7 +7,7 @@ namespace _2_fort_cs;
 
 public class Campaign
 {
-    [JsonInclude] public double Money = 1000;
+    [JsonInclude] public double Money = 2000;
     [JsonInclude] public double Battles;
     [JsonInclude] public int Level;
     [JsonInclude] public List<FloorTileTemplate> Inventory = new List<FloorTileTemplate>();
@@ -43,7 +43,7 @@ public class Campaign
     {
         if (Raylib.IsKeyPressed(KeyboardKey.KEY_FOUR) && Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_SHIFT)) // ye ole moneyhacks
         {
-            Money += 1000;
+            Money -= 1000;
         }
         
         Raylib.BeginDrawing();

@@ -32,62 +32,19 @@ public class FlyingMinion : Minion
         {
             Target = World.GetTileCenter(NavPath.Destination);
             Position = Position.MoveTowards(Target, AdjustedSpeed() * Time.DeltaTime);
-            if (Position == Target)
+            if (NavPath.TargetReached(Position))
             {
                 Retarget();
             }
         }
+
+        Frenzy = false;
     }
 
-
-    // public virtual void Update()
-    // {
-    //     // if the next tile in our path is adjacent and solid, then attack it
-    //     
-    //     // else, move towards next tile on path.
-    //     
-    //     // if we're at our final destination, ask for a new path. (Don't ask for a new path if we already have)
-    //
-    //     if (Position.X < -24 || Position.X > World.BoardWidth * 24 + 24 || Position.Y < -24 || Position.Y > World.BoardHeight * 24 + 24)
-    //     {
-    //         Console.WriteLine($"{Template.Name} had an adventure and was returned to board center.");
-    //         Position = new Vector2(World.BoardWidth * 12, World.BoardHeight * 12);
-    //     }
-    //     
-    //     double adjustedSpeed = Template.Speed;
-    //     Structure? structure = World.GetTileAtPos(Position);
-    //     if (Glued || (!IsFlying() && structure?.Team == Team && structure is Minefield)) adjustedSpeed *= 0.5;
-    //
-    //     if (!IsFlying()) Target = World.GetTileCenter(NavPath.NextTile(Position));
-    //     
-    //     Structure? t = World.GetTileAtPos(Position.MoveTowards(Target, Template.Range)); // TODO: make this respect minion range
-    //     if (IsFlying() && t != World.GetTile(NavPath.Destination)) t = null; // cheeky intercept so flyers ignore all but their target.
-    //
-    //     if (t != null && t.PhysSolid(Team) && t.Team != Team)
-    //     {
-    //         if (Time.Scaled - _lastFiredTime > 60/Template.RateOfFire)
-    //         {
-    //             Template.Projectile.Instantiate(t, this);
-    //             _lastFiredTime = Time.Scaled;
-    //         }
-    //     }
-    //     else if (IsFlying())
-    //     {
-    //         Target = World.GetTileCenter(NavPath.Destination);
-    //         Position = Position.MoveTowards(Target, adjustedSpeed * Time.DeltaTime);
-    //         if (Position == Target)
-    //         {
-    //             Retarget();
-    //         }
-    //     }
-    //     else
-    //     {
-    //         if (NavPath.Found && NavPath.TargetReached(Position))
-    //         {
-    //             Retarget();
-    //         }
-    //         Position = Position.MoveTowards(Target, adjustedSpeed * Time.DeltaTime);
-    //     }
-    //     Z = Position.Y + (IsFlying() ? 240 : 0);
-    // }
+    public override void SetTarget(Int2D target)
+    {
+        NavPath.Reset();
+        NavPath.Start = World.PosToTilePos(Position);
+        NavPath.Destination = target;
+    }
 }

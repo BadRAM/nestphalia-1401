@@ -81,14 +81,24 @@ public class MortarShell : Projectile
 
         if (t >= 1)
         {
-            foreach (Minion minion in World.Minions)
+            if (Target is Structure s)
             {
-                if (!minion.IsFlying && minion.Team != _team &&
-                    Raylib.CheckCollisionCircles(_targetPos, _template.BlastRadius, minion.Position, minion.Template.PhysicsRadius))
+                s.Hurt(_template.Damage);
+            }
+            else
+            {
+                for (int index = 0; index < World.Minions.Count; index++)
                 {
-                    minion.Hurt(this);
+                    Minion minion = World.Minions[index];
+                    if (!minion.IsFlying && minion.Team != _team &&
+                        Raylib.CheckCollisionCircles(_targetPos, _template.BlastRadius, minion.Position,
+                            minion.Template.PhysicsRadius))
+                    {
+                        minion.Hurt(this);
+                    }
                 }
             }
+            
             _timeExploded = Time.Scaled;
         }
     }

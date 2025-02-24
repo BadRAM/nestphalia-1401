@@ -16,6 +16,7 @@ public static class BattleScene
     public static void Start(Fort leftFort, Fort rightFort)
     {
         Pause = false;
+        Time.TimeScale = 1;
         
         if (leftFort == null || rightFort == null)
         {
@@ -40,19 +41,19 @@ public static class BattleScene
 
         if (IsKeyDown(KeyboardKey.KEY_A))
         {
-            World.Camera.offset.X -= 4;
+            World.Camera.offset.X += 4;
         }
         if (IsKeyDown(KeyboardKey.KEY_D))
         {
-            World.Camera.offset.X += 4;
+            World.Camera.offset.X -= 4;
         }
         if (IsKeyDown(KeyboardKey.KEY_W))
         {
-            World.Camera.offset.Y -= 4;
+            World.Camera.offset.Y += 4;
         }
         if (IsKeyDown(KeyboardKey.KEY_S))
         {
-            World.Camera.offset.Y += 4;
+            World.Camera.offset.Y -= 4;
         }
         
         if (IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT))
@@ -109,14 +110,14 @@ public static class BattleScene
             {
                 CustomBattleMenu.Start();
                 CustomBattleMenu.OutcomeMessage =
-                    (winner == TeamName.Player
+                    (winner == TeamName.Left
                         ? CustomBattleMenu.LeftFort?.Name ?? ""
                         : CustomBattleMenu.RightFort?.Name ?? "") + " won the battle!";
             }
             else
             {
                 Console.WriteLine($"{winner.ToString()} wins the battle!");
-                Program.Campaign.ReportBattleOutcome(winner == TeamName.Player);
+                Program.Campaign.ReportBattleOutcome(winner == TeamName.Left);
                 Program.Campaign.Start();
             }
         }
@@ -130,11 +131,12 @@ public static class BattleScene
         
         //DrawText($"Minion 0's wherabouts: X={World.Minions[0].Position.X} Y={World.Minions[0].Position.Y}", 12, 12, 20, Color.White);
         
-        DrawTextLeft(12, 16, $"FPS: {GetFPS()}");
-        DrawTextLeft(12, 32, $"Wave: {World.Wave}");
-        DrawTextLeft(12, 48, $"Bugs: {World.Minions.Count}");
-        DrawTextLeft(12, 64, $"Sprites: {World.Sprites.Count}");
-        DrawTextLeft(12, 80, $"Zoom: {World.Camera.zoom}");
+        DrawTextLeft(6, 16, $"FPS: {GetFPS()}");
+        DrawTextLeft(6, 32, $"Wave: {World.Wave}");
+        DrawTextLeft(6, 48, $"Bugs: {World.Minions.Count}");
+        // DrawTextLeft(6, 64, $"Sprites: {World.Sprites.Count}");
+        DrawTextLeft(6, 64, $"Zoom: {World.Camera.zoom}");
+        DrawTextLeft(6, 80, $"PathQueue: {PathFinder.GetQueueLength()}");
         
         if (IsKeyDown(KeyboardKey.KEY_F))
         {
@@ -157,13 +159,12 @@ public static class BattleScene
                 }
                 else
                 {
-                    Program.Campaign.ReportBattleOutcome(winner == TeamName.Enemy);
+                    Program.Campaign.ReportBattleOutcome(winner == TeamName.Right);
                     Program.Campaign.Start();
                 }
             }
             //DrawTextEx(Resources.Font, "PAUSED", new Vector2(Screen.HCenter, Screen.VCenter), 48, 4, WHITE);
         }
-        
         EndDrawing();
     }
 
@@ -190,8 +191,8 @@ public static class BattleScene
             }
         }
 
-        if (playerDead) return TeamName.Enemy;
-        if (enemyDead) return TeamName.Player;
+        if (playerDead) return TeamName.Right;
+        if (enemyDead) return TeamName.Left;
         return TeamName.None;
     }
 }

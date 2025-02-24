@@ -78,6 +78,9 @@ public class Tower : Structure
                 case TowerTemplate.TargetSelector.Random:
                     _target = FindTargetRandom();
                     break;
+                case TowerTemplate.TargetSelector.RandomFocus:
+                    _target = FindTargetRandomFocus();
+                    break;
                 default:
                     throw new NotImplementedException();
             }
@@ -139,7 +142,7 @@ public class Tower : Structure
     protected Minion? FindTargetRandomFocus()
     {
         Minion? random = _target;
-        if (random != null && random.Health > 0) return random;
+        if (random != null && random.Health > 0 && Vector2.Distance(random.Position, position) < _template.Range) return random;
         return FindTargetRandom();
     }
 }

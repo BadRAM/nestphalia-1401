@@ -20,6 +20,8 @@ public static class CustomBattleMenu
         World.InitializePreview();
         World.Camera.zoom = 0.5f;
         World.Camera.offset = new Vector2(Screen.HCenter-288, Screen.VCenter-100);
+        LeftFort?.LoadToBoard(false);
+        RightFort?.LoadToBoard(true);
     }
 
     public static void Update()

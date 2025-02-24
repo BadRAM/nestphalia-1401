@@ -60,7 +60,7 @@ public class Projectile : ISprite
             if (Position == structure.GetCenter())
             {
                 World.GetTileAtPos(Position)?.Hurt(Template.Damage);
-                World.ProjectilesToRemove.Add(this);
+                Destroy();
             }
         }
         else if (Target is Vector2 vec)
@@ -69,11 +69,16 @@ public class Projectile : ISprite
             if (Position == vec)
             {
                 World.GetTileAtPos(Position)?.Hurt(Template.Damage);
-                World.ProjectilesToRemove.Add(this);
+                Destroy();
             }
         }
 
         Z = Position.Y + 24;
+    }
+
+    public virtual void Destroy()
+    {
+        World.ProjectilesToRemove.Add(this);
     }
 
     public virtual void Draw()

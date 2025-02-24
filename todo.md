@@ -2,28 +2,23 @@
 
 Programming todo:
 =================
-- More better UI
- - Menus with designed layouts and backgrounds
- - Post battle screen
-- New Structures/Minions
- - Lightning Tower
- - Glue Paper
- - Hazard sign (Enemies disregard, your bugs strongly avoid)
- - Grasshopper
- - Spider
- - Sapper Beetle
- - Frog
-- More utility structures
-- Minion melee attack animation
-- Minion state machine
+- 15 levels
+- Clickable ability button
+
 - Fix minion collision with wall corners
 - Splash screen
 
+- Fix Hopper distraction
+- Multiple forts in campaign
+
 ----- Postponed to team bug fort 2 -----
+- Minion melee attack animation
+- Minion state machine
 - Assets from json
 - Minion vs Minion melee
 - Multitile structures
 - Active ability towers?
+- Post battle screen
 
 
 Design todo:
@@ -35,6 +30,7 @@ Design todo:
   - Lightning tower?
   - 
  - Minions
+  - Ranged Minion that shoots over walls
   - Grasshopper
   - Frog
   - Dragonfly
@@ -54,7 +50,15 @@ Design todo:
   - Slow floor
   - Honey pot
   - Minefield
-
+ - Active ability tower
+  - Rally Minions to point
+  - Frenzy Aura
+  - Freeze/slow aura
+  - Tower disabling EMP
+  - Minion Invincibility aura
+  - Repair/Rebuild building
+  - Destroy Wall 
+  - Spiderling egg sac mortar
 
 - Workers?
  - Are spawned by core structure
