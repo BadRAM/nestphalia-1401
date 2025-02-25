@@ -9,19 +9,19 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <None Update="resources/**/*.png">
+        <None Update="resources/**/*">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
         </None>
-    </ItemGroup>
+    </ItemGroup>    
     <ItemGroup>
-        <None Update="resources/**/*.wav">
+        <None Update="readme.txt*">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
         </None>
-    </ItemGroup>
+    </ItemGroup>    
     <ItemGroup>
-        <None Update="resources/**/*.fort">
+        <None Update="credits.txt">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
         </None>

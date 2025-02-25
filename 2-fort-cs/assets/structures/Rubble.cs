@@ -11,6 +11,7 @@ public class Rubble : Structure
     public Rubble(StructureTemplate template, Team team, int x, int y) : base(RubbleTemplate, team, x, y)
     {
         DestroyedStructure = template;
+        Z = position.Y - 24;
     }
     
     public override void Hurt(double damage) { }

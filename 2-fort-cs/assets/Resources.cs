@@ -57,7 +57,7 @@ public static class Resources
         CampaignLevels.Add(LoadFort("/resources/level13.fort"));
         CampaignLevels.Add(LoadFort("/resources/level14.fort"));
         CampaignLevels.Add(LoadFort("/resources/level15.fort"));
-        CampaignLevels.Add(LoadFort("/resources/level16.fort"));
+        // CampaignLevels.Add(LoadFort("/resources/level16.fort"));
     }
     
     public static Texture GetTextureByName(string name)

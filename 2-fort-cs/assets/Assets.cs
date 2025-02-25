@@ -14,14 +14,14 @@ public static class Assets
         FloorTiles.Add(new FloorTileTemplate("Blank", Resources.GetTextureByName("clear")));
         
         Structures.Add(new StructureTemplate("wall_mud", "Mud Wall", "", Resources.GetTextureByName("wall"), 100, 10, 0, -10));
-        Structures.Add(new StructureTemplate("wall_wood", "Wooden Wall", "", Resources.GetTextureByName("wall_wood"), 250, 45, 6, -10));
-        Structures.Add(new StructureTemplate("wall_stone", "Stone Wall", "", Resources.GetTextureByName("wall2"), 500, 115, 10, -10));
+        Structures.Add(new StructureTemplate("wall_wood", "Wooden Wall", "", Resources.GetTextureByName("wall_wood"), 250, 65, 6, -10));
+        Structures.Add(new StructureTemplate("wall_stone", "Stone Wall", "", Resources.GetTextureByName("wall2"), 500, 250, 10, -10));
         
-        Structures.Add(new StructureTemplate("honey_pot", "Honey Pot", "", Resources.GetTextureByName("honeypot"), 75, 35, 5, 100));
-        Structures.Add(new GluePaperTemplate("glue_paper", "Glue Paper", "", Resources.GetTextureByName("stickypaper"), 100, 10, 8, 0));
+        Structures.Add(new StructureTemplate("honey_pot", "Honey Pot", "decoy nest", Resources.GetTextureByName("honeypot"), 75, 35, 5, 100));
+        Structures.Add(new GluePaperTemplate("glue_paper", "Glue Paper", "", Resources.GetTextureByName("stickypaper"), 150, 10, 8, 0));
         Structures.Add(new HazardSignTemplate("hazard_sign","Hazard Sign", "", Resources.GetTextureByName("hazard_sign"), 30, 10, 0, Double.MinValue));
 
-        Structures.Add(new DoorTemplate("door_weak", "Gate", "", Resources.GetTextureByName("doorClosed"), Resources.GetTextureByName("doorOpen"), 95, 100, 1, 5, 32));
+        Structures.Add(new DoorTemplate("door_weak", "Gate", "", Resources.GetTextureByName("doorClosed"), Resources.GetTextureByName("doorOpen"), 80, 100, 1, 5, 32));
         Structures.Add(new DoorTemplate("door_strong","Vault Door", "", Resources.GetTextureByName("vault_door_closed"), Resources.GetTextureByName("vault_door_open"), 250, 1000, 15, 5, 32));
         
         Structures.Add
@@ -53,7 +53,7 @@ public static class Assets
                 "Machine Gun",
                 "",
                 Resources.GetTextureByName("turret2"),
-                160,
+                120,
                 400,
                 2,
                 5,
@@ -74,7 +74,7 @@ public static class Assets
                 "Minefield",
                 "",
                 Resources.GetTextureByName("minefield"),
-                100,
+                80,
                 55,
                 2,
                 Double.MinValue, 
@@ -91,10 +91,10 @@ public static class Assets
             (
                 "tower_mortar",
                 "Mortar",
-                "",
+                "Splash damage, radius 48\nCan only hit grounded units",
                 Resources.GetTextureByName("mortar"),
-                200,
-                300,
+                75,
+                500,
                 4,
                 5,
                 90,
@@ -112,10 +112,10 @@ public static class Assets
             (
                 "tower_lightning",
                 "Lightning Tower",
-                "",
+                "Can only hit midair units",
                 Resources.GetTextureByName("tower_lightning"),
                 160,
-                400,
+                600,
                 7,
                 5,
                 120,
@@ -135,13 +135,13 @@ public static class Assets
                 "Sniper",
                 "",
                 Resources.GetTextureByName("turret3"),
-                200,
-                1000,
+                60,
+                3000,
                 14,
                 5,
-                600,
+                450,
                 new ProjectileTemplate(Resources.GetTextureByName("bullet"), 60, 800), 
-                30,
+                25,
                 TowerTemplate.TargetSelector.Random,
                 true,
                 true
@@ -301,7 +301,7 @@ public static class Assets
                     20, 
                     0, 
                     5, 
-                    40,
+                    45,
                     5
                 ), 
                 5, 
@@ -319,7 +319,7 @@ public static class Assets
                 "",
                 Resources.GetTextureByName("spawner2"), 
                 50, 
-                300,
+                1000,
                 8,
                 50,
                 new MinionTemplate
@@ -328,10 +328,10 @@ public static class Assets
                     "Snail", 
                     "",
                     Resources.GetTextureByName("snail"), 
-                    50, 
+                    65, 
                     5, 
                     15, 
-                    20, 
+                    35, 
                     6
                 ), 
                 2, 
@@ -346,11 +346,11 @@ public static class Assets
             (
                 "nest_sapper_beetle",
                 "Beetle Burrow",
-                "Sapper Beetles will launch a single powerful attack, then return to their nest to join the next wave",
+                "Sapper Beetles attack once, then return to \ntheir nest to join the next wave",
                 Resources.GetTextureByName("spawner4"),
                 50,
                 2500,
-                8,
+                11,
                 50,
                 new SapperMinionTemplate
                 (
@@ -360,13 +360,13 @@ public static class Assets
                     Resources.GetTextureByName("sapper_attacking"),
                     Resources.GetTextureByName("sapper_retreating"),
                     50, 
-                    0, 
-                    200, 
+                    2, 
+                    250, 
                     65, 
-                    10
+                    8
                 ), 
                 1, 
-                0.25,
+                0,
                 1
             )
         );
@@ -405,7 +405,7 @@ public static class Assets
                         15, 
                         0, 
                         5, 
-                        30, 
+                        45, 
                         2
                     )
                 ), 
@@ -424,7 +424,7 @@ public static class Assets
                 "",
                 Resources.GetTextureByName("spawner4"),
                 50,
-                2500,
+                10000,
                 15,
                 50,
                 new HopperMinionTemplate
@@ -433,7 +433,7 @@ public static class Assets
                     "Frog",
                     "",
                     Resources.GetTextureByName("frog"),
-                    1000, 
+                    1500, 
                     0, 
                     50, 
                     20, 

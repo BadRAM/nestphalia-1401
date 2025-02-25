@@ -17,6 +17,7 @@ public static class EditorScene
     private static bool _newNest;
     private static bool _nestCapped;
     private static bool _beaconCapped;
+    private static bool _fortAlreadySaved;
     private static StructureTemplate.StructureClass _structureClass;
     
     public static void Start(Fort? fortToLoad = null, bool creativeMode = false)
@@ -24,6 +25,8 @@ public static class EditorScene
         _saveMessage = "";
         _sandboxMode = creativeMode;
         _fort = fortToLoad ?? new Fort();
+        _fortAlreadySaved = File.Exists(Directory.GetCurrentDirectory() + $"/forts/{_fort.Name}.fort");
+        Console.WriteLine($"checking if {Directory.GetCurrentDirectory() +  $"/forts/{_fort.Name}.fort"} exists. Answer: {_fortAlreadySaved.ToString()}");
         
         Program.CurrentScene = Scene.Editor;
         World.InitializeEditor();
@@ -113,6 +116,7 @@ public static class EditorScene
         if (_sandboxMode)
         {
             if (ButtonWide(Screen.HCenter-600, Screen.VCenter+260, "Exit")) MenuScene.Start();
+            if (ButtonWide(Screen.HCenter-600, Screen.VCenter+180, "Save Changes", _fortAlreadySaved)) Resources.SaveFort($"/forts/{_fort.Name}");
         }
         else
         {
@@ -123,7 +127,7 @@ public static class EditorScene
             }
         }
         
-        if (ButtonWide(Screen.HCenter-600, Screen.VCenter+220, "Save to file"))
+        if (ButtonWide(Screen.HCenter-600, Screen.VCenter+220, "Save to new file"))
         {
             int number = 1;
             while (true)
@@ -132,6 +136,8 @@ public static class EditorScene
                 {
                     Resources.SaveFort($"forts/fort{number}");
                     _saveMessage = $"Saved fort as fort{number}.fort";
+                    _fort.Name = $"fort{number}";
+                    _fortAlreadySaved = true;
                     break;
                 }
                 if (number >= 999)
@@ -195,8 +201,8 @@ public static class EditorScene
             EndMode2D();
         }
         
-        DrawTextLeft(Screen.HCenter-590, Screen.VCenter+180, _saveMessage);
-        DrawTextLeft(Screen.HCenter-590, Screen.VCenter+50, GetFortStats());
+        DrawTextLeft(Screen.HCenter-590, Screen.VCenter+150, _saveMessage);
+        DrawTextLeft(Screen.HCenter-590, Screen.VCenter+20, GetFortStats());
         
         EndDrawing();
     }
@@ -228,13 +234,14 @@ public static class EditorScene
         if (!_sandboxMode)
         {
             _nestCapped = nestCount >= Program.Campaign.Level * 2 + 10;
-            _beaconCapped = beaconCount >= 3;
+            _beaconCapped = beaconCount >= 4;
         }
         
-        return $"{turretCount} Towers\n" +
+        return $"{_fort.Name}" +
+               $"{turretCount} Towers\n" +
                $"{utilityCount} Utility\n" +
                nestCount + (_sandboxMode ? "" : "/"+(Program.Campaign.Level*2+10)) + " Nests\n" +
-               beaconCount + (_sandboxMode ? "" : "/3") + " Beacons\n" +
+               beaconCount + (_sandboxMode ? "" : "/4") + " Beacons\n" +
                $"{structureCount} Total\n" +
                $"{totalCost} Cost";
     }

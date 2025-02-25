@@ -44,7 +44,8 @@ public class StructureTemplate
     {
         return $"{Name}\n" +
                $"${Price}\n" +
-               $"HP: {MaxHealth}";
+               $"HP: {MaxHealth}\n" +
+               $"{Description}";
     }
 }
 

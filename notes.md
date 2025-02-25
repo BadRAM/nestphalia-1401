@@ -118,3 +118,9 @@ Honeypot
 Grasshopper
 Dung Beetle -->
 
+Playtest Notes
+==============
+
+- tell the player that nests are important
+- Tell the player what rmb does in editor
+- 

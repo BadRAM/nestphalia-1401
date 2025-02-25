@@ -36,7 +36,9 @@ public class SpawnerTemplate : StructureTemplate
                (Minion.Armor == 0 ? "" : $"Armor: {Minion.Armor}\n") +
                $"Speed: {Minion.Speed}\n" +
                $"Damage: {Minion.Projectile.Damage} ({Minion.Projectile.Damage / Minion.AttackCooldown}/s)\n" +
-               $"Size: {Minion.PhysicsRadius*2}";
+               $"Size: {Minion.PhysicsRadius * 2}\n" +
+               $"{Description}";
+
     }
 }
 

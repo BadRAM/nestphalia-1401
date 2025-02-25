@@ -11,6 +11,7 @@ public class Team
     public bool IsRightSide;
     public bool IsPlayerControlled;
     public List<ActiveAbilityBeacon?> Beacons = new List<ActiveAbilityBeacon?>();
+    public const int BeaconCap = 4;
     public Color UnitTint;
     private Texture _abilitySlot;
     private int _usingAbility = -1;
@@ -49,7 +50,7 @@ public class Team
                 }
             }
         }
-        while (Beacons.Count < 3) Beacons.Add(null);
+        while (Beacons.Count < BeaconCap) Beacons.Add(null);
     }
     
     public double GetHateFor(int x, int y)
@@ -117,15 +118,15 @@ public class Team
     
     public void Draw()
     {
-        int posX = IsRightSide ? Screen.HCenter + 500  : Screen.HCenter - 500;
-        for (int i = 0; i < 3; i++)
+        int posX = IsRightSide ? Screen.HCenter + 450  : Screen.HCenter - 450;
+        for (int i = 0; i < BeaconCap; i++)
         {
             Color c = Raylib.WHITE;
             if (!Beacons[i]?.IsReady() ?? false) c = Raylib.GRAY;
             if (i == _usingAbility) c = Raylib.DARKGRAY;
-            Raylib.DrawTexture(_abilitySlot, posX + i*68 - 100, Screen.Bottom - 68, c);
-            if (IsPlayerControlled) GUI.DrawTextLeft(posX + i*68 - 100, Screen.Bottom - 68, (i+1).ToString());
-            Beacons[i]?.DrawStatus(posX + i*68 - 100, Screen.Bottom - 68);
+            Raylib.DrawTexture(_abilitySlot, posX + i*68 - 150, Screen.Bottom - 68, c);
+            if (IsPlayerControlled) GUI.DrawTextLeft(posX + i*68 - 150, Screen.Bottom - 68, (i+1).ToString());
+            Beacons[i]?.DrawStatus(posX + i*68 - 150, Screen.Bottom - 68);
         }
     }
 }

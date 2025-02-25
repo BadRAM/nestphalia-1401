@@ -43,7 +43,19 @@ public class Campaign
     {
         if (Raylib.IsKeyPressed(KeyboardKey.KEY_FOUR) && Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_SHIFT)) // ye ole moneyhacks
         {
+            Money += 1000;
+        }
+        if (Raylib.IsKeyPressed(KeyboardKey.KEY_THREE) && Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_SHIFT)) // ye ole unmoneyhacks
+        {
             Money -= 1000;
+        }
+        if (Raylib.IsKeyPressed(KeyboardKey.KEY_FIVE) && Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_SHIFT)) // ye ole progresshacks
+        {
+            Level++;
+        }
+        if (Raylib.IsKeyPressed(KeyboardKey.KEY_SIX) && Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_SHIFT)) // ye ole unprogresshacks
+        {
+            Level++;
         }
         
         Raylib.BeginDrawing();
@@ -106,7 +118,7 @@ public class Campaign
             {
                 Level++;
                 _outcomeText += $"\nNew level and structure unlocked!";
-                if (Level == 8)
+                if (Level == 15)
                 {
                     _outcomeText = "The capitol has fallen, you are the new bug emperor! \nCongratulations!";
                 }

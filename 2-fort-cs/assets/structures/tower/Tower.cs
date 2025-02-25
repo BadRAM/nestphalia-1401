@@ -48,8 +48,9 @@ public class TowerTemplate : StructureTemplate
         return $"{Name}\n" +
                $"${Price}\n" +
                $"HP: {MaxHealth}\n" +
-               $"Damage: {Projectile.Damage} ({Projectile.Damage / (RateOfFire / 60)}/s)\n" +
-               $"Range: {Range}";
+               $"Damage: {Projectile.Damage} ({(Projectile.Damage * (RateOfFire/60)).ToString("N0")}/s)\n" +
+               $"Range: {Range}\n" +
+               $"{Description}\n";
     }
 }
 

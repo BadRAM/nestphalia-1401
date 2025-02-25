@@ -2,8 +2,10 @@
 
 Programming todo:
 =================
+
 - 15 levels
 - Clickable ability button
+- Escape pauses
 
 - Fix minion collision with wall corners
 - Splash screen

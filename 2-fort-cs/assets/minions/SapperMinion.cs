@@ -7,7 +7,7 @@ namespace _2_fort_cs;
 public class SapperMinionTemplate : MinionTemplate
 {
     public Texture RetreatingTexture;
-
+    
     public SapperMinionTemplate(string id, string name, string description, Texture texture, Texture retreatingTexture, double maxHealth, double armor, double damage, double speed, float physicsRadius) : base(id, name, description, texture, maxHealth, armor, damage, speed, physicsRadius, 0)
     {
         RetreatingTexture = retreatingTexture;
