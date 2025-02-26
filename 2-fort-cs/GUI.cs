@@ -8,6 +8,7 @@ public static class GUI
 {
     private static Texture _buttonWideTexture;
     private static Texture _buttonNarrowTexture;
+    private static SoundResource _buttonClickSFX;
     public static Font Font;
     const int FontSize = 16;
     
@@ -15,6 +16,7 @@ public static class GUI
     {
         _buttonWideTexture = Resources.GetTextureByName("button_wide");
         _buttonNarrowTexture = Resources.GetTextureByName("button_narrow");
+        _buttonClickSFX = Resources.GetSoundByName("shovel");
     }
 
     public static void DrawTextCentered(int x, int y, string text, float size = FontSize, Color? color = null)
@@ -42,7 +44,12 @@ public static class GUI
         DrawTextureRec(_buttonWideTexture, subSprite, new Vector2(x,y), WHITE);
         DrawTextCentered(x+150, y+20, text);
         
-        return enabled && hover && IsMouseButtonReleased(MouseButton.MOUSE_BUTTON_LEFT);
+        if (enabled && hover && IsMouseButtonReleased(MouseButton.MOUSE_BUTTON_LEFT))
+        {
+            _buttonClickSFX.Play();
+            return true;
+        }
+        return false;
     }
     
     public static bool ButtonNarrow(int x, int y, string text, bool enabled = true)
@@ -54,6 +61,10 @@ public static class GUI
         DrawTextureRec(_buttonNarrowTexture, subSprite, new Vector2(x,y), WHITE);
         DrawTextCentered(x+50, y+20, text);
         
-        return enabled && hover && IsMouseButtonReleased(MouseButton.MOUSE_BUTTON_LEFT);
-    }
+        if (enabled && hover && IsMouseButtonReleased(MouseButton.MOUSE_BUTTON_LEFT))
+        {
+            _buttonClickSFX.Play();
+            return true;
+        }
+        return false;    }
 }

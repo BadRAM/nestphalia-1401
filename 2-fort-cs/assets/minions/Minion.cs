@@ -122,7 +122,7 @@ public class Minion : ISprite
         }
         if (Time.Scaled - _attackStartedTime >= (Frenzy ? Template.AttackCooldown/2 : Template.AttackCooldown))
         {
-            Template.Projectile.Instantiate(t, this);
+            Template.Projectile.Instantiate(t, this, Position);
             _attackStartedTime = Time.Scaled;
         }
         return true;

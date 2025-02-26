@@ -1,3 +1,4 @@
+using System.Numerics;
 using ZeroElectric.Vinculum;
 
 namespace _2_fort_cs;
@@ -17,12 +18,22 @@ public static class Screen
     public static List<List<bool>> backgroundNoise = new List<List<bool>>();
     public static Texture Tile1;
     public static Texture Tile2;
+    private static List<Texture> _graffiti = new List<Texture>();
+    private static int _graffitiPosX;
+    private static int _graffitiPosY;
+    private static int _graffitiPicked;
 
     public static void Initialize()
     {
         //WhiteNoise = Raylib.GenImageWhiteNoise(1024, 1024, 0.5f);
         Tile1 = Resources.GetTextureByName("floor1");
         Tile2 = Resources.GetTextureByName("floor2");
+        _graffiti.Add(Resources.GetTextureByName("trogdor"));
+        _graffiti.Add(Resources.GetTextureByName("s"));
+        _graffiti.Add(Resources.GetTextureByName("kilroy"));
+        _graffiti.Add(Resources.GetTextureByName("triangle"));
+        _graffiti.Add(Resources.GetTextureByName("rune"));
+        _graffiti.Add(Resources.GetTextureByName("tag_isopod"));
     }
 
     public static void RegenerateBackground()
@@ -39,6 +50,19 @@ public static class Screen
             while (row.Count <= Bottom/24)
             {
                 row.Add(Random.Shared.Next(2) == 0);
+            }
+        }
+
+        _graffitiPicked = Random.Shared.Next(_graffiti.Count);
+
+        while (true)
+        {
+            _graffitiPosX = Random.Shared.Next(HCenter - 1000, HCenter + 1000);
+            _graffitiPosY = Random.Shared.Next(VCenter - 600, VCenter + 600);
+
+            if ((_graffitiPosX < HCenter - 664 || _graffitiPosX > HCenter + 600) && (_graffitiPosY < VCenter - 364 || _graffitiPosY > VCenter + 300) )
+            {
+                break;
             }
         }
     }
@@ -71,5 +95,6 @@ public static class Screen
             }
         }
         Raylib.DrawRectangle(HCenter - 600, VCenter - 300, 1200, 600, new Color(10, 10, 10, 64));
+        Raylib.DrawTexture(_graffiti[_graffitiPicked], _graffitiPosX, _graffitiPosY, Raylib.WHITE);
     }
 }

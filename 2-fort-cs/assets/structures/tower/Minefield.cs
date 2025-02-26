@@ -32,11 +32,13 @@ public class Minefield : Structure
     private int _chargesLeft;
     private double _timeLastTriggered;
     private Vector2[] _drawPoints = new []{new Vector2(6,6), new Vector2(-6,-6), new Vector2(-6,6), new Vector2(6,-6)};
+    private SoundResource _armSound;
     
     public Minefield(MinefieldTemplate template, Team team, int x, int y) : base(template, team, x, y)
     {
         _template = template;
         _chargesLeft = template.MaxCharges;
+        _armSound = Resources.GetSoundByName("primed");
         for (int i = 0; i < _drawPoints.Length; i++)
         {
             _drawPoints[i] += new Vector2(Random.Shared.Next(-2, 2), Random.Shared.Next(-2, 2));
@@ -75,10 +77,9 @@ public class Minefield : Structure
 
     private void Trigger()
     {
+        _armSound.PlayRandomPitch(SoundResource.WorldToPan(position.X));
         _chargesLeft--;
-        position += _drawPoints[_chargesLeft];
-        _template.Bomb.Instantiate(position, this);
-        position = World.GetTileCenter(X, Y);
+        _template.Bomb.Instantiate(position, this, position + _drawPoints[_chargesLeft]);
         _timeLastTriggered = Time.Scaled;
         Health = Math.Max(_chargesLeft, Health);
         if (_chargesLeft <= 0) Destroy();

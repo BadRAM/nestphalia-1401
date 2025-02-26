@@ -37,6 +37,8 @@ public class Campaign
         Program.CurrentScene = Scene.Campaign;
         Screen.RegenerateBackground();
         Save();
+        Resources.PlayMusicByName("hook_-_paranoya");
+
     }
     
     public void Update()

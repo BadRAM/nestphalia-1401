@@ -24,12 +24,14 @@ public class TowerTemplate : StructureTemplate
     public TargetSelector TargetMode;
     public bool CanHitFlying;
     public bool CanHitGround;
+    public int ProjectileOffset;
 
-    public TowerTemplate(string id, string name, string description, Texture texture, double maxHealth, double price, int levelRequirement, double baseHate, double range, ProjectileTemplate projectile, double rateOfFire, TargetSelector targetMode, bool canHitGround, bool canHitFlying) 
+    public TowerTemplate(string id, string name, string description, Texture texture, double maxHealth, double price, int levelRequirement, double baseHate, double range, ProjectileTemplate projectile, int projectileOffset, double rateOfFire, TargetSelector targetMode, bool canHitGround, bool canHitFlying) 
         : base(id, name, description, texture, maxHealth, price, levelRequirement, baseHate)
     {
         Range = range;
         Projectile = projectile;
+        ProjectileOffset = projectileOffset;
         //Damage = damage;
         RateOfFire = rateOfFire;
         TargetMode = targetMode;
@@ -59,10 +61,12 @@ public class Tower : Structure
     private double _timeLastFired;
     private TowerTemplate _template;
     private Minion? _target;
+    private SoundResource _shootSound;
     
     public Tower(TowerTemplate template, Team team, int x, int y) : base(template, team, x, y)
     {
         _template = template;
+        _shootSound = Resources.GetSoundByName("shoot");
     }
     
     public override void Update()
@@ -93,7 +97,8 @@ public class Tower : Structure
 
             if (_target != null)
             {
-                _template.Projectile.Instantiate(_target, this);
+                _shootSound.PlayRandomPitch(SoundResource.WorldToPan(position.X), 0.15f);
+                _template.Projectile.Instantiate(_target, this, position - Vector2.UnitY * _template.ProjectileOffset);
                 _timeLastFired = Time.Scaled;
             }
         }

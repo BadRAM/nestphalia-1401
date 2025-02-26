@@ -6,6 +6,15 @@ rosettedotnet - Art
 
 
 Assets used:
+Sounds:
+shovel - https://freesound.org/people/160051Student/sounds/376914/
+explosion/shoot - https://freesound.org/people/TB0Y298/sounds/718962/
+
 
 Music:
-jesper_kyd_-_highlands.mod
+jesper_kyd_-_highlands.mod - https://modarchive.org/index.php?request=view_by_moduleid&query=167107
+so_lets_get_killed.xm - https://modarchive.org/index.php?request=view_by_moduleid&query=150462
+scene03.xm - https://modarchive.org/index.php?request=view_by_moduleid&query=190254
+unreal_technology_demo_95_-_unreals.s3m - https://modarchive.org/index.php?request=view_by_moduleid&query=74584
+kolbenfresser.xm - https://modarchive.org/index.php?request=view_by_moduleid&query=148388
+hook_-_paranoya.mod - https://modarchive.org/index.php?request=view_by_moduleid&query=159353

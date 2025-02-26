@@ -27,16 +27,27 @@ public static class BattleScene
         World.InitializeBattle(leftFort, rightFort);
         
         Program.CurrentScene = Scene.Battle;
+        
+        Resources.PlayMusicByName("jesper-kyd-highlands");
     }
 
     public static void Update()
     {
         // ----- INPUT + GUI PHASE -----
 
-        if (IsKeyPressed(KeyboardKey.KEY_P))
+        if (IsKeyPressed(KeyboardKey.KEY_P) || IsKeyPressed(KeyboardKey.KEY_ESCAPE))
         {
             Pause = !Pause;
             Time.TimeScale = Pause ? 0 : 1;
+        }
+
+        if (IsKeyPressed(KeyboardKey.KEY_F))
+        {
+            SetMasterVolume(Program.Muted ? 0 : 0.25f);
+        }
+        if (IsKeyReleased(KeyboardKey.KEY_F))
+        {
+            SetMasterVolume(Program.Muted ? 0 : 1f);
         }
 
         if (IsKeyDown(KeyboardKey.KEY_A))
@@ -104,7 +115,7 @@ public static class BattleScene
         TeamName winner = CheckWinner();
         if (winner != TeamName.None)
         {
-            SetTargetFPS(60);
+            SetMasterVolume(Program.Muted ? 0 : 1f);
 
             if (CustomBattle)
             {
@@ -136,7 +147,7 @@ public static class BattleScene
         DrawTextLeft(6, 48, $"Bugs: {World.Minions.Count}");
         // DrawTextLeft(6, 64, $"Sprites: {World.Sprites.Count}");
         DrawTextLeft(6, 64, $"Zoom: {World.Camera.zoom}");
-        DrawTextLeft(6, 80, $"PathQueue: {PathFinder.GetQueueLength()}");
+        // DrawTextLeft(6, 80, $"PathQueue: {PathFinder.GetQueueLength()}");
         
         if (IsKeyDown(KeyboardKey.KEY_F))
         {
@@ -150,8 +161,6 @@ public static class BattleScene
             DrawTextCentered(Screen.HCenter, Screen.VCenter, "PAUSED", 48);
             if (ButtonNarrow(Screen.HCenter-50, Screen.VCenter + 30, "Quit"))
             {
-                SetTargetFPS(60);
-
                 if (CustomBattle)
                 {
                     CustomBattleMenu.Start();

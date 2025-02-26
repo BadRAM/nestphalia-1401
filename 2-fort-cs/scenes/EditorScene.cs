@@ -61,6 +61,8 @@ public static class EditorScene
                 }
             }
         }
+        
+        Resources.PlayMusicByName("so_lets_get_killed");
     }
 
     public static void Update()
@@ -82,7 +84,7 @@ public static class EditorScene
                 }
                 else
                 {
-                    if (_brush == null || (_brush.Price < Program.Campaign.Money && (_brush.Class != StructureTemplate.StructureClass.Nest || !_nestCapped) &&  (_brush is not ActiveAbilityBeaconTemplate || !_beaconCapped)))
+                    if (_brush == null || (_brush.Price <= Program.Campaign.Money && (_brush.Class != StructureTemplate.StructureClass.Nest || !_nestCapped) &&  (_brush is not ActiveAbilityBeaconTemplate || !_beaconCapped)))
                     {
                         if (World.GetTile(tilePos) != null)
                         {
@@ -241,7 +243,7 @@ public static class EditorScene
                $"{turretCount} Towers\n" +
                $"{utilityCount} Utility\n" +
                nestCount + (_sandboxMode ? "" : "/"+(Program.Campaign.Level*2+10)) + " Nests\n" +
-               beaconCount + (_sandboxMode ? "" : "/4") + " Beacons\n" +
+               beaconCount + (_sandboxMode ? "" : "/4") + " Stratagems\n" +
                $"{structureCount} Total\n" +
                $"{totalCost} Cost";
     }

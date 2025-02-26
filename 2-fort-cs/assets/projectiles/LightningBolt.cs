@@ -9,12 +9,9 @@ public class LightningBoltTemplate : ProjectileTemplate
     {
     }
 
-    public override void Instantiate(object target, object source)
+    public override void Instantiate(object target, object source, Vector2 position)
     {
-        Vector2 pos = Vector2.Zero;
-        if (source is Minion m) pos = m.Position;
-        if (source is Structure s) pos = s.GetCenter();
-        LightningBolt p = new LightningBolt(this, pos, target, source);
+        LightningBolt p = new LightningBolt(this, position, target, source);
         World.Projectiles.Add(p);
         World.Sprites.Add(p);
     }

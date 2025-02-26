@@ -16,7 +16,7 @@ public class ProjectileTemplate
         Texture = texture;
     }
 
-    public virtual void Instantiate(object target, object source)
+    public virtual void Instantiate(object target, object source, Vector2 position)
     {
         Vector2 pos = Vector2.Zero;
         if (source is Minion m) pos = m.Position;

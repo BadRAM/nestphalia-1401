@@ -16,13 +16,14 @@ public static class World
     public static List<ISprite> Sprites = new List<ISprite>();
     public static double WaveDuration = 20;
     public static bool PreWave;
-    public static double PreWaveOffset = 1;
+    public static double PreWaveOffset = 1.6;
     public static double FirstWaveTime = 0;
     public static int Wave = 0;
     public static Camera2D Camera;
     public static Team LeftTeam;
     public static Team RightTeam;
     public static bool BattleStarted;
+    private static SoundResource _waveStartSoundEffect;
     
     private static void Initialize()
     {
@@ -37,6 +38,7 @@ public static class World
         FirstWaveTime = Time.Scaled;
         Wave = 0;
         BattleStarted = false;
+        _waveStartSoundEffect = Resources.GetSoundByName("start");
         
         LeftTeam = new Team("Player", false, Raylib.BLUE);
         LeftTeam.IsPlayerControlled = true;
@@ -168,6 +170,8 @@ public static class World
         {
             if (Time.Scaled - FirstWaveTime > WaveDuration * Wave)
             {
+                _waveStartSoundEffect.Play();
+
                 PreWave = true;
                 for (int x = 0; x < BoardWidth; ++x)
                 {

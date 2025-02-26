@@ -59,6 +59,8 @@ public class Structure : ISprite
     public double Health;
     public Team Team;
 
+    private SoundResource _deathSound;
+
     public double Z { get; set; }
 
     public Structure(StructureTemplate template, Team team, int x, int y)
@@ -71,6 +73,8 @@ public class Structure : ISprite
         
         Health = template.MaxHealth;
         Team = team;
+
+        _deathSound = Resources.GetSoundByName("shovel");
     }
 
     public virtual void Update() { }
@@ -109,6 +113,7 @@ public class Structure : ISprite
 
     public virtual void Destroy()
     {
+        _deathSound.PlayRandomPitch(SoundResource.WorldToPan(position.X));
         World.DestroyTile(X, Y);
         // World.SetTile(Rubble.RubbleTemplate, Team, X, Y);
     }

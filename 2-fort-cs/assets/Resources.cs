@@ -17,15 +17,73 @@ public class SpriteResource
     }
 }
 
+public class SoundResource
+{
+    public string Name;
+    private Sound _sound;
+    private Sound[] _soundBuffer;
+    private int _bufferIndex;
+    private float _volume = 1;
+
+    public SoundResource(string name, Sound sound, int bufferSize)
+    {
+        Name = name;
+        _sound = sound;
+        SetSoundVolume(_sound, 0.75f);
+        _soundBuffer = new Sound[bufferSize];
+        for (int i = 0; i < bufferSize; i++)
+        {
+            _soundBuffer[i] = LoadSoundAlias(sound);
+        }
+    }
+    
+    public void Play(float pan = 0.5f, float pitch = 1f, float volume = 0.75f)
+    {
+        if (IsSoundPlaying(_soundBuffer[_bufferIndex])) return;
+        SetSoundPan(_soundBuffer[_bufferIndex], pan);
+        SetSoundPitch(_soundBuffer[_bufferIndex], pitch);
+        SetSoundVolume(_soundBuffer[_bufferIndex], volume);
+        PlaySound(_soundBuffer[_bufferIndex]);
+        _bufferIndex++;
+        _bufferIndex %= _soundBuffer.Length;
+    }
+
+    public void PlayRandomPitch(float pan = 0.5f, float volume = 0.75f)
+    {
+        Play(pan, 0.8f + Random.Shared.NextSingle() * 0.4f, volume);
+    }
+
+    public static float WorldToPan(float X)
+    {
+        return 0.75f - (X / (World.BoardWidth * 24)) * 0.5f;
+    }
+}
+
+public class MusicResource
+{
+    public string Name;
+    public Music Music;
+
+    public MusicResource(string name, Music music)
+    {
+        Name = name;
+        Music = music;
+    }
+}
+
 public static class Resources
 {
     public static Texture MissingTexture;
     public static List<SpriteResource> Sprites = new List<SpriteResource>();
+    public static List<SoundResource> Sounds = new List<SoundResource>();
+    public static List<MusicResource> Music = new List<MusicResource>();
     public static List<Fort> CampaignLevels = new List<Fort>();
     public static Font Font;
     private static Font _accessibleFont;
     private static Font _defaultFont;
     private static bool _fontAccessibility;
+    public static Music MusicPlaying;
+    
     
     public static void Load()
     {
@@ -41,6 +99,21 @@ public static class Resources
         {
             Sprites.Add(new SpriteResource(Path.GetFileNameWithoutExtension(path), LoadTexture("resources/sprites/" + Path.GetFileName(path))));
         }
+        
+        foreach (string path in Directory.GetFiles(Directory.GetCurrentDirectory() + "/resources/sfx"))
+        {
+            Sounds.Add(new SoundResource(Path.GetFileNameWithoutExtension(path), LoadSound("resources/sfx/" + Path.GetFileName(path)), 16));
+        }
+        
+        foreach (string path in Directory.GetFiles(Directory.GetCurrentDirectory() + "/resources/music"))
+        {
+            Music.Add(new MusicResource(Path.GetFileNameWithoutExtension(path), LoadMusicStream("resources/music/" + Path.GetFileName(path))));
+        }
+
+        MusicPlaying = Music[0].Music;
+        PlayMusicStream(MusicPlaying);
+
+        //Sounds.Add(new SoundResource("explosion", LoadSound("resources/sfx/explosion.wav"), 8));
         
         CampaignLevels.Add(LoadFort("/resources/level1.fort"));
         CampaignLevels.Add(LoadFort("/resources/level2.fort"));
@@ -64,6 +137,35 @@ public static class Resources
     {
         SpriteResource? s = Sprites.FirstOrDefault(x => x.Name == name);
         return s?.Tex ?? MissingTexture;
+    }
+    
+    public static SoundResource GetSoundByName(string name)
+    {
+        SoundResource? s = Sounds.FirstOrDefault(x => x.Name == name);
+        return s ?? Sounds[0];
+    }
+
+    public static void PlayMusicByName(string name)
+    {
+        StopMusicStream(MusicPlaying);
+        MusicResource? s = Music.FirstOrDefault(x => x.Name == name);
+        
+        if (s != null)
+        {
+            MusicPlaying = s.Music;
+            SetMusicVolume(MusicPlaying, 0.5f);
+            PlayMusicStream(MusicPlaying);
+        }
+        else
+        {
+            Console.WriteLine("MusicResource was null! Music names are:");
+            foreach (MusicResource m in Music)
+            {
+                Console.WriteLine($" - {m.Name}");
+            }
+            // MusicPlaying = Music[0].Music;
+            // PlayMusicStream(MusicPlaying);
+        }
     }
 
     public static void Unload()

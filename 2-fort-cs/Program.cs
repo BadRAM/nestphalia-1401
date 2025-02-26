@@ -18,6 +18,7 @@ public enum Scene
 static class Program
 {
 	private static bool Paused;
+	public static bool Muted;
 	public static Scene CurrentScene;
 	public static Campaign Campaign;
 	
@@ -29,6 +30,9 @@ static class Program
 	    
         InitWindow(1200, 600, "2-fort");
         SetTargetFPS(60);
+        SetExitKey(KeyboardKey.KEY_NULL);
+
+        InitAudioDevice();      
         
         Screen.UpdateBounds();
         
@@ -43,7 +47,7 @@ static class Program
         GUI.Initialize();
         
         
-        IntroScene.Start();
+        MenuScene.Start();
         while (!WindowShouldClose())
         {
 	        Time.UpdateTime();
@@ -77,12 +81,17 @@ static class Program
 			        PostBattleScene.Update();
 			        break;
 	        }
+
+
+	        SetMusicVolume(Resources.MusicPlaying, MathF.Min((float)Time.Scaled, 0.5f));
+	        UpdateMusicStream(Resources.MusicPlaying);
         }
 
         Console.WriteLine("Quitting time!");
         
 	    Resources.Unload();
         
+	    CloseAudioDevice();     
         //CloseWindow();
     }
 }

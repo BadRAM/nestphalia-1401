@@ -17,6 +17,7 @@ public static class MenuScene
         _helpWindowOpen = false;
         Program.CurrentScene = Scene.MainMenu;
         RegenerateBackground();
+        Resources.PlayMusicByName("unreal_technology_demo_95_-_unreals");
     }
 
     public static void Update()
@@ -47,9 +48,14 @@ public static class MenuScene
         }
 
         if (ButtonNarrow(HCenter + 500, VCenter + 260, "Font")) Resources.ToggleFontAccessibility();
+        if (ButtonNarrow(HCenter + 500, VCenter + 220, "Mute"))
+        {
+            Program.Muted = !Program.Muted;
+            SetMasterVolume(Program.Muted ? 0 : 1);
+        }
         
         
-        DrawTextLeft(HCenter-600, VCenter+280, "By BadRAM and rosettedotnet");
+        DrawTextLeft(HCenter-590, VCenter+260, "By BadRAM and rosettedotnet\nWith music from the mod archive");
 
         if (_helpWindowOpen)
         {

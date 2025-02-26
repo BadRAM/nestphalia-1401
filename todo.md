@@ -3,9 +3,12 @@
 Programming todo:
 =================
 
+- 1 music
+- 5 music (menu, editor, battlesetup, campaign, battle)
+- Music Transitions
+- 20 music (1 per campaign level)
 - 15 levels
 - Clickable ability button
-- Escape pauses
 
 - Fix minion collision with wall corners
 - Splash screen

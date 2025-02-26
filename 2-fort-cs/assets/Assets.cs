@@ -20,7 +20,7 @@ public static class Assets
         Structures.Add(new StructureTemplate("honey_pot", "Honey Pot", "decoy nest", Resources.GetTextureByName("honeypot"), 75, 35, 5, 100));
         Structures.Add(new GluePaperTemplate("glue_paper", "Glue Paper", "", Resources.GetTextureByName("stickypaper"), 150, 10, 8, 0));
         Structures.Add(new HazardSignTemplate("hazard_sign","Hazard Sign", "", Resources.GetTextureByName("hazard_sign"), 30, 10, 0, Double.MinValue));
-
+        
         Structures.Add(new DoorTemplate("door_weak", "Gate", "", Resources.GetTextureByName("doorClosed"), Resources.GetTextureByName("doorOpen"), 80, 100, 1, 5, 32));
         Structures.Add(new DoorTemplate("door_strong","Vault Door", "", Resources.GetTextureByName("vault_door_closed"), Resources.GetTextureByName("vault_door_open"), 250, 1000, 15, 5, 32));
         
@@ -30,7 +30,7 @@ public static class Assets
             (
                 "tower_basic",
                 "Watchtower",
-                "",
+                "\n\"Look! Ants!\"",
                 Resources.GetTextureByName("turret"), 
                 80,
                 75,
@@ -38,6 +38,7 @@ public static class Assets
                 5,
                 120,
                 new ProjectileTemplate(Resources.GetTextureByName("bullet"), 10, 400), 
+                0,
                 40,
                 TowerTemplate.TargetSelector.Nearest,
                 true,
@@ -50,8 +51,12 @@ public static class Assets
             new TowerTemplate
             (
                 "tower_machinegun",
-                "Machine Gun",
-                "",
+                "Millipede Ranger",
+                "" +
+                "\nWhen his accuracy is questioned, the " +
+                "\nMillipede ranger insists that he can " +
+                "\nput as many arrows in a target as a " +
+                "\ndozen ant archers.",
                 Resources.GetTextureByName("turret2"),
                 120,
                 400,
@@ -59,6 +64,7 @@ public static class Assets
                 5,
                 100,
                 new ProjectileTemplate(Resources.GetTextureByName("bullet"), 5, 400), 
+                0,
                 400,
                 TowerTemplate.TargetSelector.RandomFocus,
                 true,
@@ -72,7 +78,8 @@ public static class Assets
             (
                 "minefield",
                 "Minefield",
-                "",
+                "\nFriendly bugs can safely traverse mines, " +
+                "\nbut hate doing so.",
                 Resources.GetTextureByName("minefield"),
                 80,
                 55,
@@ -99,6 +106,7 @@ public static class Assets
                 5,
                 90,
                 new MortarShellTemplate(Resources.GetTextureByName("bullet"), 10, 0.7, 96, 48), 
+                0,
                 30,
                 TowerTemplate.TargetSelector.Random,
                 true,
@@ -120,6 +128,7 @@ public static class Assets
                 5,
                 120,
                 new LightningBoltTemplate(10), 
+                46,
                 400,
                 TowerTemplate.TargetSelector.Random,
                 false,
@@ -132,8 +141,8 @@ public static class Assets
             new TowerTemplate
             (
                 "tower_sniper",
-                "Sniper",
-                "",
+                "Mantis Sniper",
+                "\n\"Don't tell my wife where I am.\"",
                 Resources.GetTextureByName("turret3"),
                 60,
                 3000,
@@ -141,6 +150,7 @@ public static class Assets
                 5,
                 450,
                 new ProjectileTemplate(Resources.GetTextureByName("bullet"), 60, 800), 
+                0,
                 25,
                 TowerTemplate.TargetSelector.Random,
                 true,
@@ -153,8 +163,9 @@ public static class Assets
             new RallyBeaconTemplate
             (
                 "beacon_rally",
-                "Rally Beacon", 
-                "Commands all your bugs to a single target", 
+                "Rally Stratagem", 
+                "Commands all your bugs to a single target\n\n\"Strength in numbers! They can't stop all " +
+                "\nof us!\"", 
                 Resources.GetTextureByName("flag1"), 
                 100,
                 750,
@@ -171,8 +182,8 @@ public static class Assets
             new RepairBeaconTemplate
             (
                 "beacon_repair",
-                "Repair Beacon",
-                "Rebuilds one structure",
+                "Repair Stratagem",
+                "Rebuilds one structure\n\n",
                 Resources.GetTextureByName("flag2"),
                 100,
                 1000,
@@ -189,7 +200,7 @@ public static class Assets
             new SpawnBoostBeaconTemplate
             (
                 "beacon_spawnboost",
-                "Brood Beacon",
+                "Brood Stratagem",
                 "Grants a nest an extra wave of bugs",
                 Resources.GetTextureByName("flag2"),
                 100,
@@ -207,7 +218,7 @@ public static class Assets
             new FrenzyBeaconTemplate
             (
                 "beacon_frenzy",
-                "Frenzy Beacon",
+                "Frenzy Stratagem",
                 "Causes a frenzy in an area",
                 Resources.GetTextureByName("flag1"),
                 100,
@@ -226,7 +237,7 @@ public static class Assets
             (
                 "nest_ant",
                 "Anthill", 
-                "",
+                "\n",
                 Resources.GetTextureByName("spawner"), 
                 50, 
                 250, 

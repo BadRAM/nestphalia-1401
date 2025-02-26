@@ -16,12 +16,9 @@ public class MortarShellTemplate : ProjectileTemplate
         BlastRadius = blastRadius;
     }
 
-    public override void Instantiate(object target, object source)
+    public override void Instantiate(object target, object source, Vector2 position)
     {
-        Vector2 pos = Vector2.Zero;
-        if (source is Minion m) pos = m.Position;
-        if (source is Structure s) pos = s.GetCenter();
-        MortarShell p = new MortarShell(this, pos, target, source);
+        MortarShell p = new MortarShell(this, position, target, source);
         World.Projectiles.Add(p);
         World.Sprites.Add(p);
     }
@@ -36,6 +33,7 @@ public class MortarShell : Projectile
     private Team _team;
     private Texture _explosion;
     private double _timeExploded = 0;
+    private SoundResource _soundEffect;
     
     public MortarShell(MortarShellTemplate template, Vector2 position, object target, object source) : base(template, position, target, source)
     {
@@ -43,6 +41,7 @@ public class MortarShell : Projectile
         _timeFired = Time.Scaled;
         _startPos = position;
         _explosion = Resources.GetTextureByName("explosion32");
+        _soundEffect = Resources.GetSoundByName("explosion");
         if (target is Minion minion)
         {
             _targetPos = minion.Position;
@@ -81,6 +80,7 @@ public class MortarShell : Projectile
 
         if (t >= 1)
         {
+            _soundEffect.PlayRandomPitch(SoundResource.WorldToPan(Position.X));
             if (Target is Structure s)
             {
                 s.Hurt(_template.Damage);

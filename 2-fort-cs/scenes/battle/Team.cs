@@ -103,10 +103,11 @@ public class Team
             if ((Beacons[0]?.IsReady() ?? false) && Raylib.IsKeyPressed(KeyboardKey.KEY_ONE))   _usingAbility = 0;
             if ((Beacons[1]?.IsReady() ?? false) && Raylib.IsKeyPressed(KeyboardKey.KEY_TWO))   _usingAbility = 1;
             if ((Beacons[2]?.IsReady() ?? false) && Raylib.IsKeyPressed(KeyboardKey.KEY_THREE)) _usingAbility = 2;
+            if ((Beacons[3]?.IsReady() ?? false) && Raylib.IsKeyPressed(KeyboardKey.KEY_THREE)) _usingAbility = 3;
         }
         else
         {
-            int i = Random.Shared.Next(3);
+            int i = Random.Shared.Next(4);
             if ((Beacons[i]?.IsReady() ?? false) && Time.Scaled - _timeLastAbilityUsed > 10)
             {
                 Vector2? targetPos = Beacons[i]?.SelectPosition();

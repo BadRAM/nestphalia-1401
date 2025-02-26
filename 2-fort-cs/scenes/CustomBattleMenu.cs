@@ -22,6 +22,7 @@ public static class CustomBattleMenu
         World.Camera.offset = new Vector2(Screen.HCenter-288, Screen.VCenter-100);
         LeftFort?.LoadToBoard(false);
         RightFort?.LoadToBoard(true);
+        Resources.PlayMusicByName("scene03");
     }
 
     public static void Update()
