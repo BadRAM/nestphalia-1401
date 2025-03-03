@@ -183,8 +183,8 @@ public static class BattleScene
 
     private static Team? CheckWinner()
     {
-        if (World.LeftTeam.GetHealth() <= 0) return World.LeftTeam;
-        if (World.RightTeam.GetHealth() <= 0) return World.RightTeam;
+        if (World.LeftTeam.GetHealth() <= 0) return World.RightTeam;
+        if (World.RightTeam.GetHealth() <= 0) return World.LeftTeam;
         return null;
     }
 }
