@@ -18,10 +18,12 @@ public static class EditorScene
     private static bool _nestCapped;
     private static bool _beaconCapped;
     private static bool _fortAlreadySaved;
+    private static bool _sellAllConfirm;
     private static StructureTemplate.StructureClass _structureClass;
     
     public static void Start(Fort? fortToLoad = null, bool creativeMode = false)
     {
+        _brush = null;
         _saveMessage = "";
         _sandboxMode = creativeMode;
         _fort = fortToLoad ?? new Fort();
@@ -30,7 +32,6 @@ public static class EditorScene
         
         Program.CurrentScene = Scene.Editor;
         World.InitializeEditor();
-        World.Camera.offset = new Vector2(Screen.HCenter, Screen.VCenter);
         _fort.LoadToBoard(false);
         
         Screen.RegenerateBackground();
@@ -69,7 +70,7 @@ public static class EditorScene
     {
         // ----- INPUT + GUI PHASE -----
         
-        World.Camera.offset = new Vector2(Screen.HCenter-264, Screen.VCenter-264);
+        World.Camera.offset = new Vector2(Screen.HCenter, Screen.VCenter);
 
         if (IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT))
         {
@@ -84,7 +85,13 @@ public static class EditorScene
                 }
                 else
                 {
-                    if (_brush == null || (_brush.Price <= Program.Campaign.Money && (_brush.Class != StructureTemplate.StructureClass.Nest || !_nestCapped) &&  (_brush is not ActiveAbilityBeaconTemplate || !_beaconCapped)))
+                    if (_brush == null || 
+                        (
+                          _brush.Price <= Program.Campaign.Money && 
+                         (_brush.Class != StructureTemplate.StructureClass.Nest || !_nestCapped || World.GetTile(tilePos) is Spawner) && 
+                         (_brush is not ActiveAbilityBeaconTemplate || !_beaconCapped || World.GetTile(tilePos) is ActiveAbilityBeacon)
+                        )
+                       )
                     {
                         if (World.GetTile(tilePos) != null)
                         {
@@ -151,7 +158,9 @@ public static class EditorScene
             }
         }
 
-        if (ButtonNarrow(Screen.HCenter+150, Screen.VCenter+260, "Erase", _brush != null)) _brush = null;
+        if (ButtonNarrow(Screen.HCenter+150, Screen.VCenter+260, "Sell", _brush != null)) _brush = null;
+        if (ButtonNarrow(Screen.HCenter-250, Screen.VCenter+260, "Sell All", !_sellAllConfirm)) _sellAllConfirm = true;
+        if (_sellAllConfirm && ButtonNarrow(Screen.HCenter-150, Screen.VCenter+260, "Confirm")) SellAll();
         if (ButtonNarrow(Screen.HCenter+300, Screen.VCenter-300, (_newUtil ? "NEW! " : "") + "Utility", _structureClass != StructureTemplate.StructureClass.Utility)) _structureClass = StructureTemplate.StructureClass.Utility;
         if (ButtonNarrow(Screen.HCenter+400, Screen.VCenter-300, (_newTower ? "NEW! " : "") + "Tower", _structureClass != StructureTemplate.StructureClass.Tower)) _structureClass = StructureTemplate.StructureClass.Tower;
         if (ButtonNarrow(Screen.HCenter+500, Screen.VCenter-300, (_newNest ? "NEW! " : "") + "Nest", _structureClass != StructureTemplate.StructureClass.Nest)) _structureClass = StructureTemplate.StructureClass.Nest;
@@ -178,7 +187,7 @@ public static class EditorScene
         
         if (_brush == null)
         {
-            DrawTextLeft(Screen.HCenter-590, Screen.VCenter-290, "ERASING");
+            DrawTextLeft(Screen.HCenter-590, Screen.VCenter-290, "SELLING");
         }
         else
         {
@@ -203,10 +212,26 @@ public static class EditorScene
             EndMode2D();
         }
         
-        DrawTextLeft(Screen.HCenter-590, Screen.VCenter+150, _saveMessage);
-        DrawTextLeft(Screen.HCenter-590, Screen.VCenter+20, GetFortStats());
+        DrawTextLeft(Screen.HCenter-590, Screen.VCenter+170, _saveMessage);
+        DrawTextLeft(Screen.HCenter-590, Screen.VCenter+50, GetFortStats());
         
         EndDrawing();
+    }
+
+    private static void SellAll()
+    {
+        for (int x = 0; x < World.BoardWidth; ++x)
+        {
+            for (int y = 0; y < World.BoardHeight; ++y)
+            {
+                Structure? t = World.GetTile(x, y);
+                if (t == null) continue;
+                if (!_sandboxMode) Program.Campaign.Money += t.Template.Price;
+                World.SetTile(null, World.LeftTeam, x, y);
+            }
+        }
+
+        _sellAllConfirm = false;
     }
 
     private static string GetFortStats()
@@ -239,7 +264,7 @@ public static class EditorScene
             _beaconCapped = beaconCount >= 4;
         }
         
-        return $"{_fort.Name}" +
+        return $"{_fort.Name}\n" +
                $"{turretCount} Towers\n" +
                $"{utilityCount} Utility\n" +
                nestCount + (_sandboxMode ? "" : "/"+(Program.Campaign.Level*2+10)) + " Nests\n" +

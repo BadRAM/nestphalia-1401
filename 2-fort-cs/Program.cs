@@ -24,6 +24,16 @@ static class Program
 	
     public static void Main()
     {
+	    // Int2D i2d = Int2D.Zero;
+	    // Console.WriteLine($"i2d = {i2d.ToString()}");
+	    // i2d = i2d + Int2D.Down;
+	    // Console.WriteLine($"i2d = {i2d.ToString()}");
+	    // i2d = i2d + Int2D.Right;
+	    // Console.WriteLine($"i2d = {i2d.ToString()}");
+	    // i2d = i2d + Int2D.Up;
+	    // Console.WriteLine($"i2d = {i2d.ToString()}");
+	    // i2d = i2d + Int2D.Left;
+	    // Console.WriteLine($"i2d = {i2d.ToString()}");
 	    SetWindowMinSize(1200, 600);
 	    
 	    SetWindowState(ConfigFlags.FLAG_WINDOW_RESIZABLE);

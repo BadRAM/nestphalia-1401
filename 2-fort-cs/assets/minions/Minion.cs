@@ -42,7 +42,14 @@ public class MinionTemplate
     
     public virtual string GetStats()
     {
-        return "Function under construction";
+        return                
+            $"{Name}\n" +
+            $"HP: {MaxHealth}\n" +
+            (Armor == 0 ? "" : $"Armor: {Armor}\n") +
+            $"Speed: {Speed}\n" +
+            $"Damage: {Projectile.Damage} ({Projectile.Damage / AttackCooldown}/s)\n" +
+            $"Size: {PhysicsRadius * 2}\n" +
+            $"{Description}";
     }
 }
 
@@ -293,7 +300,7 @@ public class Minion : ISprite
         Health -= Math.Max(1, damageSource.Template.Damage - Template.Armor);
         if (Health <= 0)
         {
-            Team.AddFearOf(Template.MaxHealth, World.PosToTilePos(Position));
+            Team.AddFearOf(Template.MaxHealth/10, World.PosToTilePos(Position));
             //Console.WriteLine($"{Template.Name} killed by {damageSource.Source.GetType().Name} which is " + (damageSource.Source is Structure ? "" : "not ") + "a structure, assigning hate...");
             if (damageSource.Source is Structure s)
             {

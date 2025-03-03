@@ -22,13 +22,14 @@ public static class World
     public static Camera2D Camera;
     public static Team LeftTeam;
     public static Team RightTeam;
-    public static bool BattleStarted;
+    private static bool _battleStarted;
     private static SoundResource _waveStartSoundEffect;
+    private static bool _battleOver;
     
     private static void Initialize()
     {
-        Camera.target = new Vector2(0, 0);
-        Camera.offset = new Vector2(0, 0);
+        Camera.target = new Vector2(BoardWidth * 12, BoardHeight * 12);
+        Camera.offset = new Vector2(Screen.HCenter, Screen.VCenter);
         Camera.rotation = 0;
         Camera.zoom = 1;
         Minions.Clear();
@@ -37,8 +38,10 @@ public static class World
         PathFinder.ClearQueue();
         FirstWaveTime = Time.Scaled;
         Wave = 0;
-        BattleStarted = false;
+        _battleStarted = false;
+        PreWave = false;
         _waveStartSoundEffect = Resources.GetSoundByName("start");
+        _battleOver = false;
         
         LeftTeam = new Team("Player", false, Raylib.BLUE);
         LeftTeam.IsPlayerControlled = true;
@@ -48,6 +51,7 @@ public static class World
     public static void InitializeEditor()
     {
         Initialize();
+        Camera.target = new Vector2(22 * 12, BoardHeight * 12);
         
         // set up floor tile checkerboard
         for (int x = 0; x < BoardWidth; x++)
@@ -74,8 +78,8 @@ public static class World
     public static void InitializePreview()
     {
         Initialize();
-        
-        // set up floor tile checkerboard
+        Camera.zoom = 0.5f;
+        Camera.offset = new Vector2(Screen.HCenter, Screen.VCenter+50);        // set up floor tile checkerboard
         for (int x = 0; x < BoardWidth; x++)
         {
             for (int y = 0; y < BoardHeight; y++)
@@ -86,7 +90,7 @@ public static class World
         }
     }
     
-    public static void InitializeBattle(Fort leftFort, Fort rightFort)
+    public static void InitializeBattle(Fort leftFort, Fort rightFort, bool leftIsPlayer, bool rightIsPlayer)
     {
         Initialize();
         
@@ -105,10 +109,14 @@ public static class World
         rightFort.LoadToBoard(true);
         
         // Tell teams they can generate fear and hate
+        LeftTeam.Name = leftFort.Name;
+        LeftTeam.IsPlayerControlled = leftIsPlayer;
         LeftTeam.Initialize();
+        RightTeam.Name = rightFort.Name;
+        RightTeam.IsPlayerControlled = rightIsPlayer;
         RightTeam.Initialize();
 
-        BattleStarted = true;
+        _battleStarted = true;
     }
     
     public static void SetTile(StructureTemplate? tile, Team team, int x, int y)
@@ -148,40 +156,50 @@ public static class World
     {
         return _board[x,y];
     }
+
+    public static Team GetOtherTeam(Team team)
+    {
+        return team == LeftTeam ? RightTeam : LeftTeam;
+    }
     
     public static void Update()
     {
-        if (PreWave)
+        // Update wave timer
+        if (!_battleOver)
         {
-            if (Time.Scaled - (FirstWaveTime + PreWaveOffset) > WaveDuration * Wave)
+            if (PreWave)
             {
-                Wave++;
-                PreWave = false;
-                for (int x = 0; x < BoardWidth; ++x)
+                if (Time.Scaled - (FirstWaveTime + PreWaveOffset) > WaveDuration * Wave)
                 {
-                    for (int y = 0; y < BoardHeight; ++y)
+                    Wave++;
+                    PreWave = false;
+                    for (int x = 0; x < BoardWidth; ++x)
                     {
-                        _board[x, y]?.WaveEffect();
+                        for (int y = 0; y < BoardHeight; ++y)
+                        {
+                            _board[x, y]?.WaveEffect();
+                        }
                     }
                 }
             }
-        }
-        else
-        {
-            if (Time.Scaled - FirstWaveTime > WaveDuration * Wave)
+            else
             {
-                _waveStartSoundEffect.Play();
+                if (Time.Scaled - FirstWaveTime > WaveDuration * Wave)
+                {
+                    _waveStartSoundEffect.Play();
 
-                PreWave = true;
-                for (int x = 0; x < BoardWidth; ++x)
-                {
-                    for (int y = 0; y < BoardHeight; ++y)
+                    PreWave = true;
+                    for (int x = 0; x < BoardWidth; ++x)
                     {
-                        _board[x, y]?.PreWaveEffect();
+                        for (int y = 0; y < BoardHeight; ++y)
+                        {
+                            _board[x, y]?.PreWaveEffect();
+                        }
                     }
                 }
             }
         }
+
         
         LeftTeam.Update();
         RightTeam.Update();
@@ -254,7 +272,7 @@ public static class World
         
         Raylib.EndMode2D();
 
-        if (BattleStarted)
+        if (_battleStarted)
         {
             LeftTeam.Draw();
             RightTeam.Draw();
@@ -324,6 +342,11 @@ public enum TeamName
 
 public record struct Int2D
 {
+    public static readonly Int2D Zero  = new Int2D(0, 0);
+    public static readonly Int2D Up    = new Int2D(0, -1);
+    public static readonly Int2D Down  = new Int2D(0, 1);
+    public static readonly Int2D Left  = new Int2D(-1, 0);
+    public static readonly Int2D Right = new Int2D(1, 0);
     public int X;
     public int Y;
 
@@ -336,5 +359,18 @@ public record struct Int2D
     public Vector2 ToVector2()
     {
         return new Vector2(X, Y);
+    }
+
+    public override String ToString()
+    {
+        return $"{X},{Y}";
+    }
+    
+    public static Int2D operator +(Int2D a, Int2D b) {
+        return new Int2D 
+        {
+            X = a.X + b.X,
+            Y = a.Y + b.Y
+        };
     }
 }

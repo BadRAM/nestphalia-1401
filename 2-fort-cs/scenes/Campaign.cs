@@ -17,6 +17,7 @@ public class Campaign
     [JsonInclude] public int SelectedFort;
     private int _selectedLevel = -1;
     private string _outcomeText = "";
+    private bool _fortValid = true;
 
     public void Save()
     {
@@ -37,8 +38,8 @@ public class Campaign
         Program.CurrentScene = Scene.Campaign;
         Screen.RegenerateBackground();
         Save();
+        _fortValid = Fort1.IsValid();
         Resources.PlayMusicByName("hook_-_paranoya");
-
     }
     
     public void Update()
@@ -93,7 +94,7 @@ public class Campaign
         if (_selectedLevel != -1)
         {
             GUI.DrawTextLeft(Screen.HCenter-140, Screen.VCenter-30, $"{Resources.CampaignLevels[_selectedLevel].Name}\nTravel cost: {_selectedLevel * 250} \nPrize: {(_selectedLevel+1) * 1000}");
-            if (Money >= _selectedLevel * 250 && GUI.ButtonWide(Screen.HCenter-150, Screen.VCenter+20, "To Battle!"))
+            if (Money >= _selectedLevel * 250 && GUI.ButtonWide(Screen.HCenter-150, Screen.VCenter+20, "To Battle!", _fortValid))
             {
                 Money -= _selectedLevel * 250;
                 BattleScene.CustomBattle = false;

@@ -3,20 +3,12 @@
 Programming todo:
 =================
 
-- 1 music
-- 5 music (menu, editor, battlesetup, campaign, battle)
-- Music Transitions
-- 20 music (1 per campaign level)
-- 15 levels
-- Clickable ability button
-
-- Fix minion collision with wall corners
 - Splash screen
 
-- Fix Hopper distraction
-- Multiple forts in campaign
 
 ----- Postponed to team bug fort 2 -----
+- Fix minion collision with wall corners
+- Better fear evaluation, make bugs more scared of staying in scary places than passing through them. Find a way to reduce fear when nearby turrets are destroyed. (reduction = hate/area of effect?)
 - Minion melee attack animation
 - Minion state machine
 - Assets from json

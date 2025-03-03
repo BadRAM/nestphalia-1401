@@ -104,6 +104,30 @@ public class Tower : Structure
         }
     }
 
+    public override void Destroy()
+    {
+        Team e = World.GetOtherTeam(Team);
+
+        Queue<Int2D> protectedArea = new Queue<Int2D>();
+        for (int x = 0; x < World.BoardWidth; x++)
+        {
+            for (int y = 0; y < World.BoardHeight; y++)
+            {
+                if (Vector2.Distance(World.GetTileCenter(x,y), position) > _template.Range) continue;
+                if (e.GetFearOf(x, y) > 0) protectedArea.Enqueue(new Int2D(x,y));
+            }
+        }
+
+        double reduction = -(e.GetHateFor(X, Y) / protectedArea.Count);
+        Console.WriteLine($"Tower at {X},{Y} destroyed, reducing {protectedArea.Count} surrounding tiles fear by {reduction}");
+        while (protectedArea.Count > 0)
+        {
+            e.AddFearOf(reduction, protectedArea.Dequeue());
+        }
+        
+        base.Destroy();
+    }
+
     protected Minion? FindTargetNearest()
     {
         Minion? nearest = null;

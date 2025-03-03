@@ -23,18 +23,28 @@ public class RepairBeacon : ActiveAbilityBeacon
 
     public override void Activate(Vector2 targetPosition)
     {
-        Structure? structure = World.GetTileAtPos(targetPosition);
-        if (structure != null && structure.Team == Team)
+        Int2D pos = World.PosToTilePos(targetPosition);
+        
+        Repair(pos, true);
+        Repair(pos + Int2D.Up, false);
+        Repair(pos + Int2D.Down, false);
+        Repair(pos + Int2D.Left, false);
+        Repair(pos + Int2D.Right, false);
+        base.Activate(targetPosition);
+    }
+
+    private void Repair(Int2D targetPosition, bool repairNonWalls)
+    {
+        Structure? structure = World.GetTile(targetPosition);
+        if (structure != null && structure.Team == Team && (repairNonWalls || structure.GetType() == typeof(Structure) || (structure is Rubble r && r.DestroyedStructure.GetType() == typeof(StructureTemplate))))
         {
             if (structure is Rubble rubble)
             {
-                World.SetTile(rubble.DestroyedStructure, Team, World.PosToTilePos(targetPosition));
-                base.Activate(targetPosition);
+                World.SetTile(rubble.DestroyedStructure, Team, targetPosition);
             }
             else if (structure.Health < structure.Template.MaxHealth)
             {
                 structure.Health = structure.Template.MaxHealth;
-                base.Activate(targetPosition);
             }
         }
     }

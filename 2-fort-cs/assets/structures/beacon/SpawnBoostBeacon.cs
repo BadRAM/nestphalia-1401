@@ -23,10 +23,38 @@ public class SpawnBoostBeacon : ActiveAbilityBeacon
 
     public override void Activate(Vector2 targetPosition)
     {
-        Structure s = World.GetTileAtPos(targetPosition);
-        if (s is Spawner spawner)
+        // Structure s = World.GetTileAtPos(targetPosition);
+        // if (s is Spawner spawner)
+        // {
+        //     spawner.WaveEffect();
+        //     base.Activate(targetPosition);
+        // }
+        
+        Structure? s = World.GetTile(X+1, Y);
+        if (s is Spawner spawner1)
         {
-            spawner.WaveEffect();
+            spawner1.WaveEffect();
+            base.Activate(targetPosition);
+        }
+        
+        s = World.GetTile(X-1, Y);
+        if (s is Spawner spawner2)
+        {
+            spawner2.WaveEffect();
+            base.Activate(targetPosition);
+        }
+        
+        s = World.GetTile(X, Y+1);
+        if (s is Spawner spawner3)
+        {
+            spawner3.WaveEffect();
+            base.Activate(targetPosition);
+        }
+        
+        s = World.GetTile(X, Y-1);
+        if (s is Spawner spawner4)
+        {
+            spawner4.WaveEffect();
             base.Activate(targetPosition);
         }
     }
@@ -34,21 +62,22 @@ public class SpawnBoostBeacon : ActiveAbilityBeacon
 
     public override Vector2? SelectPosition(double minimumValue)
     {
-        List<Spawner> spawners = new List<Spawner>();
-        
-        for (int x = 0; x < World.BoardWidth; x++)
-        {
-            for (int y = 0; y < World.BoardHeight; y++)
-            {
-                Structure? structure = World.GetTile(x,y);
-                if (structure?.Team == Team && structure is Spawner nest)
-                {
-                    spawners.Add(nest);
-                }
-            }
-        }
-
-        if (spawners.Count == 0) return null;
-        return spawners[Random.Shared.Next(0, spawners.Count)].GetCenter();
+        // List<Spawner> spawners = new List<Spawner>();
+        //
+        // for (int x = 0; x < World.BoardWidth; x++)
+        // {
+        //     for (int y = 0; y < World.BoardHeight; y++)
+        //     {
+        //         Structure? structure = World.GetTile(x,y);
+        //         if (structure?.Team == Team && structure is Spawner nest)
+        //         {
+        //             spawners.Add(nest);
+        //         }
+        //     }
+        // }
+        //
+        // if (spawners.Count == 0) return null;
+        // return spawners[Random.Shared.Next(0, spawners.Count)].GetCenter();
+        return position;
     }
 }

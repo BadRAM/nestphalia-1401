@@ -23,6 +23,21 @@ public class BroodMinionTemplate : MinionTemplate
         World.Minions.Add(m);
         World.Sprites.Add(m);
     }
+
+    public override string GetStats()
+    {
+        return                
+            $"{Name}\n" +
+            $"HP: {MaxHealth}\n" +
+            (Armor == 0 ? "" : $"Armor: {Armor}\n") +
+            $"Speed: {Speed}\n" +
+            $"Damage: {Projectile.Damage} ({Projectile.Damage / AttackCooldown}/s)\n" +
+            $"Size: {PhysicsRadius * 2}\n" +
+            $"spawns 1 {SpawnedMinion.Name} every {SpawnInterval}s\n" +
+            $"spawns {SpawnsOnDeath} on death\n\n" +
+            $"{SpawnedMinion.GetStats()}\n" +
+            $"{Description}";
+    }
 }
     
 public class BroodMinion : Minion

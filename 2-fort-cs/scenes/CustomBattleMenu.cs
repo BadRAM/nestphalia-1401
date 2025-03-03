@@ -10,6 +10,8 @@ public static class CustomBattleMenu
     private static bool _loadingLeftSide = true;
     public static string OutcomeMessage;
     private static int _fortListPage = 1;
+    private static bool _leftIsPlayer = true;
+    private static bool _rightIsPlayer = false;
 
     public static void Start()
     {
@@ -18,8 +20,6 @@ public static class CustomBattleMenu
         _loadingLeftSide = true;
         OutcomeMessage = "";
         World.InitializePreview();
-        World.Camera.zoom = 0.5f;
-        World.Camera.offset = new Vector2(Screen.HCenter-288, Screen.VCenter-100);
         LeftFort?.LoadToBoard(false);
         RightFort?.LoadToBoard(true);
         Resources.PlayMusicByName("scene03");
@@ -42,6 +42,10 @@ public static class CustomBattleMenu
         if (LeftFort != null  && GUI.ButtonWide(Screen.HCenter + 300, Screen.VCenter - 260, $"Edit {LeftFort.Name}" )) EditorScene.Start(LeftFort,  true);
         if (RightFort != null && GUI.ButtonWide(Screen.HCenter + 300, Screen.VCenter - 220, $"Edit {RightFort.Name}")) EditorScene.Start(RightFort, true);
 
+        if (LeftFort != null  && GUI.ButtonNarrow(Screen.HCenter + 200, Screen.VCenter - 260, _leftIsPlayer  ? "PLAYER" : "CPU" )) _leftIsPlayer =  !_leftIsPlayer;
+        if (RightFort != null && GUI.ButtonNarrow(Screen.HCenter + 200, Screen.VCenter - 220, _rightIsPlayer ? "PLAYER" : "CPU" )) _rightIsPlayer = !_rightIsPlayer;
+
+        
         if (GUI.ButtonNarrow(Screen.HCenter - 600, Screen.VCenter + 260, "<", _fortListPage > 1)) _fortListPage--;
             GUI.ButtonNarrow(Screen.HCenter - 500, Screen.VCenter + 260, _fortListPage.ToString(), false);
         if (GUI.ButtonNarrow(Screen.HCenter - 400, Screen.VCenter + 260, ">", _fortListPage <= forts.Length/12)) _fortListPage++;
@@ -88,7 +92,7 @@ public static class CustomBattleMenu
         if (LeftFort != null && RightFort != null &&
             GUI.ButtonWide(Screen.HCenter-150, Screen.VCenter + 260, "Begin!"))
         {
-            BattleScene.Start(LeftFort, RightFort);
+            BattleScene.Start(LeftFort, RightFort, _leftIsPlayer, _rightIsPlayer);
             BattleScene.CustomBattle = true;
         }
         

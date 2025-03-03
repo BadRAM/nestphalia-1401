@@ -190,7 +190,7 @@ public static class PathFinder
         n.PrevNode = prevNode;
         n.Weight = prevNode.Weight;
         n.Weight += weight;
-        n.Weight += team.GetFearOf(x, y) * 0.2;
+        n.Weight += team.GetFearOf(x, y);
         Structure? structure = World.GetTile(x, y);
         if (structure == null || structure is Rubble) return n;
         if (structure is Minefield && structure.Team == team)

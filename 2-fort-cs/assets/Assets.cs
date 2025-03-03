@@ -14,14 +14,14 @@ public static class Assets
         FloorTiles.Add(new FloorTileTemplate("Blank", Resources.GetTextureByName("clear")));
         
         Structures.Add(new StructureTemplate("wall_mud", "Mud Wall", "", Resources.GetTextureByName("wall"), 100, 10, 0, -10));
-        Structures.Add(new StructureTemplate("wall_wood", "Wooden Wall", "", Resources.GetTextureByName("wall_wood"), 250, 65, 6, -10));
-        Structures.Add(new StructureTemplate("wall_stone", "Stone Wall", "", Resources.GetTextureByName("wall2"), 500, 250, 10, -10));
+        Structures.Add(new StructureTemplate("wall_wood", "Wooden Wall", "", Resources.GetTextureByName("wall_wood"), 250, 55, 6, -10));
+        Structures.Add(new StructureTemplate("wall_stone", "Stone Wall", "", Resources.GetTextureByName("wall2"), 500, 215, 10, -10));
         
-        Structures.Add(new StructureTemplate("honey_pot", "Honey Pot", "decoy nest", Resources.GetTextureByName("honeypot"), 75, 35, 5, 100));
-        Structures.Add(new GluePaperTemplate("glue_paper", "Glue Paper", "", Resources.GetTextureByName("stickypaper"), 150, 10, 8, 0));
-        Structures.Add(new HazardSignTemplate("hazard_sign","Hazard Sign", "", Resources.GetTextureByName("hazard_sign"), 30, 10, 0, Double.MinValue));
+        Structures.Add(new StructureTemplate("honey_pot", "Honey Pot", "Decoy nest", Resources.GetTextureByName("honeypot"), 75, 35, 5, 100));
+        Structures.Add(new GluePaperTemplate("glue_paper", "Glue Paper", "", Resources.GetTextureByName("stickypaper"), 150, 25, 8, 0));
+        Structures.Add(new HazardSignTemplate("hazard_sign","Hazard Sign", "", Resources.GetTextureByName("hazard_sign"), 30, 10, 15, Double.MinValue));
         
-        Structures.Add(new DoorTemplate("door_weak", "Gate", "", Resources.GetTextureByName("doorClosed"), Resources.GetTextureByName("doorOpen"), 80, 100, 1, 5, 32));
+        Structures.Add(new DoorTemplate("door_weak", "Gate", "", Resources.GetTextureByName("doorClosed"), Resources.GetTextureByName("doorOpen"), 80, 50, 1, 5, 32));
         Structures.Add(new DoorTemplate("door_strong","Vault Door", "", Resources.GetTextureByName("vault_door_closed"), Resources.GetTextureByName("vault_door_open"), 250, 1000, 15, 5, 32));
         
         Structures.Add
@@ -37,7 +37,7 @@ public static class Assets
                 0,
                 5,
                 120,
-                new ProjectileTemplate(Resources.GetTextureByName("bullet"), 10, 400), 
+                new ProjectileTemplate(Resources.GetTextureByName("bullet"), 15, 400), 
                 0,
                 40,
                 TowerTemplate.TargetSelector.Nearest,
@@ -58,7 +58,7 @@ public static class Assets
                 "\nput as many arrows in a target as a " +
                 "\ndozen ant archers.",
                 Resources.GetTextureByName("turret2"),
-                120,
+                95,
                 400,
                 2,
                 5,
@@ -82,7 +82,7 @@ public static class Assets
                 "\nbut hate doing so.",
                 Resources.GetTextureByName("minefield"),
                 80,
-                55,
+                85,
                 2,
                 Double.MinValue, 
                 4,
@@ -105,7 +105,7 @@ public static class Assets
                 4,
                 5,
                 90,
-                new MortarShellTemplate(Resources.GetTextureByName("bullet"), 10, 0.7, 96, 48), 
+                new MortarShellTemplate(Resources.GetTextureByName("bullet"), 10, 0.7, 96, 48),
                 0,
                 30,
                 TowerTemplate.TargetSelector.Random,
@@ -183,7 +183,7 @@ public static class Assets
             (
                 "beacon_repair",
                 "Repair Stratagem",
-                "Rebuilds one structure\n\n",
+                "Rebuilds one structure, and adjacent walls\n\n",
                 Resources.GetTextureByName("flag2"),
                 100,
                 1000,
@@ -201,10 +201,10 @@ public static class Assets
             (
                 "beacon_spawnboost",
                 "Brood Stratagem",
-                "Grants a nest an extra wave of bugs",
+                "Grants adjacent nests an extra wave of bugs",
                 Resources.GetTextureByName("flag2"),
                 100,
-                1000,
+                2000,
                 9,
                 50,
                 42,
@@ -222,7 +222,7 @@ public static class Assets
                 "Causes a frenzy in an area",
                 Resources.GetTextureByName("flag1"),
                 100,
-                1000,
+                1250,
                 12,
                 50,
                 45,
@@ -237,7 +237,7 @@ public static class Assets
             (
                 "nest_ant",
                 "Anthill", 
-                "\n",
+                "",
                 Resources.GetTextureByName("spawner"), 
                 50, 
                 250, 
@@ -247,9 +247,9 @@ public static class Assets
                 (
                     "minion_ant",
                     "Ant", 
-                    "",
+                    "\nAntz is made for Fight'n and Winn'n!",
                     Resources.GetTextureByName("smant"), 
-                    15, 
+                    20, 
                     0, 
                     5, 
                     75, 
@@ -277,7 +277,7 @@ public static class Assets
                 (
                     "minion_grasshopper",
                     "Grasshopper",
-                    "",
+                    "\nHoppers are known for their free spirits \nand musical talent",
                     Resources.GetTextureByName("hopper"),
                     40, 
                     0, 
@@ -307,7 +307,7 @@ public static class Assets
                 (
                     "minion_bee",
                     "Bee",
-                    "",
+                    "\n\"For the Queen!\"",
                     Resources.GetTextureByName("bee"), 
                     20, 
                     0, 
@@ -330,16 +330,16 @@ public static class Assets
                 "",
                 Resources.GetTextureByName("spawner2"), 
                 50, 
-                1000,
+                1200,
                 8,
                 50,
                 new MinionTemplate
                 (
                     "minion_snail",
                     "Snail", 
-                    "",
+                    "\nSnails get it done.",
                     Resources.GetTextureByName("snail"), 
-                    65, 
+                    60, 
                     5, 
                     15, 
                     35, 
@@ -367,10 +367,10 @@ public static class Assets
                 (
                     "minion_sapper_beetle",
                     "Beetle",
-                    "",
+                    "\nWide load coming through!",
                     Resources.GetTextureByName("sapper_attacking"),
                     Resources.GetTextureByName("sapper_retreating"),
-                    50, 
+                    55, 
                     2, 
                     250, 
                     65, 
@@ -411,13 +411,14 @@ public static class Assets
                     (
                         "minion_spiderling",
                         "Spiderling", 
-                        "",
-                        Resources.GetTextureByName("spiderling"), 
-                        15, 
-                        0, 
-                        5, 
-                        45, 
-                        2
+                        "\n\"I was born ready!\"",
+                        Resources.GetTextureByName("spiderling"),
+                        15,
+                        0,
+                        2,
+                        55,
+                        2,
+                        0.5
                     )
                 ), 
                 1, 
@@ -442,7 +443,7 @@ public static class Assets
                 (
                     "minion_frog",
                     "Frog",
-                    "",
+                    "\nAt least it's on our side.\nFor now...",
                     Resources.GetTextureByName("frog"),
                     1500, 
                     0, 

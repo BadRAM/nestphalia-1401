@@ -43,8 +43,8 @@ public class FlyingMinion : Minion
 
     public override void SetTarget(Int2D target)
     {
-        NavPath.Reset();
         NavPath.Start = World.PosToTilePos(Position);
+        NavPath.Reset();
         NavPath.Destination = target;
     }
 }

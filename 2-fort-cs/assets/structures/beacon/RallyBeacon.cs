@@ -53,10 +53,4 @@ public class RallyBeacon : ActiveAbilityBeacon
         }
         return null;
     }
-
-    public override void Destroy()
-    {
-        base.Destroy();
-        Team.RemoveBeacon(this);
-    }
 }

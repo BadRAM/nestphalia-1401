@@ -38,7 +38,7 @@ public static class GUI
     public static bool ButtonWide(int x, int y, string text, bool enabled = true)
     {
         bool hover = CheckCollisionPointRec(GetMousePosition(), new Rectangle(x, y, 300, 40));
-        bool press = !enabled || (hover && IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT));
+        bool press = !enabled || (hover && (IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT) || IsMouseButtonReleased(MouseButton.MOUSE_BUTTON_LEFT)));
         
         Rectangle subSprite = new Rectangle(0, !press ? !hover ? 0 : 40 : 80, 300, 40);
         DrawTextureRec(_buttonWideTexture, subSprite, new Vector2(x,y), WHITE);
@@ -55,7 +55,7 @@ public static class GUI
     public static bool ButtonNarrow(int x, int y, string text, bool enabled = true)
     {
         bool hover = CheckCollisionPointRec(GetMousePosition(), new Rectangle(x, y, 100, 40));
-        bool press = !enabled || (hover && IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT));
+        bool press = !enabled || (hover && (IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT) || IsMouseButtonReleased(MouseButton.MOUSE_BUTTON_LEFT)));
         
         Rectangle subSprite = new Rectangle(0, !press ? !hover ? 0 : 40 : 80, 100, 40);
         DrawTextureRec(_buttonNarrowTexture, subSprite, new Vector2(x,y), WHITE);

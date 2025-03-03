@@ -49,4 +49,10 @@ public abstract class ActiveAbilityBeacon : Structure
     {
         return Time.Scaled - TimeLastUsed > _template.Cooldown;
     }
+    
+    public override void Destroy()
+    {
+        base.Destroy();
+        Team.RemoveBeacon(this);
+    }
 }

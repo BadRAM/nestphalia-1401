@@ -7,24 +7,32 @@ namespace _2_fort_cs;
 
 public static class BattleScene
 {
-    // public static Fort PlayerFort;
-    // public static Fort EnemyFort;
+    public static Fort LeftFort;
+    public static Fort RightFort;
     public static bool Pause;
     public static bool CustomBattle;
+    // private static bool _battleOver;
+    public static Team? Winner;
     private static int _skips; 
+    
 
-    public static void Start(Fort leftFort, Fort rightFort)
+    public static void Start(Fort leftFort, Fort rightFort, bool leftIsPlayer = true, bool rightIsPlayer = false)
     {
+        Winner = null;
+        
+        LeftFort = leftFort;
+        RightFort = rightFort;
+        
         Pause = false;
         Time.TimeScale = 1;
         
-        if (leftFort == null || rightFort == null)
+        if (LeftFort == null || RightFort == null)
         {
             Console.WriteLine("Null fort!");
             return;
         }
 
-        World.InitializeBattle(leftFort, rightFort);
+        World.InitializeBattle(leftFort, rightFort, leftIsPlayer, rightIsPlayer);
         
         Program.CurrentScene = Scene.Battle;
         
@@ -49,6 +57,16 @@ public static class BattleScene
         {
             SetMasterVolume(Program.Muted ? 0 : 1f);
         }
+        
+        // if (IsKeyPressed(KeyboardKey.KEY_R) && IsKeyDown(KeyboardKey.KEY_LEFT_SHIFT)) // restarthack
+        // {
+        //     Start(LeftFort, RightFort);
+        // }
+        //
+        // if (IsKeyDown(KeyboardKey.KEY_R) && Time.Scaled - World.FirstWaveTime > 5) // autorestarthack
+        // {
+        //     Start(LeftFort, RightFort);
+        // }
 
         if (IsKeyDown(KeyboardKey.KEY_A))
         {
@@ -67,11 +85,11 @@ public static class BattleScene
             World.Camera.offset.Y -= 4;
         }
         
-        if (IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT))
+        if (IsMouseButtonDown(MouseButton.MOUSE_BUTTON_RIGHT))
         {
             World.Camera.offset += GetMouseDelta();
         }
-
+        
         
         // Snipped from raylib example
         float wheel = GetMouseWheelMove();
@@ -95,7 +113,7 @@ public static class BattleScene
         
         // ----- WORLD UPDATE PHASE -----
 
-        if (!Pause)
+        if (!Pause && Winner == null)
         {
             World.Update();
 
@@ -112,31 +130,34 @@ public static class BattleScene
             }
         }
         
-        TeamName winner = CheckWinner();
-        if (winner != TeamName.None)
-        {
-            SetMasterVolume(Program.Muted ? 0 : 1f);
-
-            if (CustomBattle)
-            {
-                CustomBattleMenu.Start();
-                CustomBattleMenu.OutcomeMessage =
-                    (winner == TeamName.Left
-                        ? CustomBattleMenu.LeftFort?.Name ?? ""
-                        : CustomBattleMenu.RightFort?.Name ?? "") + " won the battle!";
-            }
-            else
-            {
-                Console.WriteLine($"{winner.ToString()} wins the battle!");
-                Program.Campaign.ReportBattleOutcome(winner == TeamName.Left);
-                Program.Campaign.Start();
-            }
-        }
+        Winner = CheckWinner();
+        // if (winner != null)
+        // {
+        //     Winner = winner;
+        //     _battleOver = true;
+        //     
+        //     SetMasterVolume(Program.Muted ? 0 : 1f);
+        //
+        //     if (CustomBattle)
+        //     {
+        //         CustomBattleMenu.Start();
+        //         CustomBattleMenu.OutcomeMessage =
+        //             (winner == TeamName.Left
+        //                 ? CustomBattleMenu.LeftFort?.Name ?? ""
+        //                 : CustomBattleMenu.RightFort?.Name ?? "") + " won the battle!";
+        //     }
+        //     else
+        //     {
+        //         Console.WriteLine($"{winner.ToString()} wins the battle!");
+        //         Program.Campaign.ReportBattleOutcome(winner == TeamName.Left);
+        //         Program.Campaign.Start();
+        //     }
+        // }
         
         
         // ----- DRAW PHASE -----
         BeginDrawing();
-        ClearBackground(BLACK);
+        ClearBackground(new Color(16, 8, 4, 255));
         
         World.Draw();
         
@@ -149,13 +170,29 @@ public static class BattleScene
         DrawTextLeft(6, 64, $"Zoom: {World.Camera.zoom}");
         // DrawTextLeft(6, 80, $"PathQueue: {PathFinder.GetQueueLength()}");
         
-        if (IsKeyDown(KeyboardKey.KEY_F))
+        if (Winner != null)
         {
             DrawRectangle(0,0,Screen.Left,Screen.Bottom,new Color(0,0,0,128));
-            DrawTextCentered(Screen.HCenter, Screen.VCenter, $"{_skips+1}X SPEED", 48);
+            DrawTextCentered(Screen.HCenter, Screen.VCenter-48, "BATTLE OVER!", 48);
+            DrawTextCentered(Screen.HCenter, Screen.VCenter, $"{Winner.Name} is victorious!", 48);
+            if (ButtonNarrow(Screen.HCenter-50, Screen.VCenter + 30, "Return"))
+            {
+                SetMasterVolume(Program.Muted ? 0 : 1f);
+
+                if (CustomBattle)
+                {
+                    CustomBattleMenu.Start();
+                    CustomBattleMenu.OutcomeMessage = Winner.Name + " won the battle!";
+                }
+                else
+                {
+                    Program.Campaign.ReportBattleOutcome(Winner.IsPlayerControlled);
+                    Program.Campaign.Start();
+                }
+            }
+            //DrawTextEx(Resources.Font, "PAUSED", new Vector2(Screen.HCenter, Screen.VCenter), 48, 4, WHITE);
         }
-        
-        if (Pause)
+        else if (Pause)
         {
             DrawRectangle(0,0,Screen.Left,Screen.Bottom,new Color(0,0,0,128));
             DrawTextCentered(Screen.HCenter, Screen.VCenter, "PAUSED", 48);
@@ -168,40 +205,49 @@ public static class BattleScene
                 }
                 else
                 {
-                    Program.Campaign.ReportBattleOutcome(winner == TeamName.Right);
+                    Program.Campaign.ReportBattleOutcome(false);
                     Program.Campaign.Start();
                 }
             }
             //DrawTextEx(Resources.Font, "PAUSED", new Vector2(Screen.HCenter, Screen.VCenter), 48, 4, WHITE);
         }
+        else if (IsKeyDown(KeyboardKey.KEY_F))
+        {
+            DrawRectangle(0,0,Screen.Left,Screen.Bottom,new Color(0,0,0,128));
+            DrawTextCentered(Screen.HCenter, Screen.VCenter, $"{_skips+1}X SPEED", 48);
+        }
         EndDrawing();
     }
 
-    private static TeamName CheckWinner()
+    private static Team? CheckWinner()
     {
-        bool playerDead = true;
-        bool enemyDead = true;
-        
-        for (int x = 0; x < World.BoardWidth; x++)
-        {
-            for (int y = 0; y < World.BoardHeight; y++)
-            {
-                if (World.GetTile(x,y) is Spawner)
-                {
-                    if (x < 24)
-                    {
-                        playerDead = false;
-                    }
-                    else
-                    {
-                        enemyDead = false;
-                    }
-                }
-            }
-        }
+        if (World.LeftTeam.GetHealth() <= 0) return World.LeftTeam;
+        if (World.RightTeam.GetHealth() <= 0) return World.RightTeam;
+        return null;
 
-        if (playerDead) return TeamName.Right;
-        if (enemyDead) return TeamName.Left;
-        return TeamName.None;
+        // bool playerDead = true;
+        // bool enemyDead = true;
+        //
+        // for (int x = 0; x < World.BoardWidth; x++)
+        // {
+        //     for (int y = 0; y < World.BoardHeight; y++)
+        //     {
+        //         if (World.GetTile(x,y) is Spawner)
+        //         {
+        //             if (x < 24)
+        //             {
+        //                 playerDead = false;
+        //             }
+        //             else
+        //             {
+        //                 enemyDead = false;
+        //             }
+        //         }
+        //     }
+        // }
+        //
+        // if (playerDead) return TeamName.Right;
+        // if (enemyDead) return TeamName.Left;
+        // return TeamName.None;
     }
 }

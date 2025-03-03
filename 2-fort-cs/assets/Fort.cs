@@ -4,7 +4,7 @@ namespace _2_fort_cs;
 
 public class Fort
 {
-    [JsonInclude] public string Name = "Fort";
+    [JsonInclude] public string Name = "Your Fort";
     [JsonInclude] public string Comment = "It's a fort!";
     [JsonInclude] public string[] Board = new string[20 * 20];
     
@@ -54,6 +54,25 @@ public class Fort
                $"{utilityCount} Utility\n" +
                $"{nestCount} Nests\n" +
                $"{structureCount} Total";
+    }
+
+    public bool IsValid()
+    {
+        int nestCount = 0;
+        int stratagemCount = 0;
+        
+        for (int x = 0; x < 20; ++x)
+        {
+            for (int y = 0; y < 20; ++y)
+            {
+                StructureTemplate? t = Assets.GetTileByID(Board[x+y*20]);
+                if (t == null) continue;
+                if (t is SpawnerTemplate) nestCount++;
+                if (t is ActiveAbilityBeaconTemplate) stratagemCount++;
+            }
+        }
+
+        return nestCount > 0 && stratagemCount <= 4;
     }
 
     // Updates this fort object to reflect the current player side fort in the world.

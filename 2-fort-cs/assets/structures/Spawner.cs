@@ -30,15 +30,9 @@ public class SpawnerTemplate : StructureTemplate
                $"${Price}\n" +
                $"HP: {MaxHealth}\n" +
                $"Wave Size: {WaveSize} + {WaveGrowth} per wave\n" +
-               $"Spawn Delay: {TimeBetweenSpawns}\n\n" +
-               $"{Minion.Name}\n" +
-               $"HP: {Minion.MaxHealth}\n" +
-               (Minion.Armor == 0 ? "" : $"Armor: {Minion.Armor}\n") +
-               $"Speed: {Minion.Speed}\n" +
-               $"Damage: {Minion.Projectile.Damage} ({Minion.Projectile.Damage / Minion.AttackCooldown}/s)\n" +
-               $"Size: {Minion.PhysicsRadius * 2}\n" +
-               $"{Description}";
-
+               $"Spawn Delay: {TimeBetweenSpawns}\n" +
+               $"{Description}\n" +
+               $"{Minion.GetStats()}";
     }
 }
 
@@ -63,6 +57,10 @@ public class Spawner : Structure
         base.Update();
         if (_spawnsRemaining > 0 && Time.Scaled - _lastSpawnTime > _template.TimeBetweenSpawns)
         {
+            if (!_navPath.Found)
+            {
+                Console.WriteLine($"Creating a minion without a path, PathQueueLength: {PathFinder.GetQueueLength()}");
+            }
             _template.Minion.Instantiate(position, Team, _navPath.Clone());
             _spawnsRemaining--;
             _lastSpawnTime = Time.Scaled;
@@ -72,6 +70,7 @@ public class Spawner : Structure
     public override void PreWaveEffect()
     {
         Retarget();
+        _navPath.Start = new Int2D(X, Y);
         _navPath.Reset();
         _navPath.Destination = _targetTile;
         if (!(_template.Minion is FlyingMinionTemplate))
@@ -110,7 +109,8 @@ public class Spawner : Structure
         {
             for (int y = 0; y < World.BoardHeight; ++y)
             {
-                if (World.GetTile(x,y) != null && World.GetTile(x,y).Team != Team)
+                Structure? s = World.GetTile(x, y);
+                if (s != null && s.Team != Team && s is not Rubble)
                 {
                     if (Team.GetHateFor(x,y) > 0)
                     {
@@ -124,11 +124,18 @@ public class Spawner : Structure
         
         if (targets.Count == 0)
         {
+            Console.WriteLine("NO TARGETS!");
             return;
         }
         
         int i = Utils.WeightedRandom(targets.Count);
+        Console.WriteLine($"Picked target {i}");
         _targetTile = targets[i].Value;
         //_targetTile = targets[0].Value;
+
+        if (_targetTile == new Int2D(0,0))
+        {
+            Console.WriteLine("TARGETED ZERO");
+        }
     }
 }

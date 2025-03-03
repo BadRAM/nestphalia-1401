@@ -79,7 +79,7 @@ public class Minefield : Structure
     {
         _armSound.PlayRandomPitch(SoundResource.WorldToPan(position.X));
         _chargesLeft--;
-        _template.Bomb.Instantiate(position, this, position + _drawPoints[_chargesLeft]);
+        _template.Bomb.Instantiate(position + _drawPoints[_chargesLeft], this, position + _drawPoints[_chargesLeft]);
         _timeLastTriggered = Time.Scaled;
         Health = Math.Max(_chargesLeft, Health);
         if (_chargesLeft <= 0) Destroy();

@@ -123,4 +123,5 @@ Playtest Notes
 
 - tell the player that nests are important
 - Tell the player what rmb does in editor
-- 
+- Rename "Erase" to "Sell"
+- Corpses/bloodstains to indicate fear
