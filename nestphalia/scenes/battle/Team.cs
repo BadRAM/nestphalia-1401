@@ -84,12 +84,13 @@ public class Team
 
     public void AddFearOf(double fear, int x, int y)
     {
-        _fearMap[x, y] += fear;
+        _fearMap[x, y] = Math.Max(0, _fearMap[x, y] + fear);
+        
     }
     
     public void AddFearOf(double fear, Int2D pos)
     {
-        _fearMap[pos.X, pos.Y] += fear;
+        AddFearOf(fear, pos.X, pos.Y);
     }
 
     public double GetHealth()
@@ -136,7 +137,7 @@ public class Team
             if ((Beacons[0]?.IsReady() ?? false) && Raylib.IsKeyPressed(KeyboardKey.KEY_ONE))   _usingAbility = 0;
             if ((Beacons[1]?.IsReady() ?? false) && Raylib.IsKeyPressed(KeyboardKey.KEY_TWO))   _usingAbility = 1;
             if ((Beacons[2]?.IsReady() ?? false) && Raylib.IsKeyPressed(KeyboardKey.KEY_THREE)) _usingAbility = 2;
-            if ((Beacons[3]?.IsReady() ?? false) && Raylib.IsKeyPressed(KeyboardKey.KEY_FOUR)) _usingAbility = 3;
+            if ((Beacons[3]?.IsReady() ?? false) && Raylib.IsKeyPressed(KeyboardKey.KEY_FOUR))  _usingAbility = 3;
 
             int posX = IsRightSide ? Screen.HCenter + 450  : Screen.HCenter - 450;
             for (int i = 0; i < BeaconCap; i++)
@@ -169,8 +170,12 @@ public class Team
             {
                 for (int y = 0; y < World.BoardHeight; y++)
                 {
-                    Raylib.DrawCircleV(World.GetTileCenter(x,y), (float)(GetFearOf(x,y)/20), new Color(0, 0, 200, 128));
-                    Raylib.DrawCircleV(World.GetTileCenter(x,y), (float)(GetHateFor(x,y)/20), new Color(200, 0, 0, 128));
+                    Raylib.DrawCircleV(World.GetTileCenter(x,y), (float)(GetFearOf(x,y)/10), new Color(128,  128, 255, 128));
+                    Raylib.DrawCircleV(World.GetTileCenter(x,y), (float)(GetHateFor(x,y)/10), new Color(255, 0, 128, 128));
+                    if (GetFearOf(x,y) < 0)
+                    {
+                        Raylib.DrawCircleV(World.GetTileCenter(x,y), 12, new Color(255, 255, 0, 128));
+                    }
                 }
             }
             Raylib.EndMode2D();

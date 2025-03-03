@@ -93,7 +93,7 @@ public class Spawner : Structure
     
     public override bool NavSolid(Team team)
     {
-        return false;
+        return team != Team;
     }
     
     public override bool PhysSolid(Team team)
