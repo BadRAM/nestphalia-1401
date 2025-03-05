@@ -40,7 +40,7 @@ public class SapperMinion : Minion
 
     public override void Update()
     {
-        Target = World.GetTileCenter(NavPath.NextTile(Position));
+        NextPos = World.GetTileCenter(NavPath.NextTile(Position));
         if (!_attacking && NavPath.Found && NavPath.TargetReached(Position))
         {
             if (World.GetTile(_startTile) is Spawner s)
@@ -58,8 +58,7 @@ public class SapperMinion : Minion
         if (TryAttack())
         {
             _attacking = false;
-            NavPath.Start = World.PosToTilePos(Position);
-            NavPath.Reset();
+            NavPath.Reset(Position);
             NavPath.Destination = _startTile;
             PathFinder.RequestPath(NavPath);
         }
@@ -72,7 +71,7 @@ public class SapperMinion : Minion
                 PathFinder.RequestPath(NavPath);
             }
             // else, move towards next tile on path.
-            Position = Position.MoveTowards(Target, AdjustedSpeed() * Time.DeltaTime);
+            Position = Position.MoveTowards(NextPos, AdjustedSpeed() * Time.DeltaTime);
         }
 
         Frenzy = false;
@@ -87,7 +86,7 @@ public class SapperMinion : Minion
 
         Texture texture = _attacking ? _template.Texture : _template.RetreatingTexture;
         Vector2 pos = new Vector2((int)Position.X - texture.width / 2, (int)Position.Y - texture.height / 2);
-        bool flip = Target.X > pos.X;
+        bool flip = NextPos.X > pos.X;
         Rectangle source = new Rectangle(flip ? texture.width : 0, 0, flip ? texture.width : -texture.width, texture.height);
         Raylib.DrawTextureRec(texture, source, pos, Team.UnitTint);
         

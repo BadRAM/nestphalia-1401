@@ -41,6 +41,11 @@ public class RepairBeacon : ActiveAbilityBeacon
             if (structure is Rubble rubble)
             {
                 World.SetTile(rubble.DestroyedStructure, Team, targetPosition);
+                structure = World.GetTile(targetPosition); 
+                if (structure is ActiveAbilityBeacon beacon)
+                {
+                    Team.AddBeacon(beacon);
+                }
             }
             else if (structure.Health < structure.Template.MaxHealth)
             {

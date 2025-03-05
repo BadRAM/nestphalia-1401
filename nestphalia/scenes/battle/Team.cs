@@ -98,11 +98,23 @@ public class Team
         return _health;
     }
 
-    public void RemoveBeacon(ActiveAbilityBeacon rallyBeacon)
+    public void AddBeacon(ActiveAbilityBeacon beacon)
     {
-        if (Beacons.Contains(rallyBeacon))
+        for (int i = 0; i < BeaconCap; i++)
         {
-            Beacons[Beacons.IndexOf(rallyBeacon)] = null;
+            if (Beacons[i] == null)
+            {
+                Beacons[i] = beacon;
+                return;
+            }
+        }
+    }
+
+    public void RemoveBeacon(ActiveAbilityBeacon beacon)
+    {
+        if (Beacons.Contains(beacon))
+        {
+            Beacons[Beacons.IndexOf(beacon)] = null;
         }
     }
 

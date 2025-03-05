@@ -33,12 +33,12 @@ public class HopperMinion : Minion
     
     public override void Update()
     {
+        
         // If the next tile is the target, attack it
         // else, if the second from next tile is empty, hop to it
         // else, if the next tile is empty, walk to it.
         // else, attack next tile
-        Target = World.GetTileCenter(NavPath.NextTile(Position));
-
+        
         if (_jumping)
         {
             if (Time.Scaled - _jumpStartTime < _jumpChargeDuration)
@@ -64,6 +64,8 @@ public class HopperMinion : Minion
             }
         }
         
+        UpdateNextPos();
+        
         Int2D? ahead = NavPath.LookAhead(1);
         
         if (ahead == null)
@@ -77,7 +79,7 @@ public class HopperMinion : Minion
                 }
                 else
                 {
-                    Position = Position.MoveTowards(Target, AdjustedSpeed() * Time.DeltaTime);
+                    Position = Position.MoveTowards(NextPos, AdjustedSpeed() * Time.DeltaTime);
                 }
             }
         }
@@ -89,14 +91,14 @@ public class HopperMinion : Minion
                 NavPath.Skip();
                 _jumping = true;
                 _jumpStartPos = Position;
-                _jumpEndPos = World.GetTileCenter((Int2D)ahead);
+                _jumpEndPos = World.GetTileCenter((Int2D)ahead) + new Vector2(Random.Shared.Next(17)-8, Random.Shared.Next(23)-11);
                 _jumpStartTime = Time.Scaled;
             }
             else
             {
                 if (!TryAttack())
                 {
-                    Position = Position.MoveTowards(Target, AdjustedSpeed() * Time.DeltaTime);
+                    Position = Position.MoveTowards(NextPos, AdjustedSpeed() * Time.DeltaTime);
                 }
             }
         }

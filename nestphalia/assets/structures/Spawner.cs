@@ -70,12 +70,15 @@ public class Spawner : Structure
     public override void PreWaveEffect()
     {
         Retarget();
-        _navPath.Start = new Int2D(X, Y);
-        _navPath.Reset();
+        _navPath.Reset(position);
         _navPath.Destination = _targetTile;
         if (!(_template.Minion is FlyingMinionTemplate))
         {
             PathFinder.RequestPath(_navPath);
+        }
+        else
+        {
+            _navPath.Found = true;
         }
     }
     
@@ -136,8 +139,7 @@ public class Spawner : Structure
     public void SetTarget(Int2D target)
     {
         _targetTile = target;
-        _navPath.Start = new Int2D(X, Y);
-        _navPath.Reset();
+        _navPath.Reset(position);
         _navPath.Destination = _targetTile;
         if (!(_template.Minion is FlyingMinionTemplate))
         {

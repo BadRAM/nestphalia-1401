@@ -10,7 +10,7 @@ public static class CustomBattleMenu
     private static bool _loadingLeftSide = true;
     public static string OutcomeMessage;
     private static int _fortListPage = 1;
-    private static bool _leftIsPlayer = true;
+    private static bool _leftIsPlayer = false;
     private static bool _rightIsPlayer = false;
 
     public static void Start()

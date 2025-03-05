@@ -39,7 +39,7 @@ public static class PathFinder
             FindPath(_pathQueue.Dequeue());
             if (i == max-1)
             {
-                Console.WriteLine($"Max path calc in {(Raylib.GetTime() - startTime) * 1000}ms");
+                Console.WriteLine($"Max path calc in {(Raylib.GetTime() - startTime) * 1000}ms, Queue length: {GetQueueLength()}");
             }
         }
     }
@@ -281,10 +281,10 @@ public class NavPath
         return p;
     }
     
-    public void Reset()
+    public void Reset(Vector2 position)
     {
-        Destination = Start;
         Found = false;
         Waypoints.Clear();
+        Start = World.PosToTilePos(position);
     }
 }

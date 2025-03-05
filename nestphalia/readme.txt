@@ -6,8 +6,13 @@ All game progress is saved in campaign.sav, if you want to back up, transfer, or
 
 Version History:
 
-1.1 - Tournament Edition - 2025-03-02
+---- 1.1.2 - 2025-03-02 ----
+ - Fixed a bug that caused bugs to pathfind in circles
 
+---- 1.1.1 - 2025-03-02 ----
+ - Fixed a bug where victory would be awarded to the wrong team.
+
+==== 1.1 - Tournament Edition - 2025-03-02 ====
 New Features & Tweaks
  - Braver Bugs! bugs are less afraid to tread where their allies died, and their fear is eased when turrets are destroyed!
  - Custom battle menu lets you set forts as player/cpu controlled

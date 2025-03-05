@@ -30,8 +30,8 @@ public class FlyingMinion : Minion
         // if the next tile in our path is adjacent and solid, then attack it
         if (!TryAttack())
         {
-            Target = World.GetTileCenter(NavPath.Destination);
-            Position = Position.MoveTowards(Target, AdjustedSpeed() * Time.DeltaTime);
+            NextPos = World.GetTileCenter(NavPath.Destination);
+            Position = Position.MoveTowards(NextPos, AdjustedSpeed() * Time.DeltaTime);
             if (NavPath.TargetReached(Position))
             {
                 Retarget();
@@ -43,8 +43,7 @@ public class FlyingMinion : Minion
 
     public override void SetTarget(Int2D target)
     {
-        NavPath.Start = World.PosToTilePos(Position);
-        NavPath.Reset();
+        NavPath.Reset(Position);
         NavPath.Destination = target;
     }
 }
