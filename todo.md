@@ -3,12 +3,22 @@
 Programming todo:
 =================
 
-- Splash screen
+- ~~Bugs pushed too far from their next path tile will repath~~
+- ~~Re-register repaired stratagems~~
+- ~~Hopper target pos randomization~~
+- Heavier bugs push smaller bugs out of the way
 
+----- Postponed to Champion's Edition -----
+
+- Orphaned sapper beetles will seek another burrow
+- Limit total spiderlings a spider can spawn
+- Switch back to raylib-cs and try compiling for web
 
 ----- Postponed to team bug fort 2 -----
+- Refactor Minion.Hurt() to not need a damagesource
+- Splash screen
 - Fix minion collision with wall corners
-- Better fear evaluation, make bugs more scared of staying in scary places than passing through them. Find a way to reduce fear when nearby turrets are destroyed. (reduction = hate/area of effect?)
+- Better fear evaluation, make bugs more scared of staying in scary places than passing through them. 
 - Minion melee attack animation
 - Minion state machine
 - Assets from json
