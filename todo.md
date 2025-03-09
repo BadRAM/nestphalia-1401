@@ -3,22 +3,33 @@
 Programming todo:
 =================
 
+----- Champion's Edition -----
+
 - ~~Bugs pushed too far from their next path tile will repath~~
 - ~~Re-register repaired stratagems~~
 - ~~Hopper target pos randomization~~
 - Heavier bugs push smaller bugs out of the way
+- Sandbox editor is inside of custom battle menu
+- fort10 doesn't save correctly
+- new graffiti
 
------ Postponed to Champion's Edition -----
 
+----- V2 -----
+
+- Game load cutscene
+- Fancy title text
+- Main menu art
+- Campaign screen Map
 - Orphaned sapper beetles will seek another burrow
 - Limit total spiderlings a spider can spawn
 - Switch back to raylib-cs and try compiling for web
+
 
 ----- Postponed to team bug fort 2 -----
 - Refactor Minion.Hurt() to not need a damagesource
 - Splash screen
 - Fix minion collision with wall corners
-- Better fear evaluation, make bugs more scared of staying in scary places than passing through them. 
+- Better fear evaluation, make bugs more scared of staying in scary places than passing through them.
 - Minion melee attack animation
 - Minion state machine
 - Assets from json

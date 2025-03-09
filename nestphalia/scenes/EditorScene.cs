@@ -20,9 +20,11 @@ public static class EditorScene
     private static bool _fortAlreadySaved;
     private static bool _sellAllConfirm;
     private static StructureTemplate.StructureClass _structureClass;
+    private static Texture _bg;
     
     public static void Start(Fort? fortToLoad = null, bool creativeMode = false)
     {
+        _bg = Resources.GetTextureByName("editor_bg");
         _brush = null;
         _saveMessage = "";
         _sandboxMode = creativeMode;
@@ -121,7 +123,27 @@ public static class EditorScene
         Screen.DrawBackground(GRAY);
         
         World.Draw();
-
+        
+        // Draw brush preview ghost
+        if (CheckCollisionPointRec(GetMousePosition(), new Rectangle(Screen.HCenter-240, Screen.VCenter-240, 480, 480)))
+        {
+            BeginMode2D(World.Camera);
+            Vector2 mousePos = World.GetTileCenter(World.GetMouseTilePos());
+            if (_brush is TowerTemplate t)
+            {
+                DrawCircleLines((int)mousePos.X, (int)mousePos.Y, (int)t.Range, new Color(200, 50, 50, 255));
+                DrawCircle((int)mousePos.X, (int)mousePos.Y, (int)t.Range, new Color(200, 50, 50, 64));
+            }
+            if (_brush != null)
+            {
+                DrawTexture(_brush.Texture, (int)mousePos.X-12, (int)mousePos.Y-(_brush.Texture.height - 12), new Color(128, 128, 255, 128));
+            }
+            EndMode2D();
+        }
+        
+        // Draw "Background"
+        DrawTexture(_bg, Screen.HCenter - 608, Screen.VCenter - 308, WHITE);
+        
         if (_sandboxMode)
         {
             if (ButtonWide(Screen.HCenter-600, Screen.VCenter+260, "Exit")) MenuScene.Start();
@@ -192,24 +214,6 @@ public static class EditorScene
         else
         {
             DrawTextLeft(Screen.HCenter-590, Screen.VCenter-290, $"Placing {_brush.GetStats()}");
-        }
-
-
-
-        if (CheckCollisionPointRec(GetMousePosition(), new Rectangle(Screen.HCenter-264, Screen.VCenter-264, 528, 528)))
-        {
-            BeginMode2D(World.Camera);
-            Vector2 mousePos = World.GetTileCenter(World.GetMouseTilePos());
-            if (_brush is TowerTemplate t)
-            {
-                DrawCircleLines((int)mousePos.X, (int)mousePos.Y, (int)t.Range, new Color(200, 50, 50, 255));
-                DrawCircle((int)mousePos.X, (int)mousePos.Y, (int)t.Range, new Color(200, 50, 50, 64));
-            }
-            if (_brush != null)
-            {
-                DrawTexture(_brush.Texture, (int)mousePos.X-12, (int)mousePos.Y-(_brush.Texture.height - 12), new Color(128, 128, 255, 128));
-            }
-            EndMode2D();
         }
         
         DrawTextLeft(Screen.HCenter-590, Screen.VCenter+170, _saveMessage);
