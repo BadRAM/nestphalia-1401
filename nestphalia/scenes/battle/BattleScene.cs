@@ -73,6 +73,11 @@ public static class BattleScene
         {
             World.Camera.offset.Y -= 4;
         }
+
+        if (IsKeyDown(KeyboardKey.KEY_I))
+        {
+            PathFinder.ResetStopwatches();
+        }
         
         if (IsMouseButtonDown(MouseButton.MOUSE_BUTTON_RIGHT))
         {
@@ -133,6 +138,7 @@ public static class BattleScene
         // DrawTextLeft(6, 64, $"Sprites: {World.Sprites.Count}");
         DrawTextLeft(6, 64, $"Zoom: {World.Camera.zoom}");
         // DrawTextLeft(6, 80, $"PathQueue: {PathFinder.GetQueueLength()}");
+        PathFinder.DrawProfilerBar();
         
         if (Winner != null)
         {

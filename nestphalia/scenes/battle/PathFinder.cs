@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Numerics;
 using ZeroElectric.Vinculum;
 
@@ -6,6 +7,12 @@ namespace nestphalia;
 public static class PathFinder
 {
     private static Queue<NavPath> _pathQueue = new Queue<NavPath>();
+    private static Stopwatch _swTotalTime = new Stopwatch();
+    private static int _totalPaths = 0;
+    private static Stopwatch _swMisc = new Stopwatch();
+    private static Stopwatch _swFindNext = new Stopwatch();
+    private static Stopwatch _swCull = new Stopwatch();
+    private static Stopwatch _swAddNodes = new Stopwatch();
     
     private class PathNode : IComparable<PathNode>
     {
@@ -46,6 +53,8 @@ public static class PathFinder
 
     public static void FindPath(NavPath navPath)
     {
+        
+        // Guards
         if (navPath.Found)
         {
             int c = _pathQueue.Count;
@@ -54,7 +63,9 @@ public static class PathFinder
             return;
         }
         
-        //Console.WriteLine($"{Minion.Template.Name} pathing from {World.PosToTilePos(Minion.Position)} to {DesiredTarget}");
+        // Start of pathing
+        _swTotalTime.Start();
+        _totalPaths++;
         
         PathNode?[,] nodeGrid = new PathNode[World.BoardWidth,World.BoardHeight];
         
@@ -66,6 +77,7 @@ public static class PathFinder
         int count = 0;
         while (true)
         {
+            _swMisc.Start();
             count++;
             
             // Abort if we ran out of options.
@@ -75,6 +87,9 @@ public static class PathFinder
                 Console.WriteLine("Couldn't find a path!");
                 break;
             }
+            
+            _swMisc.Stop();
+            _swFindNext.Start();
             
             double minWeight = double.MaxValue;
             int mindex = 0;
@@ -89,14 +104,27 @@ public static class PathFinder
             n = nodesToConsider[mindex];
             nodesToConsider.RemoveAt(mindex);
             
+            _swFindNext.Stop();
+            _swMisc.Start();
+            
             // Break if we're done
-            if (n.Pos == navPath.Destination) break;
+            if (n.Pos == navPath.Destination)
+            {
+                _swMisc.Stop();
+                break;
+            }
             
             // set cheapest node into grid
             nodeGrid[n.Pos.X,n.Pos.Y] = n;
             
+            _swMisc.Stop();
+            _swCull.Start();
+            
             // cull other nodes that point to same tile
             nodesToConsider.RemoveAll(a => a.Pos == n.Pos);
+            
+            _swCull.Stop();
+            _swAddNodes.Start();
             
             // add new nodes for consideration
             // left
@@ -170,10 +198,12 @@ public static class PathFinder
                 PathNode? nn = WeightedNode(n, n.Pos.X+1, n.Pos.Y+1, 1.5f, navPath.Team);
                 if (nn != null) nodesToConsider.Add(nn);
             }
+            
+            _swAddNodes.Stop();
         }
         
         //Console.WriteLine($"Found path in {count} loops, final node weight {n.Weight}");
-
+        
         while (true)
         {
             navPath.Waypoints.Insert(0, n.Pos);
@@ -182,6 +212,8 @@ public static class PathFinder
         }
 
         navPath.Found = true;
+        
+        _swTotalTime.Stop();
     }
 
     private static PathNode? WeightedNode(PathNode prevNode, int x, int y, double weight, Team team)
@@ -218,6 +250,50 @@ public static class PathFinder
     public static void ClearQueue()
     {
         _pathQueue.Clear();
+    }
+
+    public static void DrawProfilerBar()
+    {
+        // ReSharper disable once InconsistentNaming
+        long totalSWTime = _swMisc.ElapsedMilliseconds + _swFindNext.ElapsedMilliseconds + _swCull.ElapsedMilliseconds + _swAddNodes.ElapsedMilliseconds;
+        if (totalSWTime == 0) return;
+        
+        GUI.DrawTextLeft(Screen.HCenter + 350, Screen.VCenter - 250, 
+            $"Avg Pathing Time: {(1000 * _swTotalTime.Elapsed.TotalSeconds/_totalPaths).ToString("N3")}ms\n" +
+            $"{_totalPaths} paths totalling {_swTotalTime.ElapsedMilliseconds}ms\n" +
+            $"Time in pathloop: {totalSWTime}ms\n" +
+            $"Misc: {_swMisc.ElapsedMilliseconds}ms\n" +
+            $"FindNext: {_swFindNext.ElapsedMilliseconds}ms\n" +
+            $"Cull: {_swCull.ElapsedMilliseconds}ms\n" +
+            $"AddNodes: {_swAddNodes.ElapsedMilliseconds}ms");
+        
+        int totalWidth = 1000;
+        int x = Screen.HCenter-500;
+        int width = (int)(totalWidth * _swMisc.ElapsedMilliseconds / totalSWTime);
+        
+        Raylib.DrawRectangle(x, Screen.VCenter-300, width, 40, Raylib.GRAY);
+        GUI.DrawTextLeft(x, Screen.VCenter-290, $"Misc: {(int)(100 * _swMisc.ElapsedMilliseconds / totalSWTime)}%");
+        x += width;
+        width = (int)(totalWidth * _swFindNext.ElapsedMilliseconds / totalSWTime);
+        Raylib.DrawRectangle(x, Screen.VCenter-300, width, 40, Raylib.GREEN);
+        GUI.DrawTextLeft(x, Screen.VCenter-290, $"FindNext: {(int)(100 * _swFindNext.ElapsedMilliseconds / totalSWTime)}%");
+        x += width;
+        width = (int)(totalWidth * _swCull.ElapsedMilliseconds / totalSWTime);
+        Raylib.DrawRectangle(x, Screen.VCenter-300, width, 40, Raylib.ORANGE);
+        GUI.DrawTextLeft(x, Screen.VCenter-290, $"Cull: {(int)(100 * _swCull.ElapsedMilliseconds / totalSWTime)}%");
+        x += width;
+        width = (int)(totalWidth * _swAddNodes.ElapsedMilliseconds / totalSWTime);
+        Raylib.DrawRectangle(x, Screen.VCenter-300, width, 40, Raylib.SKYBLUE);
+        GUI.DrawTextLeft(x, Screen.VCenter-290, $"AddNodes: {(int)(100 * _swAddNodes.ElapsedMilliseconds / totalSWTime)}%");
+        x += width;
+    }
+
+    public static void ResetStopwatches()
+    {
+        _swMisc.Reset();
+        _swCull.Reset();
+        _swFindNext.Reset();
+        _swAddNodes.Reset();
     }
 }
 
