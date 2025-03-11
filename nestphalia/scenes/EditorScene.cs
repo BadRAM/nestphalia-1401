@@ -122,10 +122,13 @@ public static class EditorScene
         ClearBackground(BLACK);
         Screen.DrawBackground(GRAY);
         
-        World.Draw();
+        World.DrawFloor();
+        
+        // Draw gui background texture
+        DrawTexture(_bg, Screen.HCenter - 608, Screen.VCenter - 308, WHITE);
         
         // Draw brush preview ghost
-        if (CheckCollisionPointRec(GetMousePosition(), new Rectangle(Screen.HCenter-240, Screen.VCenter-240, 480, 480)))
+        if (CheckCollisionPointRec(GetMousePosition(), new Rectangle(Screen.HCenter-240, Screen.VCenter-232, 480, 480)))
         {
             BeginMode2D(World.Camera);
             Vector2 mousePos = World.GetTileCenter(World.GetMouseTilePos());
@@ -140,9 +143,9 @@ public static class EditorScene
             }
             EndMode2D();
         }
+
+        World.Draw();
         
-        // Draw "Background"
-        DrawTexture(_bg, Screen.HCenter - 608, Screen.VCenter - 308, WHITE);
         
         if (_sandboxMode)
         {
@@ -181,13 +184,13 @@ public static class EditorScene
         }
 
         if (ButtonNarrow(Screen.HCenter+150, Screen.VCenter+260, "Sell", _brush != null)) _brush = null;
-        if (ButtonNarrow(Screen.HCenter-250, Screen.VCenter+260, "Sell All", !_sellAllConfirm)) _sellAllConfirm = true;
-        if (_sellAllConfirm && ButtonNarrow(Screen.HCenter-150, Screen.VCenter+260, "Confirm")) SellAll();
+        if (_sellAllConfirm && ButtonNarrow(Screen.HCenter-250, Screen.VCenter+260, "Cancel"))   _sellAllConfirm = false;
+        else if (!_sellAllConfirm&& ButtonNarrow(Screen.HCenter-250, Screen.VCenter+260, "Sell All")) _sellAllConfirm = true;
+        if (_sellAllConfirm && ButtonNarrow(Screen.HCenter-150, Screen.VCenter+260, "Confirm"))  SellAll();
         if (ButtonNarrow(Screen.HCenter+300, Screen.VCenter-300, (_newUtil ? "NEW! " : "") + "Utility", _structureClass != StructureTemplate.StructureClass.Utility)) _structureClass = StructureTemplate.StructureClass.Utility;
         if (ButtonNarrow(Screen.HCenter+400, Screen.VCenter-300, (_newTower ? "NEW! " : "") + "Tower", _structureClass != StructureTemplate.StructureClass.Tower)) _structureClass = StructureTemplate.StructureClass.Tower;
         if (ButtonNarrow(Screen.HCenter+500, Screen.VCenter-300, (_newNest ? "NEW! " : "") + "Nest", _structureClass != StructureTemplate.StructureClass.Nest)) _structureClass = StructureTemplate.StructureClass.Nest;
 
-        //Console.WriteLine(RayGui.GuiTextBox(new Rectangle(10, 620, 400, 200), "Fort Name:", 12, true));
         int y = 0;
         for (int i = 0; i < Assets.Structures.Count; i++)
         {

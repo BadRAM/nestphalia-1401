@@ -30,6 +30,7 @@ public static class CustomBattleMenu
         Raylib.BeginDrawing();
         Raylib.ClearBackground(Raylib.GRAY);
         Screen.DrawBackground(Raylib.DARKGRAY);
+        World.DrawFloor();
         World.Draw();
         
         string[] forts = Directory.GetFiles(Directory.GetCurrentDirectory() + "/forts/");

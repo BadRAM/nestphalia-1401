@@ -55,7 +55,7 @@ public class SapperMinion : Minion
         }
         
         // if the next tile in our path is adjacent and solid, then attack it
-        if (TryAttack())
+        if (_attacking && TryAttack())
         {
             _attacking = false;
             NavPath.Reset(Position);

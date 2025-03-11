@@ -73,8 +73,6 @@ public class Campaign
 
         
         if (GUI.ButtonWide(Screen.HCenter-600,   Screen.VCenter-300, "Edit Fort")) EditorScene.Start(Fort1);
-        // if (RayGui.GuiButton(new Rectangle(20,  100, 200, 40), "Edit Fort 2") != 0) EditorScene.Start(Fort2);
-        // if (RayGui.GuiButton(new Rectangle(20,  150, 200, 40), "Edit Fort 3") != 0) EditorScene.Start(Fort3);
         if (Level >= 14 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter-300, Resources.CampaignLevels[14].Name)) _selectedLevel = 14;
         if (Level >= 13 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter-260, Resources.CampaignLevels[13].Name)) _selectedLevel = 13;
         if (Level >= 12 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter-220, Resources.CampaignLevels[12].Name)) _selectedLevel = 12;

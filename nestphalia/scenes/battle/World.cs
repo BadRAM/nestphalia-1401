@@ -51,7 +51,7 @@ public static class World
     public static void InitializeEditor()
     {
         Initialize();
-        Camera.target = new Vector2(22 * 12, BoardHeight * 12);
+        Camera.target = new Vector2(22 * 12, BoardHeight * 12 + 8);
         
         // set up floor tile checkerboard
         for (int x = 0; x < BoardWidth; x++)
@@ -204,7 +204,7 @@ public static class World
         LeftTeam.Update();
         RightTeam.Update();
         
-        PathFinder.ServeQueue(5);
+        PathFinder.ServeQueue(10);
         
         for (int x = 0; x < BoardWidth; ++x)
         {
@@ -249,7 +249,7 @@ public static class World
         ProjectilesToRemove.Clear();
     }
 
-    public static void Draw()
+    public static void DrawFloor()
     {
         Raylib.BeginMode2D(Camera);
         
@@ -262,6 +262,13 @@ public static class World
                 //Raylib.DrawCircle((int)pos.X, (int)pos.Y, (int)LeftTeam.GetFearOf(x,y), Raylib.BLUE);
             }
         }
+        
+        Raylib.EndMode2D();
+    }
+
+    public static void Draw()
+    {
+        Raylib.BeginMode2D(Camera);
 
         Sprites = Sprites.OrderBy(o => o.Z).ToList();
 

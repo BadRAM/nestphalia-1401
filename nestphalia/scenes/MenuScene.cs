@@ -56,11 +56,6 @@ public static class MenuScene
         
         
         DrawTextLeft(HCenter-590, VCenter+260, "By BadRAM and rosettedotnet\nWith music from the mod archive");
-
-        if (_helpWindowOpen)
-        {
-            RayGui.GuiDummyRec(new Rectangle(550, 100, 400, 400), "TODO: Write help text");
-        }
             
         EndDrawing();
     }

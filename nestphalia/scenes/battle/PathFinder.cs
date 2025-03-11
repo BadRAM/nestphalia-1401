@@ -12,6 +12,9 @@ public static class PathFinder
     private static Stopwatch _swMisc = new Stopwatch();
     private static Stopwatch _swFindNext = new Stopwatch();
     private static Stopwatch _swAddNodes = new Stopwatch();
+    private static Stopwatch _swRegisterNode = new Stopwatch();
+    private static Stopwatch _swNewNode = new Stopwatch();
+    
     
     private class PathNode : IComparable<PathNode>
     {
@@ -69,10 +72,11 @@ public static class PathFinder
         
         PathNode?[,] nodeGrid = new PathNode[World.BoardWidth,World.BoardHeight];
         
-        List<PathNode> nodesToConsider = new List<PathNode>();
+        LinkedList<PathNode> nodesToConsider = new LinkedList<PathNode>();
         
         PathNode n = new PathNode(navPath.Start);
-        nodesToConsider.Add(n);
+        nodesToConsider.AddFirst(n);
+        // nodesToConsider.Add(n);
         
         int count = 0;
         while (true)
@@ -104,8 +108,8 @@ public static class PathFinder
             // n = nodesToConsider[mindex];
             // nodesToConsider.RemoveAt(mindex);
             
-            n = nodesToConsider[0];
-            nodesToConsider.RemoveAt(0);
+            n = nodesToConsider.First.Value;
+            nodesToConsider.RemoveFirst();
             
             _swFindNext.Stop();
             _swMisc.Start();
@@ -127,32 +131,24 @@ public static class PathFinder
             // left
             if (n.Pos.X-1 >= 0)
             {
-                // PathNode? nn = WeightedNode(n, n.Pos.X-1, n.Pos.Y, 1, navPath.Team);
-                // if (nn != null) nodesToConsider.Add(nn);
                 AddWeightedNode(nodeGrid, nodesToConsider, n, n.Pos.X-1, n.Pos.Y, 1, navPath.Team);
             }
             
             // right
             if (n.Pos.X+1 < World.BoardWidth)
             {
-                // PathNode? nn = WeightedNode(n, n.Pos.X+1, n.Pos.Y, 1, navPath.Team);
-                // if (nn != null) nodesToConsider.Add(nn);
                 AddWeightedNode(nodeGrid, nodesToConsider, n, n.Pos.X+1, n.Pos.Y, 1, navPath.Team);
             }
             
             // up
             if (n.Pos.Y-1 >= 0)
             {
-                // PathNode? nn = WeightedNode(n, n.Pos.X, n.Pos.Y-1, 1, navPath.Team);
-                // if (nn != null) nodesToConsider.Add(nn);
                 AddWeightedNode(nodeGrid, nodesToConsider, n, n.Pos.X, n.Pos.Y-1, 1, navPath.Team);
             }
             
             // down
             if (n.Pos.Y+1 < World.BoardHeight)
             {
-                // PathNode? nn = WeightedNode(n, n.Pos.X, n.Pos.Y+1, 1, navPath.Team);
-                // if (nn != null) nodesToConsider.Add(nn);
                 AddWeightedNode(nodeGrid, nodesToConsider, n, n.Pos.X, n.Pos.Y+1, 1, navPath.Team);
             }
             
@@ -162,8 +158,6 @@ public static class PathFinder
                 && !(World.GetTile(n.Pos.X-1, n.Pos.Y)?.NavSolid(navPath.Team) ?? false)
                 && !(World.GetTile(n.Pos.X, n.Pos.Y-1)?.NavSolid(navPath.Team) ?? false))
             {
-                // PathNode? nn = WeightedNode(n, n.Pos.X-1, n.Pos.Y-1, 1.5f, navPath.Team);
-                // if (nn != null) nodesToConsider.Add(nn);
                 AddWeightedNode(nodeGrid, nodesToConsider, n, n.Pos.X-1, n.Pos.Y-1, 1, navPath.Team);
             }
             
@@ -173,8 +167,6 @@ public static class PathFinder
                 && !(World.GetTile(n.Pos.X+1, n.Pos.Y)?.NavSolid(navPath.Team) ?? false)
                 && !(World.GetTile(n.Pos.X, n.Pos.Y-1)?.NavSolid(navPath.Team) ?? false))
             {
-                // PathNode? nn = WeightedNode(n, n.Pos.X+1, n.Pos.Y-1, 1.5f, navPath.Team);
-                // if (nn != null) nodesToConsider.Add(nn);
                 AddWeightedNode(nodeGrid, nodesToConsider, n, n.Pos.X+1, n.Pos.Y-1, 1, navPath.Team);
             }
             
@@ -184,8 +176,6 @@ public static class PathFinder
                 && !(World.GetTile(n.Pos.X-1, n.Pos.Y)?.NavSolid(navPath.Team) ?? false)
                 && !(World.GetTile(n.Pos.X, n.Pos.Y+1)?.NavSolid(navPath.Team) ?? false))
             {
-                // PathNode? nn = WeightedNode(n, n.Pos.X-1, n.Pos.Y+1, 1.5f, navPath.Team);
-                // if (nn != null) nodesToConsider.Add(nn);
                 AddWeightedNode(nodeGrid, nodesToConsider, n, n.Pos.X-1, n.Pos.Y+1, 1, navPath.Team);
             }
             
@@ -195,8 +185,6 @@ public static class PathFinder
                 && !(World.GetTile(n.Pos.X+1, n.Pos.Y)?.NavSolid(navPath.Team) ?? false)
                 && !(World.GetTile(n.Pos.X, n.Pos.Y+1)?.NavSolid(navPath.Team) ?? false))
             {
-                // PathNode? nn = WeightedNode(n, n.Pos.X+1, n.Pos.Y+1, 1.5f, navPath.Team);
-                // if (nn != null) nodesToConsider.Add(nn);
                 AddWeightedNode(nodeGrid, nodesToConsider, n, n.Pos.X+1, n.Pos.Y+1, 1, navPath.Team);
             }
             
@@ -217,23 +205,38 @@ public static class PathFinder
         _swTotalTime.Stop();
     }
 
-    private static void AddWeightedNode(PathNode?[,] nodeGrid, List<PathNode> nodesToConsider, PathNode prevNode, int x, int y, double weight, Team team)
+    private static void AddWeightedNode(PathNode?[,] nodeGrid, LinkedList<PathNode> nodesToConsider, PathNode prevNode, int x, int y, double weight, Team team)
     {
         if (nodeGrid[x, y]?.Set ?? false) return;
+        _swAddNodes.Stop();
+        _swNewNode.Start();
         PathNode? n = WeightedNode(prevNode, x, y, weight, team);
+        _swNewNode.Stop();
+        _swRegisterNode.Start();
         if ((nodeGrid[x,y]?.Weight ?? Double.MaxValue) > n.Weight)
         {
             nodeGrid[x, y] = n;
-            for (int i = 0; i < nodesToConsider.Count; i++)
+            if (nodesToConsider.First == null)
             {
-                if (n.Weight < nodesToConsider[i].Weight)
+                nodesToConsider.AddFirst(n);
+                _swRegisterNode.Stop();
+                _swAddNodes.Start();
+                return;
+            }
+            for(LinkedListNode<PathNode> ln = nodesToConsider.First; ln != null; ln=ln.Next)
+            {
+                if (n.Weight < ln.Value.Weight)
                 {
-                    nodesToConsider.Insert(i, n);
+                    nodesToConsider.AddBefore(ln, n);
+                    _swRegisterNode.Stop();
+                    _swAddNodes.Start();
                     return;
                 }
             }
-            nodesToConsider.Add(n);
+            nodesToConsider.AddLast(n);
         }
+        _swRegisterNode.Stop();
+        _swAddNodes.Start();
     }
 
     private static PathNode? WeightedNode(PathNode prevNode, int x, int y, double weight, Team team)
@@ -275,16 +278,18 @@ public static class PathFinder
     public static void DrawProfilerBar()
     {
         // ReSharper disable once InconsistentNaming
-        long totalSWTime = _swMisc.ElapsedMilliseconds + _swFindNext.ElapsedMilliseconds + _swAddNodes.ElapsedMilliseconds;
+        long totalSWTime = _swMisc.ElapsedMilliseconds + _swFindNext.ElapsedMilliseconds + _swAddNodes.ElapsedMilliseconds + _swNewNode.ElapsedMilliseconds + _swRegisterNode.ElapsedMilliseconds;
         if (totalSWTime == 0) return;
-        
-        GUI.DrawTextLeft(Screen.HCenter + 350, Screen.VCenter - 250, 
-            $"Avg Pathing Time: {(1000 * _swTotalTime.Elapsed.TotalSeconds/_totalPaths).ToString("N3")}ms\n" +
-            $"{_totalPaths} paths totalling {_swTotalTime.ElapsedMilliseconds}ms\n" +
+
+        GUI.DrawTextLeft(Screen.HCenter + 350, Screen.VCenter - 250,
+            $"Avg Pathing Time: {(1000 * _swTotalTime.Elapsed.TotalSeconds / _totalPaths).ToString("N3")}ms\n" +
+            $"{_totalPaths} paths totalling {_swTotalTime.ElapsedMilliseconds}ms\n" +//);// +
             $"Time in pathloop: {totalSWTime}ms\n" +
             $"Misc: {_swMisc.ElapsedMilliseconds}ms\n" +
             $"FindNext: {_swFindNext.ElapsedMilliseconds}ms\n" +
-            $"AddNodes: {_swAddNodes.ElapsedMilliseconds}ms");
+            $"AddNodes: {_swAddNodes.ElapsedMilliseconds}ms\n" +
+            $"NewNode: {_swNewNode.ElapsedMilliseconds}ms\n" +
+            $"RegisterNode: {_swRegisterNode.ElapsedMilliseconds}ms");
         
         int totalWidth = 1000;
         int x = Screen.HCenter-500;
@@ -301,13 +306,14 @@ public static class PathFinder
         Raylib.DrawRectangle(x, Screen.VCenter-300, width, 40, Raylib.SKYBLUE);
         GUI.DrawTextLeft(x, Screen.VCenter-290, $"AddNodes: {(int)(100 * _swAddNodes.ElapsedMilliseconds / totalSWTime)}%");
         x += width;
-    }
-
-    public static void ResetStopwatches()
-    {
-        _swMisc.Reset();
-        _swFindNext.Reset();
-        _swAddNodes.Reset();
+        width = (int)(totalWidth * _swNewNode.ElapsedMilliseconds / totalSWTime);
+        Raylib.DrawRectangle(x, Screen.VCenter-300, width, 40, Raylib.ORANGE);
+        GUI.DrawTextLeft(x, Screen.VCenter-290, $"NewNode: {(int)(100 * _swNewNode.ElapsedMilliseconds / totalSWTime)}%");
+        x += width;
+        width = (int)(totalWidth * _swRegisterNode.ElapsedMilliseconds / totalSWTime);
+        Raylib.DrawRectangle(x, Screen.VCenter-300, width, 40, Raylib.PURPLE);
+        GUI.DrawTextLeft(x, Screen.VCenter-290, $"RegisterNode: {(int)(100 * _swRegisterNode.ElapsedMilliseconds / totalSWTime)}%");
+        x += width;
     }
 }
 

@@ -73,11 +73,6 @@ public static class BattleScene
         {
             World.Camera.offset.Y -= 4;
         }
-
-        if (IsKeyDown(KeyboardKey.KEY_I))
-        {
-            PathFinder.ResetStopwatches();
-        }
         
         if (IsMouseButtonDown(MouseButton.MOUSE_BUTTON_RIGHT))
         {
@@ -130,6 +125,7 @@ public static class BattleScene
         BeginDrawing();
         ClearBackground(new Color(16, 8, 4, 255));
         
+        World.DrawFloor();
         World.Draw();
         
         DrawTextLeft(6, 16, $"FPS: {GetFPS()}");

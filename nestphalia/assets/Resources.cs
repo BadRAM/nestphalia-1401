@@ -91,9 +91,6 @@ public static class Resources
         _accessibleFont = LoadFont("resources/pixelplay16.png");
         _defaultFont = LoadFont("resources/alagard.png");
         Font = _defaultFont;
-        RayGui.GuiSetFont(Font);
-        RayGui.GuiSetStyle(0, 16, 12);
-
         
         foreach (string path in Directory.GetFiles(Directory.GetCurrentDirectory() + "/resources/sprites"))
         {
