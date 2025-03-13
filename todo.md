@@ -8,14 +8,21 @@ Programming todo:
 - ~~Bugs pushed too far from their next path tile will repath~~
 - ~~Re-register repaired stratagems~~
 - ~~Hopper target pos randomization~~
+- ~~Sell all cancel button~~
+- ~~Beetles throw a lot of bombs sometimes~~
+- Bugs walk towards target while unpathed, then go back to their path origin
 - Heavier bugs push smaller bugs out of the way
 - Sandbox editor is inside of custom battle menu
+- Custom Battle Folders
 - fort10 doesn't save correctly
 - new graffiti
+- Editor path preview
 
 
 ----- V2 -----
 
+- Campaign rebalance, use 'funding' instead of direct cash stores.
+- Help text/tutorial
 - Game load cutscene
 - Fancy title text
 - Main menu art

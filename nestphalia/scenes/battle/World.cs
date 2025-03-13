@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Numerics;
 using ZeroElectric.Vinculum;
 
@@ -25,6 +26,20 @@ public static class World
     private static bool _battleStarted;
     private static SoundResource _waveStartSoundEffect;
     private static bool _battleOver;
+
+    public static bool DrawDebugInfo;
+    private static Stopwatch _swFrame = new Stopwatch();
+    private static Stopwatch _swUpdate = new Stopwatch();
+    private static Stopwatch _swUpdateTeams = new Stopwatch();
+    private static Stopwatch _swUpdatePathfinder = new Stopwatch();
+    private static Stopwatch _swUpdateBoard = new Stopwatch();
+    private static Stopwatch _swUpdateMinions = new Stopwatch();
+    private static Stopwatch _swUpdateMinionsCollide = new Stopwatch();
+    private static Stopwatch _swUpdateProjectiles = new Stopwatch();
+    
+    private static Stopwatch _swDraw = new Stopwatch();
+    private static Stopwatch _swDrawSort = new Stopwatch();
+    private static Stopwatch _swDrawSprites = new Stopwatch();
     
     private static void Initialize()
     {
@@ -42,6 +57,7 @@ public static class World
         PreWave = false;
         _waveStartSoundEffect = Resources.GetSoundByName("start");
         _battleOver = false;
+        DrawDebugInfo = false;
         
         LeftTeam = new Team("Player", false, Raylib.BLUE);
         LeftTeam.IsPlayerControlled = true;
@@ -164,6 +180,8 @@ public static class World
     
     public static void Update()
     {
+        _swUpdate.Restart();
+        
         // Update wave timer
         if (!_battleOver)
         {
@@ -200,12 +218,16 @@ public static class World
             }
         }
 
-        
+        _swUpdateTeams.Restart();
         LeftTeam.Update();
         RightTeam.Update();
+        _swUpdateTeams.Stop();
         
+        _swUpdatePathfinder.Restart();
         PathFinder.ServeQueue(10);
+        _swUpdatePathfinder.Stop();
         
+        _swUpdateBoard.Restart();
         for (int x = 0; x < BoardWidth; ++x)
         {
             for (int y = 0; y < BoardHeight; ++y)
@@ -213,13 +235,17 @@ public static class World
                 _board[x, y]?.Update();
             }
         }
+        _swUpdateBoard.Stop();
         
-        Minions = Minions.OrderBy(o=>o.Position.X).ToList();
+        _swUpdateMinions.Restart();
         for (int index = 0; index < Minions.Count; index++)
         {
             Minions[index].Update();
         }
+        _swUpdateMinions.Stop();
 
+        _swUpdateMinionsCollide.Restart();
+        Minions = Minions.OrderBy(o=>o.Position.X).ToList();
         for (int i = 0; i < Minions.Count; i++)
         {
             Minions[i].PlanCollision(i);
@@ -228,13 +254,18 @@ public static class World
         {
             m.LateUpdate();
         }
+        _swUpdateMinionsCollide.Stop();
+
+        _swUpdateMinions.Start();
         foreach (Minion m in MinionsToRemove)
         {
             Minions.Remove(m);
             Sprites.Remove(m);
         }
         MinionsToRemove.Clear();
+        _swUpdateMinions.Stop();
 
+        _swUpdateProjectiles.Restart();
         for (int index = 0; index < Projectiles.Count; index++)
         {
             Projectile p = Projectiles[index];
@@ -247,6 +278,9 @@ public static class World
             Sprites.Remove(p);
         }
         ProjectilesToRemove.Clear();
+        _swUpdateProjectiles.Stop();
+        
+        _swUpdate.Stop();
     }
 
     public static void DrawFloor()
@@ -258,6 +292,7 @@ public static class World
             for (int y = 0; y < BoardHeight; ++y)
             {
                 _floor[x,y].Draw(x*24, y*24);
+                // // Hate/fear debug
                 //Raylib.DrawCircle((int)pos.X, (int)pos.Y, (int)(LeftTeam.GetHateFor(x,y)/20), Raylib.RED);
                 //Raylib.DrawCircle((int)pos.X, (int)pos.Y, (int)LeftTeam.GetFearOf(x,y), Raylib.BLUE);
             }
@@ -268,6 +303,7 @@ public static class World
 
     public static void Draw()
     {
+        _swDraw.Restart();
         Raylib.BeginMode2D(Camera);
 
         Sprites = Sprites.OrderBy(o => o.Z).ToList();
@@ -284,6 +320,89 @@ public static class World
             LeftTeam.Draw();
             RightTeam.Draw();
         }
+        _swDraw.Stop();
+        
+        if (DrawDebugInfo) DrawDebug();
+        _swFrame.Restart();
+    }
+
+    public static void DrawDebug()
+    {
+        // Raylib.BeginMode2D(World.Camera);
+        // for (int i = 0; i < World.BoardWidth; i++)
+        // {
+        //     for (int j = 0; j < World.BoardHeight; j++)
+        //     {
+        //         if (_nodeGrid[i, j] != null && _nodeGrid[i, j].PrevNode != null)
+        //         {
+        //             int t = (int)(_nodeGrid[i, j].Weight - _nodeGrid[i, j].PrevNode.Weight);
+        //             Color c = new Color(t, 255-t, 0, 200);
+        //             Raylib.DrawLineV(World.GetTileCenter(i, j), World.GetTileCenter(_nodeGrid[i, j].PrevNode.Pos), c);
+        //         }
+        //         else
+        //         {
+        //             Raylib.DrawCircleV(World.GetTileCenter(i,j), 4, Raylib.RED);
+        //         }
+        //     }
+        // }
+        // Raylib.EndMode2D();
+        
+        // ReSharper disable once InconsistentNaming
+        double totalSWTime = _swFrame.Elapsed.TotalSeconds;
+        //long totalSWTime = _swMisc.ElapsedMilliseconds + _swFindNext.ElapsedMilliseconds + _swAddNodes.ElapsedMilliseconds + _swNewNode.ElapsedMilliseconds + _swRegisterNode.ElapsedMilliseconds;
+        // if (totalSWTime == 0) return;
+
+        // GUI.DrawTextLeft(Screen.HCenter + 350, Screen.VCenter - 250,
+        //     $"Avg Pathing Time: {(1000 * _swTotalTime.Elapsed.TotalSeconds / _totalPaths).ToString("N3")}ms\n" +
+        //     $"{_totalPaths} paths totalling {_swTotalTime.ElapsedMilliseconds}ms\n" +
+        //     $"Average nodes per path: {_totalNodes / _totalPaths}\n" +
+        //     $"Time in pathloop: {totalSWTime}ms\n" +
+        //     $"Misc: {_swMisc.ElapsedMilliseconds}ms\n" +
+        //     $"FindNext: {_swFindNext.ElapsedMilliseconds}ms\n" +
+        //     $"AddNodes: {_swAddNodes.ElapsedMilliseconds}ms\n" +
+        //     $"NewNode: {_swNewNode.ElapsedMilliseconds}ms\n" +
+        //     $"RegisterNode: {_swRegisterNode.ElapsedMilliseconds}ms");
+        
+        int totalWidth = 1000;
+        int x = Screen.HCenter-500;
+        
+        int width = (int)(totalWidth * _swUpdate.Elapsed.TotalSeconds / totalSWTime);
+        Raylib.DrawRectangle(x, Screen.VCenter-300, width, 10, Raylib.RED);
+        x += width;
+        width = (int)(totalWidth * _swDraw.Elapsed.TotalSeconds / totalSWTime);
+        Raylib.DrawRectangle(x, Screen.VCenter-300, width, 10, Raylib.GREEN);
+        x += width;
+        width = totalWidth - x;
+        Raylib.DrawRectangle(x, Screen.VCenter-300, width, 10, Raylib.GRAY);
+
+        totalSWTime = _swUpdate.Elapsed.TotalSeconds;
+        x = Screen.HCenter - 500;
+        width = (int)(totalWidth * _swUpdateTeams.Elapsed.TotalSeconds / totalSWTime);
+        Raylib.DrawRectangle(x, Screen.VCenter-290, width, 20, Raylib.SKYBLUE);
+        GUI.DrawTextLeft(x, Screen.VCenter-290, $"Teams {(int)(100 * _swUpdateTeams.Elapsed.TotalSeconds / totalSWTime)}%");
+        x += width;
+        width = (int)(totalWidth * _swUpdatePathfinder.Elapsed.TotalSeconds / totalSWTime);
+        Raylib.DrawRectangle(x, Screen.VCenter-290, width, 20, Raylib.ORANGE);
+        GUI.DrawTextLeft(x, Screen.VCenter-290, $"Path {(int)(100 * _swUpdatePathfinder.Elapsed.TotalSeconds / totalSWTime)}%");
+        x += width;
+        width = (int)(totalWidth * _swUpdateBoard.Elapsed.TotalSeconds / totalSWTime);
+        Raylib.DrawRectangle(x, Screen.VCenter-290, width, 20, Raylib.PURPLE);
+        GUI.DrawTextLeft(x, Screen.VCenter-290, $"Board {(int)(100 * _swUpdateBoard.Elapsed.TotalSeconds / totalSWTime)}%");
+        x += width;
+        width = (int)(totalWidth * _swUpdateMinions.Elapsed.TotalSeconds / totalSWTime);
+        Raylib.DrawRectangle(x, Screen.VCenter-290, width, 20, Raylib.YELLOW);
+        GUI.DrawTextLeft(x, Screen.VCenter-290, $"Minions {(int)(100 * _swUpdateMinions.Elapsed.TotalSeconds / totalSWTime)}%");
+        x += width;
+        width = (int)(totalWidth * _swUpdateMinionsCollide.Elapsed.TotalSeconds / totalSWTime);
+        Raylib.DrawRectangle(x, Screen.VCenter-290, width, 20, Raylib.RED);
+        GUI.DrawTextLeft(x, Screen.VCenter-290, $"Phys {(int)(100 * _swUpdateMinionsCollide.Elapsed.TotalSeconds / totalSWTime)}%");
+        x += width;
+        width = (int)(totalWidth * _swUpdateProjectiles.Elapsed.TotalSeconds / totalSWTime);
+        Raylib.DrawRectangle(x, Screen.VCenter-290, width, 20, Raylib.BLUE);
+        GUI.DrawTextLeft(x, Screen.VCenter-290, $"Proj {(int)(100 * _swUpdateProjectiles.Elapsed.TotalSeconds / totalSWTime)}%");
+        x += width;
+        width = totalWidth - x;
+        Raylib.DrawRectangle(x, Screen.VCenter-300, width, 10, Raylib.GRAY);
     }
 
     public static Int2D PosToTilePos(Vector2 position)
@@ -324,27 +443,6 @@ public static class World
     {
         return GetTileCenter(tilePos.X, tilePos.Y);
     }
-
-    // public static void Flip()
-    // {
-    //     Structure?[,] boardBuf = new Structure?[BoardWidth, BoardHeight];
-    //     for (int x = 0; x < BoardWidth; ++x)
-    //     {
-    //         for (int y = 0; y < BoardHeight; ++y)
-    //         {
-    //             boardBuf[x,y] = _board[BoardWidth-(x+1),y]?.Template.Instantiate(x,y);
-    //         }
-    //     }
-    //     Array.Copy(boardBuf, _board, boardBuf.Length);
-    // }
-}
-
-public enum TeamName
-{
-    Left,
-    Right,
-    Neutral,
-    None
 }
 
 public record struct Int2D

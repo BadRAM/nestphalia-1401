@@ -39,7 +39,7 @@ public static class MenuScene
         }
         
         if (ButtonWide(HCenter-150, VCenter-40, "Custom Battle")) CustomBattleMenu.Start();
-        if (ButtonWide(HCenter-150, VCenter, "Sandbox")) EditorScene.Start(creativeMode:true);
+        //if (ButtonWide(HCenter-150, VCenter, "Sandbox")) EditorScene.Start(creativeMode:true);
         if (ButtonWide(HCenter-150, VCenter+40, "Quit")) 
         {
             EndDrawing();

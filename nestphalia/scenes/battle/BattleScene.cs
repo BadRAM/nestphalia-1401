@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Numerics;
 using ZeroElectric.Vinculum;
 using static nestphalia.GUI;
@@ -12,7 +13,13 @@ public static class BattleScene
     public static bool Pause;
     public static bool CustomBattle;
     public static Team? Winner;
-    private static int _skips; 
+    private static int _skips;
+    private static bool _pathFinderDebug;
+    private static bool _debug;
+    public static Stopwatch SwTotal;
+    public static Stopwatch SwPathfinding;
+    public static Stopwatch SwCollision;
+    public static Stopwatch SwDraw;
     
 
     public static void Start(Fort leftFort, Fort rightFort, bool leftIsPlayer = true, bool rightIsPlayer = false)
@@ -72,6 +79,16 @@ public static class BattleScene
         if (IsKeyDown(KeyboardKey.KEY_S))
         {
             World.Camera.offset.Y -= 4;
+        }
+
+        if (IsKeyPressed(KeyboardKey.KEY_Q))
+        {
+            _pathFinderDebug = !_pathFinderDebug;
+        }
+        
+        if (IsKeyPressed(KeyboardKey.KEY_F3))
+        {
+            World.DrawDebugInfo = !World.DrawDebugInfo;
         }
         
         if (IsMouseButtonDown(MouseButton.MOUSE_BUTTON_RIGHT))
@@ -134,7 +151,7 @@ public static class BattleScene
         // DrawTextLeft(6, 64, $"Sprites: {World.Sprites.Count}");
         DrawTextLeft(6, 64, $"Zoom: {World.Camera.zoom}");
         // DrawTextLeft(6, 80, $"PathQueue: {PathFinder.GetQueueLength()}");
-        PathFinder.DrawProfilerBar();
+        if (_pathFinderDebug) PathFinder.DrawDebug();
         
         if (Winner != null)
         {

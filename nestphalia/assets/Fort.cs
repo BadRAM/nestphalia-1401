@@ -7,6 +7,12 @@ public class Fort
     [JsonInclude] public string Name = "Your Fort";
     [JsonInclude] public string Comment = "It's a fort!";
     [JsonInclude] public string[] Board = new string[20 * 20];
+    [JsonIgnore]public string Path = "";
+
+    // public Fort(string path = "")
+    // {
+    //     Path = path;
+    // }
     
     public void LoadToBoard(bool rightSide)
     {

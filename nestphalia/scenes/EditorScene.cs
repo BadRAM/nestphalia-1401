@@ -29,7 +29,7 @@ public static class EditorScene
         _saveMessage = "";
         _sandboxMode = creativeMode;
         _fort = fortToLoad ?? new Fort();
-        _fortAlreadySaved = File.Exists(Directory.GetCurrentDirectory() + $"/forts/{_fort.Name}.fort");
+        _fortAlreadySaved = File.Exists(_fort.Path);
         Console.WriteLine($"checking if {Directory.GetCurrentDirectory() +  $"/forts/{_fort.Name}.fort"} exists. Answer: {_fortAlreadySaved.ToString()}");
         
         Program.CurrentScene = Scene.Editor;
@@ -73,7 +73,7 @@ public static class EditorScene
         // ----- INPUT + GUI PHASE -----
         
         World.Camera.offset = new Vector2(Screen.HCenter, Screen.VCenter);
-
+        
         if (IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT))
         {
             Int2D tilePos = World.GetMouseTilePos();
@@ -143,14 +143,13 @@ public static class EditorScene
             }
             EndMode2D();
         }
-
-        World.Draw();
         
+        World.Draw();
         
         if (_sandboxMode)
         {
             if (ButtonWide(Screen.HCenter-600, Screen.VCenter+260, "Exit")) MenuScene.Start();
-            if (ButtonWide(Screen.HCenter-600, Screen.VCenter+180, "Save Changes", _fortAlreadySaved)) Resources.SaveFort($"/forts/{_fort.Name}");
+            if (ButtonWide(Screen.HCenter-600, Screen.VCenter+180, "Save Changes", _fortAlreadySaved)) Resources.SaveFort(_fort.Name, _fort.Path);
         }
         else
         {
@@ -168,10 +167,12 @@ public static class EditorScene
             {
                 if (!File.Exists(Directory.GetCurrentDirectory() + $"/forts/fort{number}.fort"))
                 {
-                    Resources.SaveFort($"forts/fort{number}");
                     _saveMessage = $"Saved fort as fort{number}.fort";
                     _fort.Name = $"fort{number}";
+                    _fort.Path = Directory.GetCurrentDirectory() + _fort.Path + _fort.Name + ".fort";
                     _fortAlreadySaved = true;
+                    Console.WriteLine($"{Directory.GetCurrentDirectory()}/{_fort.Path}");
+                    Resources.SaveFort($"fort{number}", _fort.Path);
                     break;
                 }
                 if (number >= 999)

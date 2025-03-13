@@ -44,7 +44,7 @@ public class BroodMinion : Minion
 {
     private double _lastSpawnTime;
     private BroodMinionTemplate _template;
-        
+    
     public BroodMinion(BroodMinionTemplate template, Team team, Vector2 position, NavPath navPath) : base(template, team, position, navPath)
     {
         _lastSpawnTime = Time.Scaled;

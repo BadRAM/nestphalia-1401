@@ -103,10 +103,10 @@ public class Minion : ISprite
         UpdateNextPos();
         
         // if the next tile in our path is adjacent and solid, then attack it
-        if (!TryAttack())
+        if (!TryAttack() && NavPath.Found)
         {
             // if we're at our final destination, ask for a new path. (Don't ask for a new path if we already have)
-            if (NavPath.Found && NavPath.TargetReached(Position))
+            if (NavPath.TargetReached(Position))
             {
                 Retarget();
                 PathFinder.RequestPath(NavPath);
