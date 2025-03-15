@@ -1,14 +1,14 @@
 using System.Numerics;
-using ZeroElectric.Vinculum;
+using Raylib_cs;
 
 namespace nestphalia;
 
 // This is a minion that targets a wall, delivers a large explosive to it, and then retreats back to it's nest.
 public class SapperMinionTemplate : MinionTemplate
 {
-    public Texture RetreatingTexture;
+    public Texture2D RetreatingTexture;
     
-    public SapperMinionTemplate(string id, string name, string description, Texture texture, Texture retreatingTexture, double maxHealth, double armor, double damage, double speed, float physicsRadius) : base(id, name, description, texture, maxHealth, armor, damage, speed, physicsRadius, 0)
+    public SapperMinionTemplate(string id, string name, string description, Texture2D texture, Texture2D retreatingTexture, double maxHealth, double armor, double damage, double speed, float physicsRadius) : base(id, name, description, texture, maxHealth, armor, damage, speed, physicsRadius, 0)
     {
         RetreatingTexture = retreatingTexture;
         Projectile = new MortarShellTemplate(Resources.GetTextureByName("sapper_bomb"), damage, 0.4, 4, 0);
@@ -84,10 +84,10 @@ public class SapperMinion : Minion
         //Raylib.DrawCircle((int)Position.X, (int)Position.Y, _template.PhysicsRadius, new Color(200, 100, 100, 64));
         Z = Position.Y + (IsFlying ? 240 : 0);
 
-        Texture texture = _attacking ? _template.Texture : _template.RetreatingTexture;
-        Vector2 pos = new Vector2((int)Position.X - texture.width / 2, (int)Position.Y - texture.height / 2);
+        Texture2D texture = _attacking ? _template.Texture : _template.RetreatingTexture;
+        Vector2 pos = new Vector2((int)Position.X - texture.Width / 2, (int)Position.Y - texture.Height / 2);
         bool flip = NextPos.X > pos.X;
-        Rectangle source = new Rectangle(flip ? texture.width : 0, 0, flip ? texture.width : -texture.width, texture.height);
+        Rectangle source = new Rectangle(flip ? texture.Width : 0, 0, flip ? texture.Width : -texture.Width, texture.Height);
         Raylib.DrawTextureRec(texture, source, pos, Team.UnitTint);
         
         // Debug, shows path
@@ -97,14 +97,14 @@ public class SapperMinion : Minion
             foreach (Int2D i in NavPath.Waypoints)
             {
                 Vector2 v = World.GetTileCenter(i);
-                Raylib.DrawLine((int)path.X, (int)path.Y, (int)v.X, (int)v.Y, Raylib.LIME);
+                Raylib.DrawLine((int)path.X, (int)path.Y, (int)v.X, (int)v.Y, Color.Lime);
                 path = v;
             }
         
             if (NavPath.Waypoints.Count == 0)
             {
                 Vector2 v = World.GetTileCenter(NavPath.Destination);
-                Raylib.DrawLine((int)path.X, (int)path.Y, (int)v.X, (int)v.Y, Raylib.LIME);
+                Raylib.DrawLine((int)path.X, (int)path.Y, (int)v.X, (int)v.Y, Color.Lime);
             }
         }
     }

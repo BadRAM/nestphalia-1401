@@ -1,5 +1,5 @@
 using System.Numerics;
-using ZeroElectric.Vinculum;
+using Raylib_cs;
 
 namespace nestphalia;
 
@@ -10,7 +10,7 @@ public class MinefieldTemplate : StructureTemplate
     public double Range;
     public double Cooldown;
     
-    public MinefieldTemplate(string id, string name, string description, Texture texture, double maxHealth, double price, int levelRequirement, double baseHate, int maxCharges, ProjectileTemplate bomb, double range, double cooldown) : base(id, name, description, texture, maxHealth, price, levelRequirement, baseHate)
+    public MinefieldTemplate(string id, string name, string description, Texture2D texture, double maxHealth, double price, int levelRequirement, double baseHate, int maxCharges, ProjectileTemplate bomb, double range, double cooldown) : base(id, name, description, texture, maxHealth, price, levelRequirement, baseHate)
     {
         MaxCharges = maxCharges;
         Bomb = bomb;
@@ -69,9 +69,9 @@ public class Minefield : Structure
     {
         for (int i = 0; i < Math.Min(_chargesLeft, _drawPoints.Length); i++)
         {
-            int x = (int)(_drawPoints[i].X + position.X - _template.Bomb.Texture.width/2);
-            int y = (int)(_drawPoints[i].Y + position.Y - _template.Bomb.Texture.height/2);
-            Raylib.DrawTexture(_template.Bomb.Texture, x, y, Raylib.WHITE);
+            int x = (int)(_drawPoints[i].X + position.X - _template.Bomb.Texture.Width/2);
+            int y = (int)(_drawPoints[i].Y + position.Y - _template.Bomb.Texture.Height/2);
+            Raylib.DrawTexture(_template.Bomb.Texture, x, y, Color.White);
         }
     }
 

@@ -1,10 +1,10 @@
-using ZeroElectric.Vinculum;
+using Raylib_cs;
 
 namespace nestphalia;
 
 public class HazardSignTemplate : StructureTemplate
 {
-    public HazardSignTemplate(string id, string name, string description, Texture texture, double maxHealth, double price, int levelRequirement, double baseHate) : base(id, name, description, texture, maxHealth, price, levelRequirement, baseHate) {}
+    public HazardSignTemplate(string id, string name, string description, Texture2D texture, double maxHealth, double price, int levelRequirement, double baseHate) : base(id, name, description, texture, maxHealth, price, levelRequirement, baseHate) {}
 
     public override Structure Instantiate(Team team, int x, int y)
     {

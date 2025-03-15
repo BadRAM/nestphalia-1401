@@ -1,5 +1,5 @@
 using System.Numerics;
-using ZeroElectric.Vinculum;
+using Raylib_cs;
 
 namespace nestphalia;
 
@@ -7,9 +7,9 @@ public abstract class ActiveAbilityBeaconTemplate : StructureTemplate
 {
     public double Cooldown;
     public double CooldownReduction;
-    public Texture AbilityIcon;
+    public Texture2D AbilityIcon;
     
-    public ActiveAbilityBeaconTemplate(string id, string name, string description, Texture texture, double maxHealth, double price, int levelRequirement, double baseHate, double cooldown, double cooldownReduction, Texture abilityIcon) : base(id, name, description, texture, maxHealth, price, levelRequirement, baseHate)
+    public ActiveAbilityBeaconTemplate(string id, string name, string description, Texture2D texture, double maxHealth, double price, int levelRequirement, double baseHate, double cooldown, double cooldownReduction, Texture2D abilityIcon) : base(id, name, description, texture, maxHealth, price, levelRequirement, baseHate)
     {
         Cooldown = cooldown;
         CooldownReduction = cooldownReduction;
@@ -39,7 +39,7 @@ public abstract class ActiveAbilityBeacon : Structure
     
     public void DrawStatus(int posX, int posY)
     {
-        Raylib.DrawTexture(_template.AbilityIcon, posX, posY, IsReady() ? Raylib.WHITE : Raylib.GRAY);
+        Raylib.DrawTexture(_template.AbilityIcon, posX, posY, IsReady() ? Color.White : Color.Gray);
         if (!IsReady())
         {
             Raylib.DrawRectangle(posX+2, posY+2, 60, (int)(2 + 60 * (1-(Time.Scaled - TimeLastUsed) / _template.Cooldown)), new Color(255, 255, 255, 64));
@@ -50,7 +50,7 @@ public abstract class ActiveAbilityBeacon : Structure
         {
             Raylib.BeginMode2D(World.Camera);
             
-            Raylib.DrawTexture(Template.Texture, (int)(TargetPosition.X - (Template.Texture.width-20)), (int)(TargetPosition.Y - (Template.Texture.height-8)), Raylib.WHITE);
+            Raylib.DrawTexture(Template.Texture, (int)(TargetPosition.X - (Template.Texture.Width-20)), (int)(TargetPosition.Y - (Template.Texture.Height-8)), Color.White);
             Raylib.EndMode2D();
         }
     }

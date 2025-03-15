@@ -1,5 +1,5 @@
 using System.Numerics;
-using ZeroElectric.Vinculum;
+using Raylib_cs;
 
 namespace nestphalia;
 
@@ -8,7 +8,7 @@ public class StructureTemplate
     public string ID;
     public string Name;
     public string Description;
-    public Texture Texture;
+    public Texture2D Texture;
     public double MaxHealth;
     public double Price;
     public int LevelRequirement;
@@ -22,7 +22,7 @@ public class StructureTemplate
         Nest
     }
     
-    public StructureTemplate(string id, string name, string description, Texture texture, double maxHealth, double price, int levelRequirement, double baseHate)
+    public StructureTemplate(string id, string name, string description, Texture2D texture, double maxHealth, double price, int levelRequirement, double baseHate)
     {
         Name = name;
         Texture = texture;
@@ -87,7 +87,7 @@ public class Structure : ISprite
     {
         int t = 127 + (int)(128 * (Health / Template.MaxHealth));
         int x = (int)(position.X - 12);
-        int y = (int)(position.Y - (Template.Texture.height - 12));
+        int y = (int)(position.Y - (Template.Texture.Height - 12));
         Raylib.DrawTexture(Template.Texture, x, y, new Color(t,t,t,255));
     }
 

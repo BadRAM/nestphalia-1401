@@ -1,7 +1,7 @@
 using System.Numerics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using ZeroElectric.Vinculum;
+using Raylib_cs;
 
 namespace nestphalia;
 
@@ -44,26 +44,26 @@ public class Campaign
     
     public void Update()
     {
-        if (Raylib.IsKeyPressed(KeyboardKey.KEY_FOUR) && Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_SHIFT)) // ye ole moneyhacks
+        if (Raylib.IsKeyPressed(KeyboardKey.Four) && Raylib.IsKeyDown(KeyboardKey.LeftShift)) // ye ole moneyhacks
         {
             Money += 1000;
         }
-        if (Raylib.IsKeyPressed(KeyboardKey.KEY_THREE) && Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_SHIFT)) // ye ole unmoneyhacks
+        if (Raylib.IsKeyPressed(KeyboardKey.Three) && Raylib.IsKeyDown(KeyboardKey.LeftShift)) // ye ole unmoneyhacks
         {
             Money -= 1000;
         }
-        if (Raylib.IsKeyPressed(KeyboardKey.KEY_FIVE) && Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_SHIFT)) // ye ole progresshacks
+        if (Raylib.IsKeyPressed(KeyboardKey.Five) && Raylib.IsKeyDown(KeyboardKey.LeftShift)) // ye ole progresshacks
         {
             Level++;
         }
-        if (Raylib.IsKeyPressed(KeyboardKey.KEY_SIX) && Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_SHIFT)) // ye ole unprogresshacks
+        if (Raylib.IsKeyPressed(KeyboardKey.Six) && Raylib.IsKeyDown(KeyboardKey.LeftShift)) // ye ole unprogresshacks
         {
             Level++;
         }
         
         Raylib.BeginDrawing();
-        Raylib.ClearBackground(Raylib.BLACK);
-        Screen.DrawBackground(Raylib.DARKBROWN);
+        Raylib.ClearBackground(Color.Black);
+        Screen.DrawBackground(Color.DarkBrown);
         
         GUI.DrawTextLeft(Screen.HCenter-590, Screen.VCenter+100, _outcomeText);
         // Raylib.DrawTextEx(Resources.Font, _outcomeText, new Vector2(Screen.HCenter-590, Screen.VCenter+100), 12, 1, Raylib.WHITE);

@@ -92,32 +92,6 @@ Spider Nest
 Frog Pond
 
 
-<!-- 1 - Watchtower
-2 - Door
-3 - Snail
-4 - Mortar
-5 - Bee
-6 - Heavy wall
-7 - Sniper
-8 - Beetle
-
-0 ant
-0 wall
-1 watchtower
-2 door
-3 snail
-4 machinegun
-5 bee
-6 heavy wall
-7 sniper
-8 frog
-
-Mortar
-Lightning tower
-Honeypot
-Grasshopper
-Dung Beetle -->
-
 Playtest Notes
 ==============
 
@@ -172,3 +146,30 @@ Bug fixes
  - Being at Nest/Stratagem cap no longer prevents you from replacing your nests/stratagems
  - Beacon 4 now works as expected
 
+stages to profile:
+
+Team updates
+
+Pathfinder
+
+Board update
+
+Minion update
+
+Minion collision
+
+Projectile update
+
+
+Draw
+
+Sort
+
+Spritedraw
+
+
+X-Sorted physics performance:
+0.75 - 1.5 ms per update
+
+Sector Sorted Phyaics performance:
+0.75 - 1.5 ms per update

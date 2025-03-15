@@ -1,5 +1,5 @@
 using System.Numerics;
-using ZeroElectric.Vinculum;
+using Raylib_cs;
 
 namespace nestphalia;
 
@@ -32,8 +32,8 @@ public static class CustomBattleMenu
     public static void Update()
     {
         Raylib.BeginDrawing();
-        Raylib.ClearBackground(Raylib.GRAY);
-        Screen.DrawBackground(Raylib.DARKGRAY);
+        Raylib.ClearBackground(Color.Gray);
+        Screen.DrawBackground(Color.DarkGray);
         World.DrawFloor();
         World.Draw();
 

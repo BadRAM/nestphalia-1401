@@ -1,7 +1,7 @@
 using System.Numerics;
-using ZeroElectric.Vinculum;
+using Raylib_cs;
+using static Raylib_cs.Raylib;
 using static nestphalia.GUI;
-using static ZeroElectric.Vinculum.Raylib;
 
 namespace nestphalia;
 
@@ -20,7 +20,7 @@ public static class EditorScene
     private static bool _fortAlreadySaved;
     private static bool _sellAllConfirm;
     private static StructureTemplate.StructureClass _structureClass;
-    private static Texture _bg;
+    private static Texture2D _bg;
     
     public static void Start(Fort? fortToLoad = null, bool creativeMode = false)
     {
@@ -72,9 +72,9 @@ public static class EditorScene
     {
         // ----- INPUT + GUI PHASE -----
         
-        World.Camera.offset = new Vector2(Screen.HCenter, Screen.VCenter);
+        World.Camera.Offset = new Vector2(Screen.HCenter, Screen.VCenter);
         
-        if (IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT))
+        if (IsMouseButtonDown(MouseButton.Left))
         {
             Int2D tilePos = World.GetMouseTilePos();
             
@@ -109,7 +109,7 @@ public static class EditorScene
             }
         }
         
-        if (IsMouseButtonDown(MouseButton.MOUSE_BUTTON_RIGHT))
+        if (IsMouseButtonDown(MouseButton.Right))
         {
             Int2D tilePos = World.GetMouseTilePos();
             if (tilePos.X >= 1 && tilePos.X < 21 && tilePos.Y >= 1 && tilePos.Y < 21)
@@ -119,13 +119,13 @@ public static class EditorScene
         }
         
         BeginDrawing();
-        ClearBackground(BLACK);
-        Screen.DrawBackground(GRAY);
+        ClearBackground(Color.Black);
+        Screen.DrawBackground(Color.Gray);
         
         World.DrawFloor();
         
         // Draw gui background texture
-        DrawTexture(_bg, Screen.HCenter - 608, Screen.VCenter - 308, WHITE);
+        DrawTexture(_bg, Screen.HCenter - 608, Screen.VCenter - 308, Color.White);
         
         // Draw brush preview ghost
         if (CheckCollisionPointRec(GetMousePosition(), new Rectangle(Screen.HCenter-240, Screen.VCenter-232, 480, 480)))
@@ -139,7 +139,7 @@ public static class EditorScene
             }
             if (_brush != null)
             {
-                DrawTexture(_brush.Texture, (int)mousePos.X-12, (int)mousePos.Y-(_brush.Texture.height - 12), new Color(128, 128, 255, 128));
+                DrawTexture(_brush.Texture, (int)mousePos.X-12, (int)mousePos.Y-(_brush.Texture.Height - 12), new Color(128, 128, 255, 128));
             }
             EndMode2D();
         }
@@ -202,7 +202,7 @@ public static class EditorScene
             {
                 _brush = s;
             }
-            DrawTexture(s.Texture, Screen.HCenter + 320, Screen.VCenter + y * 40 - 246, WHITE);
+            DrawTexture(s.Texture, Screen.HCenter + 320, Screen.VCenter + y * 40 - 246, Color.White);
             y++;
         }
 

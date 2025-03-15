@@ -1,13 +1,13 @@
 using System.Numerics;
-using ZeroElectric.Vinculum;
-using static ZeroElectric.Vinculum.Raylib;
+using Raylib_cs;
+using static Raylib_cs.Raylib;
 
 namespace nestphalia;
 
 public static class GUI
 {
-    private static Texture _buttonWideTexture;
-    private static Texture _buttonNarrowTexture;
+    private static Texture2D _buttonWideTexture;
+    private static Texture2D _buttonNarrowTexture;
     private static SoundResource _buttonClickSFX;
     public static Font Font;
     const int FontSize = 16;
@@ -38,13 +38,13 @@ public static class GUI
     public static bool ButtonWide(int x, int y, string text, bool enabled = true)
     {
         bool hover = CheckCollisionPointRec(GetMousePosition(), new Rectangle(x, y, 300, 40));
-        bool press = !enabled || (hover && (IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT) || IsMouseButtonReleased(MouseButton.MOUSE_BUTTON_LEFT)));
+        bool press = !enabled || (hover && (IsMouseButtonDown(MouseButton.Left) || IsMouseButtonReleased(MouseButton.Left)));
         
         Rectangle subSprite = new Rectangle(0, !press ? !hover ? 0 : 40 : 80, 300, 40);
-        DrawTextureRec(_buttonWideTexture, subSprite, new Vector2(x,y), WHITE);
+        DrawTextureRec(_buttonWideTexture, subSprite, new Vector2(x,y), Color.White);
         DrawTextCentered(x+150, y+20, text);
         
-        if (enabled && hover && IsMouseButtonReleased(MouseButton.MOUSE_BUTTON_LEFT))
+        if (enabled && hover && IsMouseButtonReleased(MouseButton.Left))
         {
             _buttonClickSFX.Play();
             return true;
@@ -55,13 +55,13 @@ public static class GUI
     public static bool ButtonNarrow(int x, int y, string text, bool enabled = true)
     {
         bool hover = CheckCollisionPointRec(GetMousePosition(), new Rectangle(x, y, 100, 40));
-        bool press = !enabled || (hover && (IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT) || IsMouseButtonReleased(MouseButton.MOUSE_BUTTON_LEFT)));
+        bool press = !enabled || (hover && (IsMouseButtonDown(MouseButton.Left) || IsMouseButtonReleased(MouseButton.Left)));
         
         Rectangle subSprite = new Rectangle(0, !press ? !hover ? 0 : 40 : 80, 100, 40);
-        DrawTextureRec(_buttonNarrowTexture, subSprite, new Vector2(x,y), WHITE);
+        DrawTextureRec(_buttonNarrowTexture, subSprite, new Vector2(x,y), Color.White);
         DrawTextCentered(x+50, y+20, text);
         
-        if (enabled && hover && IsMouseButtonReleased(MouseButton.MOUSE_BUTTON_LEFT))
+        if (enabled && hover && IsMouseButtonReleased(MouseButton.Left))
         {
             _buttonClickSFX.Play();
             return true;

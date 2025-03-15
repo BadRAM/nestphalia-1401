@@ -1,14 +1,14 @@
 using System.Numerics;
-using ZeroElectric.Vinculum;
+using Raylib_cs;
 
 namespace nestphalia;
 
 public class DoorTemplate : StructureTemplate
 {
     public double Range;
-    public Texture OpenTexture;
+    public Texture2D OpenTexture;
     
-    public DoorTemplate(string id, string name, string description, Texture texture, Texture openTexture, double maxHealth, double price, int levelRequirement, double baseHate, double range) : base(id, name, description, texture, maxHealth, price, levelRequirement, baseHate)
+    public DoorTemplate(string id, string name, string description, Texture2D texture, Texture2D openTexture, double maxHealth, double price, int levelRequirement, double baseHate, double range) : base(id, name, description, texture, maxHealth, price, levelRequirement, baseHate)
     {
         OpenTexture = openTexture;
         Range = range;
@@ -82,7 +82,7 @@ public class Door : Structure
     {
         int t = 127 + (int)(128 * (Health / Template.MaxHealth));
         int x = (int)(position.X - 12);
-        int y = (int)(position.Y - (Template.Texture.height - 12));
+        int y = (int)(position.Y - (Template.Texture.Height - 12));
         Raylib.DrawTexture(_isOpen ? _template.OpenTexture : _template.Texture, x, y, new Color(t,t,t,255));
     }
 }

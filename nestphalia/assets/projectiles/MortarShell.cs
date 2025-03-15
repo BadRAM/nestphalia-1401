@@ -1,5 +1,5 @@
 using System.Numerics;
-using ZeroElectric.Vinculum;
+using Raylib_cs;
 
 namespace nestphalia;
 
@@ -9,7 +9,7 @@ public class MortarShellTemplate : ProjectileTemplate
     public double ArcHeight;
     public float BlastRadius;
         
-    public MortarShellTemplate(Texture texture, double damage, double arcDuration, double arcHeight, float blastRadius) : base(texture, damage, 0)
+    public MortarShellTemplate(Texture2D texture, double damage, double arcDuration, double arcHeight, float blastRadius) : base(texture, damage, 0)
     {
         ArcDuration = arcDuration;
         ArcHeight = arcHeight;
@@ -31,7 +31,7 @@ public class MortarShell : Projectile
     private double _timeFired;
     private MortarShellTemplate _template;
     private Team _team;
-    private Texture _explosion;
+    private Texture2D _explosion;
     private double _timeExploded = 0;
     private SoundResource _soundEffect;
     
@@ -112,12 +112,12 @@ public class MortarShell : Projectile
         {
             int frame = (int)Math.Floor((Time.Scaled - _timeExploded) / 0.1);
             Rectangle src = new Rectangle(frame * 32, 0, 32, 32);
-            if (src.X >= _explosion.width)
+            if (src.X >= _explosion.Width)
             {
                 return;
             }
             Vector2 pos = Position - new Vector2(16, 16);
-            Raylib.DrawTextureRec(_explosion, src, pos, Raylib.WHITE);
+            Raylib.DrawTextureRec(_explosion, src, pos, Color.White);
         }
         
         // base.Draw();

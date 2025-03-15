@@ -1,7 +1,6 @@
 using System.Numerics;
-using ZeroElectric.Vinculum;
-using static ZeroElectric.Vinculum.Raylib;
-using ZeroElectric.Vinculum.Extensions;
+using Raylib_cs;
+using static Raylib_cs.Raylib;
 using static nestphalia.GUI;
 using static nestphalia.Screen;
 
@@ -22,8 +21,8 @@ public static class MenuScene
     public static void Update()
     {
         BeginDrawing();
-        ClearBackground(GRAY);
-        DrawBackground(LIGHTGRAY);
+        ClearBackground(Color.Gray);
+        DrawBackground(Color.LightGray);
         
         DrawTextCentered(HCenter, VCenter-200, "NESTPHALIA 1401", 48);
         DrawTextLeft(HCenter-600, VCenter-300, "V1.2.0 - Champion's Edition");

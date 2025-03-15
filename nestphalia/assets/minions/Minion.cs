@@ -1,6 +1,5 @@
 using System.Numerics;
-using CommunityToolkit.HighPerformance.Helpers;
-using ZeroElectric.Vinculum;
+using Raylib_cs;
 
 namespace nestphalia;
 
@@ -9,7 +8,7 @@ public class MinionTemplate
     public string ID; // Minions don't really need this since they're defined as a part of their nests, which already have IDs
     public string Name;
     public string Description;
-    public Texture Texture;
+    public Texture2D Texture;
     public double MaxHealth;
     public double Armor;
     public double Damage;
@@ -18,7 +17,7 @@ public class MinionTemplate
     public double Speed;
     public float PhysicsRadius; // This is a float because Raylib.CheckCircleOverlap() wants floats
 
-    public MinionTemplate(string id, string name, string description, Texture texture, double maxHealth, double armor, double damage, double speed, float physicsRadius, double attackCooldown = 1)
+    public MinionTemplate(string id, string name, string description, Texture2D texture, double maxHealth, double armor, double damage, double speed, float physicsRadius, double attackCooldown = 1)
     {
         ID = id;
         Name = name;
@@ -297,36 +296,36 @@ public class Minion : ISprite
     {
         Z = Position.Y + (IsFlying ? 240 : 0);
 
-        Vector2 pos = new Vector2((int)Position.X - Template.Texture.width / 2, (int)Position.Y - Template.Texture.width / 2);
+        Vector2 pos = new Vector2((int)Position.X - Template.Texture.Width / 2, (int)Position.Y - Template.Texture.Width / 2);
         bool flip = NextPos.X > pos.X;
-        Rectangle source = new Rectangle(flip ? Template.Texture.width : 0, 0, flip ? Template.Texture.width : -Template.Texture.width, Template.Texture.height);
+        Rectangle source = new Rectangle(flip ? Template.Texture.Width : 0, 0, flip ? Template.Texture.Width : -Template.Texture.Width, Template.Texture.Height);
         //Raylib.DrawTexture(Template.Texture, (int)Position.X - Template.Texture.width/2, (int)Position.Y - Template.Texture.width/2, tint);
         Raylib.DrawTextureRec(Template.Texture, source, pos, Team.UnitTint);
 
         if (Health < Template.MaxHealth)
         {
-            Vector2 start = Position - new Vector2(Template.Texture.width / 2, Template.Texture.height / 2 + 2);
-            Vector2 end = start + new Vector2((float)(Template.Texture.width * (Health / Template.MaxHealth)), 0);
+            Vector2 start = Position - new Vector2(Template.Texture.Width / 2, Template.Texture.Height / 2 + 2);
+            Vector2 end = start + new Vector2((float)(Template.Texture.Width * (Health / Template.MaxHealth)), 0);
             Raylib.DrawLineEx(start, end, 1, new Color(32, 192, 32, 255));
         }
         
         // Debug, shows path
         if (Raylib.CheckCollisionPointCircle(Raylib.GetScreenToWorld2D(Raylib.GetMousePosition(), World.Camera), Position, 2*Template.PhysicsRadius))
         {
-            Raylib.DrawCircleV(NextPos, 2, Raylib.GREEN);
+            Raylib.DrawCircleV(NextPos, 2, Color.Green);
             
             Vector2 path = Position;
             foreach (Int2D i in NavPath.Waypoints)
             {
                 Vector2 v = World.GetTileCenter(i);
-                Raylib.DrawLine((int)path.X, (int)path.Y, (int)v.X, (int)v.Y, Raylib.LIME);
+                Raylib.DrawLine((int)path.X, (int)path.Y, (int)v.X, (int)v.Y, Color.Lime);
                 path = v;
             }
 
             if (NavPath.Waypoints.Count == 0)
             {
                 Vector2 v = World.GetTileCenter(NavPath.Destination);
-                Raylib.DrawLine((int)path.X, (int)path.Y, (int)v.X, (int)v.Y, Raylib.LIME);
+                Raylib.DrawLine((int)path.X, (int)path.Y, (int)v.X, (int)v.Y, Color.Lime);
             }
         }
     }

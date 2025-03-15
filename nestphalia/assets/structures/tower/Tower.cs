@@ -1,6 +1,6 @@
 using System.Diagnostics;
 using System.Numerics;
-using ZeroElectric.Vinculum;
+using Raylib_cs;
 
 namespace nestphalia;
 
@@ -26,7 +26,7 @@ public class TowerTemplate : StructureTemplate
     public bool CanHitGround;
     public int ProjectileOffset;
 
-    public TowerTemplate(string id, string name, string description, Texture texture, double maxHealth, double price, int levelRequirement, double baseHate, double range, ProjectileTemplate projectile, int projectileOffset, double rateOfFire, TargetSelector targetMode, bool canHitGround, bool canHitFlying) 
+    public TowerTemplate(string id, string name, string description, Texture2D texture, double maxHealth, double price, int levelRequirement, double baseHate, double range, ProjectileTemplate projectile, int projectileOffset, double rateOfFire, TargetSelector targetMode, bool canHitGround, bool canHitFlying) 
         : base(id, name, description, texture, maxHealth, price, levelRequirement, baseHate)
     {
         Range = range;

@@ -1,12 +1,12 @@
 using System.Numerics;
 using System.Security.Cryptography;
-using ZeroElectric.Vinculum;
+using Raylib_cs;
 
 namespace nestphalia;
 
 public class GluePaperTemplate : StructureTemplate
 {
-    public GluePaperTemplate(string id, string name, string description, Texture texture, double maxHealth, double price, int levelRequirement, double baseHate) : base(id, name, description, texture, maxHealth, price, levelRequirement, baseHate)
+    public GluePaperTemplate(string id, string name, string description, Texture2D texture, double maxHealth, double price, int levelRequirement, double baseHate) : base(id, name, description, texture, maxHealth, price, levelRequirement, baseHate)
     {
         //Class = StructureClass.Tower;
     }

@@ -1,8 +1,8 @@
 using System.Diagnostics;
 using System.Numerics;
-using ZeroElectric.Vinculum;
+using Raylib_cs;
 using static nestphalia.GUI;
-using static ZeroElectric.Vinculum.Raylib;
+using static Raylib_cs.Raylib;
 
 namespace nestphalia;
 
@@ -49,51 +49,51 @@ public static class BattleScene
     {
         // ----- INPUT + GUI PHASE -----
 
-        if (IsKeyPressed(KeyboardKey.KEY_P) || IsKeyPressed(KeyboardKey.KEY_ESCAPE))
+        if (IsKeyPressed(KeyboardKey.P) || IsKeyPressed(KeyboardKey.Escape))
         {
             Pause = !Pause;
             Time.TimeScale = Pause ? 0 : 1;
         }
 
-        if (IsKeyPressed(KeyboardKey.KEY_F))
+        if (IsKeyPressed(KeyboardKey.F))
         {
             SetMasterVolume(Program.Muted ? 0 : 0.25f);
         }
-        if (IsKeyReleased(KeyboardKey.KEY_F))
+        if (IsKeyReleased(KeyboardKey.F))
         {
             SetMasterVolume(Program.Muted ? 0 : 1f);
         }
 
-        if (IsKeyDown(KeyboardKey.KEY_A))
+        if (IsKeyDown(KeyboardKey.A))
         {
-            World.Camera.offset.X += 4;
+            World.Camera.Offset.X += 4;
         }
-        if (IsKeyDown(KeyboardKey.KEY_D))
+        if (IsKeyDown(KeyboardKey.D))
         {
-            World.Camera.offset.X -= 4;
+            World.Camera.Offset.X -= 4;
         }
-        if (IsKeyDown(KeyboardKey.KEY_W))
+        if (IsKeyDown(KeyboardKey.W))
         {
-            World.Camera.offset.Y += 4;
+            World.Camera.Offset.Y += 4;
         }
-        if (IsKeyDown(KeyboardKey.KEY_S))
+        if (IsKeyDown(KeyboardKey.S))
         {
-            World.Camera.offset.Y -= 4;
+            World.Camera.Offset.Y -= 4;
         }
 
-        if (IsKeyPressed(KeyboardKey.KEY_Q))
+        if (IsKeyPressed(KeyboardKey.Q))
         {
             _pathFinderDebug = !_pathFinderDebug;
         }
         
-        if (IsKeyPressed(KeyboardKey.KEY_F3))
+        if (IsKeyPressed(KeyboardKey.F3))
         {
             World.DrawDebugInfo = !World.DrawDebugInfo;
         }
         
-        if (IsMouseButtonDown(MouseButton.MOUSE_BUTTON_RIGHT))
+        if (IsMouseButtonDown(MouseButton.Right))
         {
-            World.Camera.offset += GetMouseDelta();
+            World.Camera.Offset += GetMouseDelta();
         }
         
         
@@ -105,16 +105,16 @@ public static class BattleScene
             Vector2 mouseWorldPos = GetScreenToWorld2D(GetMousePosition(), World.Camera);
 
             // Set the offset to where the mouse is
-            World.Camera.offset = GetMousePosition();
+            World.Camera.Offset = GetMousePosition();
 
             // Set the target to match, so that the camera maps the world space point 
             // under the cursor to the screen space point under the cursor at any zoom
-            World.Camera.target = mouseWorldPos;
+            World.Camera.Target = mouseWorldPos;
 
             // Zoom increment
             // float scaleFactor = 1.0f + 0.25f;
             // if (wheel < 0) scaleFactor = 1.0f/scaleFactor;
-            World.Camera.zoom = Math.Clamp(World.Camera.zoom + wheel * 0.5f, 0.5f, 4f);
+            World.Camera.Zoom = Math.Clamp(World.Camera.Zoom + wheel * 0.5f, 0.5f, 4f);
         }
         
         // ----- WORLD UPDATE PHASE -----
@@ -124,7 +124,7 @@ public static class BattleScene
             World.Update();
 
             _skips = 0;
-            if (IsKeyDown(KeyboardKey.KEY_F))
+            if (IsKeyDown(KeyboardKey.F))
             {
                 double startTime = GetTime();
                 while (GetTime() - startTime < 0.016)
@@ -149,7 +149,7 @@ public static class BattleScene
         DrawTextLeft(6, 32, $"Wave: {World.Wave}");
         DrawTextLeft(6, 48, $"Bugs: {World.Minions.Count}");
         // DrawTextLeft(6, 64, $"Sprites: {World.Sprites.Count}");
-        DrawTextLeft(6, 64, $"Zoom: {World.Camera.zoom}");
+        DrawTextLeft(6, 64, $"Zoom: {World.Camera.Zoom}");
         // DrawTextLeft(6, 80, $"PathQueue: {PathFinder.GetQueueLength()}");
         if (_pathFinderDebug) PathFinder.DrawDebug();
         
@@ -192,7 +192,7 @@ public static class BattleScene
                 }
             }
         }
-        else if (IsKeyDown(KeyboardKey.KEY_F))
+        else if (IsKeyDown(KeyboardKey.F))
         {
             DrawRectangle(0,0,Screen.Left,Screen.Bottom,new Color(0,0,0,128));
             DrawTextCentered(Screen.HCenter, Screen.VCenter, $"{_skips+1}X SPEED", 48);

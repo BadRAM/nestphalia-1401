@@ -1,5 +1,5 @@
 using System.Numerics;
-using ZeroElectric.Vinculum;
+using Raylib_cs;
 
 namespace nestphalia;
 
@@ -9,7 +9,7 @@ public class BroodMinionTemplate : MinionTemplate
     public int SpawnsOnDeath;
     public MinionTemplate SpawnedMinion;
     
-    public BroodMinionTemplate(string id, string name, string description, Texture texture, double maxHealth, double armor, double damage, double speed, float physicsRadius, double spawnInterval, int spawnsOnDeath, MinionTemplate spawnedMinion, double attackCooldown = 1) 
+    public BroodMinionTemplate(string id, string name, string description, Texture2D texture, double maxHealth, double armor, double damage, double speed, float physicsRadius, double spawnInterval, int spawnsOnDeath, MinionTemplate spawnedMinion, double attackCooldown = 1) 
         : base(id, name, description, texture, maxHealth, armor, damage, speed, physicsRadius, attackCooldown)
     {
         SpawnInterval = spawnInterval;

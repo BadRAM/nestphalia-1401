@@ -10,17 +10,31 @@ Programming todo:
 - ~~Hopper target pos randomization~~
 - ~~Sell all cancel button~~
 - ~~Beetles throw a lot of bombs sometimes~~
-- Bugs walk towards target while unpathed, then go back to their path origin
+- ~~Bugs walk towards target while unpathed, then go back to their path origin~~
 - Heavier bugs push smaller bugs out of the way
-- Sandbox editor is inside of custom battle menu
-- Custom Battle Folders
+- ~~Sandbox editor is inside of custom battle menu~~
+- ~~Custom Battle Folders~~
 - fort10 doesn't save correctly
 - new graffiti
 - Editor path preview
-
+- Some linux machines can't run the game.
+    DIINotFoundException: Unable to load shared library
+    ' raylib' or one of its dependencies. In order to help diagnose loading problems,
+    consider setting the LD DEBUG environment variable: libraylib: cannot open shar
+    ed object file: No such file or directory
+    at ZeroElectric. Vinculum. Raylib. SetWindoHinSize(Int32 width, Int32 height)
+    at nestphalia.Program.Main() in C:\Users\Luke\Workspace\RiderProjects\2-fort-
+    cs\nestphalia\Program.cs:line 27
+    Aborted (core dumped)
+- ESC quits all menus
+- Separate music and sfx mutes
 
 ----- V2 -----
 
+- Refactor Minion.Hurt() to not need a damagesource
+- Pathfinding optimizations: 
+  - as soon as a node is set in the targeted half of the battlefield, purge all nodes and dont' allow any new ones to be created in the untargeted half
+  - Binary search to find consider queue insertion point
 - Campaign rebalance, use 'funding' instead of direct cash stores.
 - Help text/tutorial
 - Game load cutscene
@@ -33,8 +47,6 @@ Programming todo:
 
 
 ----- Postponed to team bug fort 2 -----
-- Refactor Minion.Hurt() to not need a damagesource
-- Splash screen
 - Fix minion collision with wall corners
 - Better fear evaluation, make bugs more scared of staying in scary places than passing through them.
 - Minion melee attack animation

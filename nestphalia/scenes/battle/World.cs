@@ -1,6 +1,6 @@
 using System.Diagnostics;
 using System.Numerics;
-using ZeroElectric.Vinculum;
+using Raylib_cs;
 
 namespace nestphalia;
 
@@ -44,10 +44,10 @@ public static class World
     
     private static void Initialize()
     {
-        Camera.target = new Vector2(BoardWidth * 12, BoardHeight * 12);
-        Camera.offset = new Vector2(Screen.HCenter, Screen.VCenter);
-        Camera.rotation = 0;
-        Camera.zoom = 1;
+        Camera.Target = new Vector2(BoardWidth * 12, BoardHeight * 12);
+        Camera.Offset = new Vector2(Screen.HCenter, Screen.VCenter);
+        Camera.Rotation = 0;
+        Camera.Zoom = 1;
         Minions.Clear();
         Projectiles.Clear();
         Sprites.Clear();
@@ -60,9 +60,9 @@ public static class World
         _battleOver = false;
         DrawDebugInfo = false;
         
-        LeftTeam = new Team("Player", false, Raylib.BLUE);
+        LeftTeam = new Team("Player", false, Color.Blue);
         LeftTeam.IsPlayerControlled = true;
-        RightTeam = new Team("Enemy", true, Raylib.RED);
+        RightTeam = new Team("Enemy", true, Color.Red);
 
         for (int x = 0; x < BoardWidth; x++)
         {
@@ -80,7 +80,7 @@ public static class World
     public static void InitializeEditor()
     {
         Initialize();
-        Camera.target = new Vector2(22 * 12, BoardHeight * 12 + 8);
+        Camera.Target = new Vector2(22 * 12, BoardHeight * 12 + 8);
         
         // set up floor tile checkerboard
         for (int x = 0; x < BoardWidth; x++)
@@ -107,8 +107,8 @@ public static class World
     public static void InitializePreview()
     {
         Initialize();
-        Camera.zoom = 0.5f;
-        Camera.offset = new Vector2(Screen.HCenter, Screen.VCenter+50);        // set up floor tile checkerboard
+        Camera.Zoom = 0.5f;
+        Camera.Offset = new Vector2(Screen.HCenter, Screen.VCenter+50);        // set up floor tile checkerboard
         for (int x = 0; x < BoardWidth; x++)
         {
             for (int y = 0; y < BoardHeight; y++)
@@ -438,42 +438,42 @@ public static class World
         int x = Screen.HCenter-500;
         
         int width = (int)(totalWidth * _swUpdate.Elapsed.TotalSeconds / totalSWTime);
-        Raylib.DrawRectangle(x, Screen.VCenter-300, width, 10, Raylib.RED);
+        Raylib.DrawRectangle(x, Screen.VCenter-300, width, 10, Color.Red);
         x += width;
         width = (int)(totalWidth * _swDraw.Elapsed.TotalSeconds / totalSWTime);
-        Raylib.DrawRectangle(x, Screen.VCenter-300, width, 10, Raylib.GREEN);
+        Raylib.DrawRectangle(x, Screen.VCenter-300, width, 10, Color.Green);
         x += width;
         width = totalWidth - x;
-        Raylib.DrawRectangle(x, Screen.VCenter-300, width, 10, Raylib.GRAY);
+        Raylib.DrawRectangle(x, Screen.VCenter-300, width, 10, Color.Gray);
 
         totalSWTime = _swUpdate.Elapsed.TotalSeconds;
         x = Screen.HCenter - 500;
         width = (int)(totalWidth * _swUpdateTeams.Elapsed.TotalSeconds / totalSWTime);
-        Raylib.DrawRectangle(x, Screen.VCenter-290, width, 20, Raylib.SKYBLUE);
+        Raylib.DrawRectangle(x, Screen.VCenter-290, width, 20, Color.SkyBlue);
         GUI.DrawTextLeft(x, Screen.VCenter-290, $"Teams {(int)(100 * _swUpdateTeams.Elapsed.TotalSeconds / totalSWTime)}%");
         x += width;
         width = (int)(totalWidth * _swUpdatePathfinder.Elapsed.TotalSeconds / totalSWTime);
-        Raylib.DrawRectangle(x, Screen.VCenter-290, width, 20, Raylib.ORANGE);
+        Raylib.DrawRectangle(x, Screen.VCenter-290, width, 20, Color.Orange);
         GUI.DrawTextLeft(x, Screen.VCenter-290, $"Path {(int)(100 * _swUpdatePathfinder.Elapsed.TotalSeconds / totalSWTime)}%");
         x += width;
         width = (int)(totalWidth * _swUpdateBoard.Elapsed.TotalSeconds / totalSWTime);
-        Raylib.DrawRectangle(x, Screen.VCenter-290, width, 20, Raylib.PURPLE);
+        Raylib.DrawRectangle(x, Screen.VCenter-290, width, 20, Color.Purple);
         GUI.DrawTextLeft(x, Screen.VCenter-290, $"Board {(int)(100 * _swUpdateBoard.Elapsed.TotalSeconds / totalSWTime)}%");
         x += width;
         width = (int)(totalWidth * _swUpdateMinions.Elapsed.TotalSeconds / totalSWTime);
-        Raylib.DrawRectangle(x, Screen.VCenter-290, width, 20, Raylib.YELLOW);
+        Raylib.DrawRectangle(x, Screen.VCenter-290, width, 20, Color.Yellow);
         GUI.DrawTextLeft(x, Screen.VCenter-290, $"Minions {(int)(100 * _swUpdateMinions.Elapsed.TotalSeconds / totalSWTime)}%");
         x += width;
         width = (int)(totalWidth * _swUpdateMinionsCollide.Elapsed.TotalSeconds / totalSWTime);
-        Raylib.DrawRectangle(x, Screen.VCenter-290, width, 20, Raylib.RED);
+        Raylib.DrawRectangle(x, Screen.VCenter-290, width, 20, Color.Red);
         GUI.DrawTextLeft(x, Screen.VCenter-290, $"Phys {(int)(100 * _swUpdateMinionsCollide.Elapsed.TotalSeconds / totalSWTime)}%, {(_swUpdateMinionsCollide.Elapsed.TotalSeconds * 1000).ToString("N4")}ms");
         x += width;
         width = (int)(totalWidth * _swUpdateProjectiles.Elapsed.TotalSeconds / totalSWTime);
-        Raylib.DrawRectangle(x, Screen.VCenter-290, width, 20, Raylib.BLUE);
+        Raylib.DrawRectangle(x, Screen.VCenter-290, width, 20, Color.Blue);
         GUI.DrawTextLeft(x, Screen.VCenter-290, $"Proj {(int)(100 * _swUpdateProjectiles.Elapsed.TotalSeconds / totalSWTime)}%");
         x += width;
         width = totalWidth - x;
-        Raylib.DrawRectangle(x, Screen.VCenter-300, width, 10, Raylib.GRAY);
+        Raylib.DrawRectangle(x, Screen.VCenter-300, width, 10, Color.Gray);
     }
 
     // Returns a list of all minions in the square of tiles described by the arguments

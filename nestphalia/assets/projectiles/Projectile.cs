@@ -1,15 +1,15 @@
 using System.Numerics;
-using ZeroElectric.Vinculum;
+using Raylib_cs;
 
 namespace nestphalia;
 
 public class ProjectileTemplate
 {
-    public Texture Texture;
+    public Texture2D Texture;
     public double Damage;
     public double Speed;
 
-    public ProjectileTemplate(Texture texture, double damage, double speed)
+    public ProjectileTemplate(Texture2D texture, double damage, double speed)
     {
         Damage = damage;
         Speed = speed;
@@ -83,6 +83,6 @@ public class Projectile : ISprite
 
     public virtual void Draw()
     {
-        Raylib.DrawTexture(Template.Texture, (int)Position.X - Template.Texture.width/2, (int)Position.Y - Template.Texture.width/2, Raylib.WHITE);
+        Raylib.DrawTexture(Template.Texture, (int)Position.X - Template.Texture.Width/2, (int)Position.Y - Template.Texture.Width/2, Color.White);
     }
 }

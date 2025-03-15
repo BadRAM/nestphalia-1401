@@ -1,16 +1,16 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using ZeroElectric.Vinculum;
-using static ZeroElectric.Vinculum.Raylib;
+using Raylib_cs;
+using static Raylib_cs.Raylib;
 
 namespace nestphalia;
 
 public class SpriteResource
 {
     public string Name;
-    public Texture Tex;
+    public Texture2D Tex;
 
-    public SpriteResource(string name, Texture tex)
+    public SpriteResource(string name, Texture2D tex)
     {
         Name = name;
         Tex = tex;
@@ -73,7 +73,7 @@ public class MusicResource
 
 public static class Resources
 {
-    public static Texture MissingTexture;
+    public static Texture2D MissingTexture;
     public static List<SpriteResource> Sprites = new List<SpriteResource>();
     public static List<SoundResource> Sounds = new List<SoundResource>();
     public static List<MusicResource> Music = new List<MusicResource>();
@@ -130,7 +130,7 @@ public static class Resources
         // CampaignLevels.Add(LoadFort("/resources/level16.fort"));
     }
     
-    public static Texture GetTextureByName(string name)
+    public static Texture2D GetTextureByName(string name)
     {
         SpriteResource? s = Sprites.FirstOrDefault(x => x.Name == name);
         return s?.Tex ?? MissingTexture;

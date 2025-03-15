@@ -1,5 +1,5 @@
 using System.Numerics;
-using ZeroElectric.Vinculum;
+using Raylib_cs;
 
 namespace nestphalia;
 
@@ -13,8 +13,8 @@ public class Team
     public List<ActiveAbilityBeacon?> Beacons = new List<ActiveAbilityBeacon?>();
     public const int BeaconCap = 4;
     public Color UnitTint;
-    private Texture _abilitySlot;
-    private Texture _healthBar;
+    private Texture2D _abilitySlot;
+    private Texture2D _healthBar;
     private int _usingAbility = -1;
     //private double _minimumValue = 100;
     private double _timeLastAbilityUsed = -10;
@@ -141,20 +141,20 @@ public class Team
         // use abilities
         if (IsPlayerControlled)
         {
-            if (_usingAbility != -1 && (Beacons[_usingAbility]?.IsReady() ?? false) && Raylib.IsMouseButtonPressed(MouseButton.MOUSE_BUTTON_LEFT))
+            if (_usingAbility != -1 && (Beacons[_usingAbility]?.IsReady() ?? false) && Raylib.IsMouseButtonPressed(MouseButton.Left))
             {
                 Beacons[_usingAbility]?.Activate(Raylib.GetScreenToWorld2D(Raylib.GetMousePosition(), World.Camera));
                 _usingAbility = -1;
             }
-            if ((Beacons[0]?.IsReady() ?? false) && Raylib.IsKeyPressed(KeyboardKey.KEY_ONE))   _usingAbility = 0;
-            if ((Beacons[1]?.IsReady() ?? false) && Raylib.IsKeyPressed(KeyboardKey.KEY_TWO))   _usingAbility = 1;
-            if ((Beacons[2]?.IsReady() ?? false) && Raylib.IsKeyPressed(KeyboardKey.KEY_THREE)) _usingAbility = 2;
-            if ((Beacons[3]?.IsReady() ?? false) && Raylib.IsKeyPressed(KeyboardKey.KEY_FOUR))  _usingAbility = 3;
+            if ((Beacons[0]?.IsReady() ?? false) && Raylib.IsKeyPressed(KeyboardKey.One))   _usingAbility = 0;
+            if ((Beacons[1]?.IsReady() ?? false) && Raylib.IsKeyPressed(KeyboardKey.Two))   _usingAbility = 1;
+            if ((Beacons[2]?.IsReady() ?? false) && Raylib.IsKeyPressed(KeyboardKey.Three)) _usingAbility = 2;
+            if ((Beacons[3]?.IsReady() ?? false) && Raylib.IsKeyPressed(KeyboardKey.Four))  _usingAbility = 3;
 
             int posX = IsRightSide ? Screen.HCenter + 450  : Screen.HCenter - 450;
             for (int i = 0; i < BeaconCap; i++)
             {
-                if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_BUTTON_LEFT) && Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), new Rectangle( posX + i*68 - 150, Screen.Bottom - 68, 64, 64)))
+                if (Raylib.IsMouseButtonPressed(MouseButton.Left) && Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), new Rectangle( posX + i*68 - 150, Screen.Bottom - 68, 64, 64)))
                 {
                     _usingAbility = i;
                 }
@@ -175,7 +175,7 @@ public class Team
     public void Draw()
     {
         // fear/hate debug
-        if (Raylib.IsKeyDown(KeyboardKey.KEY_H))
+        if (Raylib.IsKeyDown(KeyboardKey.H))
         {
             Raylib.BeginMode2D(World.Camera);
             for (int x = 0; x < World.BoardWidth; x++)
@@ -199,9 +199,9 @@ public class Team
         {
             int x = posX + i * 68 - 134;
             int y = Screen.Bottom - 68;
-            Color c = Raylib.WHITE;
-            if (!Beacons[i]?.IsReady() ?? false) c = Raylib.GRAY;
-            if (i == _usingAbility) c = Raylib.DARKGRAY;
+            Color c = Color.White;
+            if (!Beacons[i]?.IsReady() ?? false) c = Color.Gray;
+            if (i == _usingAbility) c = Color.DarkGray;
             Raylib.DrawTexture(_abilitySlot, x, y, c);
             Beacons[i]?.DrawStatus(x, y);
             if (IsPlayerControlled)
@@ -215,9 +215,9 @@ public class Team
         }
         
         // health bar
-        Raylib.DrawTextureRec(_healthBar, new Rectangle(0, 80, 300, 40), new Vector2(IsRightSide ? Screen.HCenter + 20  : Screen.HCenter - 320, Screen.Bottom - 44), Raylib.WHITE);
+        Raylib.DrawTextureRec(_healthBar, new Rectangle(0, 80, 300, 40), new Vector2(IsRightSide ? Screen.HCenter + 20  : Screen.HCenter - 320, Screen.Bottom - 44), Color.White);
         float hpBarSize = (float)(300 * _health / _maxHealth);
-        Raylib.DrawTextureRec(_healthBar, new Rectangle( IsRightSide ? 300 - hpBarSize : 0, 40, hpBarSize, 40), new Vector2(IsRightSide ? (300 - hpBarSize) + Screen.HCenter + 20  : Screen.HCenter - 320, Screen.Bottom -44), Raylib.WHITE);
+        Raylib.DrawTextureRec(_healthBar, new Rectangle( IsRightSide ? 300 - hpBarSize : 0, 40, hpBarSize, 40), new Vector2(IsRightSide ? (300 - hpBarSize) + Screen.HCenter + 20  : Screen.HCenter - 320, Screen.Bottom -44), Color.White);
         GUI.DrawTextCentered(IsRightSide ? Screen.HCenter + 160 : Screen.HCenter - 160, Screen.Bottom - 24, $"{Name} - {_health}/{_maxHealth}");
     }
 }

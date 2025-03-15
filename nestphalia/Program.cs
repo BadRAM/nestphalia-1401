@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Numerics;
-using ZeroElectric.Vinculum;
-using static ZeroElectric.Vinculum.Raylib;
+using Raylib_cs;
+using static Raylib_cs.Raylib;
 namespace nestphalia;
 
 public enum Scene
@@ -24,11 +24,11 @@ static class Program
 	
     public static void Main()
     {
+	    SetConfigFlags(ConfigFlags.ResizableWindow);
 	    InitWindow(1200, 600, "2-fort");
 	    SetWindowMinSize(1200, 600);
-	    SetWindowState(ConfigFlags.FLAG_WINDOW_RESIZABLE);
         SetTargetFPS(60);
-        SetExitKey(KeyboardKey.KEY_NULL);
+        SetExitKey(KeyboardKey.Null);
 		
         InitAudioDevice();
         

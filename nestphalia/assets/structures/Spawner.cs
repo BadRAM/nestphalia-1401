@@ -1,5 +1,5 @@
 using System.Net.NetworkInformation;
-using ZeroElectric.Vinculum;
+using Raylib_cs;
 
 namespace nestphalia;
 
@@ -10,7 +10,7 @@ public class SpawnerTemplate : StructureTemplate
     public double WaveGrowth;
     public double TimeBetweenSpawns;
     
-    public SpawnerTemplate(string id, string name, string description, Texture texture, double maxHealth, double price, int levelRequirement, double baseHate, MinionTemplate minion, int waveSize, double waveGrowth, double timeBetweenSpawns) : base(id, name, description, texture, maxHealth, price, levelRequirement, baseHate)
+    public SpawnerTemplate(string id, string name, string description, Texture2D texture, double maxHealth, double price, int levelRequirement, double baseHate, MinionTemplate minion, int waveSize, double waveGrowth, double timeBetweenSpawns) : base(id, name, description, texture, maxHealth, price, levelRequirement, baseHate)
     {
         Minion = minion;
         WaveSize = waveSize;

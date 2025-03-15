@@ -1,5 +1,5 @@
 using System.Numerics;
-using ZeroElectric.Vinculum;
+using Raylib_cs;
 
 namespace nestphalia;
 
@@ -52,9 +52,9 @@ public class LightningBolt : Projectile
 
     public override void Draw()
     {
-        Color c = Raylib.WHITE;
-        if (Time.Scaled - _timeFired >= 0.1) c = Raylib.SKYBLUE;
-        if (Time.Scaled - _timeFired >= _duration/2) c = Raylib.BLACK;
+        Color c = Color.White;
+        if (Time.Scaled - _timeFired >= 0.1) c = Color.SkyBlue;
+        if (Time.Scaled - _timeFired >= _duration/2) c = Color.Black;
         for (int i = 0; i < _points.Count-1; i++)
         {
             Raylib.DrawLineEx(_points[i], _points[i+1], 1, c);

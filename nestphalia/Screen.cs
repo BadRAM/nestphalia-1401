@@ -1,5 +1,5 @@
 using System.Numerics;
-using ZeroElectric.Vinculum;
+using Raylib_cs;
 
 namespace nestphalia;
 
@@ -16,9 +16,9 @@ public static class Screen
     public static int Bottom;
     //public static Image WhiteNoise = Raylib.GenImageWhiteNoise(1024, 1024, 0.5f);
     public static List<List<bool>> backgroundNoise = new List<List<bool>>();
-    public static Texture Tile1;
-    public static Texture Tile2;
-    private static List<Texture> _graffiti = new List<Texture>();
+    public static Texture2D Tile1;
+    public static Texture2D Tile2;
+    private static List<Texture2D> _graffiti = new List<Texture2D>();
     private static int _graffitiPosX;
     private static int _graffitiPosY;
     private static int _graffitiPicked;
@@ -95,6 +95,6 @@ public static class Screen
             }
         }
         Raylib.DrawRectangle(HCenter - 600, VCenter - 300, 1200, 600, new Color(10, 10, 10, 64));
-        Raylib.DrawTexture(_graffiti[_graffitiPicked], _graffitiPosX, _graffitiPosY, Raylib.WHITE);
+        Raylib.DrawTexture(_graffiti[_graffitiPicked], _graffitiPosX, _graffitiPosY, Color.White);
     }
 }

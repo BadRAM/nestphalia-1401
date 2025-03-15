@@ -1,14 +1,14 @@
 using System.Numerics;
-using ZeroElectric.Vinculum;
+using Raylib_cs;
 
 namespace nestphalia;
 
 public class FloorTileTemplate
 {
     public string Name;
-    public Texture Texture;
+    public Texture2D Texture;
     
-    public FloorTileTemplate(string name, Texture texture)
+    public FloorTileTemplate(string name, Texture2D texture)
     {
         Name = name;
         Texture = texture;
@@ -32,6 +32,6 @@ public class FloorTile
     
     public virtual void Draw(int x, int y)
     {
-        Raylib.DrawTexture(Template.Texture, x, y, Raylib.WHITE);
+        Raylib.DrawTexture(Template.Texture, x, y, Color.White);
     }
 }
