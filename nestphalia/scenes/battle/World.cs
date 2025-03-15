@@ -11,6 +11,7 @@ public static class World
     private static FloorTile[,] _floor = new FloorTile[BoardWidth, BoardHeight];
     private static Structure?[,] _board = new Structure?[BoardWidth, BoardHeight];
     public static List<Minion> Minions = new List<Minion>();
+    public static List<Minion>[,] MinionGrid = new List<Minion>[BoardWidth, BoardHeight];
     public static List<Minion> MinionsToRemove = new List<Minion>();
     public static List<Projectile> Projectiles = new List<Projectile>();
     public static List<Projectile> ProjectilesToRemove = new List<Projectile>();
@@ -62,6 +63,18 @@ public static class World
         LeftTeam = new Team("Player", false, Raylib.BLUE);
         LeftTeam.IsPlayerControlled = true;
         RightTeam = new Team("Enemy", true, Raylib.RED);
+
+        for (int x = 0; x < BoardWidth; x++)
+        {
+            for (int y = 0; y < BoardHeight; y++)
+            {
+                MinionGrid[x, y] = new List<Minion>();
+            }
+        }
+        foreach (List<Minion> minionList in MinionGrid)
+        {
+            minionList.Clear();
+        }
     }
 
     public static void InitializeEditor()
@@ -182,6 +195,18 @@ public static class World
     {
         _swUpdate.Restart();
         
+        _swUpdateMinionsCollide.Restart();
+        foreach (List<Minion> gridSquare in MinionGrid)
+        {
+            gridSquare.Clear();
+        }
+        foreach (Minion minion in Minions)
+        {
+            Int2D pos = PosToTilePos(minion.Position);
+            MinionGrid[pos.X, pos.Y].Add(minion);
+        }
+        _swUpdateMinionsCollide.Stop();
+        
         // Update wave timer
         if (!_battleOver)
         {
@@ -244,14 +269,11 @@ public static class World
         }
         _swUpdateMinions.Stop();
 
-        _swUpdateMinionsCollide.Restart();
-        Minions = Minions.OrderBy(o=>o.Position.X).ToList();
-        for (int i = 0; i < Minions.Count; i++)
-        {
-            Minions[i].PlanCollision(i);
-        }
+        _swUpdateMinionsCollide.Start();
+        DoMinionCollision();
         foreach (Minion m in Minions)
         {
+            m.CollideTerrain();
             m.LateUpdate();
         }
         _swUpdateMinionsCollide.Stop();
@@ -281,6 +303,55 @@ public static class World
         _swUpdateProjectiles.Stop();
         
         _swUpdate.Stop();
+    }
+
+    private static void DoMinionCollision()
+    {
+        for (int x = 0; x < BoardWidth; x++) // Iterate MinionGrid Rows
+        {
+            for (int y = 0; y < BoardHeight; y++) // Iterate MinionGrid Columns
+            {
+                for (int i = 0; i < MinionGrid[x, y].Count; i++) // Iterate Minions in cell at x,y
+                {
+                    for (int j = i+1; j < MinionGrid[x, y].Count; j++)
+                    {
+                        MinionGrid[x, y][i].CollideMinion(MinionGrid[x, y][j]);
+                    }
+
+                    if (x < BoardWidth - 1)
+                    {
+                        if (y > 0)
+                        {
+                            for (int j = 0; j < MinionGrid[x + 1, y - 1].Count; j++)
+                            {
+                                MinionGrid[x, y][i].CollideMinion(MinionGrid[x + 1, y - 1][j]);
+                            }
+                        }
+
+                        for (int j = 0; j < MinionGrid[x + 1, y].Count; j++)
+                        {
+                            MinionGrid[x, y][i].CollideMinion(MinionGrid[x + 1, y][j]);
+                        }
+
+                        if (y < BoardHeight - 1)
+                        {
+                            for (int j = 0; j < MinionGrid[x + 1, y + 1].Count; j++)
+                            {
+                                MinionGrid[x, y][i].CollideMinion(MinionGrid[x + 1, y + 1][j]);
+                            }
+                        }
+                    }
+
+                    if (y < BoardHeight - 1)
+                    {
+                        for (int j = 0; j < MinionGrid[x, y + 1].Count; j++)
+                        {
+                            MinionGrid[x, y][i].CollideMinion(MinionGrid[x, y + 1][j]);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public static void DrawFloor()
@@ -395,7 +466,7 @@ public static class World
         x += width;
         width = (int)(totalWidth * _swUpdateMinionsCollide.Elapsed.TotalSeconds / totalSWTime);
         Raylib.DrawRectangle(x, Screen.VCenter-290, width, 20, Raylib.RED);
-        GUI.DrawTextLeft(x, Screen.VCenter-290, $"Phys {(int)(100 * _swUpdateMinionsCollide.Elapsed.TotalSeconds / totalSWTime)}%");
+        GUI.DrawTextLeft(x, Screen.VCenter-290, $"Phys {(int)(100 * _swUpdateMinionsCollide.Elapsed.TotalSeconds / totalSWTime)}%, {(_swUpdateMinionsCollide.Elapsed.TotalSeconds * 1000).ToString("N4")}ms");
         x += width;
         width = (int)(totalWidth * _swUpdateProjectiles.Elapsed.TotalSeconds / totalSWTime);
         Raylib.DrawRectangle(x, Screen.VCenter-290, width, 20, Raylib.BLUE);
@@ -403,6 +474,26 @@ public static class World
         x += width;
         width = totalWidth - x;
         Raylib.DrawRectangle(x, Screen.VCenter-300, width, 10, Raylib.GRAY);
+    }
+
+    // Returns a list of all minions in the square of tiles described by the arguments
+    public static List<Minion> GetMinionsInRegion(Int2D center, int radius)
+    {
+        radius--;
+        List<Minion> minions = new List<Minion>();
+        for (int x = center.X - radius; x < center.X + radius; x++)
+        {
+            if (x < 0 || x >= BoardWidth) continue;
+            for (int y = center.Y - radius; y < center.Y + radius; y++)
+            {
+                if (y < 0 || y >= BoardHeight) continue;
+                foreach (Minion m in MinionGrid[x,y])
+                {
+                    minions.Add(m);
+                }
+            }
+        }
+        return minions;
     }
 
     public static Int2D PosToTilePos(Vector2 position)

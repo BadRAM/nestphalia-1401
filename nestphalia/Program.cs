@@ -24,15 +24,13 @@ static class Program
 	
     public static void Main()
     {
+	    InitWindow(1200, 600, "2-fort");
 	    SetWindowMinSize(1200, 600);
-	    
 	    SetWindowState(ConfigFlags.FLAG_WINDOW_RESIZABLE);
-	    
-        InitWindow(1200, 600, "2-fort");
         SetTargetFPS(60);
         SetExitKey(KeyboardKey.KEY_NULL);
-
-        InitAudioDevice();      
+		
+        InitAudioDevice();
         
         Screen.UpdateBounds();
         

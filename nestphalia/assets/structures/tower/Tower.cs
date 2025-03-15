@@ -104,6 +104,18 @@ public class Tower : Structure
         }
     }
 
+    public override void Draw()
+    {
+        base.Draw();
+
+        // Draw range circle on hover
+        // if (World.PosToTilePos(Raylib.GetScreenToWorld2D(Raylib.GetMousePosition(), World.Camera)) == new Int2D(X,Y))
+        // {
+        //     Raylib.DrawCircleLinesV(position, (int)_template.Range, new Color(200, 50, 50, 255));
+        //     Raylib.DrawCircleV(position, (int)_template.Range, new Color(200, 50, 50, 64));
+        // }
+    }
+
     public override void Destroy()
     {
         Team e = World.GetOtherTeam(Team);
@@ -130,14 +142,15 @@ public class Tower : Structure
 
     protected Minion? FindTargetNearest()
     {
+        List<Minion> nearbyMinions = World.GetMinionsInRegion(new Int2D(X, Y), (int)(1 + _template.Range / 24));
         Minion? nearest = null;
         double minDist = double.MaxValue;
-        for (int i = 0; i < World.Minions.Count; i++)
+        for (int i = 0; i < nearbyMinions.Count; i++)
         {
-            Minion m = World.Minions[i];
+            Minion m = nearbyMinions[i];
             if (m.Team == Team) continue;
             if ((m.IsFlying && !_template.CanHitFlying) || (!m.IsFlying && !_template.CanHitGround)) continue;
-            double d = Vector2.Distance(World.Minions[i].Position, position);
+            double d = Vector2.Distance(nearbyMinions[i].Position, position);
             if (d < _template.Range && d < minDist)
             {
                 minDist = d;
@@ -150,9 +163,10 @@ public class Tower : Structure
 
     protected Minion? FindTargetRandom()
     {
+        List<Minion> nearbyMinions = World.GetMinionsInRegion(new Int2D(X, Y), (int)(1 + _template.Range / 24));
         Minion? random = null;
         List<Minion> ValidTargets = new List<Minion>();
-        foreach (Minion m in World.Minions)
+        foreach (Minion m in nearbyMinions)
         {
             if ((m.IsFlying && !_template.CanHitFlying) || (!m.IsFlying && !_template.CanHitGround)) continue;
             if (m.Team != Team && Vector2.Distance(m.Position, position) < _template.Range)

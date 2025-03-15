@@ -135,7 +135,7 @@ public static class EditorScene
             if (_brush is TowerTemplate t)
             {
                 DrawCircleLines((int)mousePos.X, (int)mousePos.Y, (int)t.Range, new Color(200, 50, 50, 255));
-                DrawCircle((int)mousePos.X, (int)mousePos.Y, (int)t.Range, new Color(200, 50, 50, 64));
+                //DrawCircle((int)mousePos.X, (int)mousePos.Y, (int)t.Range, new Color(200, 50, 50, 64));
             }
             if (_brush != null)
             {

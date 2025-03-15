@@ -26,7 +26,7 @@ public static class MenuScene
         DrawBackground(LIGHTGRAY);
         
         DrawTextCentered(HCenter, VCenter-200, "NESTPHALIA 1401", 48);
-        DrawTextLeft(HCenter-600, VCenter-300, "V1.1.2 - Tournament Edition");
+        DrawTextLeft(HCenter-600, VCenter-300, "V1.2.0 - Champion's Edition");
             
         if (ButtonWide(HCenter-150, VCenter-80, "Start"))
         {

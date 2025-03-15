@@ -172,27 +172,31 @@ public class Minion : ISprite
     }
     
     // Should this be here, or in World? maybe somewhere else entirely, like a physics functions class?
-    public void PlanCollision(int index)
+    public void CollideMinion(Minion other)
     {
-        for (int i = index+1; i < World.Minions.Count; i++)
+        if (other == this) 
         {
-            // Abort loop if we're outside of our X band
-            if (World.Minions[i].Position.X - Position.X > Template.PhysicsRadius + 12) break;
-            if (World.Minions[i].IsFlying != IsFlying) continue;
-            if (!Raylib.CheckCollisionCircles(Position, Template.PhysicsRadius, World.Minions[i].Position, World.Minions[i].Template.PhysicsRadius)) continue;
-            if (Position == World.Minions[i].Position)
-            {
-                                 _collisionOffset += new Vector2((float)(Random.Shared.NextDouble() - 0.5), (float)(Random.Shared.NextDouble() - 0.5));
-                World.Minions[i]._collisionOffset += new Vector2((float)(Random.Shared.NextDouble() - 0.5), (float)(Random.Shared.NextDouble() - 0.5));
-                continue;
-            }
-            
-            Vector2 delta = Position - World.Minions[i].Position;
-            float weightRatio = Template.PhysicsRadius / (Template.PhysicsRadius + World.Minions[i].Template.PhysicsRadius);
-                             _collisionOffset += delta.Normalized() * Math.Min((Template.PhysicsRadius + World.Minions[i].Template.PhysicsRadius - delta.Length()) * (1-weightRatio), 0.5f);
-            World.Minions[i]._collisionOffset -= delta.Normalized() * Math.Min((Template.PhysicsRadius + World.Minions[i].Template.PhysicsRadius - delta.Length()) * (weightRatio), 0.5f);
+            Console.WriteLine("Selfcolliding!");
+            return;
         }
-
+        if (other.IsFlying != IsFlying) return;
+        if (!Raylib.CheckCollisionCircles(Position, Template.PhysicsRadius, other.Position, other.Template.PhysicsRadius)) return;
+        if (Position == other.Position) // jostle randomly if both minions are in the exact same position
+        {
+                  _collisionOffset += new Vector2((float)(Random.Shared.NextDouble() - 0.5), (float)(Random.Shared.NextDouble() - 0.5));
+            other._collisionOffset += new Vector2((float)(Random.Shared.NextDouble() - 0.5), (float)(Random.Shared.NextDouble() - 0.5));
+            return;
+        }
+        
+        Vector2 delta = Position - other.Position;
+        float weightRatio = Template.PhysicsRadius / (Template.PhysicsRadius + other.Template.PhysicsRadius);
+        float penDepth = (Template.PhysicsRadius + other.Template.PhysicsRadius - delta.Length());
+              _collisionOffset += delta.Normalized() * Math.Min(penDepth * (1f-weightRatio), 0.5f);
+        other._collisionOffset -= delta.Normalized() * Math.Min(penDepth * (weightRatio),    0.5f);
+    }
+    
+    public void CollideTerrain()
+    {
         if (IsFlying) return;
         Int2D tilePos = World.PosToTilePos(Position);
         
