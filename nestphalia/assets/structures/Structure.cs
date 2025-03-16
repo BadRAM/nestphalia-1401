@@ -85,7 +85,8 @@ public class Structure : ISprite
 
     public virtual void Draw()
     {
-        int t = 127 + (int)(128 * (Health / Template.MaxHealth));
+        int t = 127 + (int)Math.Clamp(127 * (Health / Template.MaxHealth), 0, 128);
+        if (Template.MaxHealth == 0) t = 255;
         int x = (int)(position.X - 12);
         int y = (int)(position.Y - (Template.Texture.Height - 12));
         Raylib.DrawTexture(Template.Texture, x, y, new Color(t,t,t,255));

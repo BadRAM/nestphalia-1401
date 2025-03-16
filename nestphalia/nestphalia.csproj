@@ -2,8 +2,8 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>net6.0</TargetFramework>
-        <RootNamespace>_2_fort_cs</RootNamespace>
+        <TargetFramework>net7.0</TargetFramework>
+        <RootNamespace>Raylib_cs_Recreated</RootNamespace>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
@@ -13,22 +13,10 @@
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
         </None>
-    </ItemGroup>    
-    <ItemGroup>
-        <None Update="readme.txt*">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-        </None>
-    </ItemGroup>    
-    <ItemGroup>
-        <None Update="credits.txt">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-        </None>
     </ItemGroup>
     
     <ItemGroup>
-      <PackageReference Include="Raylib-cs" Version="7.0.1" />
+        <PackageReference Include="Raylib-cs" Version="7.0.1" />
     </ItemGroup>
 
 </Project>
