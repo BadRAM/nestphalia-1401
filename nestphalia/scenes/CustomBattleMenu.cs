@@ -28,7 +28,7 @@ public static class CustomBattleMenu
         Resources.PlayMusicByName("scene03");
         _activeDirectory = "";
     }
-
+    
     public static void Update()
     {
         Raylib.BeginDrawing();
@@ -102,7 +102,7 @@ public static class CustomBattleMenu
                 if (GUI.ButtonWide(Screen.HCenter - 600, Screen.VCenter + i * 40 - 240, "+ New Fort +"))
                 {
                     Fort f = new Fort();
-                    f.Path = "/forts/" + _activeDirectory;
+                    f.Path = Directory.GetCurrentDirectory() + "/forts/" + _activeDirectory + "/newFort.fort";
                     EditorScene.Start(f, creativeMode: true);
                 }
             }

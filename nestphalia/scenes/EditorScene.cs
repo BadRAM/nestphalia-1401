@@ -9,6 +9,7 @@ public static class EditorScene
 {
     private static bool _sandboxMode = false;
     private static StructureTemplate? _brush;
+    private static EditorTool _toolActive;
     private static Fort _fort;
     private static string _saveMessage;
     private static string _fortStats;
@@ -21,6 +22,13 @@ public static class EditorScene
     private static bool _sellAllConfirm;
     private static StructureTemplate.StructureClass _structureClass;
     private static Texture2D _bg;
+
+    private enum EditorTool
+    {
+        Brush,
+        Erase,
+        PathTester
+    }
     
     public static void Start(Fort? fortToLoad = null, bool creativeMode = false)
     {
@@ -37,12 +45,12 @@ public static class EditorScene
         _fort.LoadToBoard(false);
         
         Screen.RegenerateBackground();
-
+        
         
         _newUtil = false;
         _newTower = false;
         _newNest = false;
-
+        
         if (!_sandboxMode)
         {
             foreach (StructureTemplate template in Assets.Structures)
@@ -67,7 +75,7 @@ public static class EditorScene
         
         Resources.PlayMusicByName("so_lets_get_killed");
     }
-
+    
     public static void Update()
     {
         // ----- INPUT + GUI PHASE -----
@@ -169,7 +177,7 @@ public static class EditorScene
                 {
                     _saveMessage = $"Saved fort as fort{number}.fort";
                     _fort.Name = $"fort{number}";
-                    _fort.Path = Directory.GetCurrentDirectory() + _fort.Path + _fort.Name + ".fort";
+                    _fort.Path = Path.GetDirectoryName(_fort.Path) + "/" + _fort.Name + ".fort";
                     _fortAlreadySaved = true;
                     Console.WriteLine($"{Directory.GetCurrentDirectory()}/{_fort.Path}");
                     Resources.SaveFort($"fort{number}", _fort.Path);
@@ -183,7 +191,7 @@ public static class EditorScene
                 number++;
             }
         }
-
+        
         if (ButtonNarrow(Screen.HCenter+150, Screen.VCenter+260, "Sell", _brush != null)) _brush = null;
         if (_sellAllConfirm && ButtonNarrow(Screen.HCenter-250, Screen.VCenter+260, "Cancel"))   _sellAllConfirm = false;
         else if (!_sellAllConfirm&& ButtonNarrow(Screen.HCenter-250, Screen.VCenter+260, "Sell All")) _sellAllConfirm = true;
@@ -191,7 +199,7 @@ public static class EditorScene
         if (ButtonNarrow(Screen.HCenter+300, Screen.VCenter-300, (_newUtil ? "NEW! " : "") + "Utility", _structureClass != StructureTemplate.StructureClass.Utility)) _structureClass = StructureTemplate.StructureClass.Utility;
         if (ButtonNarrow(Screen.HCenter+400, Screen.VCenter-300, (_newTower ? "NEW! " : "") + "Tower", _structureClass != StructureTemplate.StructureClass.Tower)) _structureClass = StructureTemplate.StructureClass.Tower;
         if (ButtonNarrow(Screen.HCenter+500, Screen.VCenter-300, (_newNest ? "NEW! " : "") + "Nest", _structureClass != StructureTemplate.StructureClass.Nest)) _structureClass = StructureTemplate.StructureClass.Nest;
-
+        
         int y = 0;
         for (int i = 0; i < Assets.Structures.Count; i++)
         {
@@ -205,7 +213,7 @@ public static class EditorScene
             DrawTexture(s.Texture, Screen.HCenter + 320, Screen.VCenter + y * 40 - 246, Color.White);
             y++;
         }
-
+        
         if (!_sandboxMode)
         {
             DrawTextLeft(Screen.HCenter-590, Screen.VCenter+ 200, $"Bug Dollars: ${Program.Campaign.Money}");
@@ -225,7 +233,7 @@ public static class EditorScene
         
         EndDrawing();
     }
-
+    
     private static void SellAll()
     {
         for (int x = 0; x < World.BoardWidth; ++x)
@@ -238,10 +246,10 @@ public static class EditorScene
                 World.SetTile(null, World.LeftTeam, x, y);
             }
         }
-
+        
         _sellAllConfirm = false;
     }
-
+    
     private static string GetFortStats()
     {
         int structureCount = 0;
@@ -265,7 +273,7 @@ public static class EditorScene
                 else if (t.Template.Class == StructureTemplate.StructureClass.Nest) nestCount++;
             }
         }
-
+        
         if (!_sandboxMode)
         {
             _nestCapped = nestCount >= Program.Campaign.Level * 2 + 10;

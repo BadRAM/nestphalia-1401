@@ -11,12 +11,14 @@ Programming todo:
 - ~~Sell all cancel button~~
 - ~~Beetles throw a lot of bombs sometimes~~
 - ~~Bugs walk towards target while unpathed, then go back to their path origin~~
-- Heavier bugs push smaller bugs out of the way
+- ~~Heavier bugs push smaller bugs out of the way~~
 - ~~Sandbox editor is inside of custom battle menu~~
 - ~~Custom Battle Folders~~
-- fort10 doesn't save correctly
-- new graffiti
+- ~~fort10 doesn't save correctly - Could not reproduce~~
+- ~~saving to new file multiple times doesnt' work~~
+- ~~Hoppers are aware of enemy mines~~
 - Editor path preview
+- new graffiti
 - Some linux machines can't run the game.
     DIINotFoundException: Unable to load shared library
     ' raylib' or one of its dependencies. In order to help diagnose loading problems,
@@ -31,6 +33,7 @@ Programming todo:
 
 ----- V2 -----
 
+- Random damage variation
 - Refactor Minion.Hurt() to not need a damagesource
 - Pathfinding optimizations: 
   - as soon as a node is set in the targeted half of the battlefield, purge all nodes and dont' allow any new ones to be created in the untargeted half

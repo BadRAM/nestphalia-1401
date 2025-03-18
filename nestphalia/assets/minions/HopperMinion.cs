@@ -86,7 +86,7 @@ public class HopperMinion : Minion
         else
         {
             Structure? structureAhead = World.GetTile((Int2D)ahead);
-            if (structureAhead == null || (!structureAhead.PhysSolid(Team) && structureAhead is not Minefield))
+            if (structureAhead == null || (!structureAhead.PhysSolid(Team) && (structureAhead.Team != Team || structureAhead is not Minefield)))
             {
                 NavPath.Skip();
                 _jumping = true;
