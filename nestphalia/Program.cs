@@ -18,7 +18,8 @@ public enum Scene
 static class Program
 {
 	private static bool Paused;
-	public static bool Muted;
+	public static bool SFXMute;
+	public static bool MusicMute;
 	public static Scene CurrentScene;
 	public static Campaign Campaign;
 	
@@ -75,13 +76,12 @@ static class Program
 		        case Scene.Battle:
 			        BattleScene.Update();
 			        break;
-		        case Scene.PostBattle:
-			        PostBattleScene.Update();
-			        break;
 	        }
 
-
-	        SetMusicVolume(Resources.MusicPlaying, MathF.Min((float)Time.Scaled, 0.5f));
+	        if (Time.Scaled <= 1)
+	        {
+		        SetMusicVolume(Resources.MusicPlaying, MathF.Min((float)Time.Scaled, 0.3f));
+	        }
 	        UpdateMusicStream(Resources.MusicPlaying);
         }
 

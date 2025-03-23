@@ -17,7 +17,7 @@ public static class MenuScene
         RegenerateBackground();
         Resources.PlayMusicByName("unreal_technology_demo_95_-_unreals");
     }
-
+    
     public static void Update()
     {
         BeginDrawing();
@@ -26,7 +26,7 @@ public static class MenuScene
         
         DrawTextCentered(HCenter, VCenter-200, "NESTPHALIA 1401", 48);
         DrawTextLeft(HCenter-600, VCenter-300, "V1.2.0 - Champion's Edition");
-            
+        
         if (ButtonWide(HCenter-150, VCenter-80, "Start"))
         {
             Program.Campaign = new Campaign();
@@ -45,17 +45,21 @@ public static class MenuScene
             CloseWindow();
             return;
         }
-
+        
         if (ButtonNarrow(HCenter + 500, VCenter + 260, "Font")) Resources.ToggleFontAccessibility();
-        if (ButtonNarrow(HCenter + 500, VCenter + 220, "Mute"))
+        if (ButtonNarrow(HCenter + 500, VCenter + 220, "Mute Music"))
         {
-            Program.Muted = !Program.Muted;
-            SetMasterVolume(Program.Muted ? 0 : 1);
+            Program.MusicMute = !Program.MusicMute;
+            Resources.PlayMusicByName("unreal_technology_demo_95_-_unreals");
+        }
+        if (ButtonNarrow(HCenter + 500, VCenter + 180, "Mute SFX"))
+        {
+            Program.SFXMute = !Program.SFXMute;
         }
         
         
         DrawTextLeft(HCenter-590, VCenter+260, "By BadRAM and rosettedotnet\nWith music from the mod archive");
-            
+        
         EndDrawing();
     }
 }

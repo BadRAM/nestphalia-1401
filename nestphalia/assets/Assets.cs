@@ -357,7 +357,7 @@ public static class Assets
             (
                 "nest_sapper_beetle",
                 "Beetle Burrow",
-                "Sapper Beetles attack once, then return to \ntheir nest to join the next wave",
+                "Sapper Beetles attack once, then return to \ntheir nest to join the next wave\n\n\"General Paulby found great success by \ninstructing his beetles to \nresupply after each attack\"",
                 Resources.GetTextureByName("spawner4"),
                 50,
                 2500,

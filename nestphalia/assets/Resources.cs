@@ -39,7 +39,7 @@ public class SoundResource
     
     public void Play(float pan = 0.5f, float pitch = 1f, float volume = 0.75f)
     {
-        if (IsSoundPlaying(_soundBuffer[_bufferIndex])) return;
+        if (Program.SFXMute || IsSoundPlaying(_soundBuffer[_bufferIndex])) return;
         SetSoundPan(_soundBuffer[_bufferIndex], pan);
         SetSoundPitch(_soundBuffer[_bufferIndex], pitch);
         SetSoundVolume(_soundBuffer[_bufferIndex], volume);
@@ -145,12 +145,14 @@ public static class Resources
     public static void PlayMusicByName(string name)
     {
         StopMusicStream(MusicPlaying);
+        if (Program.MusicMute) return;
+        
         MusicResource? s = Music.FirstOrDefault(x => x.Name == name);
         
         if (s != null)
         {
             MusicPlaying = s.Music;
-            SetMusicVolume(MusicPlaying, 0.5f);
+            SetMusicVolume(MusicPlaying, 0.3f);
             PlayMusicStream(MusicPlaying);
         }
         else

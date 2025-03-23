@@ -438,42 +438,42 @@ public static class World
         int x = Screen.HCenter-500;
         
         int width = (int)(totalWidth * _swUpdate.Elapsed.TotalSeconds / totalSWTime);
-        Raylib.DrawRectangle(x, Screen.VCenter-300, width, 10, Color.Red);
+        Raylib.DrawRectangle(x, Screen.Top, width, 10, Color.Red);
         x += width;
         width = (int)(totalWidth * _swDraw.Elapsed.TotalSeconds / totalSWTime);
-        Raylib.DrawRectangle(x, Screen.VCenter-300, width, 10, Color.Green);
+        Raylib.DrawRectangle(x, Screen.Top, width, 10, Color.Green);
         x += width;
         width = totalWidth - x;
-        Raylib.DrawRectangle(x, Screen.VCenter-300, width, 10, Color.Gray);
+        Raylib.DrawRectangle(x, Screen.Top, width, 10, Color.Gray);
 
         totalSWTime = _swUpdate.Elapsed.TotalSeconds;
         x = Screen.HCenter - 500;
         width = (int)(totalWidth * _swUpdateTeams.Elapsed.TotalSeconds / totalSWTime);
         Raylib.DrawRectangle(x, Screen.VCenter-290, width, 20, Color.SkyBlue);
-        GUI.DrawTextLeft(x, Screen.VCenter-290, $"Teams {(int)(100 * _swUpdateTeams.Elapsed.TotalSeconds / totalSWTime)}%");
+        GUI.DrawTextLeft(x, Screen.Top+10, $"Teams {(int)(100 * _swUpdateTeams.Elapsed.TotalSeconds / totalSWTime)}%");
         x += width;
         width = (int)(totalWidth * _swUpdatePathfinder.Elapsed.TotalSeconds / totalSWTime);
         Raylib.DrawRectangle(x, Screen.VCenter-290, width, 20, Color.Orange);
-        GUI.DrawTextLeft(x, Screen.VCenter-290, $"Path {(int)(100 * _swUpdatePathfinder.Elapsed.TotalSeconds / totalSWTime)}%");
+        GUI.DrawTextLeft(x, Screen.Top+10, $"Path {(int)(100 * _swUpdatePathfinder.Elapsed.TotalSeconds / totalSWTime)}%");
         x += width;
         width = (int)(totalWidth * _swUpdateBoard.Elapsed.TotalSeconds / totalSWTime);
         Raylib.DrawRectangle(x, Screen.VCenter-290, width, 20, Color.Purple);
-        GUI.DrawTextLeft(x, Screen.VCenter-290, $"Board {(int)(100 * _swUpdateBoard.Elapsed.TotalSeconds / totalSWTime)}%");
+        GUI.DrawTextLeft(x, Screen.Top+10, $"Board {(int)(100 * _swUpdateBoard.Elapsed.TotalSeconds / totalSWTime)}%");
         x += width;
         width = (int)(totalWidth * _swUpdateMinions.Elapsed.TotalSeconds / totalSWTime);
         Raylib.DrawRectangle(x, Screen.VCenter-290, width, 20, Color.Yellow);
-        GUI.DrawTextLeft(x, Screen.VCenter-290, $"Minions {(int)(100 * _swUpdateMinions.Elapsed.TotalSeconds / totalSWTime)}%");
+        GUI.DrawTextLeft(x, Screen.Top+10, $"Minions {(int)(100 * _swUpdateMinions.Elapsed.TotalSeconds / totalSWTime)}%");
         x += width;
         width = (int)(totalWidth * _swUpdateMinionsCollide.Elapsed.TotalSeconds / totalSWTime);
         Raylib.DrawRectangle(x, Screen.VCenter-290, width, 20, Color.Red);
-        GUI.DrawTextLeft(x, Screen.VCenter-290, $"Phys {(int)(100 * _swUpdateMinionsCollide.Elapsed.TotalSeconds / totalSWTime)}%, {(_swUpdateMinionsCollide.Elapsed.TotalSeconds * 1000).ToString("N4")}ms");
+        GUI.DrawTextLeft(x, Screen.Top+10, $"Phys {(int)(100 * _swUpdateMinionsCollide.Elapsed.TotalSeconds / totalSWTime)}%, {(_swUpdateMinionsCollide.Elapsed.TotalSeconds * 1000).ToString("N4")}ms");
         x += width;
         width = (int)(totalWidth * _swUpdateProjectiles.Elapsed.TotalSeconds / totalSWTime);
         Raylib.DrawRectangle(x, Screen.VCenter-290, width, 20, Color.Blue);
-        GUI.DrawTextLeft(x, Screen.VCenter-290, $"Proj {(int)(100 * _swUpdateProjectiles.Elapsed.TotalSeconds / totalSWTime)}%");
+        GUI.DrawTextLeft(x, Screen.Top+10, $"Proj {(int)(100 * _swUpdateProjectiles.Elapsed.TotalSeconds / totalSWTime)}%");
         x += width;
         width = totalWidth - x;
-        Raylib.DrawRectangle(x, Screen.VCenter-300, width, 10, Color.Gray);
+        Raylib.DrawRectangle(x, Screen.Top+10, width, 20, Color.Gray);
     }
 
     // Returns a list of all minions in the square of tiles described by the arguments

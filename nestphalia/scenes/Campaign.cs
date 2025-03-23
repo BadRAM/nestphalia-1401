@@ -61,6 +61,11 @@ public class Campaign
             Level++;
         }
         
+        if (Raylib.IsKeyPressed(KeyboardKey.Escape))
+        {
+            MenuScene.Start();
+        }
+        
         Raylib.BeginDrawing();
         Raylib.ClearBackground(Color.Black);
         Screen.DrawBackground(Color.DarkBrown);

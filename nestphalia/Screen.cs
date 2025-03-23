@@ -28,12 +28,24 @@ public static class Screen
         //WhiteNoise = Raylib.GenImageWhiteNoise(1024, 1024, 0.5f);
         Tile1 = Resources.GetTextureByName("floor1");
         Tile2 = Resources.GetTextureByName("floor2");
-        _graffiti.Add(Resources.GetTextureByName("trogdor"));
-        _graffiti.Add(Resources.GetTextureByName("s"));
-        _graffiti.Add(Resources.GetTextureByName("kilroy"));
-        _graffiti.Add(Resources.GetTextureByName("triangle"));
-        _graffiti.Add(Resources.GetTextureByName("rune"));
-        _graffiti.Add(Resources.GetTextureByName("tag_isopod"));
+        
+        _graffiti.Add(Resources.GetTextureByName("tag_badram_isopod"));
+        _graffiti.Add(Resources.GetTextureByName("tag_badram_kilroy"));
+        _graffiti.Add(Resources.GetTextureByName("tag_badram_rune"));
+        _graffiti.Add(Resources.GetTextureByName("tag_badram_s"));
+        _graffiti.Add(Resources.GetTextureByName("tag_badram_trogdor"));
+        _graffiti.Add(Resources.GetTextureByName("tag_badram_triangle"));
+        _graffiti.Add(Resources.GetTextureByName("tag_blip"));
+        _graffiti.Add(Resources.GetTextureByName("tag_chartuch"));
+        _graffiti.Add(Resources.GetTextureByName("tag_fruitility"));
+        _graffiti.Add(Resources.GetTextureByName("tag_gnarwhal"));
+        _graffiti.Add(Resources.GetTextureByName("tag_kilroy_xiii"));
+        _graffiti.Add(Resources.GetTextureByName("tag_oldog"));
+        _graffiti.Add(Resources.GetTextureByName("tag_paulby"));
+        _graffiti.Add(Resources.GetTextureByName("tag_professorlucario"));
+        _graffiti.Add(Resources.GetTextureByName("tag_rune"));
+        _graffiti.Add(Resources.GetTextureByName("tag_sea"));
+        _graffiti.Add(Resources.GetTextureByName("tag_sonicproof"));
     }
 
     public static void RegenerateBackground()

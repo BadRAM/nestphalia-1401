@@ -292,7 +292,7 @@ public static class PathFinder
             {
                 if (_nodeGrid[i, j] != null && _nodeGrid[i, j].PrevNode != null)
                 {
-                    int t = (int)(_nodeGrid[i, j].Weight - _nodeGrid[i, j].PrevNode.Weight);
+                    int t = (int)Math.Clamp(_nodeGrid[i, j].Weight - _nodeGrid[i, j].PrevNode.Weight, 0, 255);
                     Color c = new Color(t, 255-t, 0, 200);
                     Raylib.DrawLineV(World.GetTileCenter(i, j), World.GetTileCenter(_nodeGrid[i, j].PrevNode.Pos), c);
                 }
@@ -311,7 +311,7 @@ public static class PathFinder
 
         GUI.DrawTextLeft(Screen.HCenter + 350, Screen.VCenter - 250,
             $"Avg Pathing Time: {(1000 * _swTotalTime.Elapsed.TotalSeconds / _totalPaths).ToString("N3")}ms\n" +
-            $"{_totalPaths} paths totalling {_swTotalTime.ElapsedMilliseconds}ms\n"); //+
+            $"{_totalPaths} paths totalling {_swTotalTime.ElapsedMilliseconds}ms ({_pathQueue.Count} pending)\n"); //+
         //     $"Average nodes per path: {_totalNodes / _totalPaths}\n" +
         //     $"Time in pathloop: {totalSWTime}ms\n" +
         //     $"Misc: {_swMisc.ElapsedMilliseconds}ms\n" +

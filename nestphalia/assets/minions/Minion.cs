@@ -91,6 +91,7 @@ public class Minion : ISprite
         {
             NavPath = new NavPath(Team);
             Retarget();
+            PathFinder.RequestPath(NavPath);
         }
         //_path = new PathFinder(this);
         //_path.FindPath(_targetTile);
@@ -173,11 +174,11 @@ public class Minion : ISprite
     // Should this be here, or in World? maybe somewhere else entirely, like a physics functions class?
     public void CollideMinion(Minion other)
     {
-        if (other == this) 
-        {
-            Console.WriteLine("Selfcolliding!");
-            return;
-        }
+        // if (other == this) 
+        // {
+        //     Console.WriteLine("Selfcolliding!");
+        //     return;
+        // }
         if (other.IsFlying != IsFlying) return;
         if (!Raylib.CheckCollisionCircles(Position, Template.PhysicsRadius, other.Position, other.Template.PhysicsRadius)) return;
         if (Position == other.Position) // jostle randomly if both minions are in the exact same position

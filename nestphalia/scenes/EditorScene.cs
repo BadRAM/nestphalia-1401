@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Numerics;
 using Raylib_cs;
 using static Raylib_cs.Raylib;
@@ -7,7 +8,7 @@ namespace nestphalia;
 
 public static class EditorScene
 {
-    private static bool _sandboxMode = false;
+    private static bool _sandboxMode;
     private static StructureTemplate? _brush;
     private static EditorTool _toolActive;
     private static Fort _fort;
@@ -34,6 +35,7 @@ public static class EditorScene
     {
         _bg = Resources.GetTextureByName("editor_bg");
         _brush = null;
+        _toolActive = EditorTool.Erase;
         _saveMessage = "";
         _sandboxMode = creativeMode;
         _fort = fortToLoad ?? new Fort();
@@ -72,65 +74,75 @@ public static class EditorScene
                 }
             }
         }
+
+        World.Camera.Offset = new Vector2(Screen.HCenter, Screen.VCenter);
         
         Resources.PlayMusicByName("so_lets_get_killed");
     }
     
     public static void Update()
     {
-        // ----- INPUT + GUI PHASE -----
-        
-        World.Camera.Offset = new Vector2(Screen.HCenter, Screen.VCenter);
-        
-        if (IsMouseButtonDown(MouseButton.Left))
+        // ===== INPUT + UPDATE =====
+
+        switch (_toolActive)
         {
-            Int2D tilePos = World.GetMouseTilePos();
-            
-            if (tilePos.X >= 1 && tilePos.X < 21 && tilePos.Y >= 1 && tilePos.Y < 21 
-                && _brush != World.GetTile(tilePos)?.Template)
-            {
-                if (_sandboxMode)
-                {
-                    World.SetTile(_brush, World.LeftTeam, tilePos);
-                }
-                else
-                {
-                    if (_brush == null || 
-                        (
-                          _brush.Price <= Program.Campaign.Money && 
-                         (_brush.Class != StructureTemplate.StructureClass.Nest || !_nestCapped || World.GetTile(tilePos) is Spawner) && 
-                         (_brush is not ActiveAbilityBeaconTemplate || !_beaconCapped || World.GetTile(tilePos) is ActiveAbilityBeacon)
-                        )
-                       )
-                    {
-                        if (World.GetTile(tilePos) != null)
-                        {
-                            Program.Campaign.Money += World.GetTile(tilePos).Template.Price;
-                        }
-                        World.SetTile(_brush, World.LeftTeam, tilePos);
-                        if (_brush != null)
-                        {
-                            Program.Campaign.Money -= _brush.Price;
-                        }
-                    }
-                }
-            }
+            case EditorTool.Brush:
+                BrushTool();
+                break;
+            case EditorTool.Erase:
+                EraseTool();
+                break;
+            case EditorTool.PathTester:
+                // Path test tool needs to happen during draw.
+                // PathTestTool();
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
         }
         
-        if (IsMouseButtonDown(MouseButton.Right))
+        if (IsMouseButtonPressed(MouseButton.Right))
         {
             Int2D tilePos = World.GetMouseTilePos();
             if (tilePos.X >= 1 && tilePos.X < 21 && tilePos.Y >= 1 && tilePos.Y < 21)
             {
                 _brush = World.GetTile(tilePos)?.Template;
+                if (_brush == null)
+                {
+                    _toolActive = EditorTool.Erase;
+                }
+                else
+                {
+                    _toolActive = EditorTool.Brush;
+                    _structureClass = _brush.Class;
+                }
             }
         }
+
+        if (IsKeyPressed(KeyboardKey.Escape))
+        {
+            if (_sandboxMode)
+            {
+                CustomBattleMenu.Start();
+            }
+            else
+            {
+                _fort.SaveBoard();
+                Program.Campaign.Start();
+            }
+        }
+        
+        // lazy hack so resizing the window doesn't offset the viewport
+        World.Camera.Offset = new Vector2(Screen.HCenter, Screen.VCenter); 
+        
+        // ===== DRAW =====
         
         BeginDrawing();
         ClearBackground(Color.Black);
         Screen.DrawBackground(Color.Gray);
         
         World.DrawFloor();
+
+
         
         // Draw gui background texture
         DrawTexture(_bg, Screen.HCenter - 608, Screen.VCenter - 308, Color.White);
@@ -156,7 +168,7 @@ public static class EditorScene
         
         if (_sandboxMode)
         {
-            if (ButtonWide(Screen.HCenter-600, Screen.VCenter+260, "Exit")) MenuScene.Start();
+            if (ButtonWide(Screen.HCenter-600, Screen.VCenter+260, "Exit")) CustomBattleMenu.Start();
             if (ButtonWide(Screen.HCenter-600, Screen.VCenter+180, "Save Changes", _fortAlreadySaved)) Resources.SaveFort(_fort.Name, _fort.Path);
         }
         else
@@ -168,31 +180,18 @@ public static class EditorScene
             }
         }
         
-        if (ButtonWide(Screen.HCenter-600, Screen.VCenter+220, "Save to new file"))
-        {
-            int number = 1;
-            while (true)
-            {
-                if (!File.Exists(Directory.GetCurrentDirectory() + $"/forts/fort{number}.fort"))
-                {
-                    _saveMessage = $"Saved fort as fort{number}.fort";
-                    _fort.Name = $"fort{number}";
-                    _fort.Path = Path.GetDirectoryName(_fort.Path) + "/" + _fort.Name + ".fort";
-                    _fortAlreadySaved = true;
-                    Console.WriteLine($"{Directory.GetCurrentDirectory()}/{_fort.Path}");
-                    Resources.SaveFort($"fort{number}", _fort.Path);
-                    break;
-                }
-                if (number >= 999)
-                {
-                    _saveMessage = "Couldn't save!";
-                    break;
-                }
-                number++;
-            }
-        }
+        if (ButtonWide(Screen.HCenter-600, Screen.VCenter+220, "Save to new file")) SaveToNewFile();
         
-        if (ButtonNarrow(Screen.HCenter+150, Screen.VCenter+260, "Sell", _brush != null)) _brush = null;
+        if (ButtonNarrow(Screen.HCenter+150, Screen.VCenter+260, "Sell", _toolActive != EditorTool.Erase))
+        {
+            _brush = null;
+            _toolActive = EditorTool.Erase;
+        }
+        if (ButtonNarrow(Screen.HCenter+50, Screen.VCenter+260, "Path Preview", _toolActive != EditorTool.PathTester))
+        {
+            _brush = null;
+            _toolActive = EditorTool.PathTester;
+        }
         if (_sellAllConfirm && ButtonNarrow(Screen.HCenter-250, Screen.VCenter+260, "Cancel"))   _sellAllConfirm = false;
         else if (!_sellAllConfirm&& ButtonNarrow(Screen.HCenter-250, Screen.VCenter+260, "Sell All")) _sellAllConfirm = true;
         if (_sellAllConfirm && ButtonNarrow(Screen.HCenter-150, Screen.VCenter+260, "Confirm"))  SellAll();
@@ -209,6 +208,7 @@ public static class EditorScene
             if (ButtonWide(Screen.HCenter+300, Screen.VCenter + y * 40 - 250, label, _brush != s))
             {
                 _brush = s;
+                _toolActive = EditorTool.Brush;
             }
             DrawTexture(s.Texture, Screen.HCenter + 320, Screen.VCenter + y * 40 - 246, Color.White);
             y++;
@@ -231,9 +231,118 @@ public static class EditorScene
         DrawTextLeft(Screen.HCenter-590, Screen.VCenter+170, _saveMessage);
         DrawTextLeft(Screen.HCenter-590, Screen.VCenter+50, GetFortStats());
         
+        if (_toolActive == EditorTool.PathTester)
+        {
+            PathTestTool();
+        }
+        
         EndDrawing();
     }
-    
+
+    private static void PathTestTool()
+    {
+        NavPath navPath = new NavPath(new Int2D(28, 11), World.GetMouseTilePos(), World.RightTeam);
+        PathFinder.FindPath(navPath);
+        
+        BeginMode2D(World.Camera);
+        
+        Vector2 path = World.GetTileCenter(navPath.Start);
+        foreach (Int2D i in navPath.Waypoints)
+        {
+            Vector2 v = World.GetTileCenter(i);
+            if (i.X < 22)
+            {
+                DrawLineEx(path, v, 2, Color.Lime);
+            }
+            path = v;
+        }
+
+        // if (navPath.Waypoints.Count == 0)
+        // {
+        //     Vector2 v = World.GetTileCenter(navPath.Destination);
+        //     DrawLine((int)path.X, (int)path.Y, (int)v.X, (int)v.Y, Color.Lime);
+        // }
+        
+        EndMode2D();
+    }
+
+    private static void EraseTool()
+    {
+        if (IsMouseButtonDown(MouseButton.Left))
+        {
+            Int2D tilePos = World.GetMouseTilePos();
+            
+            if (tilePos.X >= 1 && tilePos.X < 21 && tilePos.Y >= 1 && tilePos.Y < 21 
+                && _brush != World.GetTile(tilePos)?.Template)
+            {
+                World.SetTile(null, World.LeftTeam, tilePos);
+                if (!_sandboxMode)
+                {
+                    Program.Campaign.Money += World.GetTile(tilePos)?.Template.Price ?? 0;
+                }
+            }
+        }
+    }
+
+    private static void BrushTool()
+    {
+        if (_brush == null) 
+        {
+            Console.WriteLine("Tried to use null brush!");
+            _toolActive = EditorTool.Erase;
+            return;
+        }
+        if (IsMouseButtonDown(MouseButton.Left))
+        {
+            Int2D tilePos = World.GetMouseTilePos();
+            
+            if (tilePos.X >= 1 && tilePos.X < 21 && tilePos.Y >= 1 && tilePos.Y < 21 
+                && _brush != World.GetTile(tilePos)?.Template)
+            {
+                if (_sandboxMode)
+                {
+                    World.SetTile(_brush, World.LeftTeam, tilePos);
+                }
+                else if ( _brush.Price <= Program.Campaign.Money && 
+                          (_brush.Class != StructureTemplate.StructureClass.Nest || !_nestCapped || World.GetTile(tilePos) is Spawner) && 
+                          (_brush is not ActiveAbilityBeaconTemplate || !_beaconCapped || World.GetTile(tilePos) is ActiveAbilityBeacon)
+                        )
+                {
+                    if (World.GetTile(tilePos) != null)
+                    {
+                        Program.Campaign.Money += World.GetTile(tilePos).Template.Price;
+                    }
+                    World.SetTile(_brush, World.LeftTeam, tilePos);
+                    Program.Campaign.Money -= _brush.Price;
+                }
+            }
+        }
+    }
+
+    private static void SaveToNewFile()
+    {
+        int number = 1;
+        while (true)
+        {
+            if (!File.Exists(Directory.GetCurrentDirectory() + $"/forts/fort{number}.fort"))
+            {
+                _saveMessage = $"Saved fort as fort{number}.fort";
+                _fort.Name = $"fort{number}";
+                _fort.Path = Path.GetDirectoryName(_fort.Path) + "/" + _fort.Name + ".fort";
+                _fortAlreadySaved = true;
+                Console.WriteLine($"{Directory.GetCurrentDirectory()}/{_fort.Path}");
+                Resources.SaveFort($"fort{number}", _fort.Path);
+                break;
+            }
+            if (number >= 999)
+            {
+                _saveMessage = "Couldn't save!";
+                break;
+            }
+            number++;
+        }
+    }
+
     private static void SellAll()
     {
         for (int x = 0; x < World.BoardWidth; ++x)

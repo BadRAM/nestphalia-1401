@@ -31,6 +31,11 @@ public static class CustomBattleMenu
     
     public static void Update()
     {
+        if (Raylib.IsKeyPressed(KeyboardKey.Escape))
+        {
+            MenuScene.Start();
+        }
+        
         Raylib.BeginDrawing();
         Raylib.ClearBackground(Color.Gray);
         Screen.DrawBackground(Color.DarkGray);

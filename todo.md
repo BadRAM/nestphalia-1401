@@ -17,8 +17,9 @@ Programming todo:
 - ~~fort10 doesn't save correctly - Could not reproduce~~
 - ~~saving to new file multiple times doesnt' work~~
 - ~~Hoppers are aware of enemy mines~~
-- Editor path preview
+- ~~Editor path preview~~
 - new graffiti
+- Paulby shoutout
 - Some linux machines can't run the game.
     DIINotFoundException: Unable to load shared library
     ' raylib' or one of its dependencies. In order to help diagnose loading problems,
@@ -28,8 +29,10 @@ Programming todo:
     at nestphalia.Program.Main() in C:\Users\Luke\Workspace\RiderProjects\2-fort-
     cs\nestphalia\Program.cs:line 27
     Aborted (core dumped)
-- ESC quits all menus
-- Separate music and sfx mutes
+- ~~ESC quits all menus~~
+- ~~Separate music and sfx mutes~~
+- Editor background texture
+- ~~Bug: Spiderlings from death of bigspider just sit there for a while.~~
 
 ----- V2 -----
 
@@ -109,4 +112,5 @@ Design todo:
 
 Project management todo:
 ========================
+
 

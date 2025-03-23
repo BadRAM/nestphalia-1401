@@ -57,11 +57,11 @@ public static class BattleScene
 
         if (IsKeyPressed(KeyboardKey.F))
         {
-            SetMasterVolume(Program.Muted ? 0 : 0.25f);
+            SetMasterVolume(0.25f);
         }
         if (IsKeyReleased(KeyboardKey.F))
         {
-            SetMasterVolume(Program.Muted ? 0 : 1f);
+            SetMasterVolume(1f);
         }
 
         if (IsKeyDown(KeyboardKey.A))
@@ -160,7 +160,7 @@ public static class BattleScene
             DrawTextCentered(Screen.HCenter, Screen.VCenter, $"{Winner.Name} is victorious!", 48);
             if (ButtonNarrow(Screen.HCenter-50, Screen.VCenter + 30, "Return"))
             {
-                SetMasterVolume(Program.Muted ? 0 : 1f);
+                SetMasterVolume(1f);
 
                 if (CustomBattle)
                 {
