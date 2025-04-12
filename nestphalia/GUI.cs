@@ -65,6 +65,7 @@ public static class GUI
         {
             _buttonClickSFX.Play();
             return true;
-        }
-        return false;    }
+        } 
+        return false;
+    }
 }

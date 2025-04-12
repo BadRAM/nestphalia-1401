@@ -18,21 +18,33 @@ Programming todo:
 - ~~saving to new file multiple times doesnt' work~~
 - ~~Hoppers are aware of enemy mines~~
 - ~~Editor path preview~~
-- new graffiti
-- Paulby shoutout
-- Some linux machines can't run the game.
-    DIINotFoundException: Unable to load shared library
-    ' raylib' or one of its dependencies. In order to help diagnose loading problems,
-    consider setting the LD DEBUG environment variable: libraylib: cannot open shar
-    ed object file: No such file or directory
-    at ZeroElectric. Vinculum. Raylib. SetWindoHinSize(Int32 width, Int32 height)
-    at nestphalia.Program.Main() in C:\Users\Luke\Workspace\RiderProjects\2-fort-
-    cs\nestphalia\Program.cs:line 27
-    Aborted (core dumped)
+- ~~new graffiti~~
+- ~~Paulby shoutout~~
+- ~~Some linux machines can't run the game.~~
 - ~~ESC quits all menus~~
 - ~~Separate music and sfx mutes~~
-- Editor background texture
+- ~~Editor background texture~~
 - ~~Bug: Spiderlings from death of bigspider just sit there for a while.~~
+
+
+Decision point: Do I push towards 1401 v2, or start on 1402?
+---- V2: ----
+- Random damage variation
+- Campaign rebalance to use funding instead of direct cash.
+- Allow multiple campaign designs
+- Redesign the campaign forts
+- Nice campaign screen with a map and paths appearing every time you unlock a new level. Nonlinear campaign?
+- Nice title screen
+- 2-3 more bugs & towers
+
+---- 1402 ----
+- 3d engine
+- Tournament campaign
+- Worker units
+- Multitile structures
+- Inventory system
+- Many more bugs and towers than current
+
 
 ----- V2 -----
 
@@ -49,10 +61,11 @@ Programming todo:
 - Campaign screen Map
 - Orphaned sapper beetles will seek another burrow
 - Limit total spiderlings a spider can spawn
-- Switch back to raylib-cs and try compiling for web
+- try compiling for web
 
 
 ----- Postponed to team bug fort 2 -----
+
 - Fix minion collision with wall corners
 - Better fear evaluation, make bugs more scared of staying in scary places than passing through them.
 - Minion melee attack animation
@@ -60,7 +73,6 @@ Programming todo:
 - Assets from json
 - Minion vs Minion melee
 - Multitile structures
-- Active ability towers?
 - Post battle screen
 
 

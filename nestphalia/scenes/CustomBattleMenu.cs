@@ -27,6 +27,7 @@ public static class CustomBattleMenu
         RightFort?.LoadToBoard(true);
         Resources.PlayMusicByName("scene03");
         _activeDirectory = "";
+        _fortListPage = 1;
     }
     
     public static void Update()
@@ -58,7 +59,7 @@ public static class CustomBattleMenu
         
         if (GUI.ButtonNarrow(Screen.HCenter - 600, Screen.VCenter + 260, "<", _fortListPage > 1)) _fortListPage--;
             GUI.ButtonNarrow(Screen.HCenter - 500, Screen.VCenter + 260, _fortListPage.ToString(), false);
-        if (GUI.ButtonNarrow(Screen.HCenter - 400, Screen.VCenter + 260, ">", _fortListPage <= (1 + directories.Length + forts.Length)/12)) _fortListPage++;
+        if (GUI.ButtonNarrow(Screen.HCenter - 400, Screen.VCenter + 260, ">", _fortListPage <= ((_activeDirectory == "" ? 0 : 1) + directories.Length + forts.Length)/12)) _fortListPage++;
 
         for (int i = 0; i < 12; i++)
         {
@@ -82,7 +83,7 @@ public static class CustomBattleMenu
             {
                 if (GUI.ButtonWide(Screen.HCenter-600, Screen.VCenter + i*40 - 240, Path.GetFileNameWithoutExtension(forts[index - directories.Length])))
                 {
-                    Console.WriteLine("Loading " + Path.GetFileName(forts[index]));
+                    Console.WriteLine("Loading " + Path.GetFileName(forts[index - directories.Length]));
                     if (_loadingLeftSide)
                     {
                         LeftFort = Resources.LoadFort(forts[index - directories.Length]);

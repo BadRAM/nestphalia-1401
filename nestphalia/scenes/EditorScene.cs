@@ -83,7 +83,7 @@ public static class EditorScene
     public static void Update()
     {
         // ===== INPUT + UPDATE =====
-
+        
         switch (_toolActive)
         {
             case EditorTool.Brush:
@@ -93,7 +93,7 @@ public static class EditorScene
                 EraseTool();
                 break;
             case EditorTool.PathTester:
-                // Path test tool needs to happen during draw.
+                // Path test tool happens during draw.
                 // PathTestTool();
                 break;
             default:
@@ -134,6 +134,7 @@ public static class EditorScene
         // lazy hack so resizing the window doesn't offset the viewport
         World.Camera.Offset = new Vector2(Screen.HCenter, Screen.VCenter); 
         
+        
         // ===== DRAW =====
         
         BeginDrawing();
@@ -141,11 +142,9 @@ public static class EditorScene
         Screen.DrawBackground(Color.Gray);
         
         World.DrawFloor();
-
-
         
         // Draw gui background texture
-        DrawTexture(_bg, Screen.HCenter - 608, Screen.VCenter - 308, Color.White);
+        DrawTexture(_bg, Screen.HCenter - 604, Screen.VCenter - 304, Color.White);
         
         // Draw brush preview ghost
         if (CheckCollisionPointRec(GetMousePosition(), new Rectangle(Screen.HCenter-240, Screen.VCenter-232, 480, 480)))
@@ -166,51 +165,59 @@ public static class EditorScene
         
         World.Draw();
         
+        // Bottom left buttons
         if (_sandboxMode)
         {
-            if (ButtonWide(Screen.HCenter-600, Screen.VCenter+260, "Exit")) CustomBattleMenu.Start();
-            if (ButtonWide(Screen.HCenter-600, Screen.VCenter+180, "Save Changes", _fortAlreadySaved)) Resources.SaveFort(_fort.Name, _fort.Path);
+            if (ButtonWide(Screen.HCenter-592, Screen.VCenter+252, "Exit")) CustomBattleMenu.Start();
+            if (ButtonWide(Screen.HCenter-592, Screen.VCenter+172, "Save Changes", _fortAlreadySaved)) Resources.SaveFort(_fort.Name, _fort.Path);
         }
         else
         {
-            if (ButtonWide(Screen.HCenter-600, Screen.VCenter+260, "Save and Exit"))
+            if (ButtonWide(Screen.HCenter-592, Screen.VCenter+172, "Save and Exit"))
             {
                 _fort.SaveBoard();
                 Program.Campaign.Start();
             }
+            if (ButtonWide(Screen.HCenter-592, Screen.VCenter+252, "Exit without saving"))
+            {
+                Program.Campaign.Start();
+            }
         }
+        if (ButtonWide(Screen.HCenter-592, Screen.VCenter+212, "Save to new file")) SaveToNewFile();
         
-        if (ButtonWide(Screen.HCenter-600, Screen.VCenter+220, "Save to new file")) SaveToNewFile();
-        
-        if (ButtonNarrow(Screen.HCenter+150, Screen.VCenter+260, "Sell", _toolActive != EditorTool.Erase))
+        // Bottom center buttons
+        if (ButtonNarrow(Screen.HCenter+150, Screen.VCenter+258, "Sell", _toolActive != EditorTool.Erase))
         {
             _brush = null;
             _toolActive = EditorTool.Erase;
         }
-        if (ButtonNarrow(Screen.HCenter+50, Screen.VCenter+260, "Path Preview", _toolActive != EditorTool.PathTester))
+        if (ButtonNarrow(Screen.HCenter+50, Screen.VCenter+258, "Path Preview", _toolActive != EditorTool.PathTester))
         {
             _brush = null;
             _toolActive = EditorTool.PathTester;
         }
-        if (_sellAllConfirm && ButtonNarrow(Screen.HCenter-250, Screen.VCenter+260, "Cancel"))   _sellAllConfirm = false;
-        else if (!_sellAllConfirm&& ButtonNarrow(Screen.HCenter-250, Screen.VCenter+260, "Sell All")) _sellAllConfirm = true;
-        if (_sellAllConfirm && ButtonNarrow(Screen.HCenter-150, Screen.VCenter+260, "Confirm"))  SellAll();
-        if (ButtonNarrow(Screen.HCenter+300, Screen.VCenter-300, (_newUtil ? "NEW! " : "") + "Utility", _structureClass != StructureTemplate.StructureClass.Utility)) _structureClass = StructureTemplate.StructureClass.Utility;
-        if (ButtonNarrow(Screen.HCenter+400, Screen.VCenter-300, (_newTower ? "NEW! " : "") + "Tower", _structureClass != StructureTemplate.StructureClass.Tower)) _structureClass = StructureTemplate.StructureClass.Tower;
-        if (ButtonNarrow(Screen.HCenter+500, Screen.VCenter-300, (_newNest ? "NEW! " : "") + "Nest", _structureClass != StructureTemplate.StructureClass.Nest)) _structureClass = StructureTemplate.StructureClass.Nest;
+        if (_sellAllConfirm && ButtonNarrow(Screen.HCenter-250, Screen.VCenter+258, "Cancel"))   _sellAllConfirm = false;
+        else if (!_sellAllConfirm&& ButtonNarrow(Screen.HCenter-250, Screen.VCenter+258, "Sell All")) _sellAllConfirm = true;
+        if (_sellAllConfirm && ButtonNarrow(Screen.HCenter-150, Screen.VCenter+258, "Confirm"))  SellAll();
         
+        // Structure Category buttons
+        if (ButtonNarrow(Screen.HCenter+292, Screen.VCenter-292, (_newUtil ? "NEW! " : "") + "Utility", _structureClass != StructureTemplate.StructureClass.Utility)) _structureClass = StructureTemplate.StructureClass.Utility;
+        if (ButtonNarrow(Screen.HCenter+392, Screen.VCenter-292, (_newTower ? "NEW! " : "") + "Tower", _structureClass != StructureTemplate.StructureClass.Tower)) _structureClass = StructureTemplate.StructureClass.Tower;
+        if (ButtonNarrow(Screen.HCenter+492, Screen.VCenter-292, (_newNest ? "NEW! " : "") + "Nest", _structureClass != StructureTemplate.StructureClass.Nest)) _structureClass = StructureTemplate.StructureClass.Nest;
+        
+        // Structure list
         int y = 0;
         for (int i = 0; i < Assets.Structures.Count; i++)
         {
             StructureTemplate s = Assets.Structures[i];
             if ((!_sandboxMode && s.LevelRequirement > Program.Campaign.Level) || s.Class != _structureClass) continue;
             string label = ((!_sandboxMode && s.LevelRequirement == Program.Campaign.Level) ? "NEW! " : "") + s.Name + " - $" + s.Price;
-            if (ButtonWide(Screen.HCenter+300, Screen.VCenter + y * 40 - 250, label, _brush != s))
+            if (ButtonWide(Screen.HCenter+292, Screen.VCenter + y * 40 - 250, label, _brush != s))
             {
                 _brush = s;
                 _toolActive = EditorTool.Brush;
             }
-            DrawTexture(s.Texture, Screen.HCenter + 320, Screen.VCenter + y * 40 - 246, Color.White);
+            DrawTexture(s.Texture, Screen.HCenter + 312, Screen.VCenter + y * 40 - 246, Color.White);
             y++;
         }
         
