@@ -4,7 +4,33 @@ To start, just run nestphalia.exe
 
 All game progress is saved in campaign.sav, if you want to back up, transfer, or reset your progress, just copy, paste, or delete campaign.sav
 
+Your custom battle forts are saved in /forts/. Renaming files and creating folders is fully supported and expected.
+
 Version History:
+
+==== 1.2.0 - Champion's Edition - 2025-04-12 ====
+Highlighted Changes:
+ - All forts used in the first grand tournament of bugs have been included
+ - The tournament's participants have left graffiti on menu screens
+ - The custom battle menu now supports folders
+ - The sandbox editor is now accessed from inside the custom battle menu
+ - The editor now has a path preview tool, to help understand bug pathfinding
+ - SFX and Music can be muted separately
+ - Optimized pathfinding and collision detection, performance in large battles improved significantly
+Other changes:
+ - Bugs no longer get stuck in corners if they are pushed backwards by other bugs
+ - Repaired stratagems work as normal
+ - Hoppers no longer hop to the exact center of their target tile
+ - The Sell All button now allows you to cancel
+ - Fixed a bug where beetles would sometimes throw a lot of bombs instead of just one
+ - Bugs no longer walk directly towards their target while waiting for a path
+ - Larger bugs aren't as easy for small bugs to push around
+ - Hoppers are aware of minefields
+ - Fixed a bug that prevented the game from starting on most linux distributions
+ - ESC exits all menus
+ - The editor has a new background image
+ - Fixed a bug where spiderlings spawned from the death of a spider would be inactive for a while
+ - Migrated to a different raylib c# binding
 
 ---- 1.1.2 - 2025-03-02 ----
  - Fixed a bug that caused bugs to pathfind in circles
