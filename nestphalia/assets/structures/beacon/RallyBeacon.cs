@@ -49,7 +49,7 @@ public class RallyBeacon : ActiveAbilityBeacon
 
         if (value * mult > minimumValue * 10)
         {
-            return World.GetTileCenter(targets[Random.Shared.Next(0, targets.Count)]);
+            return World.GetTileCenter(targets[World.Random.Next(0, targets.Count)]);
         }
         return null;
     }

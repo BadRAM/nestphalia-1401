@@ -91,7 +91,7 @@ public class HopperMinion : Minion
                 NavPath.Skip();
                 _jumping = true;
                 _jumpStartPos = Position;
-                _jumpEndPos = World.GetTileCenter((Int2D)ahead) + new Vector2(Random.Shared.Next(17)-8, Random.Shared.Next(23)-11);
+                _jumpEndPos = World.GetTileCenter((Int2D)ahead) + new Vector2(World.Random.Next(17)-8, World.Random.Next(23)-11);
                 _jumpStartTime = Time.Scaled;
             }
             else

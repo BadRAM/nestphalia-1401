@@ -50,7 +50,7 @@ public class Projectile : ISprite
             Position = Position.MoveTowards(minion.Position, Template.Speed * Time.DeltaTime);
             if (Position == minion.Position)
             {
-                minion.Hurt(this, Template.Damage);
+                minion.Hurt(this, Template.Damage*1.5 - Template.Damage*World.Random.NextDouble());
                 World.ProjectilesToRemove.Add(this);
             }
         }
@@ -59,7 +59,7 @@ public class Projectile : ISprite
             Position = Position.MoveTowards(structure.GetCenter(), Template.Speed * Time.DeltaTime);
             if (Position == structure.GetCenter())
             {
-                World.GetTileAtPos(Position)?.Hurt(Template.Damage);
+                World.GetTileAtPos(Position)?.Hurt(Template.Damage*1.5 - Template.Damage*World.Random.NextDouble());
                 Destroy();
             }
         }
@@ -68,7 +68,7 @@ public class Projectile : ISprite
             Position = Position.MoveTowards(vec, Template.Speed * Time.DeltaTime);
             if (Position == vec)
             {
-                World.GetTileAtPos(Position)?.Hurt(Template.Damage);
+                World.GetTileAtPos(Position)?.Hurt(Template.Damage*1.5 - Template.Damage*World.Random.NextDouble());
                 Destroy();
             }
         }

@@ -177,7 +177,7 @@ public class Tower : Structure
 
         if (ValidTargets.Count > 0)
         {
-            random = ValidTargets[Random.Shared.Next(ValidTargets.Count)];
+            random = ValidTargets[World.Random.Next(ValidTargets.Count)];
         }
         
         return random;

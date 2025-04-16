@@ -41,7 +41,7 @@ public class Minefield : Structure
         _armSound = Resources.GetSoundByName("primed");
         for (int i = 0; i < _drawPoints.Length; i++)
         {
-            _drawPoints[i] += new Vector2(Random.Shared.Next(-2, 2), Random.Shared.Next(-2, 2));
+            _drawPoints[i] += new Vector2(World.Random.Next(-2, 2), World.Random.Next(-2, 2));
         }
 
         Z = position.Y - 24;

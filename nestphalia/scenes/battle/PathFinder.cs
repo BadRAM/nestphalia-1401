@@ -92,6 +92,14 @@ public static class PathFinder
         {
             // _swMisc.Start();
             count++;
+
+            // for (int i = 1; i < _nodesToConsider.Count; i++)
+            // {
+            //     if (_nodesToConsider[i-1].Weight < _nodesToConsider[i].Weight)
+            //     {
+            //         Console.WriteLine("_nodesToConsider is not sorted!");
+            //     }
+            // }
             
             // Abort if we ran out of options.
             if (_nodesToConsider.Count == 0)
@@ -106,6 +114,8 @@ public static class PathFinder
             
             n = _nodesToConsider[_nodesToConsiderOffset];
             _nodesToConsiderOffset++;
+            // n = _nodesToConsider[^1];
+            // _nodesToConsider.RemoveAt(_nodesToConsider.Count-1);
             
             // _swFindNext.Stop();
             // _swMisc.Start();
@@ -197,7 +207,8 @@ public static class PathFinder
         }
 
         navPath.Found = true;
-        // _totalNodes += _nodesToConsider.Count;
+        // _totalNodes += count;
+        //_totalNodes += _nodesToConsider.Count;
         
         _swTotalTime.Stop();
     }
@@ -215,7 +226,7 @@ public static class PathFinder
         n.Weight = prevNode.Weight;
         n.Weight += weight;
         // n.Weight += 0.1 * ((Math.Abs(x - path.Destination.X) + Math.Abs(y - path.Destination.Y)) - (Math.Abs(prevNode.Pos.X - path.Destination.X) + Math.Abs(prevNode.Pos.Y - path.Destination.Y)));
-        if ((_nodeGrid[x, y]?.Weight ?? Double.MaxValue) < n.Weight)
+        if ((_nodeGrid[x, y]?.Weight ?? Double.MaxValue) <= n.Weight)
         {
             // _swNewNode.Stop();
             // _swAddNodes.Start();
@@ -312,47 +323,47 @@ public static class PathFinder
         GUI.DrawTextLeft(Screen.HCenter + 350, Screen.VCenter - 250,
             $"Avg Pathing Time: {(1000 * _swTotalTime.Elapsed.TotalSeconds / _totalPaths).ToString("N3")}ms\n" +
             $"{_totalPaths} paths totalling {_swTotalTime.ElapsedMilliseconds}ms ({_pathQueue.Count} pending)\n"); //+
-        //     $"Average nodes per path: {_totalNodes / _totalPaths}\n" +
-        //     $"Time in pathloop: {totalSWTime}ms\n" +
-        //     $"Misc: {_swMisc.ElapsedMilliseconds}ms\n" +
-        //     $"FindNext: {_swFindNext.ElapsedMilliseconds}ms\n" +
-        //     $"AddNodes: {_swAddNodes.ElapsedMilliseconds}ms\n" +
-        //     $"NewNode: {_swNewNode.ElapsedMilliseconds}ms\n" +
-        //     $"RegisterNode: {_swRegisterNode.ElapsedMilliseconds}ms");
-        //
-        // int totalWidth = 1000;
-        // int x = Screen.HCenter-500;
+            // $"Average nodes per path: {_totalNodes / _totalPaths}\n" +
+            // $"Time in pathloop: {totalSWTime}ms\n" +
+            // $"Misc: {_swMisc.ElapsedMilliseconds}ms\n" +
+            // $"FindNext: {_swFindNext.ElapsedMilliseconds}ms\n" +
+            // $"AddNodes: {_swAddNodes.ElapsedMilliseconds}ms\n" +
+            // $"NewNode: {_swNewNode.ElapsedMilliseconds}ms\n" +
+            // $"RegisterNode: {_swRegisterNode.ElapsedMilliseconds}ms");
+        
+        int totalWidth = 1000;
+        int x = Screen.HCenter-500;
         // int width = (int)(totalWidth * _swMisc.ElapsedMilliseconds / totalSWTime);
         //
-        // Raylib.DrawRectangle(x, Screen.VCenter-300, width, 40, Raylib.GRAY);
+        // Raylib.DrawRectangle(x, Screen.VCenter-300, width, 40, Color.Gray);
         // GUI.DrawTextLeft(x, Screen.VCenter-290, $"Misc: {(int)(100 * _swMisc.ElapsedMilliseconds / totalSWTime)}%");
         // x += width;
         // width = (int)(totalWidth * _swFindNext.ElapsedMilliseconds / totalSWTime);
-        // Raylib.DrawRectangle(x, Screen.VCenter-300, width, 40, Raylib.GREEN);
+        // Raylib.DrawRectangle(x, Screen.VCenter-300, width, 40, Color.Green);
         // GUI.DrawTextLeft(x, Screen.VCenter-290, $"FindNext: {(int)(100 * _swFindNext.ElapsedMilliseconds / totalSWTime)}%");
         // x += width;
         // width = (int)(totalWidth * _swAddNodes.ElapsedMilliseconds / totalSWTime);
-        // Raylib.DrawRectangle(x, Screen.VCenter-300, width, 40, Raylib.SKYBLUE);
+        // Raylib.DrawRectangle(x, Screen.VCenter-300, width, 40, Color.SkyBlue);
         // GUI.DrawTextLeft(x, Screen.VCenter-290, $"AddNodes: {(int)(100 * _swAddNodes.ElapsedMilliseconds / totalSWTime)}%");
         // x += width;
         // width = (int)(totalWidth * _swNewNode.ElapsedMilliseconds / totalSWTime);
-        // Raylib.DrawRectangle(x, Screen.VCenter-300, width, 40, Raylib.ORANGE);
+        // Raylib.DrawRectangle(x, Screen.VCenter-300, width, 40, Color.Orange);
         // GUI.DrawTextLeft(x, Screen.VCenter-290, $"NewNode: {(int)(100 * _swNewNode.ElapsedMilliseconds / totalSWTime)}%");
         // x += width;
         // width = (int)(totalWidth * _swRegisterNode.ElapsedMilliseconds / totalSWTime);
-        // Raylib.DrawRectangle(x, Screen.VCenter-300, width, 40, Raylib.PURPLE);
+        // Raylib.DrawRectangle(x, Screen.VCenter-300, width, 40, Color.Purple);
         // GUI.DrawTextLeft(x, Screen.VCenter-290, $"RegisterNode: {(int)(100 * _swRegisterNode.ElapsedMilliseconds / totalSWTime)}%");
         // x += width;
         //
         // width = totalWidth - x;
-        // Raylib.DrawRectangle(x, Screen.VCenter-300, width, 40, Raylib.GRAY);
+        // Raylib.DrawRectangle(x, Screen.VCenter-300, width, 40, Color.Gray);
         // GUI.DrawTextLeft(x, Screen.VCenter-290, $"Out of loop: {100 * width / totalWidth}%");
     }
 }
 
 public class NavPath
 {
-    public bool Found = false; 
+    public bool Found; 
     public Int2D Start;
     public Int2D Destination;
     public Team Team;

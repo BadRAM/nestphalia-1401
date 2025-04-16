@@ -131,7 +131,7 @@ public class Spawner : Structure
             return;
         }
         
-        int i = Utils.WeightedRandom(targets.Count);
+        int i = World.Random.WeightedRandom(targets.Count);
         // Console.WriteLine($"Picked target {i}");
         _targetTile = targets[i].Value;
     }

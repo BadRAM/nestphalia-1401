@@ -16,6 +16,7 @@ public static class World
     public static List<Projectile> Projectiles = new List<Projectile>();
     public static List<Projectile> ProjectilesToRemove = new List<Projectile>();
     public static List<ISprite> Sprites = new List<ISprite>();
+    public static Random Random = new Random();
     public static double WaveDuration = 20;
     public static bool PreWave;
     public static double PreWaveOffset = 1.6;

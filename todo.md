@@ -48,12 +48,19 @@ Decision point: Do I push towards 1401 v2, or start on 1402?
 
 ----- V2 -----
 
-- Random damage variation
+- ~~Random damage variation~~
+- Make battles able to be deterministic if desired
+- Minion state machine
 - Refactor Minion.Hurt() to not need a damagesource
 - Pathfinding optimizations: 
   - as soon as a node is set in the targeted half of the battlefield, purge all nodes and dont' allow any new ones to be created in the untargeted half
   - Binary search to find consider queue insertion point
-- Campaign rebalance, use 'funding' instead of direct cash stores.
+    - Before: Registernode 30%, avg pathtime 0.547ms
+    - After:  Registernode 50%, avg pathtime 0.650ms :(
+  - Reverse sort order of list to maximize operations on performant end
+    - Before: 0.322ms
+    - After: 0.300ms :)
+- Campaign rebalance, use 'funding' instead of direct cash stores, or Pay to build the fort every mission
 - Help text/tutorial
 - Game load cutscene
 - Fancy title text

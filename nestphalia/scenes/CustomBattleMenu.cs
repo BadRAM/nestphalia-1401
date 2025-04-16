@@ -12,6 +12,7 @@ public static class CustomBattleMenu
     private static int _fortListPage = 1;
     private static bool _leftIsPlayer = false;
     private static bool _rightIsPlayer = false;
+    private static bool _deterministicMode = false;
     private static string _activeDirectory = "";
     private static string[] _directories;
     private static string[] _files;
@@ -122,6 +123,16 @@ public static class CustomBattleMenu
         GUI.DrawTextLeft(Screen.HCenter + 100, Screen.VCenter - 200, RightFort?.Comment ?? "");
         GUI.DrawTextCentered(Screen.HCenter, Screen.VCenter + 220, OutcomeMessage, 24);
         
+        if (GUI.ButtonWide(Screen.HCenter + 300, Screen.VCenter - 180, "Open Forts Folder"))
+        {
+            System.Diagnostics.Process.Start("explorer.exe", Directory.GetCurrentDirectory() + @"\forts");
+        }
+        
+        if (GUI.ButtonWide(Screen.HCenter + 300, Screen.VCenter - 140, $"Deterministic Mode {(_deterministicMode ? "On" : "Off")}"))
+        {
+            _deterministicMode = !_deterministicMode;
+        }
+        
         if (GUI.ButtonWide(Screen.HCenter + 300, Screen.VCenter + 260, "Back"))
         {
             MenuScene.Start();
@@ -130,6 +141,7 @@ public static class CustomBattleMenu
         if (LeftFort != null && RightFort != null &&
             GUI.ButtonWide(Screen.HCenter-150, Screen.VCenter + 260, "Begin!"))
         {
+            World.Random = _deterministicMode ? new Random(123) : new Random();
             BattleScene.Start(LeftFort, RightFort, _leftIsPlayer, _rightIsPlayer);
             BattleScene.CustomBattle = true;
         }

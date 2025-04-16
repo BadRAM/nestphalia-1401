@@ -85,7 +85,6 @@ public class Team
     public void AddFearOf(double fear, int x, int y)
     {
         _fearMap[x, y] = Math.Max(0, _fearMap[x, y] + fear);
-        
     }
     
     public void AddFearOf(double fear, Int2D pos)
@@ -162,7 +161,7 @@ public class Team
         }
         else
         {
-            int i = Random.Shared.Next(BeaconCap);
+            int i = World.Random.Next(BeaconCap);
             if ((Beacons[i]?.IsReady() ?? false) && Time.Scaled - _timeLastAbilityUsed > 8)
             {
                 Vector2? targetPos = Beacons[i]?.SelectPosition();
@@ -218,6 +217,6 @@ public class Team
         Raylib.DrawTextureRec(_healthBar, new Rectangle(0, 80, 300, 40), new Vector2(IsRightSide ? Screen.HCenter + 20  : Screen.HCenter - 320, Screen.Bottom - 44), Color.White);
         float hpBarSize = (float)(300 * _health / _maxHealth);
         Raylib.DrawTextureRec(_healthBar, new Rectangle( IsRightSide ? 300 - hpBarSize : 0, 40, hpBarSize, 40), new Vector2(IsRightSide ? (300 - hpBarSize) + Screen.HCenter + 20  : Screen.HCenter - 320, Screen.Bottom -44), Color.White);
-        GUI.DrawTextCentered(IsRightSide ? Screen.HCenter + 160 : Screen.HCenter - 160, Screen.Bottom - 24, $"{Name} - {_health}/{_maxHealth}");
+        GUI.DrawTextCentered(IsRightSide ? Screen.HCenter + 160 : Screen.HCenter - 160, Screen.Bottom - 24, $"{Name} - {_health:n0}/{_maxHealth:n0}");
     }
 }

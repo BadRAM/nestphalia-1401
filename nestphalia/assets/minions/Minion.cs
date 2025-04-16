@@ -183,8 +183,8 @@ public class Minion : ISprite
         if (!Raylib.CheckCollisionCircles(Position, Template.PhysicsRadius, other.Position, other.Template.PhysicsRadius)) return;
         if (Position == other.Position) // jostle randomly if both minions are in the exact same position
         {
-                  _collisionOffset += new Vector2((float)(Random.Shared.NextDouble() - 0.5), (float)(Random.Shared.NextDouble() - 0.5));
-            other._collisionOffset += new Vector2((float)(Random.Shared.NextDouble() - 0.5), (float)(Random.Shared.NextDouble() - 0.5));
+                  _collisionOffset += new Vector2((float)(World.Random.NextDouble() - 0.5), (float)(World.Random.NextDouble() - 0.5));
+            other._collisionOffset += new Vector2((float)(World.Random.NextDouble() - 0.5), (float)(World.Random.NextDouble() - 0.5));
             return;
         }
         
@@ -287,8 +287,8 @@ public class Minion : ISprite
 
         NavPath.Reset(Position);
         int i = Math.Min(targets.Count, 16);
-        i = Math.Min(Random.Shared.Next(i), Random.Shared.Next(i));
-        i = Utils.WeightedRandom(i);
+        i = Math.Min(World.Random.Next(i), World.Random.Next(i));
+        i = World.Random.WeightedRandom(i);
         NavPath.Destination = targets[i].Value;
         // _navPath.Destination = targets[0].Value;
     }
