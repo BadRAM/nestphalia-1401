@@ -76,30 +76,18 @@ public static class PathFinder
         _swTotalTime.Start();
         _totalPaths++;
         
-        //PathNode?[,] nodeGrid = new PathNode[World.BoardWidth,World.BoardHeight];
-        // LinkedList<PathNode> nodesToConsider = new LinkedList<PathNode>();
-
         _nodeGrid = new PathNode[World.BoardWidth, World.BoardHeight];
         _nodesToConsider.Clear();
         _nodesToConsiderOffset = 0;
         
         PathNode n = new PathNode(navPath.Start);
         _nodesToConsider.Add(n);
-        // nodesToConsider.Add(n);
         
-        int count = 0;
+        //int count = 0;
         while (true)
         {
             // _swMisc.Start();
-            count++;
-
-            // for (int i = 1; i < _nodesToConsider.Count; i++)
-            // {
-            //     if (_nodesToConsider[i-1].Weight < _nodesToConsider[i].Weight)
-            //     {
-            //         Console.WriteLine("_nodesToConsider is not sorted!");
-            //     }
-            // }
+            //count++;
             
             // Abort if we ran out of options.
             if (_nodesToConsider.Count == 0)
@@ -112,10 +100,8 @@ public static class PathFinder
             // _swMisc.Stop();
             // _swFindNext.Start();
             
-            n = _nodesToConsider[_nodesToConsiderOffset];
-            _nodesToConsiderOffset++;
-            // n = _nodesToConsider[^1];
-            // _nodesToConsider.RemoveAt(_nodesToConsider.Count-1);
+            n = _nodesToConsider[^1];
+            _nodesToConsider.RemoveAt(_nodesToConsider.Count-1);
             
             // _swFindNext.Stop();
             // _swMisc.Start();
@@ -225,7 +211,6 @@ public static class PathFinder
         n.PrevNode = prevNode;
         n.Weight = prevNode.Weight;
         n.Weight += weight;
-        // n.Weight += 0.1 * ((Math.Abs(x - path.Destination.X) + Math.Abs(y - path.Destination.Y)) - (Math.Abs(prevNode.Pos.X - path.Destination.X) + Math.Abs(prevNode.Pos.Y - path.Destination.Y)));
         if ((_nodeGrid[x, y]?.Weight ?? Double.MaxValue) <= n.Weight)
         {
             // _swNewNode.Stop();
@@ -268,17 +253,17 @@ public static class PathFinder
                 // _swAddNodes.Start();
                 return;
             }
-            for(int i = _nodesToConsiderOffset; i < _nodesToConsider.Count; i++)
+            for(int i = _nodesToConsider.Count-1; i >= 0; i--)
             {
                 if (n.Weight < _nodesToConsider[i].Weight)
                 {
-                    _nodesToConsider.Insert(i, n);
+                    _nodesToConsider.Insert(i+1, n);
                     // _swRegisterNode.Stop();
                     // _swAddNodes.Start();
                     return;
                 }
             }
-            _nodesToConsider.Add(n);
+            _nodesToConsider.Insert(0, n);
         }
         // _swRegisterNode.Stop();
         // _swAddNodes.Start();
