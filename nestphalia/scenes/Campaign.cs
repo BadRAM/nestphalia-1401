@@ -10,7 +10,6 @@ public class Campaign
     [JsonInclude] public double Money = 2000;
     [JsonInclude] public double Battles;
     [JsonInclude] public int Level;
-    [JsonInclude] public List<FloorTileTemplate> Inventory = new List<FloorTileTemplate>();
     [JsonInclude] public Fort Fort1 = new Fort();
     [JsonInclude] public Fort Fort2 = new Fort();
     [JsonInclude] public Fort Fort3 = new Fort();

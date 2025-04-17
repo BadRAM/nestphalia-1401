@@ -70,6 +70,13 @@ public class Minion : ISprite
     public bool IsFlying;
     public bool Frenzy;
     
+    public enum MinionState
+    {
+        Waiting,
+        Moving,
+        Attacking
+    }
+    
     public double Z { get; set; }
 
     public Minion(MinionTemplate template, Team team, Vector2 position, NavPath? navPath)
@@ -118,6 +125,7 @@ public class Minion : ISprite
         Frenzy = false;
     }
 
+    // 
     protected void UpdateNextPos()
     {
         Vector2 pos = World.GetTileCenter(NavPath.NextTile(Position));
