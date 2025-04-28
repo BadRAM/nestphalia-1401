@@ -24,7 +24,7 @@ public class Campaign
 
     public void Save()
     {
-        string jsonString = JsonSerializer.Serialize(this);
+        string jsonString = JsonSerializer.Serialize(this, SourceGenerationContext.Default.Campaign);
         //Console.WriteLine($"JSON campaign looks like: {jsonString}");
         File.WriteAllText(Directory.GetCurrentDirectory() + "/campaign.sav", jsonString);
     }
@@ -32,7 +32,7 @@ public class Campaign
     public static Campaign Load()
     {
         string jsonString = File.ReadAllText(Directory.GetCurrentDirectory() + "/campaign.sav");
-        return JsonSerializer.Deserialize<Campaign>(jsonString) ?? throw new NullReferenceException("Failed to deserialize campaign save file");
+        return JsonSerializer.Deserialize<Campaign>(jsonString, SourceGenerationContext.Default.Campaign) ?? throw new NullReferenceException("Failed to deserialize campaign save file");
     }
 
     public void Start()
@@ -222,7 +222,7 @@ public class Campaign
     {
         _selectedLevel = select;
         Resources.CampaignLevels[_selectedLevel].UpdateCost();
-        _prize = Math.Floor(Resources.CampaignLevels[_selectedLevel].TotalCost * 1.3);
+        _prize = Math.Floor(Resources.CampaignLevels[_selectedLevel].TotalCost * 1.5);
     }
 
     public int GetNestCap()

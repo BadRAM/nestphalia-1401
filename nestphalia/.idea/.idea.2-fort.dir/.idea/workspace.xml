@@ -8,23 +8,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="297dc327-1265-48a8-b6f0-6e372bbb5862" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../build_menu_bg.pdn" beforeDir="false" afterPath="$PROJECT_DIR$/../build_menu_bg.pdn" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.2-fort.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.2-fort.dir/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Screen.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Screen.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/Assets.cs" beforeDir="false" afterPath="$PROJECT_DIR$/assets/Assets.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/Fort.cs" beforeDir="false" afterPath="$PROJECT_DIR$/assets/Fort.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/assets/Resources.cs" beforeDir="false" afterPath="$PROJECT_DIR$/assets/Resources.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/minions/Minion.cs" beforeDir="false" afterPath="$PROJECT_DIR$/assets/minions/Minion.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/sprites/editor_bg.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/sprites/editor_bg.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/sprites/triangle.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/nestphalia.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/nestphalia.csproj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scenes/Campaign.cs" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Campaign.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scenes/CustomBattleMenu.cs" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/CustomBattleMenu.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scenes/EditorScene.cs" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/EditorScene.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scenes/MenuScene.cs" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/MenuScene.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scenes/PostBattleScene.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/scenes/battle/BattleScene.cs" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/battle/BattleScene.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scenes/battle/PathFinder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/battle/PathFinder.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scenes/battle/World.cs" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/battle/World.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../todo.md" beforeDir="false" afterPath="$PROJECT_DIR$/../todo.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,8 +27,8 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/a6b7f037ba7b44df80b8d3aa7e58eeb2e8e938/fe/d92b9ad5/FileSystemEnumerator`1.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/6f4af9413b11943bfdd164b58f2c3faa476fb6ffee3bb2d63ea7882b139c1/ThrowHelper.Serialization.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/e60b8a28a674789a73bf80f2349c8fd7881cb1ed21fea431b814f1e08598/Convert.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="ProjectColorInfo">{
@@ -53,6 +42,7 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     ".NET Project.nestphalia.executor": "Debug",
+    "Publish to folder.Windows.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "git-widget-placeholder": "main",
@@ -66,11 +56,15 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
-  <component name="RunManager">
+  <component name="RunManager" selected=".NET Project.nestphalia">
+    <configuration name="Windows" type="DotNetFolderPublish" factoryName="Publish to folder">
+      <riderPublish delete_existing_files="true" produce_single_file="true" ready_to_run="true" runtime="win-x64" self_contained="true" target_folder="$PROJECT_DIR$/bin/Publish/Windows" target_framework="net9.0" trim_unused_assemblies="true" uuid_high="8589477358127153881" uuid_low="-4792151472858659537" />
+      <method v="2" />
+    </configuration>
     <configuration name="nestphalia" type="DotNetProject" factoryName=".NET Project">
-      <option name="EXE_PATH" value="" />
+      <option name="EXE_PATH" value="$PROJECT_DIR$/bin/Debug/net9.0/nestphalia.exe" />
       <option name="PROGRAM_PARAMETERS" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/bin/Debug/net9.0" />
       <option name="PASS_PARENT_ENVS" value="1" />
       <option name="USE_EXTERNAL_CONSOLE" value="0" />
       <option name="USE_MONO" value="0" />
@@ -80,11 +74,15 @@
       <option name="PROJECT_ARGUMENTS_TRACKING" value="1" />
       <option name="PROJECT_WORKING_DIRECTORY_TRACKING" value="1" />
       <option name="PROJECT_KIND" value="DotNetCore" />
-      <option name="PROJECT_TFM" value="" />
+      <option name="PROJECT_TFM" value="net9.0" />
       <method v="2">
         <option name="Build" />
       </method>
     </configuration>
+    <list>
+      <item itemvalue=".NET Project.nestphalia" />
+      <item itemvalue="Publish to folder.Windows" />
+    </list>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -95,7 +93,8 @@
       <option name="presentableId" value="Default" />
       <updated>1742332716570</updated>
       <workItem from="1742332717815" duration="659000" />
-      <workItem from="1742338173657" duration="32871000" />
+      <workItem from="1742338173657" duration="34071000" />
+      <workItem from="1745877249881" duration="3684000" />
     </task>
     <servers />
   </component>

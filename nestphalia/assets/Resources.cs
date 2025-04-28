@@ -197,7 +197,7 @@ public static class Resources
         
         fort.Comment = fort.FortSummary();
         
-        string jsonString = JsonSerializer.Serialize(fort);
+        string jsonString = JsonSerializer.Serialize(fort, SourceGenerationContext.Default.Fort);
         //Console.WriteLine($"JSON fort looks like: {jsonString}");
         File.WriteAllText(path + "\\" + fortName + ".fort", jsonString);
         
@@ -207,7 +207,7 @@ public static class Resources
     public static Fort LoadFort(string filepath)
     {
         string jsonString = File.ReadAllText(filepath);
-        Fort fort = JsonSerializer.Deserialize<Fort>(jsonString);
+        Fort fort = JsonSerializer.Deserialize<Fort>(jsonString, SourceGenerationContext.Default.Fort);
         fort.UpdateCost();
         return fort;
     }

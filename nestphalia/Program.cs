@@ -35,10 +35,13 @@ static class Program
         
         Screen.UpdateBounds();
         
-        // Load a texture from the resources directory
         if (!Directory.Exists(Directory.GetCurrentDirectory() + "/forts/"))
         {
 	        Directory.CreateDirectory(Directory.GetCurrentDirectory() + "/forts/");
+        }
+        if (!Directory.Exists(Directory.GetCurrentDirectory() + "/forts/Campaign/"))
+        {
+	        Directory.CreateDirectory(Directory.GetCurrentDirectory() + "/forts/Campaign/");
         }
         Resources.Load();
         Assets.Load();
