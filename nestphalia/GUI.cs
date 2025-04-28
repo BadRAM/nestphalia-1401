@@ -9,6 +9,7 @@ public static class GUI
     private static Texture2D _buttonWideTexture;
     private static Texture2D _buttonNarrowTexture;
     private static SoundResource _buttonClickSFX;
+    private static MouseCursor _cursorLook;
     public static Font Font;
     const int FontSize = 16;
     
@@ -43,12 +44,17 @@ public static class GUI
         Rectangle subSprite = new Rectangle(0, !press ? !hover ? 0 : 40 : 80, 300, 40);
         DrawTextureRec(_buttonWideTexture, subSprite, new Vector2(x,y), Color.White);
         DrawTextCentered(x+150, y+20, text);
-        
-        if (enabled && hover && IsMouseButtonReleased(MouseButton.Left))
+
+        if (enabled && hover)
         {
-            _buttonClickSFX.Play();
-            return true;
+            _cursorLook = MouseCursor.PointingHand;
+            if (IsMouseButtonReleased(MouseButton.Left))
+            {
+                _buttonClickSFX.Play();
+                return true;
+            }
         }
+        
         return false;
     }
     
@@ -61,11 +67,63 @@ public static class GUI
         DrawTextureRec(_buttonNarrowTexture, subSprite, new Vector2(x,y), Color.White);
         DrawTextCentered(x+50, y+20, text);
         
-        if (enabled && hover && IsMouseButtonReleased(MouseButton.Left))
+        if (enabled && hover)
         {
-            _buttonClickSFX.Play();
-            return true;
-        } 
+            _cursorLook = MouseCursor.PointingHand;
+            if (IsMouseButtonReleased(MouseButton.Left))
+            {
+                _buttonClickSFX.Play();
+                return true;
+            }
+        }
         return false;
+    }
+
+    public static string TextEntry(int x, int y, string text)
+    {
+        bool hover = CheckCollisionPointRec(GetMousePosition(), new Rectangle(x, y, 300, 40));
+        
+        Rectangle subSprite = new Rectangle(0, !hover ? 0 : 40, 300, 40);
+        DrawTextureRec(_buttonWideTexture, subSprite, new Vector2(x,y), Color.White);
+        DrawTextCentered(x+150, y+20, text);
+        
+        if (hover)
+        {
+            // Set the window's cursor to the I-Beam
+            _cursorLook = MouseCursor.IBeam;
+    
+            // Get char pressed (unicode character) on the queue
+            int key = GetCharPressed();
+    
+            // Check if more characters have been pressed on the same frame
+            while (key > 0)
+            {
+                // NOTE: Only allow keys in range [32..125]
+                if ((key >= 32) && (key <= 125))
+                {
+                    text += (char)key;
+                }
+                key = GetCharPressed();  // Check next character in the queue
+            }
+    
+            if (IsKeyPressed(KeyboardKey.Backspace) && text.Length > 0)
+            {
+                text = text.Substring(0, text.Length - 1);
+            }
+        }
+        return text;
+    }
+    
+    // public class FortList
+    // {
+    //     private int _page;
+    //     
+    //     public void 
+    // }
+    
+    public static void UpdateCursor()
+    {
+        SetMouseCursor(_cursorLook);
+        _cursorLook = MouseCursor.Default;
     }
 }

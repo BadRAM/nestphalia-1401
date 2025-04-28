@@ -14,6 +14,7 @@ Highlighted Changes:
  - The tournament's participants have left graffiti on menu screens
  - The custom battle menu now supports folders
  - The sandbox editor is now accessed from inside the custom battle menu
+ - The campaign now lets you save multiple fort designs
  - The editor now has a path preview tool, to help understand bug pathfinding
  - SFX and Music can be muted separately
  - Optimized pathfinding and collision detection, performance in large battles improved significantly

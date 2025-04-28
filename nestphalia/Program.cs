@@ -25,51 +25,6 @@ static class Program
 	
     public static void Main()
     {
-	    // Stopwatch sw = new Stopwatch();
-	    // List<int> testList = new List<int>();
-	    // sw.Start();
-	    // for (int i = 0; i < 100000; i++)
-	    // {
-		   //  testList.Insert(0, i);
-	    // }
-	    // sw.Stop();
-	    // Console.WriteLine($"Inserted 100000 times in {sw.Elapsed.TotalMilliseconds}ms");
-	    // sw.Restart();
-	    // for (int i = 0; i < 100000; i++)
-	    // {
-		   //  testList.RemoveAt(0);
-	    // }
-	    // sw.Stop();
-	    // Console.WriteLine($"Removed first 100000 times in {sw.Elapsed.TotalMilliseconds}ms");
-	    // testList = new List<int>();
-	    // sw.Restart();
-	    // for (int i = 0; i < 100000; i++)
-	    // {
-		   //  testList.Insert(i, i);
-	    // }
-	    // sw.Stop();
-	    // Console.WriteLine($"Inserted at end 100000 times in {sw.Elapsed.TotalMilliseconds}ms");
-	    // sw.Restart();
-	    // for (int i = 0; i < 100000; i++)
-	    // {
-		   //  testList.RemoveAt(testList.Count-1);
-	    // }
-	    // sw.Stop();
-	    // Console.WriteLine($"Removed last 100000 times in {sw.Elapsed.TotalMilliseconds}ms");
-	    // testList = new List<int>();
-	    // sw.Restart();
-	    // for (int i = 0; i < 100000; i++)
-	    // {
-		   //  testList.Add(i);
-	    // }
-	    // sw.Stop();
-	    // Console.WriteLine($"Added 100000 times in {sw.Elapsed.TotalMilliseconds}ms");
-	    // sw.Restart();
-	    // testList.Clear();
-	    // sw.Stop();
-	    // Console.WriteLine($"Cleared 100000 entries in {sw.Elapsed.TotalMilliseconds}ms");
-
-	    
 	    SetConfigFlags(ConfigFlags.ResizableWindow);
 	    InitWindow(1200, 600, "2-fort");
 	    SetWindowMinSize(1200, 600);
@@ -101,6 +56,8 @@ static class Program
 		        Screen.UpdateBounds();
 	        }
 
+	        GUI.UpdateCursor();
+	        
 	        switch (CurrentScene)
 	        {
 		        case Scene.Intro:

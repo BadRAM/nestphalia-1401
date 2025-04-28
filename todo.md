@@ -25,6 +25,13 @@ Programming todo:
 - ~~Separate music and sfx mutes~~
 - ~~Editor background texture~~
 - ~~Bug: Spiderlings from death of bigspider just sit there for a while.~~
+- ~~Selling buildings doesn't return money properly~~
+- ~~Exit without saving doesn't refund bug dollars~~
+- ~~Fort Editor text overflow~~
+- ~~Text entry element~~
+- ~~'Save fort as' function~~
+- ~~Campaign fort design selector~~
+- ~~Rebalance campaign rewards~~
 
 
 Decision point: Do I push towards 1401 v2, or start on 1402?
@@ -36,6 +43,10 @@ Decision point: Do I push towards 1401 v2, or start on 1402?
 - Nice campaign screen with a map and paths appearing every time you unlock a new level. Nonlinear campaign?
 - Nice title screen
 - 2-3 more bugs & towers
+ - Ranged attack bug
+ - Another flyer. Ladybug? Flies until attacked.
+ - Snail rework
+ - Centipede that gets longer and shorter
 
 ---- 1402 ----
 - 3d engine
@@ -49,18 +60,20 @@ Decision point: Do I push towards 1401 v2, or start on 1402?
 ----- V2 -----
 
 - ~~Random damage variation~~
-- Make battles able to be deterministic if desired
+- ~~Make battles able to be deterministic if desired~~
 - Minion state machine
 - Refactor Minion.Hurt() to not need a damagesource
-- Pathfinding optimizations: 
-  - as soon as a node is set in the targeted half of the battlefield, purge all nodes and dont' allow any new ones to be created in the untargeted half
-  - Binary search to find consider queue insertion point
-    - Before: Registernode 30%, avg pathtime 0.547ms
-    - After:  Registernode 50%, avg pathtime 0.650ms :(
-  - Reverse sort order of list to maximize operations on performant end
-    - Before: 0.322ms
-    - After: 0.300ms :)
+- Pathfinding optimizations:
+  - ~~as soon as a node is set in the targeted half of the battlefield, purge all nodes and dont' allow any new ones to be created in the untargeted half~~
+    - ~~This feels too complex, limiting, and like it could cause difficult bugs. A more generalized chunking method would be better, but only if the game grows and pathing performance becomes a problem again~~
+  - ~~Binary search to find consider queue insertion point~~
+    - ~~Before: Registernode 30%, avg pathtime 0.547ms~~
+    - ~~After:  Registernode 50%, avg pathtime 0.650ms :(~~
+  - ~~Reverse sort order of list to maximize operations on performant end~~
+    - ~~Before: 0.322ms - 0.344 deterministic~~
+    - ~~After: 0.300ms - 0.318 deterministic :)~~
 - Campaign rebalance, use 'funding' instead of direct cash stores, or Pay to build the fort every mission
+- ~~Allow multiple campaign designs~~
 - Help text/tutorial
 - Game load cutscene
 - Fancy title text
@@ -69,6 +82,8 @@ Decision point: Do I push towards 1401 v2, or start on 1402?
 - Orphaned sapper beetles will seek another burrow
 - Limit total spiderlings a spider can spawn
 - try compiling for web
+- Make nests solid again
+- Help text / Tutorial
 
 
 ----- Postponed to team bug fort 2 -----

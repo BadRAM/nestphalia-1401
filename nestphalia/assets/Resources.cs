@@ -178,7 +178,7 @@ public static class Resources
     public static void ToggleFontAccessibility()
     {
         _fontAccessibility = !_fontAccessibility;
-        Font = _fontAccessibility ? _accessibleFont : _defaultFont;   
+        Font = _fontAccessibility ? _accessibleFont : _defaultFont;
     }
 
     public static void SaveFort(string fortName, string path)
@@ -186,8 +186,6 @@ public static class Resources
         //if (right) World.Flip();
         Fort fort = new Fort();
         fort.Name = fortName;
-        
-        Directory.GetCurrentDirectory();
         
         for (int x = 0; x < 20; x++)
         {
@@ -197,9 +195,11 @@ public static class Resources
             }
         }
         
+        fort.Comment = fort.FortSummary();
+        
         string jsonString = JsonSerializer.Serialize(fort);
         //Console.WriteLine($"JSON fort looks like: {jsonString}");
-        File.WriteAllText(path, jsonString);
+        File.WriteAllText(path + "\\" + fortName + ".fort", jsonString);
         
         //if (right) World.Flip();
     }
@@ -208,6 +208,24 @@ public static class Resources
     {
         string jsonString = File.ReadAllText(filepath);
         Fort fort = JsonSerializer.Deserialize<Fort>(jsonString);
+        fort.UpdateCost();
         return fort;
+    }
+
+    public static string GetUnusedFortName(string path)
+    {
+        int number = 1;
+        while (true)
+        {
+            if (!File.Exists(path + $"fort{number}.fort"))
+            {
+                return $"fort{number}";
+            }
+            if (number >= 1000)
+            {
+                return "TooManyForts";
+            }
+            number++;
+        }
     }
 }

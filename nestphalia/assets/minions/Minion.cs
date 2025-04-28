@@ -41,7 +41,7 @@ public class MinionTemplate
     
     public virtual string GetStats()
     {
-        return                
+        return
             $"{Name}\n" +
             $"HP: {MaxHealth}\n" +
             (Armor == 0 ? "" : $"Armor: {Armor}\n") +
@@ -124,8 +124,7 @@ public class Minion : ISprite
         
         Frenzy = false;
     }
-
-    // 
+    
     protected void UpdateNextPos()
     {
         Vector2 pos = World.GetTileCenter(NavPath.NextTile(Position));

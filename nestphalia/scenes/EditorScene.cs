@@ -12,20 +12,20 @@ public static class EditorScene
     private static StructureTemplate? _brush;
     private static EditorTool _toolActive;
     private static Fort _fort;
-    private static string _saveMessage;
-    private static string _fortStats;
+    private static string _fortStats = "";
     private static bool _newUtil;
     private static bool _newTower;
     private static bool _newNest;
-    private static bool _nestCapped;
-    private static bool _beaconCapped;
+    private static double _price;
+    private static int _nestCount;
+    private static int _beaconCount;
     private static bool _fortAlreadySaved;
     private static bool _sellAllConfirm;
     private static StructureTemplate.StructureClass _structureClass;
     private static Texture2D _bg;
 
     private enum EditorTool
-    {
+    { 
         Brush,
         Erase,
         PathTester
@@ -36,15 +36,15 @@ public static class EditorScene
         _bg = Resources.GetTextureByName("editor_bg");
         _brush = null;
         _toolActive = EditorTool.Erase;
-        _saveMessage = "";
         _sandboxMode = creativeMode;
         _fort = fortToLoad ?? new Fort();
-        _fortAlreadySaved = File.Exists(_fort.Path);
-        Console.WriteLine($"checking if {Directory.GetCurrentDirectory() +  $"/forts/{_fort.Name}.fort"} exists. Answer: {_fortAlreadySaved.ToString()}");
+        //_fortAlreadySaved = File.Exists(_fort.Path + "\\" + _fort.Name + ".fort");
+        //Console.WriteLine($"checking if {Directory.GetCurrentDirectory() +  $"/forts/{_fort.Name}.fort"} exists. Answer: {_fortAlreadySaved.ToString()}");
         
         Program.CurrentScene = Scene.Editor;
         World.InitializeEditor();
         _fort.LoadToBoard(false);
+        UpdateFortStats();
         
         Screen.RegenerateBackground();
         
@@ -118,18 +118,7 @@ public static class EditorScene
             }
         }
 
-        if (IsKeyPressed(KeyboardKey.Escape))
-        {
-            if (_sandboxMode)
-            {
-                CustomBattleMenu.Start();
-            }
-            else
-            {
-                _fort.SaveBoard();
-                Program.Campaign.Start();
-            }
-        }
+        if (IsKeyPressed(KeyboardKey.Escape)) ExitScene();
         
         // lazy hack so resizing the window doesn't offset the viewport
         World.Camera.Offset = new Vector2(Screen.HCenter, Screen.VCenter); 
@@ -165,25 +154,30 @@ public static class EditorScene
         
         World.Draw();
         
-        // Bottom left buttons
-        if (_sandboxMode)
-        {
-            if (ButtonWide(Screen.HCenter-592, Screen.VCenter+252, "Exit")) CustomBattleMenu.Start();
-            if (ButtonWide(Screen.HCenter-592, Screen.VCenter+172, "Save Changes", _fortAlreadySaved)) Resources.SaveFort(_fort.Name, _fort.Path);
-        }
-        else
-        {
-            if (ButtonWide(Screen.HCenter-592, Screen.VCenter+172, "Save and Exit"))
-            {
-                _fort.SaveBoard();
-                Program.Campaign.Start();
-            }
-            if (ButtonWide(Screen.HCenter-592, Screen.VCenter+252, "Exit without saving"))
-            {
-                Program.Campaign.Start();
-            }
-        }
-        if (ButtonWide(Screen.HCenter-592, Screen.VCenter+212, "Save to new file")) SaveToNewFile();
+        _fort.Name = TextEntry(Screen.HCenter - 592, Screen.VCenter + 172, _fort.Name);
+        if (ButtonWide(Screen.HCenter-592, Screen.VCenter+212, "Save Changes")) Resources.SaveFort(_fort.Name, _fort.Path);
+        if (ButtonWide(Screen.HCenter - 592, Screen.VCenter + 252, "Exit")) ExitScene();
+        
+        // // Bottom left buttons
+        // if (_sandboxMode)
+        // {
+        //     _fort.Name = TextEntry(Screen.HCenter - 592, Screen.VCenter + 172, _fort.Name);
+        //     if (ButtonWide(Screen.HCenter-592, Screen.VCenter+212, "Save Changes", _fortAlreadySaved)) Resources.SaveFort(_fort.Name, _fort.Path);
+        //     if (ButtonWide(Screen.HCenter-592, Screen.VCenter+252, "Exit")) CustomBattleMenu.Start(); 
+        // }
+        // else
+        // {
+        //     if (ButtonWide(Screen.HCenter-592, Screen.VCenter+172, "Save and Exit"))
+        //     {
+        //         _fort.SaveBoard();
+        //         Program.Campaign.Start();
+        //     }
+        //     if (ButtonWide(Screen.HCenter-592, Screen.VCenter+252, "Exit without saving"))
+        //     {
+        //         Program.Campaign.Start();
+        //     }
+        // }
+        //if (ButtonWide(Screen.HCenter-592, Screen.VCenter+212, "Save to new file")) SaveToNewFile();
         
         // Bottom center buttons
         if (ButtonNarrow(Screen.HCenter+150, Screen.VCenter+258, "Sell", _toolActive != EditorTool.Erase))
@@ -205,45 +199,66 @@ public static class EditorScene
         if (ButtonNarrow(Screen.HCenter+392, Screen.VCenter-292, (_newTower ? "NEW! " : "") + "Tower", _structureClass != StructureTemplate.StructureClass.Tower)) _structureClass = StructureTemplate.StructureClass.Tower;
         if (ButtonNarrow(Screen.HCenter+492, Screen.VCenter-292, (_newNest ? "NEW! " : "") + "Nest", _structureClass != StructureTemplate.StructureClass.Nest)) _structureClass = StructureTemplate.StructureClass.Nest;
         
-        // Structure list
-        int y = 0;
-        for (int i = 0; i < Assets.Structures.Count; i++)
-        {
-            StructureTemplate s = Assets.Structures[i];
-            if ((!_sandboxMode && s.LevelRequirement > Program.Campaign.Level) || s.Class != _structureClass) continue;
-            string label = ((!_sandboxMode && s.LevelRequirement == Program.Campaign.Level) ? "NEW! " : "") + s.Name + " - $" + s.Price;
-            if (ButtonWide(Screen.HCenter+292, Screen.VCenter + y * 40 - 250, label, _brush != s))
-            {
-                _brush = s;
-                _toolActive = EditorTool.Brush;
-            }
-            DrawTexture(s.Texture, Screen.HCenter + 312, Screen.VCenter + y * 40 - 246, Color.White);
-            y++;
-        }
+        StructureList();
         
-        if (!_sandboxMode)
-        {
-            DrawTextLeft(Screen.HCenter-590, Screen.VCenter+ 200, $"Bug Dollars: ${Program.Campaign.Money}");
-        }
-        
-        if (_brush == null)
-        {
-            DrawTextLeft(Screen.HCenter-590, Screen.VCenter-290, "SELLING");
-        }
-        else
-        {
-            DrawTextLeft(Screen.HCenter-590, Screen.VCenter-290, $"Placing {_brush.GetStats()}");
-        }
-        
-        DrawTextLeft(Screen.HCenter-590, Screen.VCenter+170, _saveMessage);
-        DrawTextLeft(Screen.HCenter-590, Screen.VCenter+50, GetFortStats());
+        DrawInfoPanel();
         
         if (_toolActive == EditorTool.PathTester)
         {
             PathTestTool();
         }
         
+        if (!_sandboxMode)
+        {
+            int nestCap = Program.Campaign.GetNestCap();
+            DrawTextLeft(Screen.HCenter - 260, Screen.VCenter - 290, $"Nests: {_nestCount}/{nestCap}", color: _nestCount > nestCap ? Color.Red : Color.White);
+            DrawTextLeft(Screen.HCenter - 80, Screen.VCenter - 290, $"Cost: ${_price}/{Program.Campaign.Money} bug dollars", color: _price > Program.Campaign.Money ? Color.Red : Color.White);
+            DrawTextLeft(Screen.HCenter + 160, Screen.VCenter - 290, $"Stratagems: {_beaconCount}/{4}", color: _beaconCount > 4 ? Color.Red : Color.White);
+        }
+        else
+        {
+            DrawTextLeft(Screen.HCenter - 260, Screen.VCenter - 290, $"Nests: {_nestCount}");
+            DrawTextLeft(Screen.HCenter - 80, Screen.VCenter - 290, $"Cost: ${_price} bug dollars");
+            DrawTextLeft(Screen.HCenter + 160, Screen.VCenter - 290, $"Stratagems: {_beaconCount}/{4}", color: _beaconCount > 4 ? Color.Red : Color.White);
+        }
+
         EndDrawing();
+    }
+
+    private static void StructureList()
+    {
+        int y = 0;
+        for (int i = 0; i < Assets.Structures.Count; i++)
+        {
+            StructureTemplate s = Assets.Structures[i];
+            if ((!_sandboxMode && s.LevelRequirement > Program.Campaign.Level) || s.Class != _structureClass) continue;
+            string label = ((!_sandboxMode && s.LevelRequirement == Program.Campaign.Level) ? "NEW! " : "") + s.Name +
+                           " - $" + s.Price;
+            if (ButtonWide(Screen.HCenter + 292, Screen.VCenter + y * 40 - 250, label, _brush != s))
+            {
+                _brush = s;
+                _toolActive = EditorTool.Brush;
+            }
+
+            DrawTexture(s.Texture, Screen.HCenter + 312, Screen.VCenter + y * 40 - 246, Color.White);
+            y++;
+        }
+    }
+
+    private static void DrawInfoPanel()
+    {
+        string info;
+        switch (_toolActive)
+        {
+            case EditorTool.Brush:
+                info = _brush?.GetStats() ?? "";
+                break;
+            default:
+                info = _fortStats;
+                break;
+        }
+
+        DrawTextLeft(Screen.HCenter - 590, Screen.VCenter - 290, info);
     }
 
     private static void PathTestTool()
@@ -283,10 +298,8 @@ public static class EditorScene
                 && _brush != World.GetTile(tilePos)?.Template)
             {
                 World.SetTile(null, World.LeftTeam, tilePos);
-                if (!_sandboxMode)
-                {
-                    Program.Campaign.Money += World.GetTile(tilePos)?.Template.Price ?? 0;
-                }
+                UpdateFortStats();
+                _fortAlreadySaved = false;
             }
         }
     }
@@ -306,49 +319,35 @@ public static class EditorScene
             if (tilePos.X >= 1 && tilePos.X < 21 && tilePos.Y >= 1 && tilePos.Y < 21 
                 && _brush != World.GetTile(tilePos)?.Template)
             {
-                if (_sandboxMode)
-                {
-                    World.SetTile(_brush, World.LeftTeam, tilePos);
-                }
-                else if ( _brush.Price <= Program.Campaign.Money && 
-                          (_brush.Class != StructureTemplate.StructureClass.Nest || !_nestCapped || World.GetTile(tilePos) is Spawner) && 
-                          (_brush is not ActiveAbilityBeaconTemplate || !_beaconCapped || World.GetTile(tilePos) is ActiveAbilityBeacon)
-                        )
-                {
-                    if (World.GetTile(tilePos) != null)
-                    {
-                        Program.Campaign.Money += World.GetTile(tilePos).Template.Price;
-                    }
-                    World.SetTile(_brush, World.LeftTeam, tilePos);
-                    Program.Campaign.Money -= _brush.Price;
-                }
+                World.SetTile(_brush, World.LeftTeam, tilePos);
+                UpdateFortStats();
+                _fortAlreadySaved = false;
             }
         }
     }
 
-    private static void SaveToNewFile()
-    {
-        int number = 1;
-        while (true)
-        {
-            if (!File.Exists(Directory.GetCurrentDirectory() + $"/forts/fort{number}.fort"))
-            {
-                _saveMessage = $"Saved fort as fort{number}.fort";
-                _fort.Name = $"fort{number}";
-                _fort.Path = Path.GetDirectoryName(_fort.Path) + "/" + _fort.Name + ".fort";
-                _fortAlreadySaved = true;
-                Console.WriteLine($"{Directory.GetCurrentDirectory()}/{_fort.Path}");
-                Resources.SaveFort($"fort{number}", _fort.Path);
-                break;
-            }
-            if (number >= 999)
-            {
-                _saveMessage = "Couldn't save!";
-                break;
-            }
-            number++;
-        }
-    }
+    // private static void SaveToNewFile()
+    // {
+    //     int number = 1;
+    //     while (true)
+    //     {
+    //         if (!File.Exists(Directory.GetCurrentDirectory() + $"/forts/fort{number}.fort"))
+    //         {
+    //             _saveMessage = $"Saved fort as fort{number}.fort";
+    //             _fort.Name = $"fort{number}";
+    //             //_fort.Path = Path.GetDirectoryName(_fort.Path) + "/" + _fort.Name + ".fort";
+    //             _fortAlreadySaved = true;
+    //             Resources.SaveFort($"fort{number}", _fort.Path);
+    //             break;
+    //         }
+    //         if (number >= 999)
+    //         {
+    //             _saveMessage = "Couldn't save!";
+    //             break;
+    //         }
+    //         number++;
+    //     }
+    // }
 
     private static void SellAll()
     {
@@ -366,7 +365,7 @@ public static class EditorScene
         _sellAllConfirm = false;
     }
     
-    private static string GetFortStats()
+    private static void UpdateFortStats()
     {
         int structureCount = 0;
         int turretCount = 0;
@@ -389,19 +388,28 @@ public static class EditorScene
                 else if (t.Template.Class == StructureTemplate.StructureClass.Nest) nestCount++;
             }
         }
-        
-        if (!_sandboxMode)
+
+        _nestCount = nestCount;
+        _beaconCount = beaconCount;
+        _price = totalCost;
+        _fortStats = $"{_fort.Name}\n" +
+                     $"{turretCount} Towers\n" +
+                     $"{utilityCount} Utility\n" +
+                     nestCount + (_sandboxMode ? "" : "/"+(Program.Campaign.Level*2+10)) + " Nests\n" +
+                     beaconCount + (_sandboxMode ? "" : "/4") + " Stratagems\n" +
+                     $"{structureCount} Total\n" +
+                     $"{totalCost} Cost";
+    }
+
+    private static void ExitScene()
+    {
+        if (_sandboxMode)
         {
-            _nestCapped = nestCount >= Program.Campaign.Level * 2 + 10;
-            _beaconCapped = beaconCount >= 4;
+            CustomBattleMenu.Start();
         }
-        
-        return $"{_fort.Name}\n" +
-               $"{turretCount} Towers\n" +
-               $"{utilityCount} Utility\n" +
-               nestCount + (_sandboxMode ? "" : "/"+(Program.Campaign.Level*2+10)) + " Nests\n" +
-               beaconCount + (_sandboxMode ? "" : "/4") + " Stratagems\n" +
-               $"{structureCount} Total\n" +
-               $"{totalCost} Cost";
+        else
+        {
+            Program.Campaign.Start();
+        }
     }
 }
