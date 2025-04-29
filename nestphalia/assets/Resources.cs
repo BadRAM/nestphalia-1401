@@ -229,3 +229,10 @@ public static class Resources
         }
     }
 }
+
+[JsonSourceGenerationOptions(WriteIndented = true)]
+[JsonSerializable(typeof(Fort))]
+[JsonSerializable(typeof(Campaign))]
+internal partial class SourceGenerationContext : JsonSerializerContext
+{
+}

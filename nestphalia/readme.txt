@@ -1,20 +1,23 @@
 Nestphalia 1401
 
-To start, just run nestphalia.exe
-
+To start the game:
+ - windows: Run Nestphalia.exe
+ - linux: open this folder in terminal, run 'chmod 777 ./nestphalia', then run './nestphalia'
+ 
 All game progress is saved in campaign.sav, if you want to back up, transfer, or reset your progress, just copy, paste, or delete campaign.sav
 
 Your custom battle forts are saved in /forts/. Renaming files and creating folders is fully supported and expected.
 
 Version History:
 
-==== 1.2.0 - Champion's Edition - 2025-04-12 ====
+==== 1.2.0 - Champion's Edition - 2025-04-28 ====
 Highlighted Changes:
  - All forts used in the first grand tournament of bugs have been included
  - The tournament's participants have left graffiti on menu screens
  - The custom battle menu now supports folders
  - The sandbox editor is now accessed from inside the custom battle menu
  - The campaign now lets you save multiple fort designs
+ - You must now pay the full cost of your fort design every time you start a battle. Battle rewards have increased accordingly
  - The editor now has a path preview tool, to help understand bug pathfinding
  - SFX and Music can be muted separately
  - Optimized pathfinding and collision detection, performance in large battles improved significantly

@@ -9,10 +9,10 @@
   <component name="ChangeListManager">
     <list default="true" id="297dc327-1265-48a8-b6f0-6e372bbb5862" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.2-fort.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.2-fort.dir/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Program.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/assets/Fort.cs" beforeDir="false" afterPath="$PROJECT_DIR$/assets/Fort.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/assets/Resources.cs" beforeDir="false" afterPath="$PROJECT_DIR$/assets/Resources.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/nestphalia.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/nestphalia.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/readme.txt" beforeDir="false" afterPath="$PROJECT_DIR$/readme.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scenes/Campaign.cs" beforeDir="false" afterPath="$PROJECT_DIR$/scenes/Campaign.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -42,6 +42,7 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     ".NET Project.nestphalia.executor": "Debug",
+    "Publish to folder.Linux.executor": "Run",
     "Publish to folder.Windows.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
@@ -56,7 +57,11 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
-  <component name="RunManager" selected=".NET Project.nestphalia">
+  <component name="RunManager" selected="Publish to folder.Windows">
+    <configuration name="Linux" type="DotNetFolderPublish" factoryName="Publish to folder">
+      <riderPublish delete_existing_files="true" produce_single_file="true" ready_to_run="true" runtime="linux-x64" self_contained="true" target_folder="$PROJECT_DIR$/bin/Publish/Linux" target_framework="net9.0" trim_unused_assemblies="true" uuid_high="8589477358127153881" uuid_low="-4792151472858659537" />
+      <method v="2" />
+    </configuration>
     <configuration name="Windows" type="DotNetFolderPublish" factoryName="Publish to folder">
       <riderPublish delete_existing_files="true" produce_single_file="true" ready_to_run="true" runtime="win-x64" self_contained="true" target_folder="$PROJECT_DIR$/bin/Publish/Windows" target_framework="net9.0" trim_unused_assemblies="true" uuid_high="8589477358127153881" uuid_low="-4792151472858659537" />
       <method v="2" />
@@ -82,6 +87,7 @@
     <list>
       <item itemvalue=".NET Project.nestphalia" />
       <item itemvalue="Publish to folder.Windows" />
+      <item itemvalue="Publish to folder.Linux" />
     </list>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
@@ -94,7 +100,7 @@
       <updated>1742332716570</updated>
       <workItem from="1742332717815" duration="659000" />
       <workItem from="1742338173657" duration="34071000" />
-      <workItem from="1745877249881" duration="3684000" />
+      <workItem from="1745877249881" duration="8755000" />
     </task>
     <servers />
   </component>

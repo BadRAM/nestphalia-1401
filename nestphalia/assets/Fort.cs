@@ -117,10 +117,3 @@ public class Fort
         TotalCost = totalCost;
     }
 }
-
-[JsonSourceGenerationOptions(WriteIndented = true)]
-[JsonSerializable(typeof(Fort))]
-[JsonSerializable(typeof(Campaign))]
-internal partial class SourceGenerationContext : JsonSerializerContext
-{
-}

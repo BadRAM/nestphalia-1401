@@ -154,8 +154,15 @@ public class Campaign
         }
         else
         {
-            _outcomeText = $"You were beaten back,\nyour workers salvage ${Math.Floor(_fort.TotalCost/2)} worth of materials.";
+            _outcomeText = $"You were beaten back.\nyour workers salvage ${Math.Floor(_fort.TotalCost/2)} worth of materials.";
             Money += Math.Floor(_fort.TotalCost / 2);
+        }
+
+        if (Money < 2000 || Random.Shared.Next(20) == 0)
+        {
+            int bailout = Math.Max(2000 - (int)Money, 500) + Random.Shared.Next(500);
+            _outcomeText += $"\nYour scouts uncover an ancient hoard! +${bailout}";
+            Money += bailout;
         }
     }
     
@@ -222,7 +229,7 @@ public class Campaign
     {
         _selectedLevel = select;
         Resources.CampaignLevels[_selectedLevel].UpdateCost();
-        _prize = Math.Floor(Resources.CampaignLevels[_selectedLevel].TotalCost * 1.5);
+        _prize = Math.Floor(Resources.CampaignLevels[_selectedLevel].TotalCost * 1.5) + (_selectedLevel == 0 ? 2000 : 0);
     }
 
     public int GetNestCap()

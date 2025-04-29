@@ -23,6 +23,20 @@
             <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
         </None>
     </ItemGroup>
+
+    <ItemGroup>
+        <None Update="readme.txt">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        </None>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Update="credits.txt">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        </None>
+    </ItemGroup>
     
     <ItemGroup>
         <PackageReference Include="Raylib-cs" Version="7.0.1" />
