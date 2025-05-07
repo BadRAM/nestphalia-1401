@@ -153,7 +153,7 @@ public class Team
             int posX = IsRightSide ? Screen.HCenter + 450  : Screen.HCenter - 450;
             for (int i = 0; i < BeaconCap; i++)
             {
-                if (Raylib.IsMouseButtonPressed(MouseButton.Left) && Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), new Rectangle( posX + i*68 - 150, Screen.Bottom - 68, 64, 64)))
+                if (Raylib.IsMouseButtonPressed(MouseButton.Left) && Raylib.CheckCollisionPointRec(GUI.GetScaledMousePosition(), new Rectangle( posX + i*68 - 150, Screen.Bottom - 68, 64, 64)))
                 {
                     _usingAbility = i;
                 }
@@ -206,7 +206,7 @@ public class Team
             if (IsPlayerControlled)
             {
                 GUI.DrawTextLeft(x, y, (i + 1).ToString());
-                if ((Beacons[i]?.IsReady() ?? false) && Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), new Rectangle( x, y, 64, 64)))
+                if ((Beacons[i]?.IsReady() ?? false) && Raylib.CheckCollisionPointRec(GUI.GetScaledMousePosition(), new Rectangle( x, y, 64, 64)))
                 {
                     Raylib.DrawRectangle(x, y, 64, 64, new Color(255, 255, 255, 32));
                 }

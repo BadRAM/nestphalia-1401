@@ -43,6 +43,9 @@ public static class CustomBattleMenu
         Raylib.BeginDrawing();
         Raylib.ClearBackground(Color.Gray);
         Screen.DrawBackground(Color.DarkGray);
+        
+        World.Camera.Offset = new Vector2(Screen.HCenter, Screen.VCenter+50) * GUI.GetWindowScale();
+        World.Camera.Zoom = 0.5f * GUI.GetWindowScale().X;
         World.DrawFloor();
         World.Draw();
 

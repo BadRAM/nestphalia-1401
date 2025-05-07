@@ -81,8 +81,11 @@ public static class Screen
     
     public static void UpdateBounds()
     {
-        Left = Raylib.GetScreenWidth();
-        Bottom = Raylib.GetScreenHeight();
+        Vector2 scale = GUI.GetWindowScale();
+        Console.WriteLine($"Scale is X:{scale.X},Y:{scale.Y}");
+        
+        Left = (int)(Raylib.GetScreenWidth() / scale.X);
+        Bottom = (int)(Raylib.GetScreenHeight() / scale.Y);
 
         if (Left < MinWidth || Bottom < MinHeight)
         {

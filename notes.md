@@ -15,6 +15,19 @@ V-Credits
 Quit
 
 
+Minion State Machine
+====================
+states for 1401:
+Waiting
+Moving
+AttackingBuilding
+
+states for 1402:
+Fighting
+StandingGuard
+ApproachingCombat
+
+
 Level Rewards
 =============
 0
@@ -167,6 +180,7 @@ Sort
 
 Spritedraw
 
+Full profiling adds about 0.200ms to pathfinding
 
 X-Sorted physics performance:
 0.75 - 1.5 ms per update

@@ -25,10 +25,11 @@ public static class MenuScene
         DrawBackground(Color.LightGray);
         
         DrawTextCentered(HCenter, VCenter-200, "NESTPHALIA 1401", 48);
-        DrawTextLeft(HCenter-600, VCenter-300, "V1.2.0 - Champion's Edition");
+        DrawTextLeft(HCenter-600, VCenter-300, "V1.2.1 - Champion's Edition");
         
-        if (ButtonWide(HCenter-150, VCenter-80, "Start"))
+        if (ButtonWide(HCenter-150, VCenter-80, "Start")) 
         {
+            // todo: find a way to move this check into Campaign.cs
             Program.Campaign = new Campaign();
             if (File.Exists(Directory.GetCurrentDirectory() + "/campaign.sav"))
             {
@@ -46,16 +47,15 @@ public static class MenuScene
             return;
         }
         
-        if (ButtonNarrow(HCenter + 500, VCenter + 260, "Font")) Resources.ToggleFontAccessibility();
-        if (ButtonNarrow(HCenter + 500, VCenter + 220, "Mute Music"))
+        if (ButtonNarrow(HCenter - 600, VCenter - 80, "Mute Music")) 
         {
-            Program.MusicMute = !Program.MusicMute;
+            SettingsScene.ToggleMuteMusic();
             Resources.PlayMusicByName("unreal_technology_demo_95_-_unreals");
         }
-        if (ButtonNarrow(HCenter + 500, VCenter + 180, "Mute SFX"))
-        {
-            Program.SFXMute = !Program.SFXMute;
-        }
+        if (ButtonNarrow(HCenter - 600, VCenter - 40, "Mute SFX")) SettingsScene.ToggleMuteSFX();
+        if (ButtonNarrow(HCenter - 600, VCenter + 0 , "Font")) SettingsScene.ToggleFontAccessibility();
+        if (ButtonNarrow(HCenter - 600, VCenter + 40, "High DPI")) SettingsScene.ToggleWindowScale();
+        if (SettingsScene.RestartNeeded) DrawTextLeft(HCenter - 488, VCenter + 52, "Restart to apply changes");
         
         
         DrawTextLeft(HCenter-590, VCenter+260, "By BadRAM and rosettedotnet\nWith music from the mod archive");

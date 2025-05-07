@@ -18,14 +18,18 @@ public enum Scene
 static class Program
 {
 	private static bool Paused;
-	public static bool SFXMute;
-	public static bool MusicMute;
+	// public static bool SFXMute;
+	// public static bool MusicMute;
 	public static Scene CurrentScene;
 	public static Campaign Campaign;
 	
     public static void Main()
     {
-	    SetConfigFlags(ConfigFlags.ResizableWindow);
+	    SettingsScene.Load();
+	    ConfigFlags flags = ConfigFlags.ResizableWindow;
+	    if (SettingsScene.WindowScale) flags |= ConfigFlags.HighDpiWindow;
+
+	    SetConfigFlags(flags);
 	    InitWindow(1200, 600, "2-fort");
 	    SetWindowMinSize(1200, 600);
         SetTargetFPS(60);
@@ -91,6 +95,12 @@ static class Program
         }
 
         Console.WriteLine("Quitting time!");
+
+        if (SettingsScene.RestartNeeded)
+        {
+	        SettingsScene.WindowScale = !SettingsScene.WindowScale;
+	        SettingsScene.Save();
+        }
         
 	    Resources.Unload();
         

@@ -20,6 +20,20 @@ public static class GUI
         _buttonClickSFX = Resources.GetSoundByName("shovel");
     }
 
+    public static Vector2 GetScaledMousePosition()
+    { 
+        return GetMousePosition() / GetWindowScale();
+    }
+
+    public static Vector2 GetWindowScale()
+    {
+        if (SettingsScene.WindowScale)
+        {
+            return GetWindowScaleDPI();
+        }
+        return Vector2.One;
+    }
+
     public static void DrawTextCentered(int x, int y, string text, float size = FontSize, Color? color = null)
     {
         Color c = color ?? new Color(255, 255, 255, 255);
@@ -38,7 +52,7 @@ public static class GUI
     
     public static bool ButtonWide(int x, int y, string text, bool enabled = true)
     {
-        bool hover = CheckCollisionPointRec(GetMousePosition(), new Rectangle(x, y, 300, 40));
+        bool hover = CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(x, y, 300, 40));
         bool press = !enabled || (hover && (IsMouseButtonDown(MouseButton.Left) || IsMouseButtonReleased(MouseButton.Left)));
         
         Rectangle subSprite = new Rectangle(0, !press ? !hover ? 0 : 40 : 80, 300, 40);
@@ -60,7 +74,7 @@ public static class GUI
     
     public static bool ButtonNarrow(int x, int y, string text, bool enabled = true)
     {
-        bool hover = CheckCollisionPointRec(GetMousePosition(), new Rectangle(x, y, 100, 40));
+        bool hover = CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(x, y, 100, 40));
         bool press = !enabled || (hover && (IsMouseButtonDown(MouseButton.Left) || IsMouseButtonReleased(MouseButton.Left)));
         
         Rectangle subSprite = new Rectangle(0, !press ? !hover ? 0 : 40 : 80, 100, 40);
@@ -81,11 +95,11 @@ public static class GUI
 
     public static string TextEntry(int x, int y, string text)
     {
-        bool hover = CheckCollisionPointRec(GetMousePosition(), new Rectangle(x, y, 300, 40));
+        bool hover = CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(x, y, 300, 40));
         
         Rectangle subSprite = new Rectangle(0, !hover ? 0 : 40, 300, 40);
         DrawTextureRec(_buttonWideTexture, subSprite, new Vector2(x,y), Color.White);
-        DrawTextCentered(x+150, y+20, text);
+        DrawTextCentered(x+150, y+20, text + (hover ? "_" : ""));
         
         if (hover)
         {
@@ -113,13 +127,6 @@ public static class GUI
         }
         return text;
     }
-    
-    // public class FortList
-    // {
-    //     private int _page;
-    //     
-    //     public void 
-    // }
     
     public static void UpdateCursor()
     {

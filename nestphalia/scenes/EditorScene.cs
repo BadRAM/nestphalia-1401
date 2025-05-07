@@ -121,8 +121,8 @@ public static class EditorScene
         if (IsKeyPressed(KeyboardKey.Escape)) ExitScene();
         
         // lazy hack so resizing the window doesn't offset the viewport
-        World.Camera.Offset = new Vector2(Screen.HCenter, Screen.VCenter); 
-        
+        World.Camera.Zoom = GetWindowScale().X;
+        World.Camera.Offset = new Vector2(Screen.HCenter, Screen.VCenter) * GetWindowScale(); 
         
         // ===== DRAW =====
         
@@ -136,7 +136,7 @@ public static class EditorScene
         DrawTexture(_bg, Screen.HCenter - 604, Screen.VCenter - 304, Color.White);
         
         // Draw brush preview ghost
-        if (CheckCollisionPointRec(GetMousePosition(), new Rectangle(Screen.HCenter-240, Screen.VCenter-232, 480, 480)))
+        if (CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(Screen.HCenter-240, Screen.VCenter-232, 480, 480)))
         {
             BeginMode2D(World.Camera);
             Vector2 mousePos = World.GetTileCenter(World.GetMouseTilePos());

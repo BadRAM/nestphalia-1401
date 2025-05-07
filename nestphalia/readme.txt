@@ -10,6 +10,10 @@ Your custom battle forts are saved in /forts/. Renaming files and creating folde
 
 Version History:
 
+---- 1.2.1 - 2025-05-06 ----
+ - Added support for high DPI monitors
+ - Fixed a bug where forts wouldn't save properly on linux
+
 ==== 1.2.0 - Champion's Edition - 2025-04-28 ====
 Highlighted Changes:
  - All forts used in the first grand tournament of bugs have been included

@@ -46,9 +46,9 @@ public static class World
     private static void Initialize()
     {
         Camera.Target = new Vector2(BoardWidth * 12, BoardHeight * 12);
-        Camera.Offset = new Vector2(Screen.HCenter, Screen.VCenter);
+        Camera.Offset = new Vector2(Screen.HCenter, Screen.VCenter) * GUI.GetWindowScale();
         Camera.Rotation = 0;
-        Camera.Zoom = 1;
+        Camera.Zoom = GUI.GetWindowScale().X;
         Minions.Clear();
         Projectiles.Clear();
         Sprites.Clear();
@@ -108,8 +108,10 @@ public static class World
     public static void InitializePreview()
     {
         Initialize();
-        Camera.Zoom = 0.5f;
-        Camera.Offset = new Vector2(Screen.HCenter, Screen.VCenter+50);        // set up floor tile checkerboard
+        Camera.Zoom = 0.5f * GUI.GetWindowScale().X;
+        Camera.Offset = new Vector2(Screen.HCenter, Screen.VCenter+50) * GUI.GetWindowScale();
+        
+        // set up floor tile checkerboard
         for (int x = 0; x < BoardWidth; x++)
         {
             for (int y = 0; y < BoardHeight; y++)

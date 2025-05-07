@@ -39,7 +39,7 @@ public class SoundResource
     
     public void Play(float pan = 0.5f, float pitch = 1f, float volume = 0.75f)
     {
-        if (Program.SFXMute || IsSoundPlaying(_soundBuffer[_bufferIndex])) return;
+        if (SettingsScene.SFXMute || IsSoundPlaying(_soundBuffer[_bufferIndex])) return;
         SetSoundPan(_soundBuffer[_bufferIndex], pan);
         SetSoundPitch(_soundBuffer[_bufferIndex], pitch);
         SetSoundVolume(_soundBuffer[_bufferIndex], volume);
@@ -81,7 +81,6 @@ public static class Resources
     public static Font Font;
     private static Font _accessibleFont;
     private static Font _defaultFont;
-    private static bool _fontAccessibility;
     public static Music MusicPlaying;
     
     
@@ -90,7 +89,7 @@ public static class Resources
         MissingTexture = LoadTexture("resources/sprites/missingtex.png");
         _accessibleFont = LoadFont("resources/pixelplay16.png");
         _defaultFont = LoadFont("resources/alagard.png");
-        Font = _defaultFont;
+        Font = SettingsScene.AccessibleFont ? _accessibleFont : _defaultFont;
         
         foreach (string path in Directory.GetFiles(Directory.GetCurrentDirectory() + "/resources/sprites"))
         {
@@ -145,7 +144,7 @@ public static class Resources
     public static void PlayMusicByName(string name)
     {
         StopMusicStream(MusicPlaying);
-        if (Program.MusicMute) return;
+        if (SettingsScene.MusicMute) return;
         
         MusicResource? s = Music.FirstOrDefault(x => x.Name == name);
         
@@ -175,10 +174,9 @@ public static class Resources
         }
     }
 
-    public static void ToggleFontAccessibility()
+    public static void SetFontAccessibility(bool accessible)
     {
-        _fontAccessibility = !_fontAccessibility;
-        Font = _fontAccessibility ? _accessibleFont : _defaultFont;
+        Font = accessible ? _accessibleFont : _defaultFont;
     }
 
     public static void SaveFort(string fortName, string path)
@@ -199,7 +197,7 @@ public static class Resources
         
         string jsonString = JsonSerializer.Serialize(fort, SourceGenerationContext.Default.Fort);
         //Console.WriteLine($"JSON fort looks like: {jsonString}");
-        File.WriteAllText(path + "\\" + fortName + ".fort", jsonString);
+        File.WriteAllText(path + "/" + fortName + ".fort", jsonString);
         
         //if (right) World.Flip();
     }
@@ -233,6 +231,7 @@ public static class Resources
 [JsonSourceGenerationOptions(WriteIndented = true)]
 [JsonSerializable(typeof(Fort))]
 [JsonSerializable(typeof(Campaign))]
+[JsonSerializable(typeof(SettingsScene.SavedSettings))]
 internal partial class SourceGenerationContext : JsonSerializerContext
 {
 }
