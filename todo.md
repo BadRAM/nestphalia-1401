@@ -45,6 +45,14 @@ Decision point: Do I push towards 1401 v2, or start on 1402?
     - ~~After: 0.300ms - 0.318 deterministic :)~~
   - Build the targets list once per frame (only if needed) and save it in the team class. Retargeting nests can reference this list
   - Make pathnodes structs to improve cache coherency
+    - Before: 0.420ms deterministic
+    - After: Worse :(
+  - Keep a cache of the weight calculation in team, updated by world events.
+    - Before: 0.300 release, 1.000 debug
+    - After:  0.450 release, 1.500 debug
+  - Path outwards from start and destination simultaneously, finishing as soon as the two sides touch
+    - Before: 0.850 release
+    - After:  0.045 release :')
 - Campaign rebalance, use 'funding' instead of direct cash stores, or Pay to build the fort every mission
 - ~~Allow multiple campaign designs~~
 - Help text/tutorial

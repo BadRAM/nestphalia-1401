@@ -8,25 +8,25 @@ public static class PathFinder
     private static Queue<NavPath> _pathQueue = new Queue<NavPath>();
 
     private static PathNode?[,] _nodeGrid = new PathNode?[World.BoardWidth,World.BoardHeight];
-    private static List<PathNode> _nodesToConsider = new List<PathNode>();
-    // private static NodeConsiderationPool _nodesToConsider = new NodeConsiderationPool();
-    private static int _nodesToConsiderOffset = 0;
+    private static List<PathNode> _nodeQueue = new List<PathNode>();
+    private static int _nodes;
+    private static List<PathNode> _antinodeQueue = new List<PathNode>();
+    private static int _antinodes;
+    private static bool _anti;
     
     private static Stopwatch _swTotalTime = new Stopwatch();
     private static int _totalPaths = 0;
-    private static long _totalNodes = 0;
-    private static Stopwatch _swMisc = new Stopwatch();
-    private static Stopwatch _swFindNext = new Stopwatch();
-    private static Stopwatch _swAddNodes = new Stopwatch();
-    // private static Stopwatch _swRegisterNode = new Stopwatch();
-    // private static Stopwatch _swNewNode = new Stopwatch();
+    // private static long _totalNodes = 0;
+    // private static Stopwatch _swMisc = new Stopwatch();
+    // private static Stopwatch _swFindNext = new Stopwatch();
+    // private static Stopwatch _swAddNodes = new Stopwatch();
     
-    
-    private struct PathNode : IComparable<PathNode>
+    private class PathNode
     {
         public Int2D Pos;
         public double Weight;
         public Int2D PrevNode;
+        public bool Anti;
         
         public PathNode(Int2D pos, Int2D prevNode)
         {
@@ -36,12 +36,8 @@ public static class PathFinder
 
         public PathNode GetPrevNode()
         {
+            Debug.Assert(_nodeGrid[PrevNode.X, PrevNode.Y] != null);
             return _nodeGrid[PrevNode.X, PrevNode.Y] ?? this;
-        }
-
-        public int CompareTo(PathNode other)
-        {
-            return Weight.CompareTo(other.Weight);
         }
     }
 
@@ -63,71 +59,88 @@ public static class PathFinder
             }
         }
     }
+    
+    public static int GetQueueLength()
+    {
+        return _pathQueue.Count;
+    }
 
+    public static void ClearQueue()
+    {
+        _pathQueue.Clear();
+    }
+
+    // FindPath is normally called by ServeQueue, but can be called directly if an immediate path is needed.
     public static void FindPath(NavPath navPath)
     {
-        
-        // Guards
-        if (navPath.Found)
-        {
-            int c = _pathQueue.Count;
-            _pathQueue = new Queue<NavPath>(_pathQueue.Distinct());
-            Console.WriteLine($"FindPath called on a path that's already found, from [{navPath.Start}] to [{navPath.Destination}] Trimmed {c - _pathQueue.Count} duplicate path requests");
-            return;
-        }
+        // Guard against invalid path request
+        Debug.Assert(navPath.Found);
         
         // Start of pathing
         _swTotalTime.Start();
         _totalPaths++;
         
         Array.Clear(_nodeGrid);
-        _nodesToConsider.Clear();
-        _nodesToConsiderOffset = 0;
+        _nodeQueue.Clear();
+        _antinodeQueue.Clear();
         
         PathNode n = new PathNode(navPath.Start, navPath.Start);
-        _nodesToConsider.Add(n);
+        _nodeQueue.Add(n);
         
-        int count = 0;
+        n = new PathNode(navPath.Destination, navPath.Destination);
+        _antinodeQueue.Add(n);
+        
+        // int count = 0;
+        // ===== Path Solver Loop =====================================================================================
         while (true)
         {
-             _swMisc.Start();
-            count++;
+            // _swMisc.Start();
+            // count++;
             
-            // Abort if we ran out of options.
-            if (_nodesToConsider.Count == 0)
-            // if (_nodesToConsider.IsEmpty())
-            {
-                n = new PathNode(navPath.Start, navPath.Start);
-                Console.WriteLine("Couldn't find a path!");
-                break;
-            }
+            // Guard against no-path scenarios
+            Debug.Assert(_nodeQueue.Count != 0 && _antinodeQueue.Count != 0);
+
+            // ----- Decide if this loop will be node or antinode -------------------------------------------------
+            _anti = _nodes > _antinodes;
             
-            _swMisc.Stop();
-            _swFindNext.Start();
+            // _swMisc.Stop();
+            // _swFindNext.Start();
             
-            // pull cheapest node off the top of the consider queue
+            // ----- Select Node ----------------------------------------------------------------------------------
             n = PopMinNode();
             
-            _swFindNext.Stop();
-            _swMisc.Start();
-            
-            // Break if we're done
-            if (n.Pos == navPath.Destination)
-            {
-                _swMisc.Stop();
-                break;
-            }
+            // _swFindNext.Stop();
+            // _swMisc.Start();
 
-            // guard against nodes we've already found the best path to
-            if (_nodeGrid[n.Pos.X, n.Pos.Y] != null) continue;
+            if (_nodeGrid[n.Pos.X, n.Pos.Y] != null)
+            {
+                // When nodes and antinodes touch, we're done
+                if ((_nodeGrid[n.Pos.X, n.Pos.Y]?.Anti ?? _anti) == !_anti)
+                {
+                    // _swMisc.Stop();
+                    break;
+                }
+                // guard against nodes we've already found the best path to
+                continue;
+            }
             
-            // set node into grid
+            // ----- Process selected node ------------------------------------------------------------------------
             _nodeGrid[n.Pos.X,n.Pos.Y] = n;
             
-            _swMisc.Stop();
-            _swAddNodes.Start();
+            if (_anti)
+            {
+                _antinodes++;
+            }
+            else
+            {
+                _nodes++;
+            }
             
-            // add new nodes for consideration
+            // _swMisc.Stop();
+            // _swAddNodes.Start();
+            
+            // ----- Add new nodes for consideration --------------------------------------------------------------
+            #region  Add Nodes
             // left
             if (n.Pos.X-1 >= 0)
             {
@@ -180,46 +193,85 @@ public static class PathFinder
             }
             
             // bottom right
-            if (   n.Pos.X + 1 < World.BoardWidth 
+            if (   n.Pos.X + 1 < World.BoardWidth
                 && n.Pos.Y + 1 < World.BoardHeight
                 && !navPath.Team.GetNavSolid(n.Pos.X+1, n.Pos.Y)
                 && !navPath.Team.GetNavSolid(n.Pos.X, n.Pos.Y+1))
             {
                 AddWeightedNode(n.Pos, n.Pos.X+1, n.Pos.Y+1, 1.4, navPath.Team, navPath);
             }
+            #endregion
             
-            _swAddNodes.Stop();
+            // _swAddNodes.Stop();
         }
         
-        //Console.WriteLine($"Found path in {count} loops, final node weight {n.Weight}");
+        // ===== Navpath Generation ===================================================================================
         
+        // Get the node and antinode that touched
+        PathNode nn = !_anti ? n : _nodeGrid[n.Pos.X, n.Pos.Y] ?? n;
+        PathNode an =  _anti ? n : _nodeGrid[n.Pos.X, n.Pos.Y] ?? n;
+        
+        // Build the first half by walking the nodes
         while (true)
         {
-            navPath.Waypoints.Insert(0, n.Pos);
-            if (n.PrevNode != n.Pos)
+            navPath.Waypoints.Insert(0, nn.Pos);
+            if (nn.PrevNode != nn.Pos)
             {
-                n = n.GetPrevNode();
+                nn = nn.GetPrevNode();
             }
             else
             {
                 break;
             }
         }
-
+        
+        // Build the second half by walking the antinodes
+        while (true)
+        {
+            navPath.Waypoints.Add(an.Pos);
+            if (an.PrevNode != an.Pos)
+            {
+                an = an.GetPrevNode();
+            }
+            else
+            {
+                break;
+            }
+        }
+        
+        // Set the flag to let the minion know we're done
         navPath.Found = true;
-        _totalNodes += count;
-        _totalNodes += _nodesToConsider.Count;
+        
+        // _totalNodes += count;
+        // _totalNodes += _nodeQueue.Count;
         
         _swTotalTime.Stop();
+    }
+    
+    private static PathNode PopMinNode()
+    {
+        List<PathNode> queue = _anti ? _antinodeQueue : _nodeQueue;
+        
+        double min = queue[0].Weight;
+        int mindex = 0;
+        for (int i = 1; i < queue.Count; i++)
+        {
+            if (queue[i].Weight < min)
+            {
+                min = queue[i].Weight;
+                mindex = i;
+            }
+        }
+        
+        PathNode p = queue[mindex];
+        queue[mindex] = queue[^1];
+        queue.RemoveAt(queue.Count-1);
+        return p;
     }
 
     private static void AddWeightedNode(Int2D prevNode, int x, int y, double moveDistance, Team team, NavPath path)
     {
-        // if (_nodeGrid[x, y]?.Set ?? false) return;
         if (_nodeGrid[x, y] != null) return;
-        
-        // _swAddNodes.Stop();
-        // _swNewNode.Start();
        
         // Create new node
         PathNode n = new PathNode(new Int2D(x, y), prevNode);
@@ -228,67 +280,18 @@ public static class PathFinder
         // n.Weight += team.GetFearOf(x, y);
         n.Weight += team.GetTileWeight(x, y);
 
-        // _swNewNode.Stop();
-        // _swRegisterNode.Start();
-        
+        n.Anti = _anti;
         // Register node
-        _nodesToConsider.Add(n);
-        
-        // _swRegisterNode.Stop();
-        // _swAddNodes.Start();
-    }
-    
-    
-    // Functions which handle the node consideration pool
-        
-    private static PathNode PopMinNode()
-    {
-        double min = _nodesToConsider[0].Weight;
-        int mindex = 0;
-        for (int i = 0; i < _nodesToConsider.Count; i++)
+        if (!_anti)
         {
-            if (_nodesToConsider[i].Weight < min)
-            {
-                min = _nodesToConsider[i].Weight;
-                mindex = i;
-            }
+            _nodeQueue.Add(n);
         }
-
-        
-        PathNode p = _nodesToConsider[mindex];
-        _nodesToConsider[mindex] = _nodesToConsider[^1];
-        _nodesToConsider.RemoveAt(_nodesToConsider.Count-1);
-        return p;
-        
-        // _nodesToConsider.
-        //
-        // PathNode p = _nodesToConsider[^1];
-        // _nodesToConsider.RemoveAt(_nodesToConsider.Count-1);
-        // return p;
-    }
-
-    private static void CullNodes(Int2D pos)
-    {
-        for (int i = 0; i < _nodesToConsider.Count; i++)
+        else
         {
-            if (_nodesToConsider[i].Pos == pos)
-            {
-                _nodesToConsider[i] = _nodesToConsider[^1];
-                _nodesToConsider.RemoveAt(_nodesToConsider.Count-1);
-            }
+            _antinodeQueue.Add(n);
         }
     }
-
-    public static int GetQueueLength()
-    {
-        return _pathQueue.Count;
-    }
-
-    public static void ClearQueue()
-    {
-        _pathQueue.Clear();
-    }
-
+    
     public static void DrawDebug()
     {
         Raylib.BeginMode2D(World.Camera);
@@ -325,46 +328,35 @@ public static class PathFinder
         
         // ReSharper disable once InconsistentNaming
         long totalSWTime = _swTotalTime.ElapsedMilliseconds;
-        //long totalSWTime = _swMisc.ElapsedMilliseconds + _swFindNext.ElapsedMilliseconds + _swAddNodes.ElapsedMilliseconds + _swNewNode.ElapsedMilliseconds + _swRegisterNode.ElapsedMilliseconds;
         if (totalSWTime == 0) return;
 
         GUI.DrawTextLeft(Screen.HCenter + 350, Screen.VCenter - 250,
             $"Avg Pathing Time: {(1000 * _swTotalTime.Elapsed.TotalSeconds / _totalPaths).ToString("N3")}ms\n" +
-            $"{_totalPaths} paths totalling {_swTotalTime.ElapsedMilliseconds}ms ({_pathQueue.Count} pending)\n" +
-            $"Average nodes per path: {_totalNodes / _totalPaths}\n" +
-            $"Time in pathloop: {totalSWTime}ms\n" +
-            $"Misc: {_swMisc.ElapsedMilliseconds}ms\n" +
-            $"FindNext: {_swFindNext.ElapsedMilliseconds}ms\n" +
-            $"AddNodes: {_swAddNodes.ElapsedMilliseconds}ms\n");
-            // $"NewNode: {_swNewNode.ElapsedMilliseconds}ms\n" +
-            // $"RegisterNode: {_swRegisterNode.ElapsedMilliseconds}ms");
+            $"{_totalPaths} paths totalling {_swTotalTime.ElapsedMilliseconds}ms ({_pathQueue.Count} pending)\n");
+            // $"Average nodes per path: {_totalNodes / _totalPaths}\n" +
+            // $"Time in pathloop: {totalSWTime}ms\n" +
+            // $"Misc: {_swMisc.ElapsedMilliseconds}ms\n" +
+            // $"FindNext: {_swFindNext.ElapsedMilliseconds}ms\n" +
+            // $"AddNodes: {_swAddNodes.ElapsedMilliseconds}ms\n");
         
-        int totalWidth = 1000;
-        int x = Screen.HCenter-500;
-        int width = (int)(totalWidth * _swMisc.ElapsedMilliseconds / totalSWTime);
-        
-        Raylib.DrawRectangle(x, Screen.VCenter-300, width, 40, Color.Gray);
-        GUI.DrawTextLeft(x, Screen.VCenter-290, $"Misc: {(int)(100 * _swMisc.ElapsedMilliseconds / totalSWTime)}%");
-        x += width;
-        width = (int)(totalWidth * _swFindNext.ElapsedMilliseconds / totalSWTime);
-        Raylib.DrawRectangle(x, Screen.VCenter-300, width, 40, Color.Green);
-        GUI.DrawTextLeft(x, Screen.VCenter-290, $"FindNext: {(int)(100 * _swFindNext.ElapsedMilliseconds / totalSWTime)}%");
-        x += width;
-        width = (int)(totalWidth * _swAddNodes.ElapsedMilliseconds / totalSWTime);
-        Raylib.DrawRectangle(x, Screen.VCenter-300, width, 40, Color.SkyBlue);
-        GUI.DrawTextLeft(x, Screen.VCenter-290, $"AddNodes: {(int)(100 * _swAddNodes.ElapsedMilliseconds / totalSWTime)}%");
-        x += width;
-        // width = (int)(totalWidth * _swNewNode.ElapsedMilliseconds / totalSWTime);
-        // Raylib.DrawRectangle(x, Screen.VCenter-300, width, 40, Color.Orange);
-        // GUI.DrawTextLeft(x, Screen.VCenter-290, $"NewNode: {(int)(100 * _swNewNode.ElapsedMilliseconds / totalSWTime)}%");
+        // int totalWidth = 1000;
+        // int x = Screen.HCenter-500;
+        // int width = (int)(totalWidth * _swMisc.ElapsedMilliseconds / totalSWTime);
+        //
+        // Raylib.DrawRectangle(x, Screen.VCenter-300, width, 40, Color.Gray);
+        // GUI.DrawTextLeft(x, Screen.VCenter-290, $"Misc: {(int)(100 * _swMisc.ElapsedMilliseconds / totalSWTime)}%");
         // x += width;
-        // width = (int)(totalWidth * _swRegisterNode.ElapsedMilliseconds / totalSWTime);
-        // Raylib.DrawRectangle(x, Screen.VCenter-300, width, 40, Color.Purple);
-        // GUI.DrawTextLeft(x, Screen.VCenter-290, $"RegisterNode: {(int)(100 * _swRegisterNode.ElapsedMilliseconds / totalSWTime)}%");
+        // width = (int)(totalWidth * _swFindNext.ElapsedMilliseconds / totalSWTime);
+        // Raylib.DrawRectangle(x, Screen.VCenter-300, width, 40, Color.Green);
+        // GUI.DrawTextLeft(x, Screen.VCenter-290, $"FindNext: {(int)(100 * _swFindNext.ElapsedMilliseconds / totalSWTime)}%");
         // x += width;
-        
-        width = totalWidth - x;
-        Raylib.DrawRectangle(x, Screen.VCenter-300, width, 40, Color.Gray);
-        GUI.DrawTextLeft(x, Screen.VCenter-290, $"Out of loop: {100 * width / totalWidth}%");
+        // width = (int)(totalWidth * _swAddNodes.ElapsedMilliseconds / totalSWTime);
+        // Raylib.DrawRectangle(x, Screen.VCenter-300, width, 40, Color.SkyBlue);
+        // GUI.DrawTextLeft(x, Screen.VCenter-290, $"AddNodes: {(int)(100 * _swAddNodes.ElapsedMilliseconds / totalSWTime)}%");
+        // x += width;
+        //
+        // width = totalWidth - x;
+        // Raylib.DrawRectangle(x, Screen.VCenter-300, width, 40, Color.Gray);
+        // GUI.DrawTextLeft(x, Screen.VCenter-290, $"Out of loop: {100 * width / totalWidth}%");
     }
 }
