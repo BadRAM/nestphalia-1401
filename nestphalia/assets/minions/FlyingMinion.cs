@@ -15,6 +15,11 @@ public class FlyingMinionTemplate : MinionTemplate
         World.Minions.Add(m);
         World.Sprites.Add(m);
     }
+
+    public override bool PathFromNest()
+    {
+        return false;
+    }
 }
 
 public class FlyingMinion : Minion

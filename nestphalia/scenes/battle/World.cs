@@ -28,7 +28,7 @@ public static class World
     private static bool _battleStarted;
     private static SoundResource _waveStartSoundEffect;
     private static bool _battleOver;
-
+    
     public static bool DrawDebugInfo;
     private static Stopwatch _swFrame = new Stopwatch();
     private static Stopwatch _swUpdate = new Stopwatch();
@@ -42,6 +42,13 @@ public static class World
     private static Stopwatch _swDraw = new Stopwatch();
     private static Stopwatch _swDrawSort = new Stopwatch();
     private static Stopwatch _swDrawSprites = new Stopwatch();
+
+    public static event EventHandler<Int2D> StructureChanged = delegate {};
+    
+    public class StructureChangedEventArgs(int x, int y) : EventArgs
+    {
+        public Int2D Pos { get; set; } = new(x, y);
+    }
     
     private static void Initialize()
     {
@@ -162,6 +169,8 @@ public static class World
         {
             Sprites.Add(_board[x,y]!);
         }
+        
+        StructureChanged.Invoke(null, new Int2D(x,y));
     }
     
     public static void SetTile(StructureTemplate? tile, Team team, Int2D tilePos)
@@ -177,6 +186,8 @@ public static class World
             _board[x,y] = new Rubble(_board[x, y]!.Template, _board[x, y]!.Team, x, y);
             Sprites.Add(_board[x,y]!);
         }
+        
+        StructureChanged.Invoke(null, new Int2D(x,y));
     }
 
     public static Structure? GetTile(Int2D tilePos)

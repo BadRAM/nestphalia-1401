@@ -141,7 +141,7 @@ public class Spawner : Structure
         _targetTile = target;
         _navPath.Reset(position);
         _navPath.Destination = _targetTile;
-        if (!(_template.Minion is FlyingMinionTemplate))
+        if (_template.Minion.PathFromNest())
         {
             PathFinder.FindPath(_navPath);
         }

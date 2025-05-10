@@ -3,36 +3,6 @@
 Programming todo:
 =================
 
------ Champion's Edition -----
-
-- ~~Bugs pushed too far from their next path tile will repath~~
-- ~~Re-register repaired stratagems~~
-- ~~Hopper target pos randomization~~
-- ~~Sell all cancel button~~
-- ~~Beetles throw a lot of bombs sometimes~~
-- ~~Bugs walk towards target while unpathed, then go back to their path origin~~
-- ~~Heavier bugs push smaller bugs out of the way~~
-- ~~Sandbox editor is inside of custom battle menu~~
-- ~~Custom Battle Folders~~
-- ~~fort10 doesn't save correctly - Could not reproduce~~
-- ~~saving to new file multiple times doesnt' work~~
-- ~~Hoppers are aware of enemy mines~~
-- ~~Editor path preview~~
-- ~~new graffiti~~
-- ~~Paulby shoutout~~
-- ~~Some linux machines can't run the game.~~
-- ~~ESC quits all menus~~
-- ~~Separate music and sfx mutes~~
-- ~~Editor background texture~~
-- ~~Bug: Spiderlings from death of bigspider just sit there for a while.~~
-- ~~Selling buildings doesn't return money properly~~
-- ~~Exit without saving doesn't refund bug dollars~~
-- ~~Fort Editor text overflow~~
-- ~~Text entry element~~
-- ~~'Save fort as' function~~
-- ~~Campaign fort design selector~~
-- ~~Rebalance campaign rewards~~
-
 
 Decision point: Do I push towards 1401 v2, or start on 1402?
 ---- V2: ----
@@ -64,6 +34,7 @@ Decision point: Do I push towards 1401 v2, or start on 1402?
 - Minion state machine
 - Refactor Minion.Hurt() to not need a damagesource
 - Pathfinding optimizations:
+  - note: published builds seem to run about 2x faster than debug mode in IDE
   - ~~as soon as a node is set in the targeted half of the battlefield, purge all nodes and dont' allow any new ones to be created in the untargeted half~~
     - ~~This feels too complex, limiting, and like it could cause difficult bugs. A more generalized chunking method would be better, but only if the game grows and pathing performance becomes a problem again~~
   - ~~Binary search to find consider queue insertion point~~
@@ -72,6 +43,8 @@ Decision point: Do I push towards 1401 v2, or start on 1402?
   - ~~Reverse sort order of list to maximize operations on performant end~~
     - ~~Before: 0.322ms - 0.344 deterministic~~
     - ~~After: 0.300ms - 0.318 deterministic :)~~
+  - Build the targets list once per frame (only if needed) and save it in the team class. Retargeting nests can reference this list
+  - Make pathnodes structs to improve cache coherency
 - Campaign rebalance, use 'funding' instead of direct cash stores, or Pay to build the fort every mission
 - ~~Allow multiple campaign designs~~
 - Help text/tutorial

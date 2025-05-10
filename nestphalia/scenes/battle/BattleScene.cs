@@ -150,6 +150,7 @@ public static class BattleScene
         DrawTextLeft(6, 48, $"Bugs: {World.Minions.Count}");
         // DrawTextLeft(6, 64, $"Sprites: {World.Sprites.Count}");
         DrawTextLeft(6, 64, $"Zoom: {World.Camera.Zoom}");
+        DrawTextLeft(6, 80, $"Tile {World.GetMouseTilePos().ToString()}");
         // DrawTextLeft(6, 80, $"PathQueue: {PathFinder.GetQueueLength()}");
         if (_pathFinderDebug) PathFinder.DrawDebug();
         

@@ -1,13 +1,18 @@
+using System.Net;
 using System.Numerics;
 using Raylib_cs;
 
 namespace nestphalia;
 
+// TODO: Cache target list here
+// TODO: Cache nav weight here
 public class Team
 {
     public string Name;
     private double[,] _fearMap = new double[World.BoardWidth, World.BoardHeight];
     private double[,] _hateMap = new double[World.BoardWidth, World.BoardHeight];
+    private double[,] _weightMap = new double[World.BoardWidth, World.BoardHeight];
+    private bool[,] _navSolidMap = new bool[World.BoardWidth, World.BoardHeight];
     public bool IsRightSide;
     public bool IsPlayerControlled;
     public List<ActiveAbilityBeacon?> Beacons = new List<ActiveAbilityBeacon?>();
@@ -57,11 +62,16 @@ public class Team
                         _maxHealth += spawner.Health;
                     }
                 }
+
+                _weightMap[x, y] = CalculateWeight(x, y);
+                _navSolidMap[x, y] = World.GetTile(x, y)?.NavSolid(this) ?? false;
             }
         }
         while (Beacons.Count < BeaconCap) Beacons.Add(null);
+
+        World.StructureChanged += OnStructureChanged;
     }
-    
+
     public double GetHateFor(int x, int y)
     {
         return _hateMap[x, y];
@@ -187,6 +197,7 @@ public class Team
                     {
                         Raylib.DrawCircleV(World.GetTileCenter(x,y), 12, new Color(255, 255, 0, 128));
                     }
+                    Raylib.DrawCircleV(World.GetTileCenter(x,y), MathF.Min((float)(_weightMap[x,y]/10), 10), new Color(255,  64, 255, 128));
                 }
             }
             Raylib.EndMode2D();
@@ -210,7 +221,7 @@ public class Team
                 {
                     Raylib.DrawRectangle(x, y, 64, 64, new Color(255, 255, 255, 32));
                 }
-            }   
+            }
         }
         
         // health bar
@@ -218,5 +229,48 @@ public class Team
         float hpBarSize = (float)(300 * _health / _maxHealth);
         Raylib.DrawTextureRec(_healthBar, new Rectangle( IsRightSide ? 300 - hpBarSize : 0, 40, hpBarSize, 40), new Vector2(IsRightSide ? (300 - hpBarSize) + Screen.HCenter + 20  : Screen.HCenter - 320, Screen.Bottom -44), Color.White);
         GUI.DrawTextCentered(IsRightSide ? Screen.HCenter + 160 : Screen.HCenter - 160, Screen.Bottom - 24, $"{Name} - {_health:n0}/{_maxHealth:n0}");
+    }
+    
+    public double GetTileWeight(int x, int y)
+    {
+        return _fearMap[x, y] + _weightMap[x, y];
+    }
+
+    public bool GetNavSolid(int x, int y)
+    {
+        return _navSolidMap[x, y];
+    }
+
+    private double CalculateWeight(int x, int y)
+    {
+        double weight = 0;
+        Structure? structure = World.GetTile(x, y);
+        if (!(structure == null || structure is Rubble))
+        {
+            if (structure is Minefield && structure.Team == this)
+            {
+                weight += structure.Health;
+            }
+            else if (structure is HazardSign && structure.Team == this)
+            {
+                weight += 1000000;
+            }
+            else
+            {
+                if (structure.NavSolid(this))
+                {
+                    weight += structure.Health;
+                    if (structure.Team == this) weight += 1000000; //return null;
+                }
+            }
+        }
+
+        return weight;
+    }
+    
+    private void OnStructureChanged(object? sender, Int2D pos)
+    {
+        _weightMap[pos.X, pos.Y] = CalculateWeight(pos.X, pos.Y);
+        _navSolidMap[pos.X, pos.Y] = World.GetTile(pos.X, pos.Y)?.NavSolid(this) ?? false;
     }
 }

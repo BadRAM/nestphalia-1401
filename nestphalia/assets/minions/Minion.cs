@@ -50,6 +50,12 @@ public class MinionTemplate
             $"Size: {PhysicsRadius * 2}\n" +
             $"{Description}";
     }
+
+    // Override this to return false for bugs that handle their own pathfinding on spawn
+    public virtual bool PathFromNest()
+    {
+        return true;
+    }
 }
 
 public class Minion : ISprite
