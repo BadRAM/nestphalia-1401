@@ -39,8 +39,8 @@ public class SapperMinion : Minion
         _template = template;
         _attacking = true;
         _startTile = World.PosToTilePos(position);
-        Retarget();
-        PathFinder.RequestPath(NavPath);
+        // Retarget();
+        // PathFinder.RequestPath(NavPath);
     }
 
     public override void Update()

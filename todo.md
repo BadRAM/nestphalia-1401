@@ -3,20 +3,32 @@
 Programming todo:
 =================
 
+----- V2 -----
 
-Decision point: Do I push towards 1401 v2, or start on 1402?
----- V2: ----
+- Game intro cutscene
 - Random damage variation
-- Campaign rebalance to use funding instead of direct cash.
-- Allow multiple campaign designs
 - Redesign the campaign forts
 - Nice campaign screen with a map and paths appearing every time you unlock a new level. Nonlinear campaign?
 - Nice title screen
 - 2-3 more bugs & towers
- - Ranged attack bug
- - Another flyer. Ladybug? Flies until attacked.
- - Snail rework
- - Centipede that gets longer and shorter
+  - Ranged attack bug
+  - Another flyer. Ladybug? Flies until attacked.
+  - Snail rework
+  - Centipede that gets longer and shorter
+- ~~Random damage variation~~
+- ~~Make battles able to be deterministic if desired~~
+- Minion state machine
+- Refactor Minion.Hurt() to not need a damagesource
+- ~~Campaign rebalance, use 'funding' instead of direct cash stores, or Pay to build the fort every mission~~
+- ~~Allow multiple campaign designs~~
+- Help text/tutorial
+- Orphaned sapper beetles will seek another burrow
+- Limit total spiderlings a spider can spawn
+- ~~try compiling for web~~
+- Make nests solid again
+- Help text / Tutorial
+
+
 
 ---- 1402 ----
 - 3d engine
@@ -25,47 +37,6 @@ Decision point: Do I push towards 1401 v2, or start on 1402?
 - Multitile structures
 - Inventory system
 - Many more bugs and towers than current
-
-
------ V2 -----
-
-- ~~Random damage variation~~
-- ~~Make battles able to be deterministic if desired~~
-- Minion state machine
-- Refactor Minion.Hurt() to not need a damagesource
-- Pathfinding optimizations:
-  - note: published builds seem to run about 2x faster than debug mode in IDE
-  - ~~as soon as a node is set in the targeted half of the battlefield, purge all nodes and dont' allow any new ones to be created in the untargeted half~~
-    - ~~This feels too complex, limiting, and like it could cause difficult bugs. A more generalized chunking method would be better, but only if the game grows and pathing performance becomes a problem again~~
-  - ~~Binary search to find consider queue insertion point~~
-    - ~~Before: Registernode 30%, avg pathtime 0.547ms~~
-    - ~~After:  Registernode 50%, avg pathtime 0.650ms :(~~
-  - ~~Reverse sort order of list to maximize operations on performant end~~
-    - ~~Before: 0.322ms - 0.344 deterministic~~
-    - ~~After: 0.300ms - 0.318 deterministic :)~~
-  - Build the targets list once per frame (only if needed) and save it in the team class. Retargeting nests can reference this list
-  - Make pathnodes structs to improve cache coherency
-    - Before: 0.420ms deterministic
-    - After: Worse :(
-  - Keep a cache of the weight calculation in team, updated by world events.
-    - Before: 0.300 release, 1.000 debug
-    - After:  0.450 release, 1.500 debug
-  - Path outwards from start and destination simultaneously, finishing as soon as the two sides touch
-    - Before: 0.850 release
-    - After:  0.045 release :')
-- Campaign rebalance, use 'funding' instead of direct cash stores, or Pay to build the fort every mission
-- ~~Allow multiple campaign designs~~
-- Help text/tutorial
-- Game load cutscene
-- Fancy title text
-- Main menu art
-- Campaign screen Map
-- Orphaned sapper beetles will seek another burrow
-- Limit total spiderlings a spider can spawn
-- try compiling for web
-- Make nests solid again
-- Help text / Tutorial
-
 
 ----- Postponed to team bug fort 2 -----
 
@@ -77,6 +48,34 @@ Decision point: Do I push towards 1401 v2, or start on 1402?
 - Minion vs Minion melee
 - Multitile structures
 - Post battle screen
+
+
+----- Premature Optimizations -----
+
+- Physics optimizations
+  - Sector based minion culling/lookup
+    - No significant difference
+
+- ~~Pathfinding optimizations:~~
+  - ~~note: published builds seem to run about 2x faster than debug mode in IDE~~
+  - ~~as soon as a node is set in the targeted half of the battlefield, purge all nodes and dont' allow any new ones to be created in the untargeted half~~
+    - ~~This feels too complex, limiting, and like it could cause difficult bugs. A more generalized chunking method would be better, but only if the game grows and pathing performance becomes a problem again~~
+  - ~~Binary search to find consider queue insertion point~~
+    - ~~Before: Registernode 30%, avg pathtime 0.547ms~~
+    - ~~After:  Registernode 50%, avg pathtime 0.650ms :(~~
+  - ~~Reverse sort order of list to maximize operations on performant end~~
+    - ~~Before: 0.322ms - 0.344 deterministic~~
+    - ~~After: 0.300ms - 0.318 deterministic :)~~
+  - ~~Build the targets list once per frame (only if needed) and save it in the team class. Retargeting nests can reference this list~~
+  - ~~Make pathnodes structs to improve cache coherency~~
+    - ~~Before: 0.420ms deterministic~~
+    - ~~After: Worse :(~~
+  - ~~Keep a cache of the weight calculation in team, updated by world events.~~
+    - ~~Before: 0.300 release, 1.000 debug~~
+    - ~~After:  0.450 release, 1.500 debug~~
+  - ~~Path outwards from start and destination simultaneously, finishing as soon as the two sides touch~~
+    - ~~Before: 0.850 release~~
+    - ~~After:  0.045 release :')~~
 
 
 Design todo:

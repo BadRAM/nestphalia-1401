@@ -19,7 +19,6 @@ public static class EditorScene
     private static double _price;
     private static int _nestCount;
     private static int _beaconCount;
-    private static bool _fortAlreadySaved;
     private static bool _sellAllConfirm;
     private static StructureTemplate.StructureClass _structureClass;
     private static Texture2D _bg;
@@ -38,7 +37,6 @@ public static class EditorScene
         _toolActive = EditorTool.Erase;
         _sandboxMode = creativeMode;
         _fort = fortToLoad ?? new Fort();
-        //_fortAlreadySaved = File.Exists(_fort.Path + "\\" + _fort.Name + ".fort");
         //Console.WriteLine($"checking if {Directory.GetCurrentDirectory() +  $"/forts/{_fort.Name}.fort"} exists. Answer: {_fortAlreadySaved.ToString()}");
         
         Program.CurrentScene = Scene.Editor;
@@ -158,27 +156,6 @@ public static class EditorScene
         if (ButtonWide(Screen.HCenter-592, Screen.VCenter+212, "Save Changes")) Resources.SaveFort(_fort.Name, _fort.Path);
         if (ButtonWide(Screen.HCenter - 592, Screen.VCenter + 252, "Exit")) ExitScene();
         
-        // // Bottom left buttons
-        // if (_sandboxMode)
-        // {
-        //     _fort.Name = TextEntry(Screen.HCenter - 592, Screen.VCenter + 172, _fort.Name);
-        //     if (ButtonWide(Screen.HCenter-592, Screen.VCenter+212, "Save Changes", _fortAlreadySaved)) Resources.SaveFort(_fort.Name, _fort.Path);
-        //     if (ButtonWide(Screen.HCenter-592, Screen.VCenter+252, "Exit")) CustomBattleMenu.Start(); 
-        // }
-        // else
-        // {
-        //     if (ButtonWide(Screen.HCenter-592, Screen.VCenter+172, "Save and Exit"))
-        //     {
-        //         _fort.SaveBoard();
-        //         Program.Campaign.Start();
-        //     }
-        //     if (ButtonWide(Screen.HCenter-592, Screen.VCenter+252, "Exit without saving"))
-        //     {
-        //         Program.Campaign.Start();
-        //     }
-        // }
-        //if (ButtonWide(Screen.HCenter-592, Screen.VCenter+212, "Save to new file")) SaveToNewFile();
-        
         // Bottom center buttons
         if (ButtonNarrow(Screen.HCenter+150, Screen.VCenter+258, "Sell", _toolActive != EditorTool.Erase))
         {
@@ -263,7 +240,7 @@ public static class EditorScene
 
     private static void PathTestTool()
     {
-        NavPath navPath = new NavPath(new Int2D(28, 11), World.GetMouseTilePos(), World.RightTeam);
+        NavPath navPath = new NavPath("editor", new Int2D(28, 11), World.GetMouseTilePos(), World.RightTeam);
         PathFinder.FindPath(navPath);
         
         BeginMode2D(World.Camera);
@@ -278,12 +255,6 @@ public static class EditorScene
             }
             path = v;
         }
-
-        // if (navPath.Waypoints.Count == 0)
-        // {
-        //     Vector2 v = World.GetTileCenter(navPath.Destination);
-        //     DrawLine((int)path.X, (int)path.Y, (int)v.X, (int)v.Y, Color.Lime);
-        // }
         
         EndMode2D();
     }
@@ -299,7 +270,6 @@ public static class EditorScene
             {
                 World.SetTile(null, World.LeftTeam, tilePos);
                 UpdateFortStats();
-                _fortAlreadySaved = false;
             }
         }
     }
@@ -321,33 +291,9 @@ public static class EditorScene
             {
                 World.SetTile(_brush, World.LeftTeam, tilePos);
                 UpdateFortStats();
-                _fortAlreadySaved = false;
             }
         }
     }
-
-    // private static void SaveToNewFile()
-    // {
-    //     int number = 1;
-    //     while (true)
-    //     {
-    //         if (!File.Exists(Directory.GetCurrentDirectory() + $"/forts/fort{number}.fort"))
-    //         {
-    //             _saveMessage = $"Saved fort as fort{number}.fort";
-    //             _fort.Name = $"fort{number}";
-    //             //_fort.Path = Path.GetDirectoryName(_fort.Path) + "/" + _fort.Name + ".fort";
-    //             _fortAlreadySaved = true;
-    //             Resources.SaveFort($"fort{number}", _fort.Path);
-    //             break;
-    //         }
-    //         if (number >= 999)
-    //         {
-    //             _saveMessage = "Couldn't save!";
-    //             break;
-    //         }
-    //         number++;
-    //     }
-    // }
 
     private static void SellAll()
     {

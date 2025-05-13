@@ -102,7 +102,7 @@ public class Minion : ISprite
         }
         else
         {
-            NavPath = new NavPath(Team);
+            NavPath = new NavPath(template.Name, Team);
             Retarget();
             PathFinder.RequestPath(NavPath);
         }

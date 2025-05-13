@@ -4,22 +4,25 @@ namespace nestphalia;
 
 public class NavPath
 {
-    public bool Found; 
+    public bool Found = false; 
     public Int2D Start;
     public Int2D Destination;
     public Team Team;
+    public string Requester;
     public List<Int2D> Waypoints = new List<Int2D>();
 
-    public NavPath(Team team)
+    public NavPath(string requester, Team team)
     {
         Team = team;
+        Requester = requester;
     }
     
-    public NavPath(Int2D start, Int2D destination, Team team)
+    public NavPath(string requester, Int2D start, Int2D destination, Team team)
     {
         Start = start;
         Destination = destination;
         Team = team;
+        Requester = requester;
     }
 
     public Int2D NextTile(Vector2 position)
@@ -50,13 +53,12 @@ public class NavPath
     
     public bool TargetReached(Vector2 position)
     {
-        // if (Waypoints.Count == 0) return true;
         return World.PosToTilePos(position) == Destination;
     }
     
     public NavPath Clone()
     {
-        NavPath p = new NavPath(Start, Destination, Team);
+        NavPath p = new NavPath(Requester, Start, Destination, Team);
         p.Found = Found;
         p.Waypoints = new List<Int2D>(Waypoints);
         return p;

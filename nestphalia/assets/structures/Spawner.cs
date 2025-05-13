@@ -48,7 +48,7 @@ public class Spawner : Structure
     public Spawner(SpawnerTemplate template, Team team, int x, int y) : base(template, team, x, y)
     {
         _template = template;
-        _navPath = new NavPath(team);
+        _navPath = new NavPath(_template.Name, team);
         _navPath.Start = new Int2D(x, y);
     }
     
@@ -72,7 +72,7 @@ public class Spawner : Structure
         Retarget();
         _navPath.Reset(position);
         _navPath.Destination = _targetTile;
-        if (!(_template.Minion is FlyingMinionTemplate))
+        if (_template.Minion.PathFromNest())
         {
             PathFinder.RequestPath(_navPath);
         }

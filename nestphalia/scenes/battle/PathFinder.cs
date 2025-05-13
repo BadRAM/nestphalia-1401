@@ -43,6 +43,23 @@ public static class PathFinder
 
     public static void RequestPath(NavPath navPath)
     {
+        // One thousand guards
+        Debug.Assert(!navPath.Found);
+        //Debug.Assert(!_pathQueue.Contains(navPath));
+        if (_pathQueue.Contains(navPath))
+        {
+            Console.WriteLine($"{navPath.Requester} double requested a path");
+            return;
+        }
+        //Debug.Assert(navPath.Requester != "Beetle");
+        if (navPath.Start == navPath.Destination)
+        {
+            Console.WriteLine($"{navPath.Requester} requested a zero length path.");
+            navPath.Found = true;
+            return;
+        }
+        
+        // One function call
         _pathQueue.Enqueue(navPath);
     }
 
@@ -74,7 +91,12 @@ public static class PathFinder
     public static void FindPath(NavPath navPath)
     {
         // Guard against invalid path request
-        Debug.Assert(navPath.Found);
+        Debug.Assert(!navPath.Found);
+        if (navPath.Found)
+        {
+            Console.WriteLine($"{navPath.Requester} requested pathing on a navPath that's already been found.");
+            return;
+        }
         
         // Start of pathing
         _swTotalTime.Start();
@@ -215,28 +237,16 @@ public static class PathFinder
         while (true)
         {
             navPath.Waypoints.Insert(0, nn.Pos);
-            if (nn.PrevNode != nn.Pos)
-            {
-                nn = nn.GetPrevNode();
-            }
-            else
-            {
-                break;
-            }
+            if (nn.PrevNode == nn.Pos) break;
+            nn = nn.GetPrevNode();
         }
         
         // Build the second half by walking the antinodes
         while (true)
         {
             navPath.Waypoints.Add(an.Pos);
-            if (an.PrevNode != an.Pos)
-            {
-                an = an.GetPrevNode();
-            }
-            else
-            {
-                break;
-            }
+            if (an.PrevNode == an.Pos) break;
+            an = an.GetPrevNode();
         }
         
         // Set the flag to let the minion know we're done
