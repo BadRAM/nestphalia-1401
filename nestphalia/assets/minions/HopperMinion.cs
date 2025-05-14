@@ -47,19 +47,19 @@ public class HopperMinion : Minion
             }
             else if (Time.Scaled - _jumpStartTime > _jumpDuration + _jumpChargeDuration)
             {
-                IsFlying = false;
+                Rigidbody.IsFlying = false;
                 _jumping = false;
-                Position = _jumpEndPos;
+                Rigidbody.Position = _jumpEndPos;
             }
             else
             {
-                IsFlying = true;
+                Rigidbody.IsFlying = true;
 
                 double t = (Time.Scaled - (_jumpStartTime + _jumpChargeDuration)) / _jumpDuration;
                 double arcOffset = Math.Sin(t * Math.PI) * _jumpHeight;
         
-                Position = Vector2.Lerp(_jumpStartPos, _jumpEndPos, (float)t);
-                Position.Y -= (float)arcOffset;
+                Rigidbody.Position = Vector2.Lerp(_jumpStartPos, _jumpEndPos, (float)t);
+                Rigidbody.Position.Y -= (float)arcOffset;
                 return;
             }
         }
@@ -72,25 +72,25 @@ public class HopperMinion : Minion
         {
             if (!TryAttack())
             {
-                if (NavPath.Found && NavPath.TargetReached(Position))
+                if (NavPath.Found && NavPath.TargetReached(Rigidbody.Position))
                 {
                     Retarget();
                     PathFinder.RequestPath(NavPath);
                 }
                 else
                 {
-                    Position = Position.MoveTowards(NextPos, AdjustedSpeed() * Time.DeltaTime);
+                    Rigidbody.Position = Rigidbody.Position.MoveTowards(NextPos, AdjustedSpeed() * Time.DeltaTime);
                 }
             }
         }
         else
         {
             Structure? structureAhead = World.GetTile((Int2D)ahead);
-            if (structureAhead == null || (!structureAhead.PhysSolid(Team) && (structureAhead.Team != Team || structureAhead is not Minefield)))
+            if (structureAhead == null || (!structureAhead.PhysSolid() && (structureAhead.Team != Team || structureAhead is not Minefield)))
             {
                 NavPath.Skip();
                 _jumping = true;
-                _jumpStartPos = Position;
+                _jumpStartPos = Rigidbody.Position;
                 _jumpEndPos = World.GetTileCenter((Int2D)ahead) + new Vector2(World.Random.Next(17)-8, World.Random.Next(23)-11);
                 _jumpStartTime = Time.Scaled;
             }
@@ -98,7 +98,7 @@ public class HopperMinion : Minion
             {
                 if (!TryAttack())
                 {
-                    Position = Position.MoveTowards(NextPos, AdjustedSpeed() * Time.DeltaTime);
+                    Rigidbody.Position = Rigidbody.Position.MoveTowards(NextPos, AdjustedSpeed() * Time.DeltaTime);
                 }
             }
         }

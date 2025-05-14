@@ -99,7 +99,7 @@ public class Spawner : Structure
         return team != Team;
     }
     
-    public override bool PhysSolid(Team team)
+    public override bool PhysSolid()
     {
         return false;
     }

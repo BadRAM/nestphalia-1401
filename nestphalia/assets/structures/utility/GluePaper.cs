@@ -35,9 +35,9 @@ public class GluePaper : Structure
         foreach (Minion minion in World.Minions)
         {
             if (minion.Team != Team 
-                && !minion.IsFlying
+                && !minion.Rigidbody.IsFlying
                 && !minion.Glued
-                && World.PosToTilePos(minion.Position) == new Int2D(X,Y))
+                && World.PosToTilePos(minion.Rigidbody.Position) == new Int2D(X,Y))
             {
                 minion.Glued = true;
                 Health -= minion.Health/2.0;
@@ -54,7 +54,7 @@ public class GluePaper : Structure
         return team == Team;
     }
 
-    public override bool PhysSolid(Team team)
+    public override bool PhysSolid()
     {
         return false;
     }

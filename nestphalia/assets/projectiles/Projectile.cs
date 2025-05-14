@@ -19,7 +19,7 @@ public class ProjectileTemplate
     public virtual void Instantiate(object target, object source, Vector2 position)
     {
         Vector2 pos = Vector2.Zero;
-        if (source is Minion m) pos = m.Position;
+        if (source is Minion m) pos = m.Rigidbody.Position;
         if (source is Structure s) pos = s.GetCenter();
         Projectile p = new Projectile(this, pos, target, source);
         World.Projectiles.Add(p);
@@ -47,8 +47,8 @@ public class Projectile : ISprite
     {
         if (Target is Minion minion)
         {
-            Position = Position.MoveTowards(minion.Position, Template.Speed * Time.DeltaTime);
-            if (Position == minion.Position)
+            Position = Position.MoveTowards(minion.Rigidbody.Position, Template.Speed * Time.DeltaTime);
+            if (Position == minion.Rigidbody.Position)
             {
                 minion.Hurt(this, Template.Damage*1.5 - Template.Damage*World.Random.NextDouble());
                 World.ProjectilesToRemove.Add(this);

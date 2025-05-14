@@ -40,10 +40,10 @@ public class FrenzyBeacon : ActiveAbilityBeacon
         foreach (Minion minion in World.Minions)
         {
             if (minion.Team != Team) continue;
-            double d = Vector2.Distance(minion.Position, World.GetTileCenter(minion.GetTargetTile()));
+            double d = Vector2.Distance(minion.Rigidbody.Position, World.GetTileCenter(minion.GetTargetTile()));
             if (d <= minimumValue)
             {
-                bestPos = minion.Position;
+                bestPos = minion.Rigidbody.Position;
                 bestValue = d;
             }
         }
@@ -57,7 +57,7 @@ public class FrenzyBeacon : ActiveAbilityBeacon
         {
             foreach (Minion minion in World.Minions)
             {
-                if (Raylib.CheckCollisionCircles(_effectPos, (float)_effectRadius, minion.Position, minion.Template.PhysicsRadius))
+                if (Raylib.CheckCollisionCircles(_effectPos, (float)_effectRadius, minion.Rigidbody.Position, minion.Template.PhysicsRadius))
                 {
                     minion.Frenzy = true;
                 }

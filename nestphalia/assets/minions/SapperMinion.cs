@@ -45,8 +45,8 @@ public class SapperMinion : Minion
 
     public override void Update()
     {
-        NextPos = World.GetTileCenter(NavPath.NextTile(Position));
-        if (!_attacking && NavPath.Found && NavPath.TargetReached(Position))
+        NextPos = World.GetTileCenter(NavPath.NextTile(Rigidbody.Position));
+        if (!_attacking && NavPath.Found && NavPath.TargetReached(Rigidbody.Position))
         {
             if (World.GetTile(_startTile) is Spawner s)
             {
@@ -63,20 +63,20 @@ public class SapperMinion : Minion
         if (_attacking && TryAttack())
         {
             _attacking = false;
-            NavPath.Reset(Position);
+            NavPath.Reset(Rigidbody.Position);
             NavPath.Destination = _startTile;
             PathFinder.RequestPath(NavPath);
         }
         else
         {
             // if we're at our final destination, ask for a new path. (Don't ask for a new path if we already have)
-            if (NavPath.Found && NavPath.TargetReached(Position))
+            if (NavPath.Found && NavPath.TargetReached(Rigidbody.Position))
             {
                 Retarget();
                 PathFinder.RequestPath(NavPath);
             }
             // else, move towards next tile on path.
-            Position = Position.MoveTowards(NextPos, AdjustedSpeed() * Time.DeltaTime);
+            Rigidbody.Position = Rigidbody.Position.MoveTowards(NextPos, AdjustedSpeed() * Time.DeltaTime);
         }
 
         Frenzy = false;
@@ -87,18 +87,18 @@ public class SapperMinion : Minion
         //base.Draw();
         //Color c = _attacking ? new Color(200, 100, 100, 64) : new Color(100, 200, 100, 64);
         //Raylib.DrawCircle((int)Position.X, (int)Position.Y, _template.PhysicsRadius, new Color(200, 100, 100, 64));
-        Z = Position.Y + (IsFlying ? 240 : 0);
+        Z = Rigidbody.Position.Y + (Rigidbody.IsFlying ? 240 : 0);
 
         Texture2D texture = _attacking ? _template.Texture : _template.RetreatingTexture;
-        Vector2 pos = new Vector2((int)Position.X - texture.Width / 2, (int)Position.Y - texture.Height / 2);
+        Vector2 pos = new Vector2((int)Rigidbody.Position.X - texture.Width / 2, (int)Rigidbody.Position.Y - texture.Height / 2);
         bool flip = NextPos.X > pos.X;
         Rectangle source = new Rectangle(flip ? texture.Width : 0, 0, flip ? texture.Width : -texture.Width, texture.Height);
         Raylib.DrawTextureRec(texture, source, pos, Team.UnitTint);
         
         // Debug, shows path
-        if (Raylib.CheckCollisionPointCircle(Raylib.GetScreenToWorld2D(Raylib.GetMousePosition(), World.Camera), Position, Template.PhysicsRadius))
+        if (Raylib.CheckCollisionPointCircle(Raylib.GetScreenToWorld2D(Raylib.GetMousePosition(), World.Camera), Rigidbody.Position, Template.PhysicsRadius))
         {
-            Vector2 path = Position;
+            Vector2 path = Rigidbody.Position;
             foreach (Int2D i in NavPath.Waypoints)
             {
                 Vector2 v = World.GetTileCenter(i);

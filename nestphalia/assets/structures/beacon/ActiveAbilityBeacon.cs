@@ -71,7 +71,7 @@ public abstract class ActiveAbilityBeacon : Structure
         return team != Team;
     }
     
-    public override bool PhysSolid(Team team)
+    public override bool PhysSolid()
     {
         return false;
     }

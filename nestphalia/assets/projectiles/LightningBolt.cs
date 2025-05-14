@@ -31,7 +31,7 @@ public class LightningBolt : Projectile
         Vector2 targetPos = position;
         if (target is Minion m)
         {
-            targetPos = m.Position;
+            targetPos = m.Rigidbody.Position;
             m.Hurt(this, Template.Damage*1.5 - Template.Damage*World.Random.NextDouble());
         }
         for (int i = 0; i < 8; i++)

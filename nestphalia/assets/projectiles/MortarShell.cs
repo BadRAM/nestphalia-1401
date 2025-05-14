@@ -44,7 +44,7 @@ public class MortarShell : Projectile
         _soundEffect = Resources.GetSoundByName("explosion");
         if (target is Minion minion)
         {
-            _targetPos = minion.Position;
+            _targetPos = minion.Rigidbody.Position;
         }
         if (target is Structure structure)
         {
@@ -90,10 +90,10 @@ public class MortarShell : Projectile
                 for (int index = 0; index < World.Minions.Count; index++)
                 {
                     Minion minion = World.Minions[index];
-                    if (!minion.IsFlying && minion.Team != _team &&
-                        Vector2.Distance(_targetPos, minion.Position) < _template.BlastRadius)
+                    if (!minion.Rigidbody.IsFlying && minion.Team != _team &&
+                        Vector2.Distance(_targetPos, minion.Rigidbody.Position) < _template.BlastRadius)
                     {
-                        double damage = Math.Clamp(2 * (_template.BlastRadius - Vector2.Distance(_targetPos, minion.Position)) / _template.BlastRadius, 0, 1) * _template.Damage;
+                        double damage = Math.Clamp(2 * (_template.BlastRadius - Vector2.Distance(_targetPos, minion.Rigidbody.Position)) / _template.BlastRadius, 0, 1) * _template.Damage;
                         minion.Hurt(this, damage);
                     }
                 }

@@ -11,10 +11,11 @@ public static class World
     private static FloorTile[,] _floor = new FloorTile[BoardWidth, BoardHeight];
     private static Structure?[,] _board = new Structure?[BoardWidth, BoardHeight];
     public static List<Minion> Minions = new List<Minion>();
-    public static List<Minion>[,] MinionGrid = new List<Minion>[BoardWidth, BoardHeight];
+    public static List<Rigidbody>[,] RigidbodyGrid = new List<Rigidbody>[BoardWidth, BoardHeight];
     public static List<Minion> MinionsToRemove = new List<Minion>();
     public static List<Projectile> Projectiles = new List<Projectile>();
     public static List<Projectile> ProjectilesToRemove = new List<Projectile>();
+    public static Rigidbody[] Rigidbodies = new Rigidbody[64];
     public static List<ISprite> Sprites = new List<ISprite>();
     public static Random Random = new Random();
     public static double WaveDuration = 20;
@@ -32,11 +33,13 @@ public static class World
     public static bool DrawDebugInfo;
     private static Stopwatch _swFrame = new Stopwatch();
     private static Stopwatch _swUpdate = new Stopwatch();
+    private static Stopwatch _swUpdateMinionGrid = new Stopwatch();
     private static Stopwatch _swUpdateTeams = new Stopwatch();
     private static Stopwatch _swUpdatePathfinder = new Stopwatch();
     private static Stopwatch _swUpdateBoard = new Stopwatch();
     private static Stopwatch _swUpdateMinions = new Stopwatch();
     private static Stopwatch _swUpdateMinionsCollide = new Stopwatch();
+    private static Stopwatch _swUpdateMinionsPostCollide = new Stopwatch();
     private static Stopwatch _swUpdateProjectiles = new Stopwatch();
     
     private static Stopwatch _swDraw = new Stopwatch();
@@ -76,12 +79,17 @@ public static class World
         {
             for (int y = 0; y < BoardHeight; y++)
             {
-                MinionGrid[x, y] = new List<Minion>();
+                RigidbodyGrid[x, y] = new List<Rigidbody>();
             }
         }
-        foreach (List<Minion> minionList in MinionGrid)
+        foreach (List<Rigidbody> rigidBodyList in RigidbodyGrid)
         {
-            minionList.Clear();
+            rigidBodyList.Clear();
+        }
+
+        for (int i = 0; i < Rigidbodies.Length; i++)
+        {
+            Rigidbodies[i] = new Rigidbody();
         }
     }
 
@@ -209,17 +217,18 @@ public static class World
     {
         _swUpdate.Restart();
         
-        _swUpdateMinionsCollide.Restart();
-        foreach (List<Minion> gridSquare in MinionGrid)
+        _swUpdateMinionGrid.Restart();
+        foreach (List<Rigidbody> gridSquare in RigidbodyGrid)
         {
             gridSquare.Clear();
         }
-        foreach (Minion minion in Minions)
+        foreach (Rigidbody rigidbody in Rigidbodies)
         {
-            Int2D pos = PosToTilePos(minion.Position);
-            MinionGrid[pos.X, pos.Y].Add(minion);
+            if (rigidbody.Owner == null) continue;
+            Int2D pos = PosToTilePos(rigidbody.Position);
+            RigidbodyGrid[pos.X, pos.Y].Add(rigidbody);
         }
-        _swUpdateMinionsCollide.Stop();
+        _swUpdateMinionGrid.Stop();
         
         // Update wave timer
         if (!_battleOver)
@@ -283,14 +292,17 @@ public static class World
         }
         _swUpdateMinions.Stop();
 
-        _swUpdateMinionsCollide.Start();
+        _swUpdateMinionsCollide.Restart();
         DoMinionCollision();
+        _swUpdateMinionsCollide.Stop();
+        
+        _swUpdateMinionsPostCollide.Restart();
         foreach (Minion m in Minions)
         {
-            m.CollideTerrain();
-            m.LateUpdate();
+            m.Rigidbody.CollideTerrain();
+            m.Rigidbody.LateUpdate();
         }
-        _swUpdateMinionsCollide.Stop();
+        _swUpdateMinionsPostCollide.Stop();
 
         _swUpdateMinions.Start();
         foreach (Minion m in MinionsToRemove)
@@ -325,42 +337,42 @@ public static class World
         {
             for (int y = 0; y < BoardHeight; y++) // Iterate MinionGrid Columns
             {
-                for (int i = 0; i < MinionGrid[x, y].Count; i++) // Iterate Minions in cell at x,y
+                for (int i = 0; i < RigidbodyGrid[x, y].Count; i++) // Iterate Minions in cell at x,y
                 {
-                    for (int j = i+1; j < MinionGrid[x, y].Count; j++)
+                    for (int j = i+1; j < RigidbodyGrid[x, y].Count; j++)
                     {
-                        MinionGrid[x, y][i].CollideMinion(MinionGrid[x, y][j]);
+                        RigidbodyGrid[x, y][i].CollideRigidbody(RigidbodyGrid[x, y][j]);
                     }
 
                     if (x < BoardWidth - 1)
                     {
                         if (y > 0)
                         {
-                            for (int j = 0; j < MinionGrid[x + 1, y - 1].Count; j++)
+                            for (int j = 0; j < RigidbodyGrid[x + 1, y - 1].Count; j++)
                             {
-                                MinionGrid[x, y][i].CollideMinion(MinionGrid[x + 1, y - 1][j]);
+                                RigidbodyGrid[x, y][i].CollideRigidbody(RigidbodyGrid[x + 1, y - 1][j]);
                             }
                         }
 
-                        for (int j = 0; j < MinionGrid[x + 1, y].Count; j++)
+                        for (int j = 0; j < RigidbodyGrid[x + 1, y].Count; j++)
                         {
-                            MinionGrid[x, y][i].CollideMinion(MinionGrid[x + 1, y][j]);
+                            RigidbodyGrid[x, y][i].CollideRigidbody(RigidbodyGrid[x + 1, y][j]);
                         }
 
                         if (y < BoardHeight - 1)
                         {
-                            for (int j = 0; j < MinionGrid[x + 1, y + 1].Count; j++)
+                            for (int j = 0; j < RigidbodyGrid[x + 1, y + 1].Count; j++)
                             {
-                                MinionGrid[x, y][i].CollideMinion(MinionGrid[x + 1, y + 1][j]);
+                                RigidbodyGrid[x, y][i].CollideRigidbody(RigidbodyGrid[x + 1, y + 1][j]);
                             }
                         }
                     }
 
                     if (y < BoardHeight - 1)
                     {
-                        for (int j = 0; j < MinionGrid[x, y + 1].Count; j++)
+                        for (int j = 0; j < RigidbodyGrid[x, y + 1].Count; j++)
                         {
-                            MinionGrid[x, y][i].CollideMinion(MinionGrid[x, y + 1][j]);
+                            RigidbodyGrid[x, y][i].CollideRigidbody(RigidbodyGrid[x, y + 1][j]);
                         }
                     }
                 }
@@ -462,6 +474,10 @@ public static class World
 
         totalSWTime = _swUpdate.Elapsed.TotalSeconds;
         x = Screen.HCenter - 500;
+        width = (int)(totalWidth * _swUpdateMinionGrid.Elapsed.TotalSeconds / totalSWTime);
+        Raylib.DrawRectangle(x, Screen.VCenter-290, width, 20, Color.Red);
+        GUI.DrawTextLeft(x, Screen.Top+10, $"MinionGrid {(int)(100 * _swUpdateMinionGrid.Elapsed.TotalSeconds / totalSWTime)}%");
+        x += width;
         width = (int)(totalWidth * _swUpdateTeams.Elapsed.TotalSeconds / totalSWTime);
         Raylib.DrawRectangle(x, Screen.VCenter-290, width, 20, Color.SkyBlue);
         GUI.DrawTextLeft(x, Screen.Top+10, $"Teams {(int)(100 * _swUpdateTeams.Elapsed.TotalSeconds / totalSWTime)}%");
@@ -479,8 +495,12 @@ public static class World
         GUI.DrawTextLeft(x, Screen.Top+10, $"Minions {(int)(100 * _swUpdateMinions.Elapsed.TotalSeconds / totalSWTime)}%");
         x += width;
         width = (int)(totalWidth * _swUpdateMinionsCollide.Elapsed.TotalSeconds / totalSWTime);
-        Raylib.DrawRectangle(x, Screen.VCenter-290, width, 20, Color.Red);
+        Raylib.DrawRectangle(x, Screen.VCenter-290, width, 20, Color.Pink);
         GUI.DrawTextLeft(x, Screen.Top+10, $"Phys {(int)(100 * _swUpdateMinionsCollide.Elapsed.TotalSeconds / totalSWTime)}%, {(_swUpdateMinionsCollide.Elapsed.TotalSeconds * 1000).ToString("N4")}ms");
+        x += width;        
+        width = (int)(totalWidth * _swUpdateMinionsPostCollide.Elapsed.TotalSeconds / totalSWTime);
+        Raylib.DrawRectangle(x, Screen.VCenter-290, width, 20, Color.Maroon);
+        GUI.DrawTextLeft(x, Screen.Top+10, $"PostPhys {(int)(100 * _swUpdateMinionsPostCollide.Elapsed.TotalSeconds / totalSWTime)}%, {(_swUpdateMinionsPostCollide.Elapsed.TotalSeconds * 1000).ToString("N4")}ms");
         x += width;
         width = (int)(totalWidth * _swUpdateProjectiles.Elapsed.TotalSeconds / totalSWTime);
         Raylib.DrawRectangle(x, Screen.VCenter-290, width, 20, Color.Blue);
@@ -501,13 +521,28 @@ public static class World
             for (int y = center.Y - radius; y < center.Y + radius; y++)
             {
                 if (y < 0 || y >= BoardHeight) continue;
-                foreach (Minion m in MinionGrid[x,y])
+                foreach (Rigidbody r in RigidbodyGrid[x,y])
                 {
-                    minions.Add(m);
+                    minions.Add(r.Owner);
                 }
             }
         }
         return minions;
+    }
+
+    public static Rigidbody CreateRigidbody(Minion owner, Vector2 position, float radius, bool isFlying)
+    {
+        for (int i = 0; i < Rigidbodies.Length; i++)
+        {
+            if (Rigidbodies[i].Owner == null)
+            {
+                Rigidbodies[i] = new Rigidbody(owner, position, radius, isFlying);
+                return Rigidbodies[i];
+            }
+        }
+        Array.Resize(ref Rigidbodies, Rigidbodies.Length * 2);
+        Rigidbodies[Rigidbodies.Length/2] = new Rigidbody(owner, position, radius, isFlying);
+        return Rigidbodies[Rigidbodies.Length/2];
     }
 
     public static Int2D PosToTilePos(Vector2 position)
@@ -547,40 +582,5 @@ public static class World
     public static Vector2 GetTileCenter(Int2D tilePos)
     {
         return GetTileCenter(tilePos.X, tilePos.Y);
-    }
-}
-
-public record struct Int2D
-{
-    public static readonly Int2D Zero  = new Int2D(0, 0);
-    public static readonly Int2D Up    = new Int2D(0, -1);
-    public static readonly Int2D Down  = new Int2D(0, 1);
-    public static readonly Int2D Left  = new Int2D(-1, 0);
-    public static readonly Int2D Right = new Int2D(1, 0);
-    public int X;
-    public int Y;
-
-    public Int2D(int x, int y)
-    {
-        X = x;
-        Y = y;
-    }
-
-    public Vector2 ToVector2()
-    {
-        return new Vector2(X, Y);
-    }
-
-    public override String ToString()
-    {
-        return $"{X},{Y}";
-    }
-    
-    public static Int2D operator +(Int2D a, Int2D b) {
-        return new Int2D 
-        {
-            X = a.X + b.X,
-            Y = a.Y + b.Y
-        };
     }
 }

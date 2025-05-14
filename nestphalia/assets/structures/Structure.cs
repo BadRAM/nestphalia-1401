@@ -98,7 +98,7 @@ public class Structure : ISprite
         return true;
     }
     
-    public virtual bool PhysSolid(Team team)
+    public virtual bool PhysSolid()
     {
         return true;
     }

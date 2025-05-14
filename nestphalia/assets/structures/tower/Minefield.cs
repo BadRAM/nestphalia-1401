@@ -54,10 +54,10 @@ public class Minefield : Structure
         if (Time.Scaled - _timeLastTriggered < _template.Cooldown) return;
         foreach (Minion minion in World.Minions)
         {
-            if (minion.Team != Team && !minion.IsFlying &&
+            if (minion.Team != Team && !minion.Rigidbody.IsFlying &&
                 Raylib.CheckCollisionCircles(
                     position, (float)_template.Range, 
-                    minion.Position,minion.Template.PhysicsRadius))
+                    minion.Rigidbody.Position,minion.Template.PhysicsRadius))
             {
                 Trigger();
                 break;
@@ -96,7 +96,7 @@ public class Minefield : Structure
         return team == Team;
     }
 
-    public override bool PhysSolid(Team team)
+    public override bool PhysSolid()
     {
         return false;
     }

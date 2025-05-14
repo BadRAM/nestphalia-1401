@@ -23,7 +23,7 @@ public class HazardSign : Structure
         return Team == team;
     }
 
-    public override bool PhysSolid(Team team)
+    public override bool PhysSolid()
     {
         return false;
     }

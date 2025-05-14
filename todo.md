@@ -3,6 +3,8 @@
 Programming todo:
 =================
 
+Currently the codebase is broken in the middle of a physics rework for optimization, if it's been a while since then, just revert to the last commit and go from there.
+
 ----- V2 -----
 
 - Game intro cutscene

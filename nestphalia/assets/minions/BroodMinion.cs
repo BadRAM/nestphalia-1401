@@ -57,7 +57,7 @@ public class BroodMinion : Minion
         if (_template.SpawnInterval > 0 && Time.Scaled - _lastSpawnTime >= _template.SpawnInterval)
         {
             _lastSpawnTime = Time.Scaled;
-            _template.SpawnedMinion.Instantiate(Position, Team, NavPath.Clone());
+            _template.SpawnedMinion.Instantiate(Rigidbody.Position, Team, NavPath.Clone());
         }
     }
 
@@ -67,7 +67,7 @@ public class BroodMinion : Minion
         for (int i = 0; i < _template.SpawnsOnDeath; i++)
         {
             // new Vector2((float)(Random.Shared.NextDouble()-0.5), (float)(Random.Shared.NextDouble()-0.5))
-            _template.SpawnedMinion.Instantiate(Position, Team, null);
+            _template.SpawnedMinion.Instantiate(Rigidbody.Position, Team, null);
         }
     }
 }
