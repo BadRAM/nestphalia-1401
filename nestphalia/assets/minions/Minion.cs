@@ -61,10 +61,10 @@ public class MinionTemplate
 public class Minion : ISprite
 {
     public MinionTemplate Template;
-    public Rigidbody Rigidbody;
+    // public Rigidbody Rigidbody;
     public Team Team;
     protected NavPath NavPath;
-    // public Vector2 Position;
+    public Vector2 Position;
     public double Health;
     public bool IsAlive;
     private double _timeSinceLastAction;
@@ -72,9 +72,10 @@ public class Minion : ISprite
     private bool _attacking;
     private double _attackStartedTime;
     private double _lastFiredTime;
-    // private Vector2 _collisionOffset;
+    private Vector2 _collisionOffset;
+    public Int2D OriginTile;
     public bool Glued;
-    // public bool IsFlying;
+    public bool IsFlying;
     public bool Frenzy;
     
     public enum MinionState
@@ -88,10 +89,11 @@ public class Minion : ISprite
     
     public Minion(MinionTemplate template, Team team, Vector2 position, NavPath? navPath)
     {
-        Rigidbody = World.CreateRigidbody(this, position, template.PhysicsRadius, false);
         Template = template;
-        NextPos = position;
         Team = team;
+        Position = position;
+        NextPos = position;
+        OriginTile = World.PosToTilePos(position);
         Health = Template.MaxHealth;
         IsAlive = true;
         _timeSinceLastAction = Time.Scaled;
@@ -108,7 +110,7 @@ public class Minion : ISprite
         }
         //_path = new PathFinder(this);
         //_path.FindPath(_targetTile);
-        Z = Rigidbody.Position.Y;
+        Z = Position.Y;
     }
     
     public virtual void Update()
@@ -119,13 +121,13 @@ public class Minion : ISprite
         if (!TryAttack() && NavPath.Found)
         {
             // if we're at our final destination, ask for a new path. (Don't ask for a new path if we already have)
-            if (NavPath.TargetReached(Rigidbody.Position))
+            if (NavPath.TargetReached(Position))
             {
                 Retarget();
                 PathFinder.RequestPath(NavPath);
             }
             // else, move towards next tile on path.
-            Rigidbody.Position = Rigidbody.Position.MoveTowards(NextPos, AdjustedSpeed() * Time.DeltaTime);
+            Position = Position.MoveTowards(NextPos, AdjustedSpeed() * Time.DeltaTime);
         }
         
         Frenzy = false;
@@ -133,7 +135,7 @@ public class Minion : ISprite
     
     protected void UpdateNextPos()
     {
-        Vector2 pos = World.GetTileCenter(NavPath.NextTile(Rigidbody.Position));
+        Vector2 pos = World.GetTileCenter(NavPath.NextTile(Position));
         if (pos != NextPos)
         {
             NextPos = pos;
@@ -144,7 +146,7 @@ public class Minion : ISprite
         if (Time.Scaled - _timeSinceLastAction > 5)
         {
             Console.WriteLine($"{Template.Name} got lost");
-            NavPath.Reset(Rigidbody.Position);
+            NavPath.Reset(Position);
             PathFinder.RequestPath(NavPath);
             _timeSinceLastAction = Time.Scaled;
         }
@@ -154,10 +156,10 @@ public class Minion : ISprite
     protected virtual bool TryAttack()
     {
         // Guard against out of range attacks
-        if (Vector2.Distance(Rigidbody.Position, NextPos) > 24 + Template.PhysicsRadius) { _attacking = false; return false;}
+        if (Vector2.Distance(Position, NextPos) > 24 + Template.PhysicsRadius) { _attacking = false; return false;}
         Structure? t = World.GetTileAtPos(NextPos);
         // Guard against attacking tiles that could just be walked over
-        if (t == null || t is Rubble || (!t.NavSolid(Team) && NavPath.NextTile(Rigidbody.Position) != NavPath.Destination)) { _attacking = false; return false;}
+        if (t == null || t is Rubble || (!t.NavSolid(Team) && NavPath.NextTile(Position) != NavPath.Destination)) { _attacking = false; return false;}
         // Guard against friendly tiles that can be traversed
         if (t.Team == Team && !t.PhysSolid()) { _attacking = false; return false;}
         _timeSinceLastAction = Time.Scaled;
@@ -168,7 +170,7 @@ public class Minion : ISprite
         }
         if (Time.Scaled - _attackStartedTime >= (Frenzy ? Template.AttackCooldown/2 : Template.AttackCooldown))
         {
-            Template.Projectile.Instantiate(t, this, Rigidbody.Position);
+            Template.Projectile.Instantiate(t, this, Position);
             _attackStartedTime = Time.Scaled;
         }
         return true;
@@ -178,8 +180,8 @@ public class Minion : ISprite
     public double AdjustedSpeed()
     {
         double adjustedSpeed = Template.Speed;
-        Structure? structure = World.GetTileAtPos(Rigidbody.Position);
-        if (Glued || (!Rigidbody.IsFlying && structure?.Team == Team && structure is Minefield)) adjustedSpeed *= 0.5;
+        Structure? structure = World.GetTileAtPos(Position);
+        if (Glued || (!IsFlying && structure?.Team == Team && structure is Minefield)) adjustedSpeed *= 0.5;
         if (Frenzy) adjustedSpeed *= 2;
         return adjustedSpeed;
     }
@@ -196,7 +198,7 @@ public class Minion : ISprite
                 Structure? s = World.GetTile(x, y);
                 if (s != null && s.Team != Team && s is not Rubble)
                 {
-                    targets.Add(new Sortable<Int2D>(-Vector2.Distance(Rigidbody.Position, World.GetTileCenter(x,y)), new Int2D(x,y)));
+                    targets.Add(new Sortable<Int2D>(-Vector2.Distance(Position, World.GetTileCenter(x,y)), new Int2D(x,y)));
                     // targets.Add(new PotentialTarget(-Vector2.Distance(Position, World.GetTileCenter(x,y)), new Int2D(x,y)));
                 }
             }
@@ -221,7 +223,7 @@ public class Minion : ISprite
             return;
         }
 
-        NavPath.Reset(Rigidbody.Position);
+        NavPath.Reset(Position);
         int i = Math.Min(targets.Count, 16);
         i = Math.Min(World.Random.Next(i), World.Random.Next(i));
         i = World.Random.WeightedRandom(i);
@@ -231,9 +233,9 @@ public class Minion : ISprite
 
     public virtual void Draw()
     {
-        Z = Rigidbody.Position.Y + (Rigidbody.IsFlying ? 240 : 0);
+        Z = Position.Y + (IsFlying ? 240 : 0);
 
-        Vector2 pos = new Vector2((int)Rigidbody.Position.X - Template.Texture.Width / 2, (int)Rigidbody.Position.Y - Template.Texture.Width / 2);
+        Vector2 pos = new Vector2((int)Position.X - Template.Texture.Width / 2, (int)Position.Y - Template.Texture.Width / 2);
         bool flip = NextPos.X > pos.X;
         Rectangle source = new Rectangle(flip ? Template.Texture.Width : 0, 0, flip ? Template.Texture.Width : -Template.Texture.Width, Template.Texture.Height);
         //Raylib.DrawTexture(Template.Texture, (int)Position.X - Template.Texture.width/2, (int)Position.Y - Template.Texture.width/2, tint);
@@ -241,17 +243,17 @@ public class Minion : ISprite
 
         if (Health < Template.MaxHealth)
         {
-            Vector2 start = Rigidbody.Position - new Vector2(Template.Texture.Width / 2, Template.Texture.Height / 2 + 2);
+            Vector2 start = Position - new Vector2(Template.Texture.Width / 2, Template.Texture.Height / 2 + 2);
             Vector2 end = start + new Vector2((float)(Template.Texture.Width * (Health / Template.MaxHealth)), 0);
             Raylib.DrawLineEx(start, end, 1, new Color(32, 192, 32, 255));
         }
         
         // Debug, shows path
-        if (Raylib.CheckCollisionPointCircle(Raylib.GetScreenToWorld2D(Raylib.GetMousePosition(), World.Camera), Rigidbody.Position, 2*Template.PhysicsRadius))
+        if (Raylib.CheckCollisionPointCircle(Raylib.GetScreenToWorld2D(Raylib.GetMousePosition(), World.Camera), Position, 2*Template.PhysicsRadius))
         {
             Raylib.DrawCircleV(NextPos, 2, Color.Green);
             
-            Vector2 path = Rigidbody.Position;
+            Vector2 path = Position;
             foreach (Int2D i in NavPath.Waypoints)
             {
                 Vector2 v = World.GetTileCenter(i);
@@ -275,7 +277,7 @@ public class Minion : ISprite
         Health -= Math.Max(1, damage - Template.Armor);
         if (Health <= 0)
         {
-            Team.AddFearOf(Template.MaxHealth/10, World.PosToTilePos(Rigidbody.Position));
+            Team.AddFearOf(Template.MaxHealth/10, World.PosToTilePos(Position));
             //Console.WriteLine($"{Template.Name} killed by {damageSource.Source.GetType().Name} which is " + (damageSource.Source is Structure ? "" : "not ") + "a structure, assigning hate...");
             if (damageSource.Source is Structure s)
             {
@@ -291,7 +293,6 @@ public class Minion : ISprite
     public virtual void Die()
     {
         World.MinionsToRemove.Add(this);
-        Rigidbody.Owner = null;
     }
 
     public Int2D GetTargetTile()
@@ -301,8 +302,8 @@ public class Minion : ISprite
 
     public virtual void SetTarget(Int2D target)
     {
-        NavPath.Reset(Rigidbody.Position);
-        NavPath.Start = World.PosToTilePos(Rigidbody.Position);
+        NavPath.Reset(Position);
+        NavPath.Start = World.PosToTilePos(Position);
         NavPath.Destination = target;
         PathFinder.RequestPath(NavPath);
     }

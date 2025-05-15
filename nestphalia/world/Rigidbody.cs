@@ -5,20 +5,20 @@ namespace nestphalia;
 
 public class Rigidbody
 {
-    public Minion? Owner = null;
+    public Minion Owner;
     public Vector2 Position;
     public float Radius;
     public bool IsFlying;
     private Vector2 _collisionOffset;
-    private Int2D _collideOverride;
+    public Int2D CollideOverride;
     
-    public Rigidbody(Minion owner, Vector2 position, float radius, bool isFlying)
+    public Rigidbody(Minion owner, Vector2 position, float radius, bool isFlying, Int2D collideOverride)
     {
         Owner = owner;
         Position = position;
         Radius = radius;
         IsFlying = isFlying;
-        _collideOverride = World.PosToTilePos(position);
+        CollideOverride = collideOverride;
     }
 
     public Rigidbody()
@@ -61,7 +61,7 @@ public class Rigidbody
                     y < 0 || 
                     y >= World.BoardHeight || 
                     !(World.GetTile(x,y)?.PhysSolid() ?? false) ||
-                    (_collideOverride.EqualsCoords(x,y))
+                    (CollideOverride.EqualsCoords(x,y))
                     ) continue;
                 Vector2 c = World.GetTileCenter(x, y);
                 Rectangle b = World.GetTileBounds(x, y);
@@ -101,7 +101,7 @@ public class Rigidbody
 
     public void SetCollideOverride(Int2D coords)
     {
-        _collideOverride = coords;
+        CollideOverride = coords;
     }
 
 

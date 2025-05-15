@@ -26,7 +26,7 @@ public class FlyingMinion : Minion
 {
     public FlyingMinion(MinionTemplate template, Team team, Vector2 position, NavPath? navPath) : base(template, team, position, navPath)
     {
-        Rigidbody.IsFlying = true;
+        IsFlying = true;
     }
 
     public override void Update()
@@ -36,8 +36,8 @@ public class FlyingMinion : Minion
         if (!TryAttack())
         {
             NextPos = World.GetTileCenter(NavPath.Destination);
-            Rigidbody.Position = Rigidbody.Position.MoveTowards(NextPos, AdjustedSpeed() * Time.DeltaTime);
-            if (NavPath.TargetReached(Rigidbody.Position))
+            Position = Position.MoveTowards(NextPos, AdjustedSpeed() * Time.DeltaTime);
+            if (NavPath.TargetReached(Position))
             {
                 Retarget();
             }
@@ -48,7 +48,7 @@ public class FlyingMinion : Minion
 
     public override void SetTarget(Int2D target)
     {
-        NavPath.Reset(Rigidbody.Position);
+        NavPath.Reset(Position);
         NavPath.Destination = target;
     }
 }

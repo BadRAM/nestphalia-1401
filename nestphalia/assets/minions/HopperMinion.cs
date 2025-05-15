@@ -47,19 +47,19 @@ public class HopperMinion : Minion
             }
             else if (Time.Scaled - _jumpStartTime > _jumpDuration + _jumpChargeDuration)
             {
-                Rigidbody.IsFlying = false;
+                IsFlying = false;
                 _jumping = false;
-                Rigidbody.Position = _jumpEndPos;
+                Position = _jumpEndPos;
             }
             else
             {
-                Rigidbody.IsFlying = true;
+                IsFlying = true;
 
                 double t = (Time.Scaled - (_jumpStartTime + _jumpChargeDuration)) / _jumpDuration;
                 double arcOffset = Math.Sin(t * Math.PI) * _jumpHeight;
         
-                Rigidbody.Position = Vector2.Lerp(_jumpStartPos, _jumpEndPos, (float)t);
-                Rigidbody.Position.Y -= (float)arcOffset;
+                Position = Vector2.Lerp(_jumpStartPos, _jumpEndPos, (float)t);
+                Position.Y -= (float)arcOffset;
                 return;
             }
         }
@@ -72,14 +72,14 @@ public class HopperMinion : Minion
         {
             if (!TryAttack())
             {
-                if (NavPath.Found && NavPath.TargetReached(Rigidbody.Position))
+                if (NavPath.Found && NavPath.TargetReached(Position))
                 {
                     Retarget();
                     PathFinder.RequestPath(NavPath);
                 }
                 else
                 {
-                    Rigidbody.Position = Rigidbody.Position.MoveTowards(NextPos, AdjustedSpeed() * Time.DeltaTime);
+                    Position = Position.MoveTowards(NextPos, AdjustedSpeed() * Time.DeltaTime);
                 }
             }
         }
@@ -90,7 +90,7 @@ public class HopperMinion : Minion
             {
                 NavPath.Skip();
                 _jumping = true;
-                _jumpStartPos = Rigidbody.Position;
+                _jumpStartPos = Position;
                 _jumpEndPos = World.GetTileCenter((Int2D)ahead) + new Vector2(World.Random.Next(17)-8, World.Random.Next(23)-11);
                 _jumpStartTime = Time.Scaled;
             }
@@ -98,7 +98,7 @@ public class HopperMinion : Minion
             {
                 if (!TryAttack())
                 {
-                    Rigidbody.Position = Rigidbody.Position.MoveTowards(NextPos, AdjustedSpeed() * Time.DeltaTime);
+                    Position = Position.MoveTowards(NextPos, AdjustedSpeed() * Time.DeltaTime);
                 }
             }
         }

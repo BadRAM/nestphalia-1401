@@ -107,9 +107,4 @@ static class Program
 	    CloseAudioDevice();     
         //CloseWindow();
     }
-
-    public static void Scratch()
-    {
-	    Console.WriteLine(System.Runtime.InteropServices.Marshal.SizeOf(new Rigidbody(null, Vector2.One, 1f, false)));
-    }
 }

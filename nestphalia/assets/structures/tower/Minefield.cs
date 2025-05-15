@@ -54,10 +54,10 @@ public class Minefield : Structure
         if (Time.Scaled - _timeLastTriggered < _template.Cooldown) return;
         foreach (Minion minion in World.Minions)
         {
-            if (minion.Team != Team && !minion.Rigidbody.IsFlying &&
+            if (minion.Team != Team && !minion.IsFlying &&
                 Raylib.CheckCollisionCircles(
                     position, (float)_template.Range, 
-                    minion.Rigidbody.Position,minion.Template.PhysicsRadius))
+                    minion.Position,minion.Template.PhysicsRadius))
             {
                 Trigger();
                 break;
