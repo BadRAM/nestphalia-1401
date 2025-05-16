@@ -34,8 +34,8 @@ public class Rigidbody
         if (!Raylib.CheckCollisionCircles(Position, Radius, other.Position, other.Radius)) return;
         if (Position == other.Position) // jostle randomly if both minions are in the exact same position
         {
-                  _collisionOffset += new Vector2((float)(World.Random.NextDouble() - 0.5), (float)(World.Random.NextDouble() - 0.5));
-            other._collisionOffset += new Vector2((float)(World.Random.NextDouble() - 0.5), (float)(World.Random.NextDouble() - 0.5));
+                  _collisionOffset += new Vector2(0.1f, 0.1f);
+            other._collisionOffset -= new Vector2(0.1f, 0.1f);
             return;
         }
         

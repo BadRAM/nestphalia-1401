@@ -42,6 +42,7 @@ public static class World
     private static Stopwatch _swUpdateMinionsPostCollide = new Stopwatch();
     private static Stopwatch _swUpdateProjectiles = new Stopwatch();
     private static int _totalCollideChecks;
+    private static string _debugString;
     
     private static Stopwatch _swDraw = new Stopwatch();
     private static Stopwatch _swDrawSort = new Stopwatch();
@@ -213,6 +214,7 @@ public static class World
     public static void Update()
     {
         _swUpdate.Restart();
+        _debugString = "";
         
         _swUpdateMinionGrid.Restart();
         
@@ -284,7 +286,22 @@ public static class World
 
         _swUpdateMinionsCollide.Restart();
         UpdateRigidbodyBuffer();
-        DoMinionCollision();
+        // DoMinionCollision(0, 1);
+        List<Task> tasks = new List<Task>();
+        int taskCount = 4;
+        for (int i = 0; i < taskCount; i++)
+        {
+            var i1 = i;
+            tasks.Add(Task.Run(() =>
+            {
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
+                DoMinionCollision(i1, taskCount);
+                sw.Stop();
+                _debugString += $"worker {i1} on thread {Thread.CurrentThread.ManagedThreadId} finished in {sw.Elapsed.Microseconds:N4} us\n";
+            }));
+        }
+        Task.WhenAll(tasks).Wait();
         _swUpdateMinionsCollide.Stop();
         
         _swUpdateMinionsPostCollide.Restart();
@@ -344,13 +361,15 @@ public static class World
         }
     }
 
-    private static void DoMinionCollision()
+    private static void DoMinionCollision(int workerID, int workerCount)
     {
         _totalCollideChecks = 0;
         for (int x = 0; x < BoardWidth; x++) // Iterate MinionGrid Rows
         {
             for (int y = 0; y < BoardHeight; y++) // Iterate MinionGrid Columns
             {
+                if (((x+y) % workerCount) != workerID) continue; // Skip cells we're not assigned to
+
                 for (int i = 0; i < RigidbodyGrid[x, y].Count; i++) // Iterate Minions in cell at x,y
                 {
                     for (int j = i+1; j < RigidbodyGrid[x, y].Count; j++)
@@ -474,7 +493,8 @@ public static class World
 
         GUI.DrawTextLeft(Screen.HCenter + 350, Screen.VCenter - 250,
             $"Total collision checks: {_totalCollideChecks/1000}k\n" +
-            $"ms/1k checks: {((_swUpdateMinionsCollide.Elapsed.TotalMilliseconds * 1000) / _totalCollideChecks).ToString("N4")}\n");
+            $"ms/1k checks: {((_swUpdateMinionsCollide.Elapsed.TotalMilliseconds * 1000) / _totalCollideChecks).ToString("N4")}\n\n" +
+            $"{_debugString}");
         
         int totalWidth = 1000;
         int x = Screen.HCenter-500;
