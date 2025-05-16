@@ -49,12 +49,11 @@ public static class World
     private static Stopwatch _swUpdateMinionsPostCollide = new Stopwatch();
     private static Stopwatch _swUpdateProjectiles = new Stopwatch();
     private static int _totalCollideChecks;
+    private static string _debugString;
     
     private static Stopwatch _swDraw = new Stopwatch();
     // private static Stopwatch _swDrawSort = new Stopwatch();
     // private static Stopwatch _swDrawSprites = new Stopwatch();
-    
-
 
     public static event EventHandler<Int2D> StructureChanged = delegate {};
     
@@ -192,8 +191,9 @@ public static class World
     public static void Update()
     {
         _swUpdate.Restart();
+        _debugString = "";
         
-        _swUpdateMinionsCollide.Restart();
+        _swUpdateMinionGrid.Restart();
         foreach (List<Minion> gridSquare in MinionGrid)
         {
             gridSquare.Clear();
@@ -203,7 +203,7 @@ public static class World
             Int2D pos = PosToTilePos(minion.Position);
             MinionGrid[pos.X, pos.Y].Add(minion);
         }
-        _swUpdateMinionsCollide.Stop();
+        _swUpdateMinionGrid.Stop();
         
         // Update wave timer
         if (!_battleOver)
@@ -255,10 +255,6 @@ public static class World
         RightTeam.Update();
         _swUpdateTeams.Stop();
         
-        _swUpdatePathfinder.Restart();
-        PathFinder.ServeQueue(10);
-        _swUpdatePathfinder.Stop();
-        
         _swUpdateBoard.Restart();
         for (int x = 0; x < BoardWidth; ++x)
         {
@@ -302,14 +298,39 @@ public static class World
         MinionsToRemove.Clear();
         _swUpdateMinions.Stop();
         
+        _swUpdateMinionsCollide.Restart();
+        // DoMinionCollision(0, 1);
+        List<Task> tasks = new List<Task>();
+        int taskCount = 2;
+        for (int i = 0; i < taskCount; i++)
+        {
+            var i1 = i;
+            tasks.Add(Task.Run(() =>
+            {
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
+                DoMinionCollision(i1, taskCount);
+                sw.Stop();
+                _debugString += $"worker {i1} on thread {Thread.CurrentThread.ManagedThreadId} finished in {sw.Elapsed.Microseconds:N4} us\n";
+            }));
+        }
+        _swUpdateMinionsCollide.Stop();
+        
+        _swUpdatePathfinder.Restart();
+        PathFinder.ServeQueue(10);
+        _swUpdatePathfinder.Stop();
+        
         _swUpdateMinionsCollide.Start();
-        DoMinionCollision();
+        Task.WhenAll(tasks).Wait();
+        _swUpdateMinionsCollide.Stop();
+
+        _swUpdateMinionsPostCollide.Restart();
         foreach (Minion m in Minions)
         {
             m.CollideTerrain();
             m.LateUpdate();
         }
-        _swUpdateMinionsCollide.Stop();
+        _swUpdateMinionsPostCollide.Stop();
 
         _swUpdateProjectiles.Restart();
         for (int index = 0; index < Projectiles.Count; index++)
@@ -337,13 +358,15 @@ public static class World
         _swUpdate.Stop();
     }
 
-    private static void DoMinionCollision()
+    private static void DoMinionCollision(int workerID, int workerCount)
     {
         _totalCollideChecks = 0;
-        for (int x = 0; x < BoardWidth; x++) // Iterate MinionGrid Rows
+        for (int x = 0; x < BoardWidth; x++) // Iterate MinionGrid Columns
         {
-            for (int y = 0; y < BoardHeight; y++) // Iterate MinionGrid Columns
+            for (int y = 0; y < BoardHeight; y++) // Iterate MinionGrid Rows
             {
+                if ((x+y) % workerCount != workerID) continue; // Skip cells we're not assigned to
+                
                 for (int i = 0; i < MinionGrid[x, y].Count; i++) // Iterate Minions in cell at x,y
                 {
                     for (int j = i+1; j < MinionGrid[x, y].Count; j++)
@@ -467,7 +490,8 @@ public static class World
             $"Tile {GetMouseTilePos().ToString()}\n" +
             $"Total collision checks: {_totalCollideChecks/1000}k\n" +
             $"ms/1k checks: {((_swUpdateMinionsCollide.Elapsed.TotalMilliseconds * 1000) / _totalCollideChecks).ToString("N4")}\n\n" +
-            $"{tileTypeTotals}");
+            $"{tileTypeTotals}\n" +
+            $"{_debugString}");
         
         int totalWidth = 1000;
         int x = Screen.HCenter-500;

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Numerics;
 using Raylib_cs;
 
@@ -188,17 +189,14 @@ public class Minion : ISprite
     // Should this be here, or in World? maybe somewhere else entirely, like a physics functions class?
     public void CollideMinion(Minion other)
     {
-        // if (other == this) 
-        // {
-        //     Console.WriteLine("Selfcolliding!");
-        //     return;
-        // }
+        Debug.Assert(other != this);
+
         if (other.IsFlying != IsFlying) return;
         if (!Raylib.CheckCollisionCircles(Position, Template.PhysicsRadius, other.Position, other.Template.PhysicsRadius)) return;
-        if (Position == other.Position) // jostle randomly if both minions are in the exact same position
+        if (Position == other.Position) // bump away if both minions are in the exact same position
         {
-                  _collisionOffset += new Vector2((float)(World.Random.NextDouble() - 0.5), (float)(World.Random.NextDouble() - 0.5));
-            other._collisionOffset += new Vector2((float)(World.Random.NextDouble() - 0.5), (float)(World.Random.NextDouble() - 0.5));
+                  _collisionOffset += new Vector2(0.1f, 0.1f);
+            other._collisionOffset -= new Vector2(0.1f, 0.1f);
             return;
         }
         
