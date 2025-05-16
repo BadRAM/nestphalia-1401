@@ -21,7 +21,7 @@ public class Rubble : Structure
         return false;
     }
     
-    public override bool PhysSolid(Team team)
+    public override bool PhysSolid()
     {
         return false;
     }

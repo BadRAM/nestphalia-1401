@@ -52,11 +52,16 @@ Programming todo:
 
 ----- Premature Optimizations -----
 
+- Game Logic optimizations
+  - profile tile entities separately by ID
+
 - Physics optimizations
   - Sector based minion culling/lookup
     - No significant difference
+    - ~11000 minions slows the game to 50% speed on my laptop.
+  - Multi Threading
 
-- ~~Pathfinding optimizations:~~
+- Pathfinding optimizations:
   - ~~note: published builds seem to run about 2x faster than debug mode in IDE~~
   - ~~as soon as a node is set in the targeted half of the battlefield, purge all nodes and dont' allow any new ones to be created in the untargeted half~~
     - ~~This feels too complex, limiting, and like it could cause difficult bugs. A more generalized chunking method would be better, but only if the game grows and pathing performance becomes a problem again~~
@@ -76,6 +81,9 @@ Programming todo:
   - ~~Path outwards from start and destination simultaneously, finishing as soon as the two sides touch~~
     - ~~Before: 0.850 release~~
     - ~~After:  0.045 release :')~~
+  - Give each team it's own pathfinder and pathqueue (this will prevent one team from jamming the other's pathing by filling the pathqueue)
+
+- Last resort: Reduce tickrate from 60 to 30. This is easy to do just by changing timescale and framerate, but results noticeably choppier gameplay. Interpolation would probably eat into the benefits somewhat but could easily still be worth it.
 
 
 Design todo:

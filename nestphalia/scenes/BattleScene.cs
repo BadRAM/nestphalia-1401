@@ -121,13 +121,14 @@ public static class BattleScene
 
         if (!Pause && Winner == null)
         {
+            double startTime = GetTime();
+            
             World.Update();
 
             _skips = 0;
             if (IsKeyDown(KeyboardKey.F))
             {
-                double startTime = GetTime();
-                while (GetTime() - startTime < 0.016)
+                while ((GetTime() - startTime) + ((GetTime() - startTime) / (_skips + 1)) < 0.016)
                 {
                     Time.UpdateTime();
                     World.Update();
@@ -145,12 +146,12 @@ public static class BattleScene
         World.DrawFloor();
         World.Draw();
         
-        DrawTextLeft(6, 16, $"FPS: {GetFPS()}");
-        DrawTextLeft(6, 32, $"Wave: {World.Wave}");
-        DrawTextLeft(6, 48, $"Bugs: {World.Minions.Count}");
+        // DrawTextLeft(6, 16, $"FPS: {GetFPS()}");
+        // DrawTextLeft(6, 32, $"Wave: {World.Wave}");
+        // DrawTextLeft(6, 48, $"Bugs: {World.Minions.Count}");
         // DrawTextLeft(6, 64, $"Sprites: {World.Sprites.Count}");
-        DrawTextLeft(6, 64, $"Zoom: {World.Camera.Zoom}");
-        DrawTextLeft(6, 80, $"Tile {World.GetMouseTilePos().ToString()}");
+        // DrawTextLeft(6, 64, $"Zoom: {World.Camera.Zoom}");
+        // DrawTextLeft(6, 80, $"Tile {World.GetMouseTilePos().ToString()}");
         // DrawTextLeft(6, 80, $"PathQueue: {PathFinder.GetQueueLength()}");
         if (_pathFinderDebug) PathFinder.DrawDebug();
         

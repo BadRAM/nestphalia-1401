@@ -9,7 +9,7 @@ public class MortarShellTemplate : ProjectileTemplate
     public double ArcHeight;
     public float BlastRadius;
         
-    public MortarShellTemplate(Texture2D texture, double damage, double arcDuration, double arcHeight, float blastRadius) : base(texture, damage, 0)
+    public MortarShellTemplate(string id, Texture2D texture, double damage, double arcDuration, double arcHeight, float blastRadius) : base(id, texture, damage, 0)
     {
         ArcDuration = arcDuration;
         ArcHeight = arcHeight;
@@ -87,9 +87,8 @@ public class MortarShell : Projectile
             }
             else
             {
-                for (int index = 0; index < World.Minions.Count; index++)
+                foreach (Minion minion in World.GetMinionsInRegion(World.PosToTilePos(_targetPos), (int)(1 + _template.BlastRadius / 24)))
                 {
-                    Minion minion = World.Minions[index];
                     if (!minion.IsFlying && minion.Team != _team &&
                         Vector2.Distance(_targetPos, minion.Position) < _template.BlastRadius)
                     {

@@ -11,7 +11,7 @@ public class SapperMinionTemplate : MinionTemplate
     public SapperMinionTemplate(string id, string name, string description, Texture2D texture, Texture2D retreatingTexture, double maxHealth, double armor, double damage, double speed, float physicsRadius) : base(id, name, description, texture, maxHealth, armor, damage, speed, physicsRadius, 0)
     {
         RetreatingTexture = retreatingTexture;
-        Projectile = new MortarShellTemplate(Resources.GetTextureByName("sapper_bomb"), damage, 0.4, 4, 0);
+        Projectile = new MortarShellTemplate($"{id}_bomb", Resources.GetTextureByName("sapper_bomb"), damage, 0.4, 4, 0);
         AttackCooldown = 0;
     }
 

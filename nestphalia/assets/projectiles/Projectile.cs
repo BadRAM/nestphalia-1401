@@ -5,12 +5,14 @@ namespace nestphalia;
 
 public class ProjectileTemplate
 {
+    public string ID;
     public Texture2D Texture;
     public double Damage;
     public double Speed;
 
-    public ProjectileTemplate(Texture2D texture, double damage, double speed)
+    public ProjectileTemplate(string id, Texture2D texture, double damage, double speed)
     {
+        ID = id;
         Damage = damage;
         Speed = speed;
         Texture = texture;

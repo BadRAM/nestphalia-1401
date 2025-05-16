@@ -32,16 +32,29 @@ public static class World
     public static bool DrawDebugInfo;
     private static Stopwatch _swFrame = new Stopwatch();
     private static Stopwatch _swUpdate = new Stopwatch();
+    private static Stopwatch _swUpdateMinionGrid = new Stopwatch();
     private static Stopwatch _swUpdateTeams = new Stopwatch();
     private static Stopwatch _swUpdatePathfinder = new Stopwatch();
     private static Stopwatch _swUpdateBoard = new Stopwatch();
+#if DEBUG
+    private class EntityTracker
+    {
+        public Stopwatch SW = new Stopwatch();
+        public int Count;
+    }
+    private static Dictionary<string, EntityTracker> _swEntitiesByID = new Dictionary<string, EntityTracker>();
+#endif
     private static Stopwatch _swUpdateMinions = new Stopwatch();
     private static Stopwatch _swUpdateMinionsCollide = new Stopwatch();
+    private static Stopwatch _swUpdateMinionsPostCollide = new Stopwatch();
     private static Stopwatch _swUpdateProjectiles = new Stopwatch();
+    private static int _totalCollideChecks;
     
     private static Stopwatch _swDraw = new Stopwatch();
-    private static Stopwatch _swDrawSort = new Stopwatch();
-    private static Stopwatch _swDrawSprites = new Stopwatch();
+    // private static Stopwatch _swDrawSort = new Stopwatch();
+    // private static Stopwatch _swDrawSprites = new Stopwatch();
+    
+
 
     public static event EventHandler<Int2D> StructureChanged = delegate {};
     
@@ -60,6 +73,9 @@ public static class World
         Projectiles.Clear();
         Sprites.Clear();
         PathFinder.ClearQueue();
+        #if DEBUG
+        _swEntitiesByID.Clear();
+        #endif
         FirstWaveTime = Time.Scaled;
         Wave = 0;
         _battleStarted = false;
@@ -147,6 +163,21 @@ public static class World
         leftFort.LoadToBoard(false);
         rightFort.LoadToBoard(true);
         
+        // #if DEBUG
+        // // Create stopwatches for each type of tile in play
+        // _swEntitiesByID.Add("rubble", new Stopwatch());
+        // for (int x = 0; x < BoardWidth; x++)
+        // {
+        //     for (int y = 0; y < BoardHeight; y++)
+        //     {
+        //         if (GetTile(x,y) != null && !_swEntitiesByID.ContainsKey(GetTile(x,y).Template.ID))
+        //         {
+        //             _swEntitiesByID.Add(GetTile(x,y).Template.ID, new Stopwatch());
+        //         }
+        //     }
+        // }
+        // #endif
+        
         // Tell teams they can generate fear and hate
         LeftTeam.Name = leftFort.Name;
         LeftTeam.IsPlayerControlled = leftIsPlayer;
@@ -156,53 +187,6 @@ public static class World
         RightTeam.Initialize();
 
         _battleStarted = true;
-    }
-    
-    public static void SetTile(StructureTemplate? tile, Team team, int x, int y)
-    {
-        if (_board[x, y] != null)
-        {
-            Sprites.Remove(_board[x, y]!);
-        }
-        _board[x,y] = tile?.Instantiate(team, x, y);
-        if (_board[x, y] != null)
-        {
-            Sprites.Add(_board[x,y]!);
-        }
-        
-        StructureChanged.Invoke(null, new Int2D(x,y));
-    }
-    
-    public static void SetTile(StructureTemplate? tile, Team team, Int2D tilePos)
-    {
-        SetTile(tile, team, tilePos.X, tilePos.Y);
-    }
-
-    public static void DestroyTile(int x, int y)
-    {
-        if (_board[x, y] != null)
-        {
-            Sprites.Remove(_board[x, y]!);
-            _board[x,y] = new Rubble(_board[x, y]!.Template, _board[x, y]!.Team, x, y);
-            Sprites.Add(_board[x,y]!);
-        }
-        
-        StructureChanged.Invoke(null, new Int2D(x,y));
-    }
-
-    public static Structure? GetTile(Int2D tilePos)
-    {
-        return _board[tilePos.X,tilePos.Y];
-    }
-    
-    public static Structure? GetTile(int x, int y)
-    {
-        return _board[x,y];
-    }
-
-    public static Team GetOtherTeam(Team team)
-    {
-        return team == LeftTeam ? RightTeam : LeftTeam;
     }
     
     public static void Update()
@@ -256,6 +240,15 @@ public static class World
                 }
             }
         }
+        
+        // Reset the entity timers
+        #if DEBUG
+        foreach (var e in _swEntitiesByID)
+        {
+            e.Value.SW.Reset();
+            e.Value.Count = 0;
+        }
+        #endif
 
         _swUpdateTeams.Restart();
         LeftTeam.Update();
@@ -271,7 +264,17 @@ public static class World
         {
             for (int y = 0; y < BoardHeight; ++y)
             {
-                _board[x, y]?.Update();
+                if (_board[x,y] == null) continue;
+                #if DEBUG
+                string key = _board[x, y].Template.ID;
+                if (!_swEntitiesByID.ContainsKey(key)) _swEntitiesByID.Add(key, new EntityTracker());
+                _swEntitiesByID[key].SW.Start();
+                #endif
+                _board[x, y].Update();
+                #if DEBUG
+                _swEntitiesByID[key].SW.Stop();
+                _swEntitiesByID[key].Count++;
+                #endif
             }
         }
         _swUpdateBoard.Stop();
@@ -279,10 +282,26 @@ public static class World
         _swUpdateMinions.Restart();
         for (int index = 0; index < Minions.Count; index++)
         {
+            #if DEBUG
+            string key = Minions[index].Template.ID;
+            if (!_swEntitiesByID.ContainsKey(key)) _swEntitiesByID.Add(key, new EntityTracker());
+            _swEntitiesByID[key].SW.Start();
+            #endif
             Minions[index].Update();
+            #if DEBUG
+            _swEntitiesByID[key].SW.Stop();
+            _swEntitiesByID[key].Count++;
+            #endif
         }
-        _swUpdateMinions.Stop();
 
+        foreach (Minion m in MinionsToRemove)
+        {
+            Minions.Remove(m);
+            Sprites.Remove(m);
+        }
+        MinionsToRemove.Clear();
+        _swUpdateMinions.Stop();
+        
         _swUpdateMinionsCollide.Start();
         DoMinionCollision();
         foreach (Minion m in Minions)
@@ -292,20 +311,19 @@ public static class World
         }
         _swUpdateMinionsCollide.Stop();
 
-        _swUpdateMinions.Start();
-        foreach (Minion m in MinionsToRemove)
-        {
-            Minions.Remove(m);
-            Sprites.Remove(m);
-        }
-        MinionsToRemove.Clear();
-        _swUpdateMinions.Stop();
-
         _swUpdateProjectiles.Restart();
         for (int index = 0; index < Projectiles.Count; index++)
         {
-            Projectile p = Projectiles[index];
-            p.Update();
+            #if DEBUG
+            string key = Projectiles[index].Template.ID;
+            if (!_swEntitiesByID.ContainsKey(key)) _swEntitiesByID.Add(key, new EntityTracker());
+            _swEntitiesByID[key].SW.Start();
+            #endif
+            Projectiles[index].Update();
+            #if DEBUG
+            _swEntitiesByID[key].SW.Stop();
+            _swEntitiesByID[key].Count++;
+            #endif
         }
 
         foreach (Projectile p in ProjectilesToRemove)
@@ -321,6 +339,7 @@ public static class World
 
     private static void DoMinionCollision()
     {
+        _totalCollideChecks = 0;
         for (int x = 0; x < BoardWidth; x++) // Iterate MinionGrid Rows
         {
             for (int y = 0; y < BoardHeight; y++) // Iterate MinionGrid Columns
@@ -330,6 +349,7 @@ public static class World
                     for (int j = i+1; j < MinionGrid[x, y].Count; j++)
                     {
                         MinionGrid[x, y][i].CollideMinion(MinionGrid[x, y][j]);
+                        _totalCollideChecks++;
                     }
 
                     if (x < BoardWidth - 1)
@@ -339,12 +359,14 @@ public static class World
                             for (int j = 0; j < MinionGrid[x + 1, y - 1].Count; j++)
                             {
                                 MinionGrid[x, y][i].CollideMinion(MinionGrid[x + 1, y - 1][j]);
+                                _totalCollideChecks++;
                             }
                         }
 
                         for (int j = 0; j < MinionGrid[x + 1, y].Count; j++)
                         {
                             MinionGrid[x, y][i].CollideMinion(MinionGrid[x + 1, y][j]);
+                            _totalCollideChecks++;
                         }
 
                         if (y < BoardHeight - 1)
@@ -352,6 +374,7 @@ public static class World
                             for (int j = 0; j < MinionGrid[x + 1, y + 1].Count; j++)
                             {
                                 MinionGrid[x, y][i].CollideMinion(MinionGrid[x + 1, y + 1][j]);
+                                _totalCollideChecks++;
                             }
                         }
                     }
@@ -361,6 +384,7 @@ public static class World
                         for (int j = 0; j < MinionGrid[x, y + 1].Count; j++)
                         {
                             MinionGrid[x, y][i].CollideMinion(MinionGrid[x, y + 1][j]);
+                            _totalCollideChecks++;
                         }
                     }
                 }
@@ -392,6 +416,11 @@ public static class World
         Raylib.BeginMode2D(Camera);
 
         Sprites = Sprites.OrderBy(o => o.Z).ToList();
+        // Sprites.Sort(delegate(ISprite a, ISprite b)
+        // {
+        //     if (a.Z == b.Z) return 0;
+        //     return a.Z > b.Z ? 1 : -1;
+        // });
 
         foreach (ISprite s in Sprites)
         {
@@ -413,40 +442,32 @@ public static class World
 
     public static void DrawDebug()
     {
-        // Raylib.BeginMode2D(World.Camera);
-        // for (int i = 0; i < World.BoardWidth; i++)
-        // {
-        //     for (int j = 0; j < World.BoardHeight; j++)
-        //     {
-        //         if (_nodeGrid[i, j] != null && _nodeGrid[i, j].PrevNode != null)
-        //         {
-        //             int t = (int)(_nodeGrid[i, j].Weight - _nodeGrid[i, j].PrevNode.Weight);
-        //             Color c = new Color(t, 255-t, 0, 200);
-        //             Raylib.DrawLineV(World.GetTileCenter(i, j), World.GetTileCenter(_nodeGrid[i, j].PrevNode.Pos), c);
-        //         }
-        //         else
-        //         {
-        //             Raylib.DrawCircleV(World.GetTileCenter(i,j), 4, Raylib.RED);
-        //         }
-        //     }
-        // }
-        // Raylib.EndMode2D();
-        
         // ReSharper disable once InconsistentNaming
         double totalSWTime = _swFrame.Elapsed.TotalSeconds;
-        //long totalSWTime = _swMisc.ElapsedMilliseconds + _swFindNext.ElapsedMilliseconds + _swAddNodes.ElapsedMilliseconds + _swNewNode.ElapsedMilliseconds + _swRegisterNode.ElapsedMilliseconds;
-        // if (totalSWTime == 0) return;
 
-        // GUI.DrawTextLeft(Screen.HCenter + 350, Screen.VCenter - 250,
-        //     $"Avg Pathing Time: {(1000 * _swTotalTime.Elapsed.TotalSeconds / _totalPaths).ToString("N3")}ms\n" +
-        //     $"{_totalPaths} paths totalling {_swTotalTime.ElapsedMilliseconds}ms\n" +
-        //     $"Average nodes per path: {_totalNodes / _totalPaths}\n" +
-        //     $"Time in pathloop: {totalSWTime}ms\n" +
-        //     $"Misc: {_swMisc.ElapsedMilliseconds}ms\n" +
-        //     $"FindNext: {_swFindNext.ElapsedMilliseconds}ms\n" +
-        //     $"AddNodes: {_swAddNodes.ElapsedMilliseconds}ms\n" +
-        //     $"NewNode: {_swNewNode.ElapsedMilliseconds}ms\n" +
-        //     $"RegisterNode: {_swRegisterNode.ElapsedMilliseconds}ms");
+        string tileTypeTotals = "";
+        
+        #if DEBUG
+        List<KeyValuePair<string, EntityTracker>> tileTypeStopwatches = _swEntitiesByID.ToList();
+        tileTypeStopwatches = tileTypeStopwatches.OrderByDescending(o => o.Value.SW.Elapsed).ToList();
+        
+        foreach (var t in tileTypeStopwatches)
+        {
+            if (t.Value.Count == 0) continue;
+            tileTypeTotals += $"{t.Key} : {t.Value.SW.Elapsed.TotalMicroseconds.ToString("N5")} / {t.Value.Count} = {(t.Value.SW.Elapsed.TotalMicroseconds / t.Value.Count).ToString("N5")}\n";
+        }
+        #endif
+        
+        GUI.DrawTextLeft(10, 10,
+            $"FPS: {Raylib.GetFPS()}\n" +
+            $"Wave: {Wave}\n" +
+            $"Bugs: {Minions.Count}\n" +
+            $"Sprites: {Sprites.Count}\n" +
+            $"Zoom: {Camera.Zoom}\n" +
+            $"Tile {GetMouseTilePos().ToString()}\n" +
+            $"Total collision checks: {_totalCollideChecks/1000}k\n" +
+            $"ms/1k checks: {((_swUpdateMinionsCollide.Elapsed.TotalMilliseconds * 1000) / _totalCollideChecks).ToString("N4")}\n\n" +
+            $"{tileTypeTotals}");
         
         int totalWidth = 1000;
         int x = Screen.HCenter-500;
@@ -462,49 +483,106 @@ public static class World
 
         totalSWTime = _swUpdate.Elapsed.TotalSeconds;
         x = Screen.HCenter - 500;
+        width = (int)(totalWidth * _swUpdateMinionGrid.Elapsed.TotalSeconds / totalSWTime);
+        Raylib.DrawRectangle(x, Screen.Top+10, width, 20, Color.Red);
+        GUI.DrawTextLeft(x, Screen.Top+10, $"MinionGrid {(int)(100 * _swUpdateMinionGrid.Elapsed.TotalSeconds / totalSWTime)}%");
+        x += width;
         width = (int)(totalWidth * _swUpdateTeams.Elapsed.TotalSeconds / totalSWTime);
-        Raylib.DrawRectangle(x, Screen.VCenter-290, width, 20, Color.SkyBlue);
+        Raylib.DrawRectangle(x, Screen.Top+10, width, 20, Color.SkyBlue);
         GUI.DrawTextLeft(x, Screen.Top+10, $"Teams {(int)(100 * _swUpdateTeams.Elapsed.TotalSeconds / totalSWTime)}%");
         x += width;
         width = (int)(totalWidth * _swUpdatePathfinder.Elapsed.TotalSeconds / totalSWTime);
-        Raylib.DrawRectangle(x, Screen.VCenter-290, width, 20, Color.Orange);
+        Raylib.DrawRectangle(x, Screen.Top+10, width, 20, Color.Orange);
         GUI.DrawTextLeft(x, Screen.Top+10, $"Path {(int)(100 * _swUpdatePathfinder.Elapsed.TotalSeconds / totalSWTime)}%");
         x += width;
         width = (int)(totalWidth * _swUpdateBoard.Elapsed.TotalSeconds / totalSWTime);
-        Raylib.DrawRectangle(x, Screen.VCenter-290, width, 20, Color.Purple);
+        Raylib.DrawRectangle(x, Screen.Top+10, width, 20, Color.Purple);
         GUI.DrawTextLeft(x, Screen.Top+10, $"Board {(int)(100 * _swUpdateBoard.Elapsed.TotalSeconds / totalSWTime)}%");
         x += width;
         width = (int)(totalWidth * _swUpdateMinions.Elapsed.TotalSeconds / totalSWTime);
-        Raylib.DrawRectangle(x, Screen.VCenter-290, width, 20, Color.Yellow);
+        Raylib.DrawRectangle(x, Screen.Top+10, width, 20, Color.Yellow);
         GUI.DrawTextLeft(x, Screen.Top+10, $"Minions {(int)(100 * _swUpdateMinions.Elapsed.TotalSeconds / totalSWTime)}%");
         x += width;
         width = (int)(totalWidth * _swUpdateMinionsCollide.Elapsed.TotalSeconds / totalSWTime);
-        Raylib.DrawRectangle(x, Screen.VCenter-290, width, 20, Color.Red);
+        Raylib.DrawRectangle(x, Screen.Top+10, width, 20, Color.Red);
         GUI.DrawTextLeft(x, Screen.Top+10, $"Phys {(int)(100 * _swUpdateMinionsCollide.Elapsed.TotalSeconds / totalSWTime)}%, {(_swUpdateMinionsCollide.Elapsed.TotalSeconds * 1000).ToString("N4")}ms");
+        x += width;        
+        width = (int)(totalWidth * _swUpdateMinionsPostCollide.Elapsed.TotalSeconds / totalSWTime);
+        Raylib.DrawRectangle(x, Screen.Top+10, width, 20, Color.Maroon);
+        GUI.DrawTextLeft(x, Screen.Top+10, $"PostPhys {(int)(100 * _swUpdateMinionsPostCollide.Elapsed.TotalSeconds / totalSWTime)}%, {(_swUpdateMinionsPostCollide.Elapsed.TotalSeconds * 1000).ToString("N4")}ms");
         x += width;
         width = (int)(totalWidth * _swUpdateProjectiles.Elapsed.TotalSeconds / totalSWTime);
-        Raylib.DrawRectangle(x, Screen.VCenter-290, width, 20, Color.Blue);
+        Raylib.DrawRectangle(x, Screen.Top+10, width, 20, Color.Blue);
         GUI.DrawTextLeft(x, Screen.Top+10, $"Proj {(int)(100 * _swUpdateProjectiles.Elapsed.TotalSeconds / totalSWTime)}%");
         x += width;
         width = totalWidth - x;
         Raylib.DrawRectangle(x, Screen.Top+10, width, 20, Color.Gray);
     }
+    
+    public static void SetTile(StructureTemplate? tile, Team team, int x, int y)
+    {
+        if (_board[x, y] != null)
+        {
+            Sprites.Remove(_board[x, y]!);
+        }
+        _board[x,y] = tile?.Instantiate(team, x, y);
+        if (_board[x, y] != null)
+        {
+            Sprites.Add(_board[x,y]!);
+        }
+        
+        StructureChanged.Invoke(null, new Int2D(x,y));
+    }
+    
+    public static void SetTile(StructureTemplate? tile, Team team, Int2D tilePos)
+    {
+        SetTile(tile, team, tilePos.X, tilePos.Y);
+    }
+
+    public static void DestroyTile(int x, int y)
+    {
+        if (_board[x, y] != null)
+        {
+            Sprites.Remove(_board[x, y]!);
+            _board[x,y] = new Rubble(_board[x, y]!.Template, _board[x, y]!.Team, x, y);
+            Sprites.Add(_board[x,y]!);
+        }
+        
+        StructureChanged.Invoke(null, new Int2D(x,y));
+    }
+
+    public static Structure? GetTile(Int2D tilePos)
+    {
+        return _board[tilePos.X,tilePos.Y];
+    }
+    
+    public static Structure? GetTile(int x, int y)
+    {
+        return _board[x,y];
+    }
+
+    public static Team GetOtherTeam(Team team)
+    {
+        return team == LeftTeam ? RightTeam : LeftTeam;
+    }
 
     // Returns a list of all minions in the square of tiles described by the arguments
+    // Radius 1 scans 1 tile, radius 2 scans 9 tiles, etc...
     public static List<Minion> GetMinionsInRegion(Int2D center, int radius)
     {
         radius--;
         List<Minion> minions = new List<Minion>();
-        for (int x = center.X - radius; x < center.X + radius; x++)
+        for (int x = Math.Max(center.X - radius, 0); x <= Math.Min(center.X + radius, BoardWidth-1); x++)
         {
-            if (x < 0 || x >= BoardWidth) continue;
-            for (int y = center.Y - radius; y < center.Y + radius; y++)
+            //if (x < 0 || x >= BoardWidth) continue;
+            for (int y = Math.Max(center.Y - radius, 0); y <= Math.Min(center.Y + radius, BoardHeight-1); y++)
             {
-                if (y < 0 || y >= BoardHeight) continue;
-                foreach (Minion m in MinionGrid[x,y])
-                {
-                    minions.Add(m);
-                }
+                // if (y < 0 || y >= BoardHeight) continue;
+                minions.AddRange(MinionGrid[x,y]);
+                // foreach (Minion m in MinionGrid[x,y])
+                // {
+                //     minions.Add(m);
+                // }
             }
         }
         return minions;
@@ -547,40 +625,5 @@ public static class World
     public static Vector2 GetTileCenter(Int2D tilePos)
     {
         return GetTileCenter(tilePos.X, tilePos.Y);
-    }
-}
-
-public record struct Int2D
-{
-    public static readonly Int2D Zero  = new Int2D(0, 0);
-    public static readonly Int2D Up    = new Int2D(0, -1);
-    public static readonly Int2D Down  = new Int2D(0, 1);
-    public static readonly Int2D Left  = new Int2D(-1, 0);
-    public static readonly Int2D Right = new Int2D(1, 0);
-    public int X;
-    public int Y;
-
-    public Int2D(int x, int y)
-    {
-        X = x;
-        Y = y;
-    }
-
-    public Vector2 ToVector2()
-    {
-        return new Vector2(X, Y);
-    }
-
-    public override String ToString()
-    {
-        return $"{X},{Y}";
-    }
-    
-    public static Int2D operator +(Int2D a, Int2D b) {
-        return new Int2D 
-        {
-            X = a.X + b.X,
-            Y = a.Y + b.Y
-        };
     }
 }

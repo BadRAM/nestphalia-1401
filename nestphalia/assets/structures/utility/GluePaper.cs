@@ -32,7 +32,7 @@ public class GluePaper : Structure
     {
         base.Update();
         
-        foreach (Minion minion in World.Minions)
+        foreach (Minion minion in World.GetMinionsInRegion(new Int2D(X,Y), 2))
         {
             if (minion.Team != Team 
                 && !minion.IsFlying
@@ -54,7 +54,7 @@ public class GluePaper : Structure
         return team == Team;
     }
 
-    public override bool PhysSolid(Team team)
+    public override bool PhysSolid()
     {
         return false;
     }

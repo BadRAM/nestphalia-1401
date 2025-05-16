@@ -48,14 +48,14 @@ public class FrenzyBeacon : ActiveAbilityBeacon
             }
         }
         
-        return bestValue < _effectRadius ? bestPos : null;
+        return bestValue > minimumValue ? bestPos : null;
     }
 
     public override void Update()
     {
         if (_active)
         {
-            foreach (Minion minion in World.Minions)
+            foreach (Minion minion in World.GetMinionsInRegion(World.PosToTilePos(_effectPos), (int)(1 + _effectRadius / 24)))
             {
                 if (Raylib.CheckCollisionCircles(_effectPos, (float)_effectRadius, minion.Position, minion.Template.PhysicsRadius))
                 {

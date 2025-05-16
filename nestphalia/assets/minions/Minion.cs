@@ -26,7 +26,7 @@ public class MinionTemplate
         MaxHealth = maxHealth;
         Armor = armor;
         Damage = damage;
-        Projectile = new ProjectileTemplate(Resources.GetTextureByName("minion_bullet"), damage, 400);
+        Projectile = new ProjectileTemplate($"{id}_attack", Resources.GetTextureByName("minion_bullet"), damage, 400);
         AttackCooldown = attackCooldown;
         Speed = speed;
         PhysicsRadius = physicsRadius;
@@ -67,11 +67,12 @@ public class Minion : ISprite
     public double Health;
     public bool IsAlive;
     private double _timeSinceLastAction;
-    protected Vector2 NextPos;
+    protected Vector2 NextPos; // This is the world space position the minion is currently trying to reach
     private bool _attacking;
     private double _attackStartedTime;
     // private double _lastFiredTime;
     private Vector2 _collisionOffset;
+    public Int2D OriginTile;
     public bool Glued;
     public bool IsFlying;
     public bool Frenzy;
@@ -84,14 +85,14 @@ public class Minion : ISprite
     }
     
     public double Z { get; set; }
-
+    
     public Minion(MinionTemplate template, Team team, Vector2 position, NavPath? navPath)
     {
         Template = template;
+        Team = team;
         Position = position;
         NextPos = position;
-        //_targetTile = targetTile;
-        Team = team;
+        OriginTile = World.PosToTilePos(position);
         Health = Template.MaxHealth;
         IsAlive = true;
         _timeSinceLastAction = Time.Scaled;
@@ -159,7 +160,7 @@ public class Minion : ISprite
         // Guard against attacking tiles that could just be walked over
         if (t == null || t is Rubble || (!t.NavSolid(Team) && NavPath.NextTile(Position) != NavPath.Destination)) { _attacking = false; return false;}
         // Guard against friendly tiles that can be traversed
-        if (t.Team == Team && !t.PhysSolid(Team)) { _attacking = false; return false;}
+        if (t.Team == Team && !t.PhysSolid()) { _attacking = false; return false;}
         _timeSinceLastAction = Time.Scaled;
         if (!_attacking)
         {
@@ -222,7 +223,7 @@ public class Minion : ISprite
                     x >= World.BoardWidth || 
                     y < 0 || 
                     y >= World.BoardHeight || 
-                    !(World.GetTile(x,y)?.PhysSolid(Team) ?? false) ||
+                    !(World.GetTile(x,y)?.PhysSolid() ?? false) ||
                     (World.GetTile(x,y) is Spawner && World.GetTile(x,y).Team == Team)
                     ) continue;
                 Vector2 c = World.GetTileCenter(x, y);

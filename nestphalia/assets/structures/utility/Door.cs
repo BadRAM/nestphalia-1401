@@ -35,7 +35,7 @@ public class Door : Structure
         if (_isOpen)
         {
             _isOpen = false;
-            foreach (Minion m in World.Minions)
+            foreach (Minion m in World.GetMinionsInRegion(new Int2D(X,Y), 2))
             {
                 if (m.IsFlying) continue;
                 if (m.Team == Team)
@@ -56,9 +56,11 @@ public class Door : Structure
         }
         else
         {
-            foreach (Minion m in World.Minions)
+            foreach (Minion m in World.GetMinionsInRegion(new Int2D(X,Y), 2))
             {
-                if (!m.IsFlying && m.Team == Team && Raylib.CheckCollisionCircles(position, (float)_template.Range, m.Position, m.Template.PhysicsRadius))
+                if (!m.IsFlying && 
+                    m.Team == Team && 
+                    Raylib.CheckCollisionCircles(position, (float)_template.Range, m.Position, m.Template.PhysicsRadius))
                 {
                     _isOpen = true;
                 }
@@ -73,7 +75,7 @@ public class Door : Structure
         return team != Team;
     }
 
-    public override bool PhysSolid(Team team)
+    public override bool PhysSolid()
     {
         return !_isOpen;
     }

@@ -5,7 +5,7 @@ namespace nestphalia;
 
 public class LightningBoltTemplate : ProjectileTemplate
 {
-    public LightningBoltTemplate(double damage) : base(Resources.MissingTexture, damage, 0)
+    public LightningBoltTemplate(string id, double damage) : base(id, Resources.MissingTexture, damage, 0)
     {
     }
 
