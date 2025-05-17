@@ -108,8 +108,7 @@ public class Campaign
                     if (Money >= _selectedLevel * 250 && GUI.ButtonWide(Screen.HCenter-150, Screen.VCenter+20, "To Battle!"))
                     {
                         Money -= _fort.TotalCost;
-                        BattleScene.CustomBattle = false;
-                        BattleScene.Start(_fort, Resources.CampaignLevels[_selectedLevel]);
+                        BattleScene.Start(_fort, Resources.CampaignLevels[_selectedLevel], BattleOver);
                     }
                 }
                 else
@@ -137,8 +136,13 @@ public class Campaign
     
     public void ReportBattleOutcome(bool win)
     {
+
+    }
+
+    private void BattleOver(Team? winner)
+    {
         Battles++;
-        if (win)
+        if (winner?.IsPlayerControlled ?? false)
         {
             _outcomeText = $"You destroyed {Resources.CampaignLevels[_selectedLevel].Name}!\n${_prize} prize earned.";
             Money += _prize;
@@ -164,6 +168,8 @@ public class Campaign
             _outcomeText += $"\nYour scouts uncover an ancient hoard! +${bailout}";
             Money += bailout;
         }
+        
+        Start();
     }
     
     private void ListForts()

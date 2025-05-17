@@ -89,11 +89,23 @@ public static class CustomBattleMenu
         if (LeftFort != null && RightFort != null &&
             GUI.ButtonWide(Screen.HCenter-150, Screen.VCenter + 260, "Begin!"))
         {
-            BattleScene.Start(LeftFort, RightFort, _leftIsPlayer, _rightIsPlayer, _deterministicMode);
-            BattleScene.CustomBattle = true;
+            BattleScene.Start(LeftFort, RightFort, BattleOver, _leftIsPlayer, _rightIsPlayer, _deterministicMode);
         }
         
         Raylib.EndDrawing();
+    }
+
+    private static void BattleOver(Team? winner)
+    {
+        Start();
+        if (winner == null)
+        {
+            OutcomeMessage = "Battle aborted.";
+        }
+        else
+        {
+            OutcomeMessage = winner.Name + " won the battle!";
+        }
     }
 
     private static void ListForts()

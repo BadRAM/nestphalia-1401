@@ -31,11 +31,16 @@ public static class World
     
     public static bool DrawDebugInfo;
     private static Stopwatch _swFrame = new Stopwatch();
+    private static Stopwatch _swDraw = new Stopwatch();
     private static Stopwatch _swUpdate = new Stopwatch();
     private static Stopwatch _swUpdateMinionGrid = new Stopwatch();
     private static Stopwatch _swUpdateTeams = new Stopwatch();
     private static Stopwatch _swUpdatePathfinder = new Stopwatch();
     private static Stopwatch _swUpdateBoard = new Stopwatch();
+    private static Stopwatch _swUpdateMinions = new Stopwatch();
+    private static Stopwatch _swUpdateMinionsCollide = new Stopwatch();
+    private static Stopwatch _swUpdateMinionsPostCollide = new Stopwatch();
+    private static Stopwatch _swUpdateProjectiles = new Stopwatch();
 #if DEBUG
     private class EntityTracker
     {
@@ -44,17 +49,10 @@ public static class World
     }
     private static Dictionary<string, EntityTracker> _swEntitiesByID = new Dictionary<string, EntityTracker>();
 #endif
-    private static Stopwatch _swUpdateMinions = new Stopwatch();
-    private static Stopwatch _swUpdateMinionsCollide = new Stopwatch();
-    private static Stopwatch _swUpdateMinionsPostCollide = new Stopwatch();
-    private static Stopwatch _swUpdateProjectiles = new Stopwatch();
     // private static int _totalCollideChecks;
     private static string _debugString;
     
-    private static Stopwatch _swDraw = new Stopwatch();
-    // private static Stopwatch _swDrawSort = new Stopwatch();
-    // private static Stopwatch _swDrawSprites = new Stopwatch();
-
+    
     public static event EventHandler<Int2D> StructureChanged = delegate {};
     
     public class StructureChangedEventArgs(int x, int y) : EventArgs
@@ -177,10 +175,23 @@ public static class World
     
     public static void Update()
     {
-        _swUpdate.Restart();
+        if (true) // set to false for total time breakdown
+        {
+            _swUpdate.Reset();
+            _swUpdateMinionGrid.Reset();
+            _swUpdateTeams.Reset();
+            _swUpdateBoard.Reset();
+            _swUpdateMinions.Reset();
+            _swUpdateProjectiles.Reset();
+            _swUpdateMinionsCollide.Reset();
+            _swUpdateMinionsPostCollide.Reset();
+            _swUpdatePathfinder.Reset();
+        }
+        
+        _swUpdate.Start();
         _debugString = "";
         
-        _swUpdateMinionGrid.Restart();
+        _swUpdateMinionGrid.Start();
         foreach (List<Minion> gridSquare in MinionGrid)
         {
             gridSquare.Clear();
@@ -192,6 +203,113 @@ public static class World
         }
         _swUpdateMinionGrid.Stop();
         
+        UpdateWaveTimer();
+        
+        // Reset the entity timers
+        #if DEBUG
+        foreach (var e in _swEntitiesByID)
+        {
+            e.Value.SW.Reset();
+            e.Value.Count = 0;
+        }
+        #endif
+
+        _swUpdateTeams.Start();
+        LeftTeam.Update();
+        RightTeam.Update();
+        _swUpdateTeams.Stop();
+        
+        _swUpdateBoard.Start();
+        for (int x = 0; x < BoardWidth; ++x)
+        {
+            for (int y = 0; y < BoardHeight; ++y)
+            {
+                if (_board[x,y] == null) continue;
+                #if DEBUG
+                string key = _board[x,y].Template.ID;
+                if (!_swEntitiesByID.ContainsKey(key)) _swEntitiesByID.Add(key, new EntityTracker());
+                _swEntitiesByID[key].SW.Start();
+                #endif
+                _board[x,y].Update();
+                #if DEBUG
+                _swEntitiesByID[key].SW.Stop();
+                _swEntitiesByID[key].Count++;
+                #endif
+            }
+        }
+        _swUpdateBoard.Stop();
+        
+        _swUpdateMinions.Start();
+        for (int index = 0; index < Minions.Count; index++)
+        {
+            #if DEBUG
+            string key = Minions[index].Template.ID;
+            if (!_swEntitiesByID.ContainsKey(key)) _swEntitiesByID.Add(key, new EntityTracker());
+            _swEntitiesByID[key].SW.Start();
+            #endif
+            Minions[index].Update();
+            #if DEBUG
+            _swEntitiesByID[key].SW.Stop();
+            _swEntitiesByID[key].Count++;
+            #endif
+        }
+
+        foreach (Minion m in MinionsToRemove)
+        {
+            Minions.Remove(m);
+            Sprites.Remove(m);
+        }
+        MinionsToRemove.Clear();
+        _swUpdateMinions.Stop();
+        
+        _swUpdateProjectiles.Start();
+        for (int index = 0; index < Projectiles.Count; index++)
+        {
+        #if DEBUG
+            string key = Projectiles[index].Template.ID;
+            if (!_swEntitiesByID.ContainsKey(key)) _swEntitiesByID.Add(key, new EntityTracker());
+            _swEntitiesByID[key].SW.Start();
+        #endif
+            Projectiles[index].Update();
+        #if DEBUG
+            _swEntitiesByID[key].SW.Stop();
+            _swEntitiesByID[key].Count++;
+        #endif
+        }
+
+        foreach (Projectile p in ProjectilesToRemove)
+        {
+            Projectiles.Remove(p);
+            Sprites.Remove(p);
+        }
+        ProjectilesToRemove.Clear();
+        _swUpdateProjectiles.Stop();
+        
+        _swUpdatePathfinder.Start();
+        Task pathfinderTask = Task.Run(() => PathFinder.ServeQueue(10));
+        _swUpdatePathfinder.Stop();
+        
+        _swUpdateMinionsCollide.Start();
+        DoMinionCollision();
+        _swUpdateMinionsCollide.Stop();
+        
+        _swUpdateMinionsPostCollide.Start();
+        foreach (Minion m in Minions)
+        {
+            m.CollideTerrain();
+            m.LateUpdate();
+        }
+        _swUpdateMinionsPostCollide.Stop();
+        
+        _swUpdatePathfinder.Start();
+        pathfinderTask.Wait();
+        _swUpdatePathfinder.Stop();
+        
+        _swUpdate.Stop();
+    }
+
+    private static void UpdateWaveTimer()
+    {
         // Update wave timer
         if (!_battleOver)
         {
@@ -227,108 +345,6 @@ public static class World
                 }
             }
         }
-        
-        // Reset the entity timers
-        #if DEBUG
-        foreach (var e in _swEntitiesByID)
-        {
-            e.Value.SW.Reset();
-            e.Value.Count = 0;
-        }
-        #endif
-
-        _swUpdateTeams.Restart();
-        LeftTeam.Update();
-        RightTeam.Update();
-        _swUpdateTeams.Stop();
-        
-        _swUpdateBoard.Restart();
-        for (int x = 0; x < BoardWidth; ++x)
-        {
-            for (int y = 0; y < BoardHeight; ++y)
-            {
-                if (_board[x,y] == null) continue;
-                #if DEBUG
-                string key = _board[x,y].Template.ID;
-                if (!_swEntitiesByID.ContainsKey(key)) _swEntitiesByID.Add(key, new EntityTracker());
-                _swEntitiesByID[key].SW.Start();
-                #endif
-                _board[x,y].Update();
-                #if DEBUG
-                _swEntitiesByID[key].SW.Stop();
-                _swEntitiesByID[key].Count++;
-                #endif
-            }
-        }
-        _swUpdateBoard.Stop();
-        
-        _swUpdateMinions.Restart();
-        for (int index = 0; index < Minions.Count; index++)
-        {
-            #if DEBUG
-            string key = Minions[index].Template.ID;
-            if (!_swEntitiesByID.ContainsKey(key)) _swEntitiesByID.Add(key, new EntityTracker());
-            _swEntitiesByID[key].SW.Start();
-            #endif
-            Minions[index].Update();
-            #if DEBUG
-            _swEntitiesByID[key].SW.Stop();
-            _swEntitiesByID[key].Count++;
-            #endif
-        }
-
-        foreach (Minion m in MinionsToRemove)
-        {
-            Minions.Remove(m);
-            Sprites.Remove(m);
-        }
-        MinionsToRemove.Clear();
-        _swUpdateMinions.Stop();
-        
-        _swUpdateProjectiles.Restart();
-        for (int index = 0; index < Projectiles.Count; index++)
-        {
-        #if DEBUG
-            string key = Projectiles[index].Template.ID;
-            if (!_swEntitiesByID.ContainsKey(key)) _swEntitiesByID.Add(key, new EntityTracker());
-            _swEntitiesByID[key].SW.Start();
-        #endif
-            Projectiles[index].Update();
-        #if DEBUG
-            _swEntitiesByID[key].SW.Stop();
-            _swEntitiesByID[key].Count++;
-        #endif
-        }
-
-        foreach (Projectile p in ProjectilesToRemove)
-        {
-            Projectiles.Remove(p);
-            Sprites.Remove(p);
-        }
-        ProjectilesToRemove.Clear();
-        _swUpdateProjectiles.Stop();
-        
-        _swUpdatePathfinder.Restart();
-        Task pathfinderTask = Task.Run(() => PathFinder.ServeQueue(10));
-        _swUpdatePathfinder.Stop();
-        
-        _swUpdateMinionsCollide.Restart();
-        DoMinionCollision();
-        _swUpdateMinionsCollide.Stop();
-        
-        _swUpdateMinionsPostCollide.Restart();
-        foreach (Minion m in Minions)
-        {
-            m.CollideTerrain();
-            m.LateUpdate();
-        }
-        _swUpdateMinionsPostCollide.Stop();
-        
-        _swUpdatePathfinder.Start();
-        pathfinderTask.Wait();
-        _swUpdatePathfinder.Stop();
-        
-        _swUpdate.Stop();
     }
 
     private static void DoMinionCollision()
@@ -475,35 +491,35 @@ public static class World
         x = Screen.HCenter - 500;
         width = (int)(totalWidth * _swUpdateMinionGrid.Elapsed.TotalSeconds / totalSWTime);
         Raylib.DrawRectangle(x, Screen.Top+10, width, 20, Color.Red);
-        GUI.DrawTextLeft(x, Screen.Top+10, $"MinionGrid {(int)(100 * _swUpdateMinionGrid.Elapsed.TotalSeconds / totalSWTime)}%");
+        GUI.DrawTextLeft(x, Screen.Top+10, $"MinionGrid {(int)(100 * _swUpdateMinionGrid.Elapsed.TotalSeconds / totalSWTime)}%, {(_swUpdateMinionGrid.Elapsed.TotalMilliseconds):N3}ms");
         x += width;
         width = (int)(totalWidth * _swUpdateTeams.Elapsed.TotalSeconds / totalSWTime);
         Raylib.DrawRectangle(x, Screen.Top+10, width, 20, Color.SkyBlue);
-        GUI.DrawTextLeft(x, Screen.Top+10, $"Teams {(int)(100 * _swUpdateTeams.Elapsed.TotalSeconds / totalSWTime)}%");
-        x += width;
-        width = (int)(totalWidth * _swUpdatePathfinder.Elapsed.TotalSeconds / totalSWTime);
-        Raylib.DrawRectangle(x, Screen.Top+10, width, 20, Color.Orange);
-        GUI.DrawTextLeft(x, Screen.Top+10, $"Path {(int)(100 * _swUpdatePathfinder.Elapsed.TotalSeconds / totalSWTime)}%");
+        GUI.DrawTextLeft(x, Screen.Top+10, $"Teams {(int)(100 * _swUpdateTeams.Elapsed.TotalSeconds / totalSWTime)}%, {(_swUpdateTeams.Elapsed.TotalMilliseconds):N3}ms");
         x += width;
         width = (int)(totalWidth * _swUpdateBoard.Elapsed.TotalSeconds / totalSWTime);
         Raylib.DrawRectangle(x, Screen.Top+10, width, 20, Color.Purple);
-        GUI.DrawTextLeft(x, Screen.Top+10, $"Board {(int)(100 * _swUpdateBoard.Elapsed.TotalSeconds / totalSWTime)}%");
+        GUI.DrawTextLeft(x, Screen.Top+10, $"Board {(int)(100 * _swUpdateBoard.Elapsed.TotalSeconds / totalSWTime)}%, {(_swUpdateBoard.Elapsed.TotalMilliseconds):N3}ms");
         x += width;
         width = (int)(totalWidth * _swUpdateMinions.Elapsed.TotalSeconds / totalSWTime);
         Raylib.DrawRectangle(x, Screen.Top+10, width, 20, Color.Yellow);
-        GUI.DrawTextLeft(x, Screen.Top+10, $"Minions {(int)(100 * _swUpdateMinions.Elapsed.TotalSeconds / totalSWTime)}%");
-        x += width;
-        width = (int)(totalWidth * _swUpdateMinionsCollide.Elapsed.TotalSeconds / totalSWTime);
-        Raylib.DrawRectangle(x, Screen.Top+10, width, 20, Color.Red);
-        GUI.DrawTextLeft(x, Screen.Top+10, $"Phys {(int)(100 * _swUpdateMinionsCollide.Elapsed.TotalSeconds / totalSWTime)}%, {(_swUpdateMinionsCollide.Elapsed.TotalSeconds * 1000).ToString("N4")}ms");
-        x += width;        
-        width = (int)(totalWidth * _swUpdateMinionsPostCollide.Elapsed.TotalSeconds / totalSWTime);
-        Raylib.DrawRectangle(x, Screen.Top+10, width, 20, Color.Maroon);
-        GUI.DrawTextLeft(x, Screen.Top+10, $"PostPhys {(int)(100 * _swUpdateMinionsPostCollide.Elapsed.TotalSeconds / totalSWTime)}%, {(_swUpdateMinionsPostCollide.Elapsed.TotalSeconds * 1000).ToString("N4")}ms");
+        GUI.DrawTextLeft(x, Screen.Top+10, $"Minions {(int)(100 * _swUpdateMinions.Elapsed.TotalSeconds / totalSWTime)}%, {(_swUpdateMinions.Elapsed.TotalMilliseconds):N3}ms");
         x += width;
         width = (int)(totalWidth * _swUpdateProjectiles.Elapsed.TotalSeconds / totalSWTime);
         Raylib.DrawRectangle(x, Screen.Top+10, width, 20, Color.Blue);
-        GUI.DrawTextLeft(x, Screen.Top+10, $"Proj {(int)(100 * _swUpdateProjectiles.Elapsed.TotalSeconds / totalSWTime)}%");
+        GUI.DrawTextLeft(x, Screen.Top+10, $"Proj {(int)(100 * _swUpdateProjectiles.Elapsed.TotalSeconds / totalSWTime)}%, {(_swUpdateProjectiles.Elapsed.TotalMilliseconds):N3}ms");
+        x += width;
+        width = (int)(totalWidth * _swUpdateMinionsCollide.Elapsed.TotalSeconds / totalSWTime);
+        Raylib.DrawRectangle(x, Screen.Top+10, width, 20, Color.Red);
+        GUI.DrawTextLeft(x, Screen.Top+10, $"Phys {(int)(100 * _swUpdateMinionsCollide.Elapsed.TotalSeconds / totalSWTime)}%, {(_swUpdateMinionsCollide.Elapsed.TotalMilliseconds):N3}ms");
+        x += width;        
+        width = (int)(totalWidth * _swUpdateMinionsPostCollide.Elapsed.TotalSeconds / totalSWTime);
+        Raylib.DrawRectangle(x, Screen.Top+10, width, 20, Color.Maroon);
+        GUI.DrawTextLeft(x, Screen.Top+10, $"PostPhys {(int)(100 * _swUpdateMinionsPostCollide.Elapsed.TotalSeconds / totalSWTime)}%, {(_swUpdateMinionsPostCollide.Elapsed.TotalMilliseconds):N3}ms");
+        x += width;
+        width = (int)(totalWidth * _swUpdatePathfinder.Elapsed.TotalSeconds / totalSWTime);
+        Raylib.DrawRectangle(x, Screen.Top+10, width, 20, Color.Orange);
+        GUI.DrawTextLeft(x, Screen.Top+10, $"Path {(int)(100 * _swUpdatePathfinder.Elapsed.TotalSeconds / totalSWTime)}%, {(_swUpdatePathfinder.Elapsed.TotalMilliseconds):N3}ms");
         x += width;
         width = totalWidth - x;
         Raylib.DrawRectangle(x, Screen.Top+10, width, 20, Color.Gray);

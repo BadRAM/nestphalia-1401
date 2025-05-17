@@ -8,53 +8,112 @@ namespace nestphalia;
 
 public static class BattleScene
 {
-    public static Fort LeftFort;
-    public static Fort RightFort;
-    public static bool Pause;
-    public static bool CustomBattle;
-    public static Team? Winner;
+    private static Fort _leftFort;
+    private static Fort _rightFort;
+    private static Team? _winner;
     private static int _skips;
     private static bool _pathFinderDebug;
-    private static bool _debug;
-    public static Stopwatch SwTotal;
-    public static Stopwatch SwPathfinding;
-    public static Stopwatch SwCollision;
-    public static Stopwatch SwDraw;
+    private static Action<Team?> _battleOverCallback;
+    private static SceneState _state;
     
-
-    public static void Start(Fort leftFort, Fort rightFort, bool leftIsPlayer = true, bool rightIsPlayer = false, bool deterministic = false)
+    private enum SceneState
     {
-        Winner = null;
+        StartPending,
+        BattleActive,
+        BattleFinished,
+        Paused
+    }
+    
+    public static void Start(Fort leftFort, Fort rightFort, Action<Team?> battleOverCallback, bool leftIsPlayer = true, bool rightIsPlayer = false, bool deterministic = false)
+    {
+        _winner = null;
+        _state = SceneState.BattleActive;
         
-        LeftFort = leftFort;
-        RightFort = rightFort;
-        
-        Pause = false;
-        Time.TimeScale = 1;
-        
-        if (LeftFort == null || RightFort == null)
-        {
-            Console.WriteLine("Null fort!");
-            return;
-        }
+        _leftFort = leftFort;
+        _rightFort = rightFort;
+        Debug.Assert(_leftFort != null && _rightFort != null);
 
-        World.InitializeBattle(leftFort, rightFort, leftIsPlayer, rightIsPlayer, deterministic);
+        _battleOverCallback = battleOverCallback;
         
+        Time.TimeScale = 1;
         Program.CurrentScene = Scene.Battle;
+        World.InitializeBattle(leftFort, rightFort, leftIsPlayer, rightIsPlayer, deterministic);
         
         Resources.PlayMusicByName("jesper-kyd-highlands");
     }
 
     public static void Update()
     {
-        // ----- INPUT + GUI PHASE -----
+        // ----- INPUT PHASE -----
+        HandleInputs();
 
+        // ----- WORLD UPDATE PHASE -----
+        if (_state == SceneState.BattleActive)
+        {
+            UpdateWorld();
+            CheckWinner(); // If winner is found, changes state to BattleFinished
+        }
+        
+        // ----- DRAW PHASE -----
+        BeginDrawing();
+        ClearBackground(new Color(16, 8, 4, 255));
+        
+        World.DrawFloor();
+        World.Draw();
+        
+        if (_pathFinderDebug) PathFinder.DrawDebug();
+
+        switch (_state)
+        {
+            case SceneState.StartPending:
+                break;
+            case SceneState.BattleActive:
+                if (IsKeyDown(KeyboardKey.F))
+                {
+                    DrawRectangle(0,0,Screen.Left,Screen.Bottom,new Color(0,0,0,128));
+                    DrawTextCentered(Screen.HCenter, Screen.VCenter, $"{_skips+1}X SPEED", 48);
+                }
+                break;
+            case SceneState.BattleFinished:
+                DrawRectangle(0,0,Screen.Left,Screen.Bottom,new Color(0,0,0,128));
+                DrawTextCentered(Screen.HCenter, Screen.VCenter-48, "BATTLE OVER!", 48);
+                DrawTextCentered(Screen.HCenter, Screen.VCenter, $"{_winner.Name} is victorious!", 48);
+                if (ButtonNarrow(Screen.HCenter-50, Screen.VCenter + 30, "Return"))
+                {
+                    SetMasterVolume(1f); // if F is still held, restore full volume.
+                    _battleOverCallback(_winner);
+                }
+                break;
+            case SceneState.Paused:
+                DrawRectangle(0,0,Screen.Left,Screen.Bottom,new Color(0,0,0,128));
+                DrawTextCentered(Screen.HCenter, Screen.VCenter, "PAUSED", 48);
+                if (ButtonNarrow(Screen.HCenter-50, Screen.VCenter + 30, "Quit"))
+                {
+                    _battleOverCallback(null);
+                }
+                break;
+        }
+        
+        EndDrawing();
+    }
+
+    private static void HandleInputs()
+    {
         if (IsKeyPressed(KeyboardKey.P) || IsKeyPressed(KeyboardKey.Escape))
         {
-            Pause = !Pause;
-            Time.TimeScale = Pause ? 0 : 1;
+            switch (_state)
+            {
+                case SceneState.BattleActive:
+                    _state = SceneState.Paused;
+                    Time.TimeScale = 0;
+                    break;
+                case SceneState.Paused:
+                    _state = SceneState.BattleActive;
+                    Time.TimeScale = 1;
+                    break;
+            }
         }
-
+        
         if (IsKeyPressed(KeyboardKey.F))
         {
             SetMasterVolume(0.25f);
@@ -96,7 +155,6 @@ public static class BattleScene
             World.Camera.Offset += GetMouseDelta();
         }
         
-        
         // Snipped from raylib example
         float wheel = GetMouseWheelMove();
         if (wheel != 0)
@@ -116,96 +174,40 @@ public static class BattleScene
             // if (wheel < 0) scaleFactor = 1.0f/scaleFactor;
             World.Camera.Zoom = Math.Clamp(World.Camera.Zoom + wheel * 0.5f, 0.5f, 4f);
         }
-        
-        // ----- WORLD UPDATE PHASE -----
-
-        if (!Pause && Winner == null)
-        {
-            double startTime = GetTime();
-            
-            World.Update();
-
-            _skips = 0;
-            if (IsKeyDown(KeyboardKey.F))
-            {
-                while ((GetTime() - startTime) + ((GetTime() - startTime) / (_skips + 1)) < 0.016)
-                {
-                    Time.UpdateTime();
-                    World.Update();
-                    _skips++;
-                }
-            }
-        }
-        
-        Winner = CheckWinner();
-        
-        // ----- DRAW PHASE -----
-        BeginDrawing();
-        ClearBackground(new Color(16, 8, 4, 255));
-        
-        World.DrawFloor();
-        World.Draw();
-        
-        // DrawTextLeft(6, 16, $"FPS: {GetFPS()}");
-        // DrawTextLeft(6, 32, $"Wave: {World.Wave}");
-        // DrawTextLeft(6, 48, $"Bugs: {World.Minions.Count}");
-        // DrawTextLeft(6, 64, $"Sprites: {World.Sprites.Count}");
-        // DrawTextLeft(6, 64, $"Zoom: {World.Camera.Zoom}");
-        // DrawTextLeft(6, 80, $"Tile {World.GetMouseTilePos().ToString()}");
-        // DrawTextLeft(6, 80, $"PathQueue: {PathFinder.GetQueueLength()}");
-        if (_pathFinderDebug) PathFinder.DrawDebug();
-        
-        if (Winner != null)
-        {
-            DrawRectangle(0,0,Screen.Left,Screen.Bottom,new Color(0,0,0,128));
-            DrawTextCentered(Screen.HCenter, Screen.VCenter-48, "BATTLE OVER!", 48);
-            DrawTextCentered(Screen.HCenter, Screen.VCenter, $"{Winner.Name} is victorious!", 48);
-            if (ButtonNarrow(Screen.HCenter-50, Screen.VCenter + 30, "Return"))
-            {
-                SetMasterVolume(1f);
-
-                if (CustomBattle)
-                {
-                    CustomBattleMenu.Start();
-                    CustomBattleMenu.OutcomeMessage = Winner.Name + " won the battle!";
-                }
-                else
-                {
-                    Program.Campaign.ReportBattleOutcome(Winner.IsPlayerControlled);
-                    Program.Campaign.Start();
-                }
-            }
-        }
-        else if (Pause)
-        {
-            DrawRectangle(0,0,Screen.Left,Screen.Bottom,new Color(0,0,0,128));
-            DrawTextCentered(Screen.HCenter, Screen.VCenter, "PAUSED", 48);
-            if (ButtonNarrow(Screen.HCenter-50, Screen.VCenter + 30, "Quit"))
-            {
-                if (CustomBattle)
-                {
-                    CustomBattleMenu.Start();
-                    CustomBattleMenu.OutcomeMessage = "";
-                }
-                else
-                {
-                    Program.Campaign.ReportBattleOutcome(false);
-                    Program.Campaign.Start();
-                }
-            }
-        }
-        else if (IsKeyDown(KeyboardKey.F))
-        {
-            DrawRectangle(0,0,Screen.Left,Screen.Bottom,new Color(0,0,0,128));
-            DrawTextCentered(Screen.HCenter, Screen.VCenter, $"{_skips+1}X SPEED", 48);
-        }
-        EndDrawing();
     }
 
-    private static Team? CheckWinner()
+    // Updates the world, and repeats if FFW is enabled.
+    private static void UpdateWorld()
     {
-        if (World.LeftTeam.GetHealth() <= 0) return World.RightTeam;
-        if (World.RightTeam.GetHealth() <= 0) return World.LeftTeam;
-        return null;
+        double startTime = GetTime();
+            
+        World.Update();
+
+        _skips = 0;
+        if (IsKeyDown(KeyboardKey.F))
+        {
+            while ((GetTime() - startTime) + ((GetTime() - startTime) / (_skips + 1)) < 0.016)
+            {
+                Time.UpdateTime();
+                World.Update();
+                _skips++;
+            }
+        }
     }
+    
+    private static void CheckWinner()
+    {
+        if (World.LeftTeam.GetHealth() <= 0)
+        {
+            _winner = World.RightTeam;
+            _state = SceneState.BattleFinished;
+        }
+        if (World.RightTeam.GetHealth() <= 0)
+        {
+            _winner = World.LeftTeam;
+            _state = SceneState.BattleFinished;
+        }
+    }
+    
+    
 }

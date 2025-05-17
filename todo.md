@@ -27,41 +27,27 @@ Programming todo:
 - ~~try compiling for web~~
 - Make nests solid again
 - Help text / Tutorial
-
-
-
----- 1402 ----
-- 3d engine
-- Tournament campaign
-- Worker units
-- Multitile structures
-- Inventory system
-- Many more bugs and towers than current
-
------ Postponed to team bug fort 2 -----
-
 - Fix minion collision with wall corners
-- Better fear evaluation, make bugs more scared of staying in scary places than passing through them.
 - Minion melee attack animation
 - Minion state machine
-- Assets from json
-- Minion vs Minion melee
-- Multitile structures
-- Post battle screen
 
 
 ----- Premature Optimizations -----
 
+- Codebase Refactoring
+  - Get rid of as many public fields as possible
+    - ~~Battlescene should accept callback function to report victory~~
+
 - Game Logic optimizations
-  - profile tile entities separately by ID
+  - ~~profile tile entities separately by ID~~
 
 - Physics optimizations
-  - Sector based minion culling/lookup
-    - No significant difference
-    - ~11000 minions slows the game to 50% speed on my laptop.
-  - Multi Threading
-    - multithreading collision made the game slower
-    - Giving pathfinding a background task while collision detection happens on the main thread seems to be helping a little bit.
+  - ~~Sector based minion culling/lookup~~
+    - ~~No significant difference~~
+    - ~~11000 minions slows the game to 50% speed on my laptop.~~
+  - ~~Multi Threading~~
+    - ~~multithreading collision made the game slower~~
+    - ~~Giving pathfinding a background task while collision detection happens on the main thread seems to be helping a little bit.~~
 
 - Pathfinding optimizations:
   - ~~note: published builds seem to run about 2x faster than debug mode in IDE~~
@@ -85,7 +71,21 @@ Programming todo:
     - ~~After:  0.045 release :')~~
   - Give each team it's own pathfinder and pathqueue (this will prevent one team from jamming the other's pathing by filling the pathqueue)
 
-- Last resort: Reduce tickrate from 60 to 30. This is easy to do just by changing timescale and framerate, but results noticeably choppier gameplay. Interpolation would probably eat into the benefits somewhat but could easily still be worth it.
+- Emergency Measure: Reduce tickrate from 60 to 30. This is easy to do just by changing timescale and framerate, but results in noticeably choppier gameplay. Interpolation would probably eat into the benefits somewhat but could easily still be worth it.
+
+
+----- Postponed to team bug fort 2 -----
+
+- 3d engine
+- Tournament campaign
+- Worker units
+- Multitile structures
+- Inventory system
+- Many more bugs and towers than current
+- Better fear evaluation, make bugs more scared of staying in scary places than passing through them.
+- Assets from json
+- Minion vs Minion melee
+- Post battle screen
 
 
 Design todo:
