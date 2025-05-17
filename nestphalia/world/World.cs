@@ -48,7 +48,7 @@ public static class World
     private static Stopwatch _swUpdateMinionsCollide = new Stopwatch();
     private static Stopwatch _swUpdateMinionsPostCollide = new Stopwatch();
     private static Stopwatch _swUpdateProjectiles = new Stopwatch();
-    private static int _totalCollideChecks;
+    // private static int _totalCollideChecks;
     private static string _debugString;
     
     private static Stopwatch _swDraw = new Stopwatch();
@@ -144,9 +144,11 @@ public static class World
         }
     }
     
-    public static void InitializeBattle(Fort leftFort, Fort rightFort, bool leftIsPlayer, bool rightIsPlayer)
+    public static void InitializeBattle(Fort leftFort, Fort rightFort, bool leftIsPlayer, bool rightIsPlayer, bool deterministic)
     {
         Initialize();
+        
+        Random = deterministic ? new Random(123) : new Random();
         
         // set up floor tile checkerboard
         for (int x = 0; x < BoardWidth; x++)
@@ -161,21 +163,6 @@ public static class World
         // Load forts to board
         leftFort.LoadToBoard(false);
         rightFort.LoadToBoard(true);
-        
-        // #if DEBUG
-        // // Create stopwatches for each type of tile in play
-        // _swEntitiesByID.Add("rubble", new Stopwatch());
-        // for (int x = 0; x < BoardWidth; x++)
-        // {
-        //     for (int y = 0; y < BoardHeight; y++)
-        //     {
-        //         if (GetTile(x,y) != null && !_swEntitiesByID.ContainsKey(GetTile(x,y).Template.ID))
-        //         {
-        //             _swEntitiesByID.Add(GetTile(x,y).Template.ID, new Stopwatch());
-        //         }
-        //     }
-        // }
-        // #endif
         
         // Tell teams they can generate fear and hate
         LeftTeam.Name = leftFort.Name;
@@ -262,11 +249,11 @@ public static class World
             {
                 if (_board[x,y] == null) continue;
                 #if DEBUG
-                string key = _board[x, y].Template.ID;
+                string key = _board[x,y].Template.ID;
                 if (!_swEntitiesByID.ContainsKey(key)) _swEntitiesByID.Add(key, new EntityTracker());
                 _swEntitiesByID[key].SW.Start();
                 #endif
-                _board[x, y].Update();
+                _board[x,y].Update();
                 #if DEBUG
                 _swEntitiesByID[key].SW.Stop();
                 _swEntitiesByID[key].Count++;
@@ -298,53 +285,19 @@ public static class World
         MinionsToRemove.Clear();
         _swUpdateMinions.Stop();
         
-        _swUpdateMinionsCollide.Restart();
-        // DoMinionCollision(0, 1);
-        List<Task> tasks = new List<Task>();
-        int taskCount = 2;
-        for (int i = 0; i < taskCount; i++)
-        {
-            var i1 = i;
-            tasks.Add(Task.Run(() =>
-            {
-                Stopwatch sw = new Stopwatch();
-                sw.Start();
-                DoMinionCollision(i1, taskCount);
-                sw.Stop();
-                _debugString += $"worker {i1} on thread {Thread.CurrentThread.ManagedThreadId} finished in {sw.Elapsed.Microseconds:N4} us\n";
-            }));
-        }
-        _swUpdateMinionsCollide.Stop();
-        
-        _swUpdatePathfinder.Restart();
-        PathFinder.ServeQueue(10);
-        _swUpdatePathfinder.Stop();
-        
-        _swUpdateMinionsCollide.Start();
-        Task.WhenAll(tasks).Wait();
-        _swUpdateMinionsCollide.Stop();
-
-        _swUpdateMinionsPostCollide.Restart();
-        foreach (Minion m in Minions)
-        {
-            m.CollideTerrain();
-            m.LateUpdate();
-        }
-        _swUpdateMinionsPostCollide.Stop();
-
         _swUpdateProjectiles.Restart();
         for (int index = 0; index < Projectiles.Count; index++)
         {
-            #if DEBUG
+        #if DEBUG
             string key = Projectiles[index].Template.ID;
             if (!_swEntitiesByID.ContainsKey(key)) _swEntitiesByID.Add(key, new EntityTracker());
             _swEntitiesByID[key].SW.Start();
-            #endif
+        #endif
             Projectiles[index].Update();
-            #if DEBUG
+        #if DEBUG
             _swEntitiesByID[key].SW.Stop();
             _swEntitiesByID[key].Count++;
-            #endif
+        #endif
         }
 
         foreach (Projectile p in ProjectilesToRemove)
@@ -355,24 +308,42 @@ public static class World
         ProjectilesToRemove.Clear();
         _swUpdateProjectiles.Stop();
         
+        _swUpdatePathfinder.Restart();
+        Task pathfinderTask = Task.Run(() => PathFinder.ServeQueue(10));
+        _swUpdatePathfinder.Stop();
+        
+        _swUpdateMinionsCollide.Restart();
+        DoMinionCollision();
+        _swUpdateMinionsCollide.Stop();
+        
+        _swUpdateMinionsPostCollide.Restart();
+        foreach (Minion m in Minions)
+        {
+            m.CollideTerrain();
+            m.LateUpdate();
+        }
+        _swUpdateMinionsPostCollide.Stop();
+        
+        _swUpdatePathfinder.Start();
+        pathfinderTask.Wait();
+        _swUpdatePathfinder.Stop();
+        
         _swUpdate.Stop();
     }
 
-    private static void DoMinionCollision(int workerID, int workerCount)
+    private static void DoMinionCollision()
     {
-        _totalCollideChecks = 0;
+        // _totalCollideChecks = 0;
         for (int x = 0; x < BoardWidth; x++) // Iterate MinionGrid Columns
         {
             for (int y = 0; y < BoardHeight; y++) // Iterate MinionGrid Rows
             {
-                if ((x+y) % workerCount != workerID) continue; // Skip cells we're not assigned to
-                
                 for (int i = 0; i < MinionGrid[x, y].Count; i++) // Iterate Minions in cell at x,y
                 {
                     for (int j = i+1; j < MinionGrid[x, y].Count; j++)
                     {
                         MinionGrid[x, y][i].CollideMinion(MinionGrid[x, y][j]);
-                        _totalCollideChecks++;
+                        // _totalCollideChecks++;
                     }
 
                     if (x < BoardWidth - 1)
@@ -382,14 +353,14 @@ public static class World
                             for (int j = 0; j < MinionGrid[x + 1, y - 1].Count; j++)
                             {
                                 MinionGrid[x, y][i].CollideMinion(MinionGrid[x + 1, y - 1][j]);
-                                _totalCollideChecks++;
+                                // _totalCollideChecks++;
                             }
                         }
 
                         for (int j = 0; j < MinionGrid[x + 1, y].Count; j++)
                         {
                             MinionGrid[x, y][i].CollideMinion(MinionGrid[x + 1, y][j]);
-                            _totalCollideChecks++;
+                            // _totalCollideChecks++;
                         }
 
                         if (y < BoardHeight - 1)
@@ -397,7 +368,7 @@ public static class World
                             for (int j = 0; j < MinionGrid[x + 1, y + 1].Count; j++)
                             {
                                 MinionGrid[x, y][i].CollideMinion(MinionGrid[x + 1, y + 1][j]);
-                                _totalCollideChecks++;
+                                // _totalCollideChecks++;
                             }
                         }
                     }
@@ -407,7 +378,7 @@ public static class World
                         for (int j = 0; j < MinionGrid[x, y + 1].Count; j++)
                         {
                             MinionGrid[x, y][i].CollideMinion(MinionGrid[x, y + 1][j]);
-                            _totalCollideChecks++;
+                            // _totalCollideChecks++;
                         }
                     }
                 }
@@ -439,11 +410,6 @@ public static class World
         Raylib.BeginMode2D(Camera);
 
         Sprites = Sprites.OrderBy(o => o.Z).ToList();
-        // Sprites.Sort(delegate(ISprite a, ISprite b)
-        // {
-        //     if (a.Z == b.Z) return 0;
-        //     return a.Z > b.Z ? 1 : -1;
-        // });
 
         foreach (ISprite s in Sprites)
         {
@@ -488,8 +454,8 @@ public static class World
             $"Sprites: {Sprites.Count}\n" +
             $"Zoom: {Camera.Zoom}\n" +
             $"Tile {GetMouseTilePos().ToString()}\n" +
-            $"Total collision checks: {_totalCollideChecks/1000}k\n" +
-            $"ms/1k checks: {((_swUpdateMinionsCollide.Elapsed.TotalMilliseconds * 1000) / _totalCollideChecks).ToString("N4")}\n\n" +
+            // $"Total collision checks: {_totalCollideChecks/1000}k\n" +
+            // $"ms/1k checks: {((_swUpdateMinionsCollide.Elapsed.TotalMilliseconds * 1000) / _totalCollideChecks).ToString("N4")}\n\n" +
             $"{tileTypeTotals}\n" +
             $"{_debugString}");
         

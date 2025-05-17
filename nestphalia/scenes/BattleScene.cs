@@ -22,7 +22,7 @@ public static class BattleScene
     public static Stopwatch SwDraw;
     
 
-    public static void Start(Fort leftFort, Fort rightFort, bool leftIsPlayer = true, bool rightIsPlayer = false)
+    public static void Start(Fort leftFort, Fort rightFort, bool leftIsPlayer = true, bool rightIsPlayer = false, bool deterministic = false)
     {
         Winner = null;
         
@@ -38,7 +38,7 @@ public static class BattleScene
             return;
         }
 
-        World.InitializeBattle(leftFort, rightFort, leftIsPlayer, rightIsPlayer);
+        World.InitializeBattle(leftFort, rightFort, leftIsPlayer, rightIsPlayer, deterministic);
         
         Program.CurrentScene = Scene.Battle;
         

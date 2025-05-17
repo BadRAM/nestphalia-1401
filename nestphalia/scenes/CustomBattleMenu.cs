@@ -89,8 +89,7 @@ public static class CustomBattleMenu
         if (LeftFort != null && RightFort != null &&
             GUI.ButtonWide(Screen.HCenter-150, Screen.VCenter + 260, "Begin!"))
         {
-            World.Random = _deterministicMode ? new Random(123) : new Random();
-            BattleScene.Start(LeftFort, RightFort, _leftIsPlayer, _rightIsPlayer);
+            BattleScene.Start(LeftFort, RightFort, _leftIsPlayer, _rightIsPlayer, _deterministicMode);
             BattleScene.CustomBattle = true;
         }
         

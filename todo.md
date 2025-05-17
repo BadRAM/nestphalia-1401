@@ -60,6 +60,8 @@ Programming todo:
     - No significant difference
     - ~11000 minions slows the game to 50% speed on my laptop.
   - Multi Threading
+    - multithreading collision made the game slower
+    - Giving pathfinding a background task while collision detection happens on the main thread seems to be helping a little bit.
 
 - Pathfinding optimizations:
   - ~~note: published builds seem to run about 2x faster than debug mode in IDE~~
