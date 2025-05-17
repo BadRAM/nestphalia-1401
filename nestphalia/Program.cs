@@ -4,24 +4,10 @@ using Raylib_cs;
 using static Raylib_cs.Raylib;
 namespace nestphalia;
 
-public enum Scene
-{
-	Intro,
-	MainMenu,
-	Campaign,
-	Editor,
-	CustomBattleSetup,
-	Battle,
-	PostBattle
-}
-
 static class Program
 {
 	private static bool Paused;
-	// public static bool SFXMute;
-	// public static bool MusicMute;
 	public static Scene CurrentScene;
-	public static Campaign Campaign;
 	
     public static void Main()
     {
@@ -51,9 +37,8 @@ static class Program
         Assets.Load();
         Screen.Initialize();
         GUI.Initialize();
+        new MenuScene().Start();
         
-        
-        MenuScene.Start();
         while (!WindowShouldClose())
         {
 	        Time.UpdateTime();
@@ -65,27 +50,7 @@ static class Program
 
 	        GUI.UpdateCursor();
 	        
-	        switch (CurrentScene)
-	        {
-		        case Scene.Intro:
-			        IntroScene.Update();
-			        break;
-		        case Scene.MainMenu:
-			        MenuScene.Update();
-			        break;
-		        case Scene.Campaign:
-			        Campaign.Update();
-			        break;
-		        case Scene.Editor:
-			        EditorScene.Update();
-			        break;
-		        case Scene.CustomBattleSetup:
-			        CustomBattleMenu.Update();
-			        break;		       
-		        case Scene.Battle:
-			        BattleScene.Update();
-			        break;
-	        }
+			CurrentScene.Update();
 
 	        if (Time.Scaled <= 1)
 	        {

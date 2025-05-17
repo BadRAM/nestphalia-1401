@@ -30,6 +30,7 @@ Programming todo:
 - Fix minion collision with wall corners
 - Minion melee attack animation
 - Minion state machine
+- Settings menu scene
 
 
 ----- Premature Optimizations -----

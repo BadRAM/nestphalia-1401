@@ -230,7 +230,7 @@ public static class Resources
 
 [JsonSourceGenerationOptions(WriteIndented = true)]
 [JsonSerializable(typeof(Fort))]
-[JsonSerializable(typeof(Campaign))]
+[JsonSerializable(typeof(CampaignSaveData))]
 [JsonSerializable(typeof(SettingsScene.SavedSettings))]
 internal partial class SourceGenerationContext : JsonSerializerContext
 {

@@ -1,14 +1,14 @@
 namespace nestphalia;
 
-public static class IntroScene
+public class IntroScene : Scene
 {
-    public static void Start()
+    public void Start()
     {
-        Program.CurrentScene = Scene.Intro;
+        Program.CurrentScene = this;
     }
 
-    public static void Update()
+    public override void Update()
     {
-        MenuScene.Start();
+        new MenuScene().Start();
     }
 }

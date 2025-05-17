@@ -6,22 +6,25 @@ using static nestphalia.GUI;
 
 namespace nestphalia;
 
-public static class EditorScene
+public class EditorScene : Scene
 {
-    private static bool _sandboxMode;
-    private static StructureTemplate? _brush;
-    private static EditorTool _toolActive;
-    private static Fort _fort;
-    private static string _fortStats = "";
-    private static bool _newUtil;
-    private static bool _newTower;
-    private static bool _newNest;
-    private static double _price;
-    private static int _nestCount;
-    private static int _beaconCount;
-    private static bool _sellAllConfirm;
-    private static StructureTemplate.StructureClass _structureClass;
-    private static Texture2D _bg;
+    private bool _sandboxMode;
+    private StructureTemplate? _brush;
+    private EditorTool _toolActive;
+    private Fort _fort;
+    private string _fortStats = "";
+    private bool _newUtil;
+    private bool _newTower;
+    private bool _newNest;
+    private double _price;
+    private int _nestCount;
+    private int _beaconCount;
+    private bool _sellAllConfirm;
+    private StructureTemplate.StructureClass _structureClass;
+    private Texture2D _bg;
+
+    private CampaignSaveData _data;
+    private Action _startPrevScene;
 
     private enum EditorTool
     { 
@@ -30,32 +33,35 @@ public static class EditorScene
         PathTester
     }
     
-    public static void Start(Fort? fortToLoad = null, bool creativeMode = false)
+    public void Start(Action exitAction, Fort? fortToLoad = null, CampaignSaveData? data = null)
     {
-        _bg = Resources.GetTextureByName("editor_bg");
+        _startPrevScene = exitAction; // This should be the start function of the scene that invoked the editor
         _brush = null;
         _toolActive = EditorTool.Erase;
-        _sandboxMode = creativeMode;
+        _data = data;
+        _sandboxMode = data == null;
         _fort = fortToLoad ?? new Fort();
         //Console.WriteLine($"checking if {Directory.GetCurrentDirectory() +  $"/forts/{_fort.Name}.fort"} exists. Answer: {_fortAlreadySaved.ToString()}");
-        
-        Program.CurrentScene = Scene.Editor;
+
+        Program.CurrentScene = this;
+        Screen.RegenerateBackground();
+        _bg = Resources.GetTextureByName("editor_bg");
         World.InitializeEditor();
+        World.Camera.Offset = new Vector2(Screen.HCenter, Screen.VCenter);
         _fort.LoadToBoard(false);
+        Resources.PlayMusicByName("so_lets_get_killed");
+        
         UpdateFortStats();
         
-        Screen.RegenerateBackground();
-        
-        
+        // Check if any categories have new unlocks
         _newUtil = false;
         _newTower = false;
         _newNest = false;
-        
         if (!_sandboxMode)
         {
             foreach (StructureTemplate template in Assets.Structures)
             {
-                if (template.LevelRequirement == Program.Campaign.Level)
+                if (template.LevelRequirement == _data.Level)
                 {
                     switch (template.Class)
                     {
@@ -72,13 +78,9 @@ public static class EditorScene
                 }
             }
         }
-
-        World.Camera.Offset = new Vector2(Screen.HCenter, Screen.VCenter);
-        
-        Resources.PlayMusicByName("so_lets_get_killed");
     }
     
-    public static void Update()
+    public override void Update()
     {
         // ===== INPUT + UPDATE =====
         
@@ -187,9 +189,9 @@ public static class EditorScene
         
         if (!_sandboxMode)
         {
-            int nestCap = Program.Campaign.GetNestCap();
+            int nestCap = _data.GetNestCap();
             DrawTextLeft(Screen.HCenter - 260, Screen.VCenter - 290, $"Nests: {_nestCount}/{nestCap}", color: _nestCount > nestCap ? Color.Red : Color.White);
-            DrawTextLeft(Screen.HCenter - 80, Screen.VCenter - 290, $"Cost: ${_price}/{Program.Campaign.Money} bug dollars", color: _price > Program.Campaign.Money ? Color.Red : Color.White);
+            DrawTextLeft(Screen.HCenter - 80, Screen.VCenter - 290, $"Cost: ${_price}/{_data.Money} bug dollars", color: _price > _data.Money ? Color.Red : Color.White);
             DrawTextLeft(Screen.HCenter + 160, Screen.VCenter - 290, $"Stratagems: {_beaconCount}/{4}", color: _beaconCount > 4 ? Color.Red : Color.White);
         }
         else
@@ -202,14 +204,14 @@ public static class EditorScene
         EndDrawing();
     }
 
-    private static void StructureList()
+    private void StructureList()
     {
         int y = 0;
         for (int i = 0; i < Assets.Structures.Count; i++)
         {
             StructureTemplate s = Assets.Structures[i];
-            if ((!_sandboxMode && s.LevelRequirement > Program.Campaign.Level) || s.Class != _structureClass) continue;
-            string label = ((!_sandboxMode && s.LevelRequirement == Program.Campaign.Level) ? "NEW! " : "") + s.Name +
+            if ((!_sandboxMode && s.LevelRequirement > _data.Level) || s.Class != _structureClass) continue;
+            string label = ((!_sandboxMode && s.LevelRequirement == _data.Level) ? "NEW! " : "") + s.Name +
                            " - $" + s.Price;
             if (ButtonWide(Screen.HCenter + 292, Screen.VCenter + y * 40 - 250, label, _brush != s))
             {
@@ -222,7 +224,7 @@ public static class EditorScene
         }
     }
 
-    private static void DrawInfoPanel()
+    private void DrawInfoPanel()
     {
         string info;
         switch (_toolActive)
@@ -238,7 +240,7 @@ public static class EditorScene
         DrawTextLeft(Screen.HCenter - 590, Screen.VCenter - 290, info);
     }
 
-    private static void PathTestTool()
+    private void PathTestTool()
     {
         NavPath navPath = new NavPath("editor", new Int2D(28, 11), World.GetMouseTilePos(), World.RightTeam);
         PathFinder.FindPath(navPath);
@@ -259,7 +261,7 @@ public static class EditorScene
         EndMode2D();
     }
 
-    private static void EraseTool()
+    private void EraseTool()
     {
         if (IsMouseButtonDown(MouseButton.Left))
         {
@@ -274,7 +276,7 @@ public static class EditorScene
         }
     }
 
-    private static void BrushTool()
+    private void BrushTool()
     {
         if (_brush == null) 
         {
@@ -295,7 +297,7 @@ public static class EditorScene
         }
     }
 
-    private static void SellAll()
+    private void SellAll()
     {
         for (int x = 0; x < World.BoardWidth; ++x)
         {
@@ -303,7 +305,7 @@ public static class EditorScene
             {
                 Structure? t = World.GetTile(x, y);
                 if (t == null) continue;
-                if (!_sandboxMode) Program.Campaign.Money += t.Template.Price;
+                if (!_sandboxMode) _data.Money += t.Template.Price;
                 World.SetTile(null, World.LeftTeam, x, y);
             }
         }
@@ -311,7 +313,7 @@ public static class EditorScene
         _sellAllConfirm = false;
     }
     
-    private static void UpdateFortStats()
+    private void UpdateFortStats()
     {
         int structureCount = 0;
         int turretCount = 0;
@@ -341,21 +343,14 @@ public static class EditorScene
         _fortStats = $"{_fort.Name}\n" +
                      $"{turretCount} Towers\n" +
                      $"{utilityCount} Utility\n" +
-                     nestCount + (_sandboxMode ? "" : "/"+(Program.Campaign.Level*2+10)) + " Nests\n" +
+                     nestCount + (_sandboxMode ? "" : "/"+(_data.Level*2+10)) + " Nests\n" +
                      beaconCount + (_sandboxMode ? "" : "/4") + " Stratagems\n" +
                      $"{structureCount} Total\n" +
                      $"{totalCost} Cost";
     }
 
-    private static void ExitScene()
+    private void ExitScene()
     {
-        if (_sandboxMode)
-        {
-            CustomBattleMenu.Start();
-        }
-        else
-        {
-            Program.Campaign.Start();
-        }
+        _startPrevScene();
     }
 }

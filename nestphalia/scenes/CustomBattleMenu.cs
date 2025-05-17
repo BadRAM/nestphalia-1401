@@ -3,41 +3,44 @@ using Raylib_cs;
 
 namespace nestphalia;
 
-public static class CustomBattleMenu
+public class CustomBattleMenu : Scene
 {
-    public static Fort? LeftFort;
-    public static Fort? RightFort;
-    private static bool _loadingLeftSide = true;
-    public static string OutcomeMessage;
-    private static int _fortListPage = 1;
-    private static bool _leftIsPlayer = false;
-    private static bool _rightIsPlayer = false;
-    private static bool _deterministicMode = false;
-    private static string _activeDirectory = "";
-    private static string[] _directories;
-    private static string[] _fortFiles;
+    private static Fort? _leftFort;
+    private static Fort? _rightFort;
+    private static bool _leftIsPlayer;
+    private static bool _rightIsPlayer;
+    private static bool _deterministicMode;
+    
+    private bool _loadingLeftSide = true;
+    private string _outcomeMessage = "";
+    private string _activeDirectory = "";
+    private int _fortListPage = 1;
+    private string[] _directories = [];
+    private string[] _fortFiles = [];
 
-    public static void Start()
+    public void Start()
     {
-        Program.CurrentScene = Scene.CustomBattleSetup;
-        Screen.RegenerateBackground();
+        if (_leftFort  != null) _leftFort  = Resources.LoadFort(_leftFort.Path  + "/" + _leftFort.Name  + ".fort");
+        if (_rightFort != null) _rightFort = Resources.LoadFort(_rightFort.Path + "/" + _rightFort.Name + ".fort");
+        _leftFort?.LoadToBoard(false);
+        _rightFort?.LoadToBoard(true);
         _loadingLeftSide = true;
-        OutcomeMessage = "";
-        World.InitializePreview();
-        LeftFort?.LoadToBoard(false);
-        RightFort?.LoadToBoard(true);
-        Resources.PlayMusicByName("scene03");
+        _outcomeMessage = "";
         _activeDirectory = "";
         _fortListPage = 1;
         _directories = Directory.GetDirectories(Directory.GetCurrentDirectory() + "/forts/" + _activeDirectory);
         _fortFiles = Directory.GetFiles(Directory.GetCurrentDirectory() + "/forts/" + _activeDirectory);
+        Program.CurrentScene = this;
+        Screen.RegenerateBackground();
+        World.InitializePreview();
+        Resources.PlayMusicByName("scene03");
     }
     
-    public static void Update()
+    public override void Update()
     {
         if (Raylib.IsKeyPressed(KeyboardKey.Escape))
         {
-            MenuScene.Start();
+            new MenuScene().Start();
         }
         
         Raylib.BeginDrawing();
@@ -49,27 +52,26 @@ public static class CustomBattleMenu
         World.DrawFloor();
         World.Draw();
 
-
         if (GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter-300, _loadingLeftSide ? "Selecting Left Fort" : "Selecting Right Fort"))
         {
             _loadingLeftSide = !_loadingLeftSide;
         }
         
-        if (LeftFort != null  && GUI.ButtonWide(Screen.HCenter + 300, Screen.VCenter - 260, $"Edit {LeftFort.Name}" )) EditorScene.Start(LeftFort,  true);
-        if (RightFort != null && GUI.ButtonWide(Screen.HCenter + 300, Screen.VCenter - 220, $"Edit {RightFort.Name}")) EditorScene.Start(RightFort, true);
+        if (_leftFort != null  && GUI.ButtonWide(Screen.HCenter + 300, Screen.VCenter - 260, $"Edit {_leftFort.Name}" )) new EditorScene().Start(Start, _leftFort);
+        if (_rightFort != null && GUI.ButtonWide(Screen.HCenter + 300, Screen.VCenter - 220, $"Edit {_rightFort.Name}")) new EditorScene().Start(Start, _rightFort);
         
-        if (LeftFort != null  && GUI.ButtonNarrow(Screen.HCenter + 200, Screen.VCenter - 260, _leftIsPlayer  ? "PLAYER" : "CPU" )) _leftIsPlayer =  !_leftIsPlayer;
-        if (RightFort != null && GUI.ButtonNarrow(Screen.HCenter + 200, Screen.VCenter - 220, _rightIsPlayer ? "PLAYER" : "CPU" )) _rightIsPlayer = !_rightIsPlayer;
+        if (_leftFort != null  && GUI.ButtonNarrow(Screen.HCenter + 200, Screen.VCenter - 260, _leftIsPlayer  ? "PLAYER" : "CPU" )) _leftIsPlayer =  !_leftIsPlayer;
+        if (_rightFort != null && GUI.ButtonNarrow(Screen.HCenter + 200, Screen.VCenter - 220, _rightIsPlayer ? "PLAYER" : "CPU" )) _rightIsPlayer = !_rightIsPlayer;
         
         ListForts();
         
-        string vs = (LeftFort  != null ? LeftFort.Name  : "???") + " VS " +
-                    (RightFort != null ? RightFort.Name : "???");
+        string vs = (_leftFort  != null ? _leftFort.Name  : "???") + " VS " +
+                    (_rightFort != null ? _rightFort.Name : "???");
         
         GUI.DrawTextCentered(Screen.HCenter, Screen.VCenter-250, vs, 24);
-        GUI.DrawTextLeft(Screen.HCenter - 200, Screen.VCenter - 200, LeftFort?.Comment  ?? "");
-        GUI.DrawTextLeft(Screen.HCenter + 100, Screen.VCenter - 200, RightFort?.Comment ?? "");
-        GUI.DrawTextCentered(Screen.HCenter, Screen.VCenter + 220, OutcomeMessage, 24);
+        GUI.DrawTextLeft(Screen.HCenter - 200, Screen.VCenter - 200, _leftFort?.Comment  ?? "");
+        GUI.DrawTextLeft(Screen.HCenter + 100, Screen.VCenter - 200, _rightFort?.Comment ?? "");
+        GUI.DrawTextCentered(Screen.HCenter, Screen.VCenter + 220, _outcomeMessage, 24);
         
         if (GUI.ButtonWide(Screen.HCenter + 300, Screen.VCenter - 180, "Open Forts Folder"))
         {
@@ -83,32 +85,32 @@ public static class CustomBattleMenu
         
         if (GUI.ButtonWide(Screen.HCenter + 300, Screen.VCenter + 260, "Back"))
         {
-            MenuScene.Start();
+            new MenuScene().Start();
         }
         
-        if (LeftFort != null && RightFort != null &&
+        if (_leftFort != null && _rightFort != null &&
             GUI.ButtonWide(Screen.HCenter-150, Screen.VCenter + 260, "Begin!"))
         {
-            BattleScene.Start(LeftFort, RightFort, BattleOver, _leftIsPlayer, _rightIsPlayer, _deterministicMode);
+            new BattleScene().Start(_leftFort, _rightFort, BattleOver, _leftIsPlayer, _rightIsPlayer, _deterministicMode);
         }
         
         Raylib.EndDrawing();
     }
 
-    private static void BattleOver(Team? winner)
+    private void BattleOver(Team? winner)
     {
         Start();
         if (winner == null)
         {
-            OutcomeMessage = "Battle aborted.";
+            _outcomeMessage = "Battle aborted.";
         }
         else
         {
-            OutcomeMessage = winner.Name + " won the battle!";
+            _outcomeMessage = winner.Name + " won the battle!";
         }
     }
 
-    private static void ListForts()
+    private void ListForts()
     {
         if (GUI.ButtonNarrow(Screen.HCenter - 600, Screen.VCenter + 260, "<", _fortListPage > 1)) _fortListPage--;
             GUI.ButtonNarrow(Screen.HCenter - 500, Screen.VCenter + 260, _fortListPage.ToString(), false);
@@ -146,19 +148,19 @@ public static class CustomBattleMenu
                     Console.WriteLine("Loading " + Path.GetFileName(fortPath));
                     if (_loadingLeftSide)
                     {
-                        LeftFort = Resources.LoadFort(fortPath);
-                        LeftFort.Name = Path.GetFileNameWithoutExtension(fortPath);
-                        LeftFort.Comment = LeftFort.FortSummary();
-                        LeftFort.Path = Path.GetDirectoryName(fortPath);
-                        LeftFort.LoadToBoard(false);
+                        _leftFort = Resources.LoadFort(fortPath);
+                        _leftFort.Name = Path.GetFileNameWithoutExtension(fortPath);
+                        _leftFort.Comment = _leftFort.FortSummary();
+                        _leftFort.Path = Path.GetDirectoryName(fortPath);
+                        _leftFort.LoadToBoard(false);
                     }
                     else
                     {
-                        RightFort = Resources.LoadFort(fortPath);
-                        RightFort.Name = Path.GetFileNameWithoutExtension(fortPath);
-                        RightFort.Comment = RightFort.FortSummary();
-                        RightFort.Path = Path.GetDirectoryName(fortPath);
-                        RightFort.LoadToBoard(true);
+                        _rightFort = Resources.LoadFort(fortPath);
+                        _rightFort.Name = Path.GetFileNameWithoutExtension(fortPath);
+                        _rightFort.Comment = _rightFort.FortSummary();
+                        _rightFort.Path = Path.GetDirectoryName(fortPath);
+                        _rightFort.LoadToBoard(true);
                     }
 
                     _loadingLeftSide = !_loadingLeftSide;
@@ -171,7 +173,7 @@ public static class CustomBattleMenu
                     Fort f = new Fort();
                     f.Path = Directory.GetCurrentDirectory() + "/forts/" + _activeDirectory;
                     f.Name = Resources.GetUnusedFortName(f.Path);
-                    EditorScene.Start(f, creativeMode: true);
+                    new EditorScene().Start(Start, f);
                 }
             }
         }

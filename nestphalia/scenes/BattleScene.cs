@@ -6,15 +6,15 @@ using static Raylib_cs.Raylib;
 
 namespace nestphalia;
 
-public static class BattleScene
+public class BattleScene : Scene
 {
-    private static Fort _leftFort;
-    private static Fort _rightFort;
-    private static Team? _winner;
-    private static int _skips;
-    private static bool _pathFinderDebug;
-    private static Action<Team?> _battleOverCallback;
-    private static SceneState _state;
+    private Fort _leftFort;
+    private Fort _rightFort;
+    private Team? _winner;
+    private int _skips;
+    private bool _pathFinderDebug;
+    private Action<Team?> _battleOverCallback;
+    private SceneState _state;
     
     private enum SceneState
     {
@@ -24,7 +24,7 @@ public static class BattleScene
         Paused
     }
     
-    public static void Start(Fort leftFort, Fort rightFort, Action<Team?> battleOverCallback, bool leftIsPlayer = true, bool rightIsPlayer = false, bool deterministic = false)
+    public void Start(Fort leftFort, Fort rightFort, Action<Team?> battleOverCallback, bool leftIsPlayer = true, bool rightIsPlayer = false, bool deterministic = false)
     {
         _winner = null;
         _state = SceneState.BattleActive;
@@ -36,13 +36,13 @@ public static class BattleScene
         _battleOverCallback = battleOverCallback;
         
         Time.TimeScale = 1;
-        Program.CurrentScene = Scene.Battle;
+        Program.CurrentScene = this;
         World.InitializeBattle(leftFort, rightFort, leftIsPlayer, rightIsPlayer, deterministic);
         
         Resources.PlayMusicByName("jesper-kyd-highlands");
     }
 
-    public static void Update()
+    public override void Update()
     {
         // ----- INPUT PHASE -----
         HandleInputs();
@@ -97,7 +97,7 @@ public static class BattleScene
         EndDrawing();
     }
 
-    private static void HandleInputs()
+    private void HandleInputs()
     {
         if (IsKeyPressed(KeyboardKey.P) || IsKeyPressed(KeyboardKey.Escape))
         {
@@ -177,7 +177,7 @@ public static class BattleScene
     }
 
     // Updates the world, and repeats if FFW is enabled.
-    private static void UpdateWorld()
+    private void UpdateWorld()
     {
         double startTime = GetTime();
             
@@ -195,7 +195,7 @@ public static class BattleScene
         }
     }
     
-    private static void CheckWinner()
+    private void CheckWinner()
     {
         if (World.LeftTeam.GetHealth() <= 0)
         {

@@ -58,7 +58,7 @@ public class Fort
                $"{structureCount} Total";
     }
 
-    public string IsValid(Campaign campaign)
+    public string IsValid(CampaignSaveData campaign)
     {
         int nestCount = 0;
         int stratagemCount = 0;
