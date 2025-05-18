@@ -10,7 +10,6 @@ public class CustomBattleMenu : Scene
     private static bool _leftIsPlayer;
     private static bool _rightIsPlayer;
     private static bool _deterministicMode;
-    
     private bool _loadingLeftSide = true;
     private string _outcomeMessage = "";
     private string _activeDirectory = "";
@@ -20,6 +19,8 @@ public class CustomBattleMenu : Scene
 
     public void Start()
     {
+        World.InitializePreview();
+
         if (_leftFort  != null) _leftFort  = Resources.LoadFort(_leftFort.Path  + "/" + _leftFort.Name  + ".fort");
         if (_rightFort != null) _rightFort = Resources.LoadFort(_rightFort.Path + "/" + _rightFort.Name + ".fort");
         _leftFort?.LoadToBoard(false);
@@ -32,7 +33,6 @@ public class CustomBattleMenu : Scene
         _fortFiles = Directory.GetFiles(Directory.GetCurrentDirectory() + "/forts/" + _activeDirectory);
         Program.CurrentScene = this;
         Screen.RegenerateBackground();
-        World.InitializePreview();
         Resources.PlayMusicByName("scene03");
     }
     
@@ -52,44 +52,44 @@ public class CustomBattleMenu : Scene
         World.DrawFloor();
         World.Draw();
 
-        if (GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter-300, _loadingLeftSide ? "Selecting Left Fort" : "Selecting Right Fort"))
+        if (GUI.Button300(300, -300, _loadingLeftSide ? "Selecting Left Fort" : "Selecting Right Fort"))
         {
             _loadingLeftSide = !_loadingLeftSide;
         }
         
-        if (_leftFort != null  && GUI.ButtonWide(Screen.HCenter + 300, Screen.VCenter - 260, $"Edit {_leftFort.Name}" )) new EditorScene().Start(Start, _leftFort);
-        if (_rightFort != null && GUI.ButtonWide(Screen.HCenter + 300, Screen.VCenter - 220, $"Edit {_rightFort.Name}")) new EditorScene().Start(Start, _rightFort);
+        if (_leftFort != null  && GUI.Button300(300, -260, $"Edit {_leftFort.Name}" )) new EditorScene().Start(Start, _leftFort);
+        if (_rightFort != null && GUI.Button300(300, -220, $"Edit {_rightFort.Name}")) new EditorScene().Start(Start, _rightFort);
         
-        if (_leftFort != null  && GUI.ButtonNarrow(Screen.HCenter + 200, Screen.VCenter - 260, _leftIsPlayer  ? "PLAYER" : "CPU" )) _leftIsPlayer =  !_leftIsPlayer;
-        if (_rightFort != null && GUI.ButtonNarrow(Screen.HCenter + 200, Screen.VCenter - 220, _rightIsPlayer ? "PLAYER" : "CPU" )) _rightIsPlayer = !_rightIsPlayer;
+        if (_leftFort != null  && GUI.Button100(200, -260, _leftIsPlayer  ? "PLAYER" : "CPU" )) _leftIsPlayer =  !_leftIsPlayer;
+        if (_rightFort != null && GUI.Button100(200, -220, _rightIsPlayer ? "PLAYER" : "CPU" )) _rightIsPlayer = !_rightIsPlayer;
         
         ListForts();
         
         string vs = (_leftFort  != null ? _leftFort.Name  : "???") + " VS " +
                     (_rightFort != null ? _rightFort.Name : "???");
         
-        GUI.DrawTextCentered(Screen.HCenter, Screen.VCenter-250, vs, 24);
-        GUI.DrawTextLeft(Screen.HCenter - 200, Screen.VCenter - 200, _leftFort?.Comment  ?? "");
-        GUI.DrawTextLeft(Screen.HCenter + 100, Screen.VCenter - 200, _rightFort?.Comment ?? "");
-        GUI.DrawTextCentered(Screen.HCenter, Screen.VCenter + 220, _outcomeMessage, 24);
+        GUI.DrawTextCentered(0, -250, vs, 24);
+        GUI.DrawTextLeft(-200, -200, _leftFort?.FortSummary() ?? "");
+        GUI.DrawTextLeft(100, -200, _rightFort?.FortSummary() ?? "");
+        GUI.DrawTextCentered(0, 220, _outcomeMessage, 24);
         
-        if (GUI.ButtonWide(Screen.HCenter + 300, Screen.VCenter - 180, "Open Forts Folder"))
+        if (GUI.Button300(300, -180, "Open Forts Folder"))
         {
             System.Diagnostics.Process.Start("explorer.exe", Directory.GetCurrentDirectory() + @"\forts");
         }
         
-        if (GUI.ButtonWide(Screen.HCenter + 300, Screen.VCenter - 140, $"Deterministic Mode {(_deterministicMode ? "On" : "Off")}"))
+        if (GUI.Button300(300, -140, $"Deterministic Mode {(_deterministicMode ? "On" : "Off")}"))
         {
             _deterministicMode = !_deterministicMode;
         }
         
-        if (GUI.ButtonWide(Screen.HCenter + 300, Screen.VCenter + 260, "Back"))
+        if (GUI.Button300(300, 260, "Back"))
         {
             new MenuScene().Start();
         }
         
         if (_leftFort != null && _rightFort != null &&
-            GUI.ButtonWide(Screen.HCenter-150, Screen.VCenter + 260, "Begin!"))
+            GUI.Button300(-150, 260, "Begin!"))
         {
             new BattleScene().Start(_leftFort, _rightFort, BattleOver, _leftIsPlayer, _rightIsPlayer, _deterministicMode);
         }
@@ -112,9 +112,9 @@ public class CustomBattleMenu : Scene
 
     private void ListForts()
     {
-        if (GUI.ButtonNarrow(Screen.HCenter - 600, Screen.VCenter + 260, "<", _fortListPage > 1)) _fortListPage--;
-            GUI.ButtonNarrow(Screen.HCenter - 500, Screen.VCenter + 260, _fortListPage.ToString(), false);
-        if (GUI.ButtonNarrow(Screen.HCenter - 400, Screen.VCenter + 260, ">", _fortListPage <= ((_activeDirectory == "" ? 0 : 1) + _directories.Length + _fortFiles.Length)/12)) _fortListPage++;
+        if (GUI.Button100(-600, 260, "<", _fortListPage > 1)) _fortListPage--;
+            GUI.Button100(-500, 260, _fortListPage.ToString(), false);
+        if (GUI.Button100(-400, 260, ">", _fortListPage <= ((_activeDirectory == "" ? 0 : 1) + _directories.Length + _fortFiles.Length)/12)) _fortListPage++;
         
         for (int i = 0; i < 12; i++)
         {
@@ -122,7 +122,7 @@ public class CustomBattleMenu : Scene
             if (index >= _directories.Length + _fortFiles.Length + 1) break;
             if (index == -1) // This is the 'return to parent folder' button
             {
-                if (GUI.ButtonWide(Screen.HCenter - 600, Screen.VCenter + i * 40 - 240, "^  Return to Parent Folder  ^"))
+                if (GUI.Button300(-600, i * 40 - 240, "^  Return to Parent Folder  ^"))
                 {
                     _activeDirectory = "";
                     _directories = Directory.GetDirectories(Directory.GetCurrentDirectory() + "/forts/" + _activeDirectory);
@@ -131,7 +131,7 @@ public class CustomBattleMenu : Scene
             }
             else if (index < _directories.Length) // This is a directory
             {
-                if (GUI.ButtonWide(Screen.HCenter - 600, Screen.VCenter + i * 40 - 240,
+                if (GUI.Button300(-600, i * 40 - 240,
                         $"/{Path.GetFileName(_directories[index])}/"))
                 {
                     _activeDirectory = Path.GetFileName(_directories[index]);
@@ -142,7 +142,7 @@ public class CustomBattleMenu : Scene
             else if (index < _directories.Length + _fortFiles.Length) // This is a fort
             {
                 string fortPath = _fortFiles[index - _directories.Length];
-                if (GUI.ButtonWide(Screen.HCenter - 600, Screen.VCenter + i * 40 - 240,
+                if (GUI.Button300(-600, i * 40 - 240,
                         Path.GetFileNameWithoutExtension(fortPath)))
                 {
                     Console.WriteLine("Loading " + Path.GetFileName(fortPath));
@@ -168,7 +168,7 @@ public class CustomBattleMenu : Scene
             }
             else
             {
-                if (GUI.ButtonWide(Screen.HCenter - 600, Screen.VCenter + i * 40 - 240, "+  New Fort  +"))
+                if (GUI.Button300(-600, i * 40 - 240, "+  New Fort  +"))
                 {
                     Fort f = new Fort();
                     f.Path = Directory.GetCurrentDirectory() + "/forts/" + _activeDirectory;

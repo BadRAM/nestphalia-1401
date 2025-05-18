@@ -32,7 +32,7 @@ public class CampaignSaveData
 
 public class CampaignScene : Scene
 {
-    public CampaignSaveData Data;
+    private CampaignSaveData _data;
     private int _selectedFort = -1;
     private Fort? _fort;
     private string _fortValidityMessage = "";
@@ -46,15 +46,14 @@ public class CampaignScene : Scene
 
     public CampaignScene()
     {
-        // // todo: find a way to move this check into Campaign.cs
         if (File.Exists(Directory.GetCurrentDirectory() + "/campaign.sav"))
         {
-            Data = CampaignSaveData.Load();
+            _data = CampaignSaveData.Load();
         }
         else
         {
-            Data = new CampaignSaveData();
-            Data.Save();
+            _data = new CampaignSaveData();
+            _data.Save();
         }
     }
 
@@ -65,7 +64,7 @@ public class CampaignScene : Scene
         _prize = 0;
         Program.CurrentScene = this;
         Screen.RegenerateBackground();
-        Data.Save();
+        _data.Save();
         Resources.PlayMusicByName("hook_-_paranoya");
         _directories = Directory.GetDirectories(Directory.GetCurrentDirectory() + "/forts/Campaign/" + _activeDirectory);
         _fortFiles = Directory.GetFiles(Directory.GetCurrentDirectory() + "/forts/Campaign/" + _activeDirectory);
@@ -75,19 +74,19 @@ public class CampaignScene : Scene
     {
         if (Raylib.IsKeyPressed(KeyboardKey.Four) && Raylib.IsKeyDown(KeyboardKey.LeftShift)) // ye ole moneyhacks
         {
-            Data.Money += 1000;
+            _data.Money += 1000;
         }
         if (Raylib.IsKeyPressed(KeyboardKey.Three) && Raylib.IsKeyDown(KeyboardKey.LeftShift)) // ye ole unmoneyhacks
         {
-            Data.Money -= 1000;
+            _data.Money -= 1000;
         }
         if (Raylib.IsKeyPressed(KeyboardKey.Five) && Raylib.IsKeyDown(KeyboardKey.LeftShift)) // ye ole progresshacks
         {
-            Data.Level++;
+            _data.Level++;
         }
         if (Raylib.IsKeyPressed(KeyboardKey.Six) && Raylib.IsKeyDown(KeyboardKey.LeftShift)) // ye ole unprogresshacks
         {
-            Data.Level++;
+            _data.Level++;
         }
         
         if (Raylib.IsKeyPressed(KeyboardKey.Escape))
@@ -99,27 +98,27 @@ public class CampaignScene : Scene
         Raylib.ClearBackground(Color.Black);
         Screen.DrawBackground(Color.DarkBrown);
         
-        GUI.DrawTextLeft(Screen.HCenter-200, Screen.VCenter-270, _outcomeText);
+        GUI.DrawTextLeft(-200, -270, _outcomeText);
 
-        GUI.DrawTextLeft(Screen.HCenter-200, Screen.VCenter-290, $"Bug Dollars: ${Data.Money}");
+        GUI.DrawTextLeft(-200, -290, $"Bug Dollars: ${_data.Money}");
         
         ListForts();
         
-        if (Data.Level >= 14 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter-300, Resources.CampaignLevels[14].Name)) SelectOpponent(14);
-        if (Data.Level >= 13 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter-260, Resources.CampaignLevels[13].Name)) SelectOpponent(13);
-        if (Data.Level >= 12 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter-220, Resources.CampaignLevels[12].Name)) SelectOpponent(12);
-        if (Data.Level >= 11 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter-180, Resources.CampaignLevels[11].Name)) SelectOpponent(11);
-        if (Data.Level >= 10 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter-140, Resources.CampaignLevels[10].Name)) SelectOpponent(10);
-        if (Data.Level >=  9 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter-100, Resources.CampaignLevels[ 9].Name)) SelectOpponent( 9);
-        if (Data.Level >=  8 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter- 60, Resources.CampaignLevels[ 8].Name)) SelectOpponent( 8);
-        if (Data.Level >=  7 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter- 20, Resources.CampaignLevels[ 7].Name)) SelectOpponent( 7);
-        if (Data.Level >=  6 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter+ 20, Resources.CampaignLevels[ 6].Name)) SelectOpponent( 6);
-        if (Data.Level >=  5 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter+ 60, Resources.CampaignLevels[ 5].Name)) SelectOpponent( 5);
-        if (Data.Level >=  4 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter+100, Resources.CampaignLevels[ 4].Name)) SelectOpponent( 4);
-        if (Data.Level >=  3 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter+140, Resources.CampaignLevels[ 3].Name)) SelectOpponent( 3);
-        if (Data.Level >=  2 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter+180, Resources.CampaignLevels[ 2].Name)) SelectOpponent( 2);
-        if (Data.Level >=  1 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter+220, Resources.CampaignLevels[ 1].Name)) SelectOpponent( 1);
-        if (Data.Level >=  0 && GUI.ButtonWide(Screen.HCenter+300, Screen.VCenter+260, Resources.CampaignLevels[ 0].Name)) SelectOpponent( 0);
+        if (_data.Level >= 14 && GUI.Button300(300, -300, Resources.CampaignLevels[14].Name)) SelectOpponent(14);
+        if (_data.Level >= 13 && GUI.Button300(300, -260, Resources.CampaignLevels[13].Name)) SelectOpponent(13);
+        if (_data.Level >= 12 && GUI.Button300(300, -220, Resources.CampaignLevels[12].Name)) SelectOpponent(12);
+        if (_data.Level >= 11 && GUI.Button300(300, -180, Resources.CampaignLevels[11].Name)) SelectOpponent(11);
+        if (_data.Level >= 10 && GUI.Button300(300, -140, Resources.CampaignLevels[10].Name)) SelectOpponent(10);
+        if (_data.Level >=  9 && GUI.Button300(300, -100, Resources.CampaignLevels[ 9].Name)) SelectOpponent( 9);
+        if (_data.Level >=  8 && GUI.Button300(300,  -60, Resources.CampaignLevels[ 8].Name)) SelectOpponent( 8);
+        if (_data.Level >=  7 && GUI.Button300(300,  -20, Resources.CampaignLevels[ 7].Name)) SelectOpponent( 7);
+        if (_data.Level >=  6 && GUI.Button300(300,   20, Resources.CampaignLevels[ 6].Name)) SelectOpponent( 6);
+        if (_data.Level >=  5 && GUI.Button300(300,   60, Resources.CampaignLevels[ 5].Name)) SelectOpponent( 5);
+        if (_data.Level >=  4 && GUI.Button300(300,  100, Resources.CampaignLevels[ 4].Name)) SelectOpponent( 4);
+        if (_data.Level >=  3 && GUI.Button300(300,  140, Resources.CampaignLevels[ 3].Name)) SelectOpponent( 3);
+        if (_data.Level >=  2 && GUI.Button300(300,  180, Resources.CampaignLevels[ 2].Name)) SelectOpponent( 2);
+        if (_data.Level >=  1 && GUI.Button300(300,  220, Resources.CampaignLevels[ 1].Name)) SelectOpponent( 1);
+        if (_data.Level >=  0 && GUI.Button300(300,  260, Resources.CampaignLevels[ 0].Name)) SelectOpponent( 0);
 
         if (_selectedLevel != -1)
         {
@@ -127,29 +126,29 @@ public class CampaignScene : Scene
             {
                 if (_fortValidityMessage == "")
                 {
-                    GUI.DrawTextLeft(Screen.HCenter-140, Screen.VCenter-60, $"{Resources.CampaignLevels[_selectedLevel].Name}\nFort cost: {_fort.TotalCost} \nPrize: {_prize}");
-                    if (Data.Money >= _selectedLevel * 250 && GUI.ButtonWide(Screen.HCenter-150, Screen.VCenter+20, "To Battle!"))
+                    GUI.DrawTextLeft(-140, -60, $"{Resources.CampaignLevels[_selectedLevel].Name}\nFort cost: {_fort!.TotalCost} \nPrize: {_prize}");
+                    if (_data.Money >= _selectedLevel * 250 && GUI.Button300(-150, 20, "To Battle!"))
                     {
-                        Data.Money -= _fort.TotalCost;
+                        _data.Money -= _fort.TotalCost;
                         new BattleScene().Start(_fort, Resources.CampaignLevels[_selectedLevel], BattleOver);
                     }
                 }
                 else
                 {
-                    GUI.DrawTextLeft(Screen.HCenter-140, Screen.VCenter-60, $"{Resources.CampaignLevels[_selectedLevel].Name}\nFort cost: {_fort.TotalCost} \nPrize: {_prize}\n{_fortValidityMessage}");
-                    GUI.ButtonWide(Screen.HCenter - 150, Screen.VCenter + 20, "To Battle!", false);
+                    GUI.DrawTextLeft(-140, -60, $"{Resources.CampaignLevels[_selectedLevel].Name}\nFort cost: {_fort!.TotalCost} \nPrize: {_prize}\n{_fortValidityMessage}");
+                    GUI.Button300(-150, 20, "To Battle!", false);
                 }
             }
             else
             {
-                GUI.DrawTextLeft(Screen.HCenter-140, Screen.VCenter-60, $"{Resources.CampaignLevels[_selectedLevel].Name}\nNo fort design selected! \nPrize: {_prize}");
-                GUI.ButtonWide(Screen.HCenter - 150, Screen.VCenter + 20, "To Battle!", false);
+                GUI.DrawTextLeft(-140, -60, $"{Resources.CampaignLevels[_selectedLevel].Name}\nNo fort design selected! \nPrize: {_prize}");
+                GUI.Button300(-150, 20, "To Battle!", false);
             }
         }
         
-        if (_selectedFort != -1 && GUI.ButtonWide(Screen.HCenter - 600, Screen.VCenter - 300, $"Edit {_fort.Name}" )) new EditorScene().Start(Start, _fort, Data);
+        if (_selectedFort != -1 && GUI.Button300(-600, -300, $"Edit {_fort!.Name}" )) new EditorScene().Start(Start, _fort, _data);
         
-        if (GUI.ButtonWide(Screen.HCenter-600, Screen.VCenter+260, "Quit"))
+        if (GUI.Button300(-600, 260, "Quit"))
         {
             new MenuScene().Start();
         }
@@ -159,16 +158,16 @@ public class CampaignScene : Scene
 
     private void BattleOver(Team? winner)
     {
-        Data.Battles++;
+        _data.Battles++;
         if (winner?.IsPlayerControlled ?? false)
         {
             _outcomeText = $"You destroyed {Resources.CampaignLevels[_selectedLevel].Name}!\n${_prize} prize earned.";
-            Data.Money += _prize;
-            if (Data.Level == _selectedLevel)
+            _data.Money += _prize;
+            if (_data.Level == _selectedLevel)
             {
-                Data.Level++;
+                _data.Level++;
                 _outcomeText += $"\nNew level and structure unlocked!";
-                if (Data.Level == 15)
+                if (_data.Level == 15)
                 {
                     _outcomeText = "The capitol has fallen, you are the new bug emperor! \nCongratulations!";
                 }
@@ -176,15 +175,15 @@ public class CampaignScene : Scene
         }
         else
         {
-            _outcomeText = $"You were beaten back.\nyour workers salvage ${Math.Floor(_fort.TotalCost/2)} worth of materials.";
-            Data.Money += Math.Floor(_fort.TotalCost / 2);
+            _outcomeText = $"You were beaten back.\nyour workers salvage ${Math.Floor(_fort!.TotalCost/2)} worth of materials.";
+            _data.Money += Math.Floor(_fort.TotalCost / 2);
         }
 
-        if (Data.Money < 2000 || Random.Shared.Next(20) == 0)
+        if (_data.Money < 2000 || Random.Shared.Next(20) == 0)
         {
-            int bailout = Math.Max(2000 - (int)Data.Money, 500) + Random.Shared.Next(500);
+            int bailout = Math.Max(2000 - (int)_data.Money, 500) + Random.Shared.Next(500);
             _outcomeText += $"\nYour scouts uncover an ancient hoard! +${bailout}";
-            Data.Money += bailout;
+            _data.Money += bailout;
         }
         
         Start();
@@ -192,9 +191,9 @@ public class CampaignScene : Scene
     
     private void ListForts()
     {
-        if (GUI.ButtonNarrow(Screen.HCenter - 600, Screen.VCenter + 260, "<", _fortListPage > 1)) _fortListPage--;
-            GUI.ButtonNarrow(Screen.HCenter - 500, Screen.VCenter + 260, _fortListPage.ToString(), false);
-        if (GUI.ButtonNarrow(Screen.HCenter - 400, Screen.VCenter + 260, ">", _fortListPage <= ((_activeDirectory == "" ? 0 : 1) + _directories.Length + _fortFiles.Length)/12)) _fortListPage++;
+        if (GUI.Button100(-600, 260, "<", _fortListPage > 1)) _fortListPage--;
+        GUI.Button100(-500, 260, _fortListPage.ToString(), false); // this one's just a number display box
+        if (GUI.Button100(-400, 260, ">", _fortListPage <= ((_activeDirectory == "" ? 0 : 1) + _directories.Length + _fortFiles.Length)/12)) _fortListPage++;
         
         for (int i = 0; i < 12; i++)
         {
@@ -202,7 +201,7 @@ public class CampaignScene : Scene
             if (index >= _directories.Length + _fortFiles.Length + 1) break;
             if (index == -1) // This is the 'return to parent folder' button
             {
-                if (GUI.ButtonWide(Screen.HCenter - 600, Screen.VCenter + i * 40 - 240, "^  Return to Parent Folder  ^"))
+                if (GUI.Button300(-600, i * 40 - 240, "^  Return to Parent Folder  ^"))
                 {
                     _selectedFort = -1;
                     _activeDirectory = "";
@@ -212,7 +211,7 @@ public class CampaignScene : Scene
             }
             else if (index < _directories.Length) // This is a directory
             {
-                if (GUI.ButtonWide(Screen.HCenter - 600, Screen.VCenter + i * 40 - 240,
+                if (GUI.Button300(-600, i * 40 - 240,
                         $"/{Path.GetFileName(_directories[index])}/"))
                 {
                     _selectedFort = -1;
@@ -224,7 +223,7 @@ public class CampaignScene : Scene
             else if (index < _directories.Length + _fortFiles.Length) // This is a fort
             {
                 string fortPath = _fortFiles[index - _directories.Length];
-                if (GUI.ButtonWide(Screen.HCenter - 600, Screen.VCenter + i * 40 - 240,
+                if (GUI.Button300(-600, i * 40 - 240,
                         Path.GetFileNameWithoutExtension(fortPath), _selectedFort != index))
                 {
                     Console.WriteLine("Loading " + Path.GetFileName(fortPath));
@@ -232,18 +231,18 @@ public class CampaignScene : Scene
                     _fort.Name = Path.GetFileNameWithoutExtension(fortPath);
                     _fort.Comment = _fort.FortSummary();
                     _fort.Path = Path.GetDirectoryName(fortPath);
-                    _fortValidityMessage = _fort.IsValid(Data);
+                    _fortValidityMessage = _fort.IsValid(_data);
                     _selectedFort = index;
                 }
             }
             else
             {
-                if (GUI.ButtonWide(Screen.HCenter - 600, Screen.VCenter + i * 40 - 240, "+  New Fort  +"))
+                if (GUI.Button300(-600, i * 40 - 240, "+  New Fort  +"))
                 {
                     Fort f = new Fort();
                     f.Path = Directory.GetCurrentDirectory() + "/forts/Campaign/" + _activeDirectory;
                     f.Name = Resources.GetUnusedFortName(f.Path);
-                    new EditorScene().Start(Start, f, Data);
+                    new EditorScene().Start(Start, f, _data);
                 }
             }
         }

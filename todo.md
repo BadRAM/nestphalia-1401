@@ -6,7 +6,6 @@ Programming todo:
 ----- V2 -----
 
 - Game intro cutscene
-- Random damage variation
 - Redesign the campaign forts
 - Nice campaign screen with a map and paths appearing every time you unlock a new level. Nonlinear campaign?
 - Nice title screen
@@ -38,6 +37,7 @@ Programming todo:
 - Codebase Refactoring
   - Get rid of as many public fields as possible
     - ~~Battlescene should accept callback function to report victory~~
+  - ~~Integrate Screen.HCenter/VCenter into GUI functions~~
 
 - Game Logic optimizations
   - ~~profile tile entities separately by ID~~
@@ -91,7 +91,7 @@ Programming todo:
 
 Design todo:
 ============
-- Final bug fort 1 content update
+- 1401 v2 content
  - Towers
   - AOE tower - Bomb mortar? Gas?
   - Slow tower - 

@@ -392,6 +392,6 @@ public static class PathFinder
         GUI.DrawTextLeft(x, Screen.VCenter-290, $"Out of loop: {100 * width / totalWidth}%");
         #endif
 
-        GUI.DrawTextLeft(Screen.HCenter + 350, Screen.VCenter - 250, debugText);
+        GUI.DrawTextLeft(350, -250, debugText);
     }
 }

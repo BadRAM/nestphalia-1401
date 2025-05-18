@@ -34,8 +34,14 @@ public static class GUI
         return Vector2.One;
     }
 
-    public static void DrawTextCentered(int x, int y, string text, float size = FontSize, Color? color = null)
+    public static void DrawTextCentered(int x, int y, string text, float size = FontSize, Color? color = null, bool guiSpace = true)
     {
+        if (guiSpace)
+        {
+            x += Screen.HCenter;
+            y += Screen.VCenter;
+        }
+        
         Color c = color ?? new Color(255, 255, 255, 255);
         
         Vector2 pos = new Vector2((int)(x-MeasureTextEx(Resources.Font, text, size, size/FontSize).X/2), (int)(y-size/2));
@@ -43,21 +49,34 @@ public static class GUI
         DrawTextEx(Resources.Font, text, pos, size, size/FontSize, c);
     }
 
-    public static void DrawTextLeft(int x, int y, string text, float size = FontSize, Color? color = null)
+    public static void DrawTextLeft(int x, int y, string text, float size = FontSize, Color? color = null, bool guiSpace = true)
     {
+        if (guiSpace)
+        {
+            x += Screen.HCenter;
+            y += Screen.VCenter;
+        }
+        
         Color c = color ?? new Color(255, 255, 255, 255);
         
         DrawTextEx(Resources.Font, text, new Vector2(x,y), size, size/FontSize, c);
     }
     
-    public static bool ButtonWide(int x, int y, string text, bool enabled = true)
+    // 300 pixel wide button
+    public static bool Button300(int x, int y, string text, bool enabled = true, bool guiSpace = true)
     {
+        if (guiSpace)
+        {
+            x += Screen.HCenter;
+            y += Screen.VCenter;
+        }
+        
         bool hover = CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(x, y, 300, 40));
         bool press = !enabled || (hover && (IsMouseButtonDown(MouseButton.Left) || IsMouseButtonReleased(MouseButton.Left)));
         
         Rectangle subSprite = new Rectangle(0, !press ? !hover ? 0 : 40 : 80, 300, 40);
         DrawTextureRec(_buttonWideTexture, subSprite, new Vector2(x,y), Color.White);
-        DrawTextCentered(x+150, y+20, text);
+        DrawTextCentered(x+150, y+20, text, guiSpace:false);
 
         if (enabled && hover)
         {
@@ -72,14 +91,21 @@ public static class GUI
         return false;
     }
     
-    public static bool ButtonNarrow(int x, int y, string text, bool enabled = true)
+    // 100 pixel wide button
+    public static bool Button100(int x, int y, string text, bool enabled = true, bool guiSpace = true)
     {
+        if (guiSpace)
+        {
+            x += Screen.HCenter;
+            y += Screen.VCenter;
+        }
+        
         bool hover = CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(x, y, 100, 40));
         bool press = !enabled || (hover && (IsMouseButtonDown(MouseButton.Left) || IsMouseButtonReleased(MouseButton.Left)));
         
         Rectangle subSprite = new Rectangle(0, !press ? !hover ? 0 : 40 : 80, 100, 40);
         DrawTextureRec(_buttonNarrowTexture, subSprite, new Vector2(x,y), Color.White);
-        DrawTextCentered(x+50, y+20, text);
+        DrawTextCentered(x+50, y+20, text, guiSpace:false);
         
         if (enabled && hover)
         {
@@ -93,13 +119,19 @@ public static class GUI
         return false;
     }
 
-    public static string TextEntry(int x, int y, string text)
+    public static string TextEntry(int x, int y, string text, bool guiSpace = true)
     {
+        if (guiSpace)
+        {
+            x += Screen.HCenter;
+            y += Screen.VCenter;
+        }
+        
         bool hover = CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(x, y, 300, 40));
         
         Rectangle subSprite = new Rectangle(0, !hover ? 0 : 40, 300, 40);
         DrawTextureRec(_buttonWideTexture, subSprite, new Vector2(x,y), Color.White);
-        DrawTextCentered(x+150, y+20, text + (hover ? "_" : ""));
+        DrawTextCentered(x+150, y+20, text + (hover ? "_" : ""), guiSpace:false);
         
         if (hover)
         {

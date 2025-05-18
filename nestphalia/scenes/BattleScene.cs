@@ -71,14 +71,14 @@ public class BattleScene : Scene
                 if (IsKeyDown(KeyboardKey.F))
                 {
                     DrawRectangle(0,0,Screen.Left,Screen.Bottom,new Color(0,0,0,128));
-                    DrawTextCentered(Screen.HCenter, Screen.VCenter, $"{_skips+1}X SPEED", 48);
+                    DrawTextCentered(0, 0, $"{_skips+1}X SPEED", 48);
                 }
                 break;
             case SceneState.BattleFinished:
                 DrawRectangle(0,0,Screen.Left,Screen.Bottom,new Color(0,0,0,128));
-                DrawTextCentered(Screen.HCenter, Screen.VCenter-48, "BATTLE OVER!", 48);
-                DrawTextCentered(Screen.HCenter, Screen.VCenter, $"{_winner.Name} is victorious!", 48);
-                if (ButtonNarrow(Screen.HCenter-50, Screen.VCenter + 30, "Return"))
+                DrawTextCentered(0, -48, "BATTLE OVER!", 48);
+                DrawTextCentered(0, 0, $"{_winner.Name} is victorious!", 48);
+                if (Button100(-50, 30, "Return"))
                 {
                     SetMasterVolume(1f); // if F is still held, restore full volume.
                     _battleOverCallback(_winner);
@@ -86,8 +86,8 @@ public class BattleScene : Scene
                 break;
             case SceneState.Paused:
                 DrawRectangle(0,0,Screen.Left,Screen.Bottom,new Color(0,0,0,128));
-                DrawTextCentered(Screen.HCenter, Screen.VCenter, "PAUSED", 48);
-                if (ButtonNarrow(Screen.HCenter-50, Screen.VCenter + 30, "Quit"))
+                DrawTextCentered(0, 0, "PAUSED", 48);
+                if (Button100(-50, 30, "Quit"))
                 {
                     _battleOverCallback(null);
                 }
