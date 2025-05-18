@@ -15,11 +15,9 @@ public class SapperMinionTemplate : MinionTemplate
         AttackCooldown = 0;
     }
 
-    public override void Instantiate(Vector2 position, Team team, NavPath? navPath)
+    public override void Instantiate(Team team, Vector2 position, NavPath? navPath)
     {
-        SapperMinion m = new SapperMinion(this, team, position, null);
-        World.Minions.Add(m);
-        World.Sprites.Add(m);
+        Register(new SapperMinion(this, team, position, navPath));
     }
     
     public override bool PathFromNest()
@@ -31,24 +29,23 @@ public class SapperMinionTemplate : MinionTemplate
 public class SapperMinion : Minion
 {
     private SapperMinionTemplate _template;
-    private Int2D _startTile;
-    private bool _attacking;
+    private bool _attacking = true;
     
     public SapperMinion(SapperMinionTemplate template, Team team, Vector2 position, NavPath? navPath) : base(template, team, position, navPath)
     {
         _template = template;
-        _attacking = true;
-        _startTile = World.PosToTilePos(position);
-        // Retarget();
-        // PathFinder.RequestPath(NavPath);
+        Retarget();
+        PathFinder.RequestPath(NavPath);
     }
 
     public override void Update()
     {
         NextPos = World.GetTileCenter(NavPath.NextTile(Position));
+        
+        // become
         if (!_attacking && NavPath.Found && NavPath.TargetReached(Position))
         {
-            if (World.GetTile(_startTile) is Spawner s)
+            if (World.GetTile(OriginTile) is Spawner s)
             {
                 s.AddSpawnBonus(1);
             }
@@ -64,7 +61,7 @@ public class SapperMinion : Minion
         {
             _attacking = false;
             NavPath.Reset(Position);
-            NavPath.Destination = _startTile;
+            NavPath.Destination = OriginTile;
             PathFinder.RequestPath(NavPath);
         }
         else
@@ -91,26 +88,11 @@ public class SapperMinion : Minion
 
         Texture2D texture = _attacking ? _template.Texture : _template.RetreatingTexture;
         Vector2 pos = new Vector2((int)Position.X - texture.Width / 2, (int)Position.Y - texture.Height / 2);
-        bool flip = NextPos.X > pos.X;
+        bool flip = NextPos.X > (int)Position.X;
         Rectangle source = new Rectangle(flip ? texture.Width : 0, 0, flip ? texture.Width : -texture.Width, texture.Height);
         Raylib.DrawTextureRec(texture, source, pos, Team.UnitTint);
         
-        // Debug, shows path
-        if (Raylib.CheckCollisionPointCircle(Raylib.GetScreenToWorld2D(Raylib.GetMousePosition(), World.Camera), Position, Template.PhysicsRadius))
-        {
-            Vector2 path = Position;
-            foreach (Int2D i in NavPath.Waypoints)
-            {
-                Vector2 v = World.GetTileCenter(i);
-                Raylib.DrawLine((int)path.X, (int)path.Y, (int)v.X, (int)v.Y, Color.Lime);
-                path = v;
-            }
-        
-            if (NavPath.Waypoints.Count == 0)
-            {
-                Vector2 v = World.GetTileCenter(NavPath.Destination);
-                Raylib.DrawLine((int)path.X, (int)path.Y, (int)v.X, (int)v.Y, Color.Lime);
-            }
-        }
+        DrawHealthBar();
+        DrawDebug();
     }
 }

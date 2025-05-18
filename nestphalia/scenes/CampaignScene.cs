@@ -239,9 +239,8 @@ public class CampaignScene : Scene
             {
                 if (GUI.Button300(-600, i * 40 - 240, "+  New Fort  +"))
                 {
-                    Fort f = new Fort();
-                    f.Path = Directory.GetCurrentDirectory() + "/forts/Campaign/" + _activeDirectory;
-                    f.Name = Resources.GetUnusedFortName(f.Path);
+                    string path = Directory.GetCurrentDirectory() + "/forts/Campaign/" + _activeDirectory;
+                    Fort f = new Fort(Resources.GetUnusedFortName(path), path);
                     new EditorScene().Start(Start, f, _data);
                 }
             }

@@ -52,7 +52,7 @@ public class Projectile : ISprite
             Position = Position.MoveTowards(minion.Position, Template.Speed * Time.DeltaTime);
             if (Position == minion.Position)
             {
-                minion.Hurt(this, Template.Damage*1.5 - Template.Damage*World.Random.NextDouble());
+                minion.Hurt(Template.Damage*1.5 - Template.Damage*World.Random.NextDouble(), this);
                 World.ProjectilesToRemove.Add(this);
             }
         }

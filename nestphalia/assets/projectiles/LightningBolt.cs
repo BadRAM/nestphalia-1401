@@ -32,7 +32,7 @@ public class LightningBolt : Projectile
         if (target is Minion m)
         {
             targetPos = m.Position;
-            m.Hurt(this, Template.Damage*1.5 - Template.Damage*World.Random.NextDouble());
+            m.Hurt(Template.Damage*1.5 - Template.Damage*World.Random.NextDouble(), this);
         }
         for (int i = 0; i < 8; i++)
         {

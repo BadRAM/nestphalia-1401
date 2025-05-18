@@ -3,7 +3,7 @@ using Raylib_cs;
 
 namespace nestphalia;
 
-public class BroodMinionTemplate : MinionTemplate
+public class BroodMinionTemplate : BasicMinionTemplate
 {
     public double SpawnInterval;
     public int SpawnsOnDeath;
@@ -17,11 +17,9 @@ public class BroodMinionTemplate : MinionTemplate
         SpawnedMinion = spawnedMinion;
     }
     
-    public override void Instantiate(Vector2 position, Team team, NavPath navPath)
+    public override void Instantiate(Team team, Vector2 position, NavPath? navPath)
     {
-        Minion m = new BroodMinion(this, team, position, navPath);
-        World.Minions.Add(m);
-        World.Sprites.Add(m);
+        Register(new BroodMinion(this, team, position, navPath));
     }
 
     public override string GetStats()
@@ -40,7 +38,7 @@ public class BroodMinionTemplate : MinionTemplate
     }
 }
     
-public class BroodMinion : Minion
+public class BroodMinion : BasicMinion
 {
     private double _lastSpawnTime;
     private BroodMinionTemplate _template;
@@ -57,17 +55,17 @@ public class BroodMinion : Minion
         if (_template.SpawnInterval > 0 && Time.Scaled - _lastSpawnTime >= _template.SpawnInterval)
         {
             _lastSpawnTime = Time.Scaled;
-            _template.SpawnedMinion.Instantiate(Position, Team, NavPath.Clone());
+            _template.SpawnedMinion.Instantiate(Team, Position, NavPath.Clone());
         }
     }
 
-    public override void Die()
+    protected override void Die()
     {
         base.Die();
         for (int i = 0; i < _template.SpawnsOnDeath; i++)
         {
             // new Vector2((float)(Random.Shared.NextDouble()-0.5), (float)(Random.Shared.NextDouble()-0.5))
-            _template.SpawnedMinion.Instantiate(Position, Team, null);
+            _template.SpawnedMinion.Instantiate(Team, Position, null);
         }
     }
 }

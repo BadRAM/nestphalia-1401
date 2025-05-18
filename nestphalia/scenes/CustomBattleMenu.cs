@@ -21,8 +21,8 @@ public class CustomBattleMenu : Scene
     {
         World.InitializePreview();
 
-        if (_leftFort  != null) _leftFort  = Resources.LoadFort(_leftFort.Path  + "/" + _leftFort.Name  + ".fort");
-        if (_rightFort != null) _rightFort = Resources.LoadFort(_rightFort.Path + "/" + _rightFort.Name + ".fort");
+        if (_leftFort  != null) _leftFort  = Resources.LoadFort(_leftFort.Path  + "/" + _leftFort.Name  + ".fort") ?? _leftFort;
+        if (_rightFort != null) _rightFort = Resources.LoadFort(_rightFort.Path + "/" + _rightFort.Name + ".fort") ?? _rightFort;
         _leftFort?.LoadToBoard(false);
         _rightFort?.LoadToBoard(true);
         _loadingLeftSide = true;
@@ -151,7 +151,6 @@ public class CustomBattleMenu : Scene
                         _leftFort = Resources.LoadFort(fortPath);
                         _leftFort.Name = Path.GetFileNameWithoutExtension(fortPath);
                         _leftFort.Comment = _leftFort.FortSummary();
-                        _leftFort.Path = Path.GetDirectoryName(fortPath);
                         _leftFort.LoadToBoard(false);
                     }
                     else
@@ -159,7 +158,6 @@ public class CustomBattleMenu : Scene
                         _rightFort = Resources.LoadFort(fortPath);
                         _rightFort.Name = Path.GetFileNameWithoutExtension(fortPath);
                         _rightFort.Comment = _rightFort.FortSummary();
-                        _rightFort.Path = Path.GetDirectoryName(fortPath);
                         _rightFort.LoadToBoard(true);
                     }
 
@@ -170,9 +168,8 @@ public class CustomBattleMenu : Scene
             {
                 if (GUI.Button300(-600, i * 40 - 240, "+  New Fort  +"))
                 {
-                    Fort f = new Fort();
-                    f.Path = Directory.GetCurrentDirectory() + "/forts/" + _activeDirectory;
-                    f.Name = Resources.GetUnusedFortName(f.Path);
+                    string path = Directory.GetCurrentDirectory() + "/forts/" + _activeDirectory;
+                    Fort f = new Fort(Resources.GetUnusedFortName(path), path);
                     new EditorScene().Start(Start, f);
                 }
             }

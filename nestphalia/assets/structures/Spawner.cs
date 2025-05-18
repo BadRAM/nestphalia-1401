@@ -61,7 +61,7 @@ public class Spawner : Structure
             {
                 Console.WriteLine($"Creating a minion without a path, PathQueueLength: {PathFinder.GetQueueLength()}");
             }
-            _template.Minion.Instantiate(position, Team, _navPath.Clone());
+            _template.Minion.Instantiate(Team, position, _navPath.Clone());
             _spawnsRemaining--;
             _lastSpawnTime = Time.Scaled;
         }

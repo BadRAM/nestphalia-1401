@@ -14,10 +14,7 @@ Programming todo:
   - Another flyer. Ladybug? Flies until attacked.
   - Snail rework
   - Centipede that gets longer and shorter
-- ~~Random damage variation~~
-- ~~Make battles able to be deterministic if desired~~
-- Minion state machine
-- Refactor Minion.Hurt() to not need a damagesource
+- ~~Refactor Minion.Hurt() to not need a damagesource~~
 - ~~Campaign rebalance, use 'funding' instead of direct cash stores, or Pay to build the fort every mission~~
 - ~~Allow multiple campaign designs~~
 - Help text/tutorial
@@ -26,10 +23,12 @@ Programming todo:
 - ~~try compiling for web~~
 - Make nests solid again
 - Help text / Tutorial
-- Fix minion collision with wall corners
+- ~~Fix minion collision with wall corners~~
 - Minion melee attack animation
+- Minion render layers
 - Minion state machine
 - Settings menu scene
+- ~~minion facing flicker~~
 
 
 ----- Premature Optimizations -----
@@ -38,6 +37,11 @@ Programming todo:
   - Get rid of as many public fields as possible
     - ~~Battlescene should accept callback function to report victory~~
   - ~~Integrate Screen.HCenter/VCenter into GUI functions~~
+  - Minion
+    - State machine
+    - ~~Extract physics~~
+  - World
+    - make it not static
 
 - Game Logic optimizations
   - ~~profile tile entities separately by ID~~

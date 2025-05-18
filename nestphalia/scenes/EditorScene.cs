@@ -32,14 +32,13 @@ public class EditorScene : Scene
         PathTester
     }
     
-    public void Start(Action exitAction, Fort? fortToLoad = null, CampaignSaveData? data = null)
+    public void Start(Action exitAction, Fort fortToLoad, CampaignSaveData? data = null)
     {
         _startPrevScene = exitAction; // exitAction is usually the start function of the scene that invoked the editor
         _brush = null;
         _toolActive = EditorTool.Erase;
         _data = data;
         _sandboxMode = data == null;
-        _fort = fortToLoad ?? new Fort();
         //Console.WriteLine($"checking if {Directory.GetCurrentDirectory() +  $"/forts/{_fort.Name}.fort"} exists. Answer: {_fortAlreadySaved.ToString()}");
 
         Program.CurrentScene = this;

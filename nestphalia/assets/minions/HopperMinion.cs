@@ -9,11 +9,9 @@ public class HopperMinionTemplate : MinionTemplate
     {
     }
     
-    public override void Instantiate(Vector2 position, Team team, NavPath? navPath)
+    public override void Instantiate(Team team, Vector2 position, NavPath? navPath)
     {
-        HopperMinion m = new HopperMinion(this, team, position, navPath);
-        World.Minions.Add(m);
-        World.Sprites.Add(m);
+        Register(new HopperMinion(this, team, position, navPath));
     }
 }
     
@@ -93,6 +91,8 @@ public class HopperMinion : Minion
                 _jumpStartPos = Position;
                 _jumpEndPos = World.GetTileCenter((Int2D)ahead) + new Vector2(World.Random.Next(17)-8, World.Random.Next(23)-11);
                 _jumpStartTime = Time.Scaled;
+                NavPath.Skip();
+                UpdateNextPos();
             }
             else
             {

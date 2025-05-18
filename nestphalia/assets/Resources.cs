@@ -74,9 +74,9 @@ public class MusicResource
 public static class Resources
 {
     public static Texture2D MissingTexture;
-    public static List<SpriteResource> Sprites = new List<SpriteResource>();
-    public static List<SoundResource> Sounds = new List<SoundResource>();
-    public static List<MusicResource> Music = new List<MusicResource>();
+    private static List<SpriteResource> _sprites = new List<SpriteResource>();
+    private static List<SoundResource> _sounds = new List<SoundResource>();
+    private static List<MusicResource> _music = new List<MusicResource>();
     public static List<Fort> CampaignLevels = new List<Fort>();
     public static Font Font;
     private static Font _accessibleFont;
@@ -93,20 +93,20 @@ public static class Resources
         
         foreach (string path in Directory.GetFiles(Directory.GetCurrentDirectory() + "/resources/sprites"))
         {
-            Sprites.Add(new SpriteResource(Path.GetFileNameWithoutExtension(path), LoadTexture("resources/sprites/" + Path.GetFileName(path))));
+            _sprites.Add(new SpriteResource(Path.GetFileNameWithoutExtension(path), LoadTexture("resources/sprites/" + Path.GetFileName(path))));
         }
         
         foreach (string path in Directory.GetFiles(Directory.GetCurrentDirectory() + "/resources/sfx"))
         {
-            Sounds.Add(new SoundResource(Path.GetFileNameWithoutExtension(path), LoadSound("resources/sfx/" + Path.GetFileName(path)), 16));
+            _sounds.Add(new SoundResource(Path.GetFileNameWithoutExtension(path), LoadSound("resources/sfx/" + Path.GetFileName(path)), 16));
         }
         
         foreach (string path in Directory.GetFiles(Directory.GetCurrentDirectory() + "/resources/music"))
         {
-            Music.Add(new MusicResource(Path.GetFileNameWithoutExtension(path), LoadMusicStream("resources/music/" + Path.GetFileName(path))));
+            _music.Add(new MusicResource(Path.GetFileNameWithoutExtension(path), LoadMusicStream("resources/music/" + Path.GetFileName(path))));
         }
 
-        MusicPlaying = Music[0].Music;
+        MusicPlaying = _music[0].Music;
         PlayMusicStream(MusicPlaying);
 
         //Sounds.Add(new SoundResource("explosion", LoadSound("resources/sfx/explosion.wav"), 8));
@@ -131,14 +131,14 @@ public static class Resources
     
     public static Texture2D GetTextureByName(string name)
     {
-        SpriteResource? s = Sprites.FirstOrDefault(x => x.Name == name);
+        SpriteResource? s = _sprites.FirstOrDefault(x => x.Name == name);
         return s?.Tex ?? MissingTexture;
     }
     
     public static SoundResource GetSoundByName(string name)
     {
-        SoundResource? s = Sounds.FirstOrDefault(x => x.Name == name);
-        return s ?? Sounds[0];
+        SoundResource? s = _sounds.FirstOrDefault(x => x.Name == name);
+        return s ?? _sounds[0];
     }
 
     public static void PlayMusicByName(string name)
@@ -146,7 +146,7 @@ public static class Resources
         StopMusicStream(MusicPlaying);
         if (SettingsScene.MusicMute) return;
         
-        MusicResource? s = Music.FirstOrDefault(x => x.Name == name);
+        MusicResource? s = _music.FirstOrDefault(x => x.Name == name);
         
         if (s != null)
         {
@@ -157,7 +157,7 @@ public static class Resources
         else
         {
             Console.WriteLine("MusicResource was null! Music names are:");
-            foreach (MusicResource m in Music)
+            foreach (MusicResource m in _music)
             {
                 Console.WriteLine($" - {m.Name}");
             }
@@ -168,7 +168,7 @@ public static class Resources
 
     public static void Unload()
     {
-        foreach (SpriteResource spriteResource in Sprites)
+        foreach (SpriteResource spriteResource in _sprites)
         {
             UnloadTexture(spriteResource.Tex);
         }
@@ -182,7 +182,7 @@ public static class Resources
     public static void SaveFort(string fortName, string path)
     {
         //if (right) World.Flip();
-        Fort fort = new Fort();
+        Fort fort = new Fort(fortName, path);
         fort.Name = fortName;
         
         for (int x = 0; x < 20; x++)
@@ -198,15 +198,15 @@ public static class Resources
         string jsonString = JsonSerializer.Serialize(fort, SourceGenerationContext.Default.Fort);
         //Console.WriteLine($"JSON fort looks like: {jsonString}");
         File.WriteAllText(path + "/" + fortName + ".fort", jsonString);
-        
-        //if (right) World.Flip();
     }
 
-    public static Fort LoadFort(string filepath)
+    public static Fort? LoadFort(string filepath)
     {
+        if (!Path.Exists(filepath)) return null;
         string jsonString = File.ReadAllText(filepath);
-        Fort fort = JsonSerializer.Deserialize<Fort>(jsonString, SourceGenerationContext.Default.Fort);
+        Fort fort = JsonSerializer.Deserialize<Fort>(jsonString, SourceGenerationContext.Default.Fort)!;
         fort.UpdateCost();
+        fort.Path = Path.GetDirectoryName(filepath)!;
         return fort;
     }
 

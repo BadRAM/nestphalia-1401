@@ -93,7 +93,7 @@ public class MortarShell : Projectile
                         Vector2.Distance(_targetPos, minion.Position) < _template.BlastRadius)
                     {
                         double damage = Math.Clamp(2 * (_template.BlastRadius - Vector2.Distance(_targetPos, minion.Position)) / _template.BlastRadius, 0, 1) * _template.Damage;
-                        minion.Hurt(this, damage);
+                        minion.Hurt(damage, this);
                     }
                 }
             }

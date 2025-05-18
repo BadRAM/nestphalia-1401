@@ -296,8 +296,10 @@ public static class World
         _swUpdateMinionsPostCollide.Start();
         foreach (Minion m in Minions)
         {
-            m.CollideTerrain();
-            m.LateUpdate();
+            m.ApplyPush();
+            Physics.CollideTerrain(m);
+            // m.CollideTerrain();
+            m.ApplyPush();
         }
         _swUpdateMinionsPostCollide.Stop();
         
@@ -358,7 +360,8 @@ public static class World
                 {
                     for (int j = i+1; j < MinionGrid[x, y].Count; j++)
                     {
-                        MinionGrid[x, y][i].CollideMinion(MinionGrid[x, y][j]);
+                        Physics.CollideMinion(MinionGrid[x, y][i], MinionGrid[x, y][j]);
+                        //MinionGrid[x, y][i].CollideMinion(MinionGrid[x, y][j]);
                         // _totalCollideChecks++;
                     }
 
@@ -368,14 +371,16 @@ public static class World
                         {
                             for (int j = 0; j < MinionGrid[x + 1, y - 1].Count; j++)
                             {
-                                MinionGrid[x, y][i].CollideMinion(MinionGrid[x + 1, y - 1][j]);
+                                Physics.CollideMinion(MinionGrid[x, y][i], MinionGrid[x + 1, y - 1][j]);
+                                // MinionGrid[x, y][i].CollideMinion(MinionGrid[x + 1, y - 1][j]);
                                 // _totalCollideChecks++;
                             }
                         }
 
                         for (int j = 0; j < MinionGrid[x + 1, y].Count; j++)
                         {
-                            MinionGrid[x, y][i].CollideMinion(MinionGrid[x + 1, y][j]);
+                            Physics.CollideMinion(MinionGrid[x, y][i], MinionGrid[x + 1, y][j]);
+                            // MinionGrid[x, y][i].CollideMinion(MinionGrid[x + 1, y][j]);
                             // _totalCollideChecks++;
                         }
 
@@ -383,7 +388,8 @@ public static class World
                         {
                             for (int j = 0; j < MinionGrid[x + 1, y + 1].Count; j++)
                             {
-                                MinionGrid[x, y][i].CollideMinion(MinionGrid[x + 1, y + 1][j]);
+                                Physics.CollideMinion(MinionGrid[x, y][i], MinionGrid[x + 1, y + 1][j]);
+                                // MinionGrid[x, y][i].CollideMinion(MinionGrid[x + 1, y + 1][j]);
                                 // _totalCollideChecks++;
                             }
                         }
@@ -393,7 +399,8 @@ public static class World
                     {
                         for (int j = 0; j < MinionGrid[x, y + 1].Count; j++)
                         {
-                            MinionGrid[x, y][i].CollideMinion(MinionGrid[x, y + 1][j]);
+                            Physics.CollideMinion(MinionGrid[x, y][i], MinionGrid[x, y + 1][j]);
+                            // MinionGrid[x, y][i].CollideMinion(MinionGrid[x, y + 1][j]);
                             // _totalCollideChecks++;
                         }
                     }
@@ -473,7 +480,7 @@ public static class World
             // $"Total collision checks: {_totalCollideChecks/1000}k\n" +
             // $"ms/1k checks: {((_swUpdateMinionsCollide.Elapsed.TotalMilliseconds * 1000) / _totalCollideChecks).ToString("N4")}\n\n" +
             $"{tileTypeTotals}\n" +
-            $"{_debugString}");
+            $"{_debugString}", guiSpace:false);
         
         int totalWidth = 1000;
         int x = Screen.HCenter-500;
@@ -491,38 +498,38 @@ public static class World
         x = Screen.HCenter - 500;
         width = (int)(totalWidth * _swUpdateMinionGrid.Elapsed.TotalSeconds / totalSWTime);
         Raylib.DrawRectangle(x, Screen.Top+10, width, 20, Color.Red);
-        GUI.DrawTextLeft(x, Screen.Top+10, $"MinionGrid {(int)(100 * _swUpdateMinionGrid.Elapsed.TotalSeconds / totalSWTime)}%, {(_swUpdateMinionGrid.Elapsed.TotalMilliseconds):N3}ms");
+        GUI.DrawTextLeft(x, Screen.Top+10, $"MinionGrid {(int)(100 * _swUpdateMinionGrid.Elapsed.TotalSeconds / totalSWTime)}%, {(_swUpdateMinionGrid.Elapsed.TotalMilliseconds):N3}ms", guiSpace:false);
         x += width;
         width = (int)(totalWidth * _swUpdateTeams.Elapsed.TotalSeconds / totalSWTime);
         Raylib.DrawRectangle(x, Screen.Top+10, width, 20, Color.SkyBlue);
-        GUI.DrawTextLeft(x, Screen.Top+10, $"Teams {(int)(100 * _swUpdateTeams.Elapsed.TotalSeconds / totalSWTime)}%, {(_swUpdateTeams.Elapsed.TotalMilliseconds):N3}ms");
+        GUI.DrawTextLeft(x, Screen.Top+10, $"Teams {(int)(100 * _swUpdateTeams.Elapsed.TotalSeconds / totalSWTime)}%, {(_swUpdateTeams.Elapsed.TotalMilliseconds):N3}ms", guiSpace:false);
         x += width;
         width = (int)(totalWidth * _swUpdateBoard.Elapsed.TotalSeconds / totalSWTime);
-        Raylib.DrawRectangle(x, Screen.Top+10, width, 20, Color.Purple);
-        GUI.DrawTextLeft(x, Screen.Top+10, $"Board {(int)(100 * _swUpdateBoard.Elapsed.TotalSeconds / totalSWTime)}%, {(_swUpdateBoard.Elapsed.TotalMilliseconds):N3}ms");
+        Raylib.DrawRectangle(x, 10, width, 20, Color.Purple);
+        GUI.DrawTextLeft(x, 10, $"Board {(int)(100 * _swUpdateBoard.Elapsed.TotalSeconds / totalSWTime)}%, {(_swUpdateBoard.Elapsed.TotalMilliseconds):N3}ms", guiSpace:false);
         x += width;
         width = (int)(totalWidth * _swUpdateMinions.Elapsed.TotalSeconds / totalSWTime);
-        Raylib.DrawRectangle(x, Screen.Top+10, width, 20, Color.Yellow);
-        GUI.DrawTextLeft(x, Screen.Top+10, $"Minions {(int)(100 * _swUpdateMinions.Elapsed.TotalSeconds / totalSWTime)}%, {(_swUpdateMinions.Elapsed.TotalMilliseconds):N3}ms");
+        Raylib.DrawRectangle(x, 10, width, 20, Color.Yellow);
+        GUI.DrawTextLeft(x, 10, $"Minions {(int)(100 * _swUpdateMinions.Elapsed.TotalSeconds / totalSWTime)}%, {(_swUpdateMinions.Elapsed.TotalMilliseconds):N3}ms", guiSpace:false);
         x += width;
         width = (int)(totalWidth * _swUpdateProjectiles.Elapsed.TotalSeconds / totalSWTime);
-        Raylib.DrawRectangle(x, Screen.Top+10, width, 20, Color.Blue);
-        GUI.DrawTextLeft(x, Screen.Top+10, $"Proj {(int)(100 * _swUpdateProjectiles.Elapsed.TotalSeconds / totalSWTime)}%, {(_swUpdateProjectiles.Elapsed.TotalMilliseconds):N3}ms");
+        Raylib.DrawRectangle(x, 10, width, 20, Color.Blue);
+        GUI.DrawTextLeft(x, 10, $"Proj {(int)(100 * _swUpdateProjectiles.Elapsed.TotalSeconds / totalSWTime)}%, {(_swUpdateProjectiles.Elapsed.TotalMilliseconds):N3}ms", guiSpace:false);
         x += width;
         width = (int)(totalWidth * _swUpdateMinionsCollide.Elapsed.TotalSeconds / totalSWTime);
-        Raylib.DrawRectangle(x, Screen.Top+10, width, 20, Color.Red);
-        GUI.DrawTextLeft(x, Screen.Top+10, $"Phys {(int)(100 * _swUpdateMinionsCollide.Elapsed.TotalSeconds / totalSWTime)}%, {(_swUpdateMinionsCollide.Elapsed.TotalMilliseconds):N3}ms");
+        Raylib.DrawRectangle(x, 10, width, 20, Color.Red);
+        GUI.DrawTextLeft(x, 10, $"Phys {(int)(100 * _swUpdateMinionsCollide.Elapsed.TotalSeconds / totalSWTime)}%, {(_swUpdateMinionsCollide.Elapsed.TotalMilliseconds):N3}ms", guiSpace:false);
         x += width;        
         width = (int)(totalWidth * _swUpdateMinionsPostCollide.Elapsed.TotalSeconds / totalSWTime);
-        Raylib.DrawRectangle(x, Screen.Top+10, width, 20, Color.Maroon);
-        GUI.DrawTextLeft(x, Screen.Top+10, $"PostPhys {(int)(100 * _swUpdateMinionsPostCollide.Elapsed.TotalSeconds / totalSWTime)}%, {(_swUpdateMinionsPostCollide.Elapsed.TotalMilliseconds):N3}ms");
+        Raylib.DrawRectangle(x, 10, width, 20, Color.Maroon);
+        GUI.DrawTextLeft(x, 10, $"PostPhys {(int)(100 * _swUpdateMinionsPostCollide.Elapsed.TotalSeconds / totalSWTime)}%, {(_swUpdateMinionsPostCollide.Elapsed.TotalMilliseconds):N3}ms", guiSpace:false);
         x += width;
         width = (int)(totalWidth * _swUpdatePathfinder.Elapsed.TotalSeconds / totalSWTime);
-        Raylib.DrawRectangle(x, Screen.Top+10, width, 20, Color.Orange);
-        GUI.DrawTextLeft(x, Screen.Top+10, $"Path {(int)(100 * _swUpdatePathfinder.Elapsed.TotalSeconds / totalSWTime)}%, {(_swUpdatePathfinder.Elapsed.TotalMilliseconds):N3}ms");
+        Raylib.DrawRectangle(x, 10, width, 20, Color.Orange);
+        GUI.DrawTextLeft(x, 10, $"Path {(int)(100 * _swUpdatePathfinder.Elapsed.TotalSeconds / totalSWTime)}%, {(_swUpdatePathfinder.Elapsed.TotalMilliseconds):N3}ms", guiSpace:false);
         x += width;
         width = totalWidth - x;
-        Raylib.DrawRectangle(x, Screen.Top+10, width, 20, Color.Gray);
+        Raylib.DrawRectangle(x, 10, width, 20, Color.Gray);
     }
     
     public static void SetTile(StructureTemplate? tile, Team team, int x, int y)

@@ -9,6 +9,15 @@ public class Fort
     [JsonInclude] public string[] Board = new string[20 * 20];
     [JsonIgnore] public string Path = "";
     [JsonIgnore] public double TotalCost;
+
+    public Fort(string name, string path)
+    {
+        Name = name;
+        Path = Directory.GetCurrentDirectory() + path;
+    }
+
+    // This constructor is for the json deserializer, please use the other one for creating new forts.
+    public Fort() { }
     
     public void LoadToBoard(bool rightSide)
     {

@@ -113,6 +113,13 @@ public class BattleScene : Scene
                     break;
             }
         }
+        if (_state == SceneState.Paused && IsKeyPressed(KeyboardKey.O)) // Frame step
+        {
+            Time.TimeScale = 1;
+            Time.UpdateTime();
+            World.Update();
+            Time.TimeScale = 0;
+        }
         
         if (IsKeyPressed(KeyboardKey.F))
         {
