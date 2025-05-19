@@ -17,92 +17,31 @@ public class HopperMinionTemplate : MinionTemplate
     
 public class HopperMinion : Minion
 {
-    private bool _jumping;
-    private Vector2 _jumpStartPos;
-    private Vector2 _jumpEndPos;
-    private double _jumpStartTime;
-    private double _jumpDuration = 0.5;
-    private double _jumpChargeDuration = 0.5;
-    private double _jumpHeight = 24;
-    
     public HopperMinion(MinionTemplate template, Team team, Vector2 position, NavPath? navPath) : base(template, team, position, navPath)
     {
     }
     
     public override void Update()
     {
-        
-        // If the next tile is the target, attack it
-        // else, if the second from next tile is empty, hop to it
-        // else, if the next tile is empty, walk to it.
-        // else, attack next tile
-        
-        if (_jumping)
+        if (State is Move)
         {
-            if (Time.Scaled - _jumpStartTime < _jumpChargeDuration)
+            UpdateNextPos(); // we need to do this or else Move.Update() will switch to attack mode before we have the chance to intercept
+            Int2D? ahead = NavPath.LookAhead(1);
+            if (ahead != null)
             {
-                return;
-            }
-            else if (Time.Scaled - _jumpStartTime > _jumpDuration + _jumpChargeDuration)
-            {
-                IsFlying = false;
-                _jumping = false;
-                Position = _jumpEndPos;
-            }
-            else
-            {
-                IsFlying = true;
+                Structure? structureAhead = World.GetTile((Int2D)ahead);
 
-                double t = (Time.Scaled - (_jumpStartTime + _jumpChargeDuration)) / _jumpDuration;
-                double arcOffset = Math.Sin(t * Math.PI) * _jumpHeight;
-        
-                Position = Vector2.Lerp(_jumpStartPos, _jumpEndPos, (float)t);
-                Position.Y -= (float)arcOffset;
-                return;
-            }
-        }
-        
-        UpdateNextPos();
-        
-        Int2D? ahead = NavPath.LookAhead(1);
-        
-        if (ahead == null)
-        {
-            if (!TryAttack())
-            {
-                if (NavPath.Found && NavPath.TargetReached(Position))
+                if (structureAhead == null || 
+                    (!structureAhead.PhysSolid() && 
+                     (structureAhead.Team != Team || structureAhead is not Minefield)))
                 {
-                    Retarget();
-                    PathFinder.RequestPath(NavPath);
-                }
-                else
-                {
-                    Position = Position.MoveTowards(NextPos, AdjustedSpeed() * Time.DeltaTime);
+                    Vector2 to = World.GetTileCenter((Int2D)ahead);
+                    to += new Vector2(World.Random.Next(17) - 8, World.Random.Next(23) - 11);
+                    State = new Jump(this, to, 0.25, 0.5, 0.25);
                 }
             }
         }
-        else
-        {
-            Structure? structureAhead = World.GetTile((Int2D)ahead);
-            if (structureAhead == null || (!structureAhead.PhysSolid() && (structureAhead.Team != Team || structureAhead is not Minefield)))
-            {
-                NavPath.Skip();
-                _jumping = true;
-                _jumpStartPos = Position;
-                _jumpEndPos = World.GetTileCenter((Int2D)ahead) + new Vector2(World.Random.Next(17)-8, World.Random.Next(23)-11);
-                _jumpStartTime = Time.Scaled;
-                NavPath.Skip();
-                UpdateNextPos();
-            }
-            else
-            {
-                if (!TryAttack())
-                {
-                    Position = Position.MoveTowards(NextPos, AdjustedSpeed() * Time.DeltaTime);
-                }
-            }
-        }
-
-        Frenzy = false;
+        
+        base.Update();
     }
 }

@@ -56,9 +56,9 @@ public class NavPath
         return World.PosToTilePos(position) == Destination;
     }
     
-    public NavPath Clone()
+    public NavPath Clone(string requester)
     {
-        NavPath p = new NavPath(Requester, Start, Destination, Team);
+        NavPath p = new NavPath(requester, Start, Destination, Team);
         p.Found = Found;
         p.Waypoints = new List<Int2D>(Waypoints);
         return p;

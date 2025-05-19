@@ -4,7 +4,7 @@ using Raylib_cs;
 
 namespace nestphalia;
 
-public abstract class MinionTemplate
+public class MinionTemplate
 {
     public string ID; // Minions don't really need this since they're defined as a part of their nests, which already have IDs
     public string Name;
@@ -34,7 +34,10 @@ public abstract class MinionTemplate
     }
 
     // Implementations of Instantiate() must call Register!
-    public abstract void Instantiate(Team team, Vector2 position, NavPath? navPath);
+    public virtual void Instantiate(Team team, Vector2 position, NavPath? navPath)
+    {
+        Register(new Minion(this, team, position, navPath));
+    }
     private protected void Register(Minion minion)
     {
         World.Minions.Add(minion);
@@ -60,30 +63,30 @@ public abstract class MinionTemplate
     }
 }
 
-public abstract class Minion : ISprite
+public partial class Minion : ISprite
 {
+    // Great and mighty State
+    protected BaseState State;
+    
+    // Components
     public MinionTemplate Template;
     public Team Team;
     protected NavPath NavPath;
+    
+    // Public State
     public Vector2 Position;
     public double Health;
-    private double _timeSinceLastAction;
-    protected Vector2 NextPos; // This is the world space position the minion is currently trying to reach
-    private bool _attacking;
-    private double _attackStartedTime;
-    // private double _lastFiredTime;
-    private Vector2 _collisionOffset;
-    public Int2D OriginTile;
-    public bool Glued;
     public bool IsFlying;
+    public Int2D OriginTile;
+    protected Vector2 NextPos; // This is the world space position the minion is currently trying to reach
+    
+    // Status Effects
+    public bool Glued;
     public bool Frenzy;
     
-    public enum MinionState
-    {
-        Waiting,
-        Moving,
-        Attacking
-    }
+    // Private State - Try to encapsulate these into state classes
+    private Vector2 _collisionOffset;
+    private double _timeOfLastAction;
     
     public double Z { get; set; }
     
@@ -95,7 +98,8 @@ public abstract class Minion : ISprite
         NextPos = position;
         OriginTile = World.PosToTilePos(position);
         Health = Template.MaxHealth;
-        _timeSinceLastAction = Time.Scaled;
+        _timeOfLastAction = Time.Scaled;
+        State = new Move(this);
 
         if (navPath != null)
         {
@@ -104,13 +108,46 @@ public abstract class Minion : ISprite
         else
         {
             NavPath = new NavPath(template.Name, Team);
-            Retarget();
-            PathFinder.RequestPath(NavPath);
+            // NavPath.Destination = GetNewTarget();
+            // PathFinder.RequestPath(NavPath);
+            SetTarget(GetNewTarget());
         }
         Z = Position.Y;
     }
 
-    public abstract void Update();
+    #region Events
+    
+    // Overrides must call base, or update the state machine themselves!
+    public virtual void Update()
+    {
+        State.Update();
+    }
+
+    protected virtual void OnTargetReached()
+    {
+        SetTarget(GetNewTarget());
+    }
+
+    protected virtual void OnAttack()
+    {
+        Template.Projectile.Instantiate(World.GetTileAtPos(NextPos), this, Position);
+    }
+    
+    public virtual void Draw()
+    {
+        Z = Position.Y + (IsFlying ? 240 : 0);
+
+        Vector2 pos = new Vector2((int)Position.X - Template.Texture.Width / 2f, (int)Position.Y - Template.Texture.Width / 2f);
+        bool flip = NextPos.X > (int)Position.X;
+        Rectangle source = new Rectangle(flip ? Template.Texture.Width : 0, 0, flip ? Template.Texture.Width : -Template.Texture.Width, Template.Texture.Height);
+        Raylib.DrawTextureRec(Template.Texture, source, pos, Team.UnitTint);
+
+        DrawHealthBar();
+        DrawDebug();
+    }
+    #endregion
+    
+    #region Protected Functions
     
     protected void UpdateNextPos()
     {
@@ -118,40 +155,31 @@ public abstract class Minion : ISprite
         if (pos != NextPos)
         {
             NextPos = pos;
-            _timeSinceLastAction = Time.Scaled;
-            return;
-        }
-        
-        if (Time.Scaled - _timeSinceLastAction > 5)
-        {
-            Console.WriteLine($"{Template.Name} got lost");
-            NavPath.Reset(Position);
-            PathFinder.RequestPath(NavPath);
-            _timeSinceLastAction = Time.Scaled;
+            _timeOfLastAction = Time.Scaled;
         }
     }
 
-    // Attempts to attack, returns true if attack target is valid 
-    protected bool TryAttack()
+    protected virtual bool CheckIfLost()
+    {
+        if (Time.Scaled - _timeOfLastAction > 5)
+        {
+            Console.WriteLine($"{Template.Name} got lost");
+            _timeOfLastAction = Time.Scaled;
+            return true;
+        }
+        return false;
+    }
+
+    protected bool CanAttack()
     {
         // Guard against out of range attacks
-        if (Vector2.Distance(Position, NextPos) > 24 + Template.PhysicsRadius) { _attacking = false; return false;}
+        if (Vector2.Distance(Position, NextPos) > 24 + Template.PhysicsRadius) return false;
         Structure? t = World.GetTileAtPos(NextPos);
         // Guard against attacking tiles that could just be walked over
-        if (t == null || t is Rubble || (!t.NavSolid(Team) && NavPath.NextTile(Position) != NavPath.Destination)) { _attacking = false; return false;}
+        if (t == null || t is Rubble || (!t.NavSolid(Team) && NavPath.NextTile(Position) != NavPath.Destination)) return false;
         // Guard against friendly tiles that can be traversed
-        if (t.Team == Team && !t.PhysSolid()) { _attacking = false; return false; }
-        _timeSinceLastAction = Time.Scaled;
-        if (!_attacking)
-        {
-            _attacking = true;
-            _attackStartedTime = Time.Scaled;
-        }
-        if (Time.Scaled - _attackStartedTime >= (Frenzy ? Template.AttackCooldown/2 : Template.AttackCooldown))
-        {
-            Template.Projectile.Instantiate(t, this, Position);
-            _attackStartedTime = Time.Scaled;
-        }
+        if (t.Team == Team && !t.PhysSolid()) return false; 
+
         return true;
     }
         
@@ -171,7 +199,7 @@ public abstract class Minion : ISprite
         _collisionOffset = Vector2.Zero;
     }
 
-    protected void Retarget()
+    protected Int2D GetNewTarget()
     {
         List<Sortable<Int2D>> targets = new List<Sortable<Int2D>>();
         
@@ -203,29 +231,16 @@ public abstract class Minion : ISprite
         if (targets.Count == 0)
         {
             Console.WriteLine($"{Template.Name} wants to retarget but can't see any valid targets!");
-            return;
+            return new Int2D(0,0);
         }
 
-        NavPath.Reset(Position);
+        // NavPath.Reset(Position);
         int i = Math.Min(targets.Count, 16);
-        i = Math.Min(World.Random.Next(i), World.Random.Next(i));
+        // i = Math.Min(World.Random.Next(i), World.Random.Next(i));
         i = World.Random.WeightedRandom(i);
-        NavPath.Destination = targets[i].Value;
+        return targets[i].Value;
     }
-
-    public virtual void Draw()
-    {
-        Z = Position.Y + (IsFlying ? 240 : 0);
-
-        Vector2 pos = new Vector2((int)Position.X - Template.Texture.Width / 2f, (int)Position.Y - Template.Texture.Width / 2f);
-        bool flip = NextPos.X > (int)Position.X;
-        Rectangle source = new Rectangle(flip ? Template.Texture.Width : 0, 0, flip ? Template.Texture.Width : -Template.Texture.Width, Template.Texture.Height);
-        Raylib.DrawTextureRec(Template.Texture, source, pos, Team.UnitTint);
-
-        DrawHealthBar();
-        DrawDebug();
-    }
-
+    
     protected void DrawHealthBar()
     {
         if (Health < Template.MaxHealth)
@@ -240,7 +255,7 @@ public abstract class Minion : ISprite
     {
         if (Raylib.CheckCollisionPointCircle(Raylib.GetScreenToWorld2D(Raylib.GetMousePosition(), World.Camera), Position, 2*Template.PhysicsRadius))
         {
-            Raylib.DrawCircleV(NextPos, 2, Color.Green);
+            if (World.DrawDebugInfo) Raylib.DrawCircleV(NextPos, 2, Color.Green);
             
             Vector2 path = Position;
             foreach (Int2D i in NavPath.Waypoints)
@@ -255,9 +270,14 @@ public abstract class Minion : ISprite
                 Vector2 v = World.GetTileCenter(NavPath.Destination);
                 Raylib.DrawLine((int)path.X, (int)path.Y, (int)v.X, (int)v.Y, Color.Lime);
             }
+            
+            if (World.DrawDebugInfo) GUI.DrawTextLeft((int)Position.X, (int)Position.Y, State.ToString(), guiSpace: false);
         }
     }
+    #endregion
 
+    #region Public Functions
+    
     public void Push(Vector2 distance)
     {
         _collisionOffset += distance;
@@ -283,7 +303,7 @@ public abstract class Minion : ISprite
         }
     }
 
-    protected virtual void Die()
+    public virtual void Die()
     {
         World.MinionsToRemove.Add(this);
     }
@@ -293,11 +313,22 @@ public abstract class Minion : ISprite
         return NavPath.Destination;
     }
 
-    public virtual void SetTarget(Int2D target)
+    public virtual void SetTarget(Int2D target, double thinkDuration = 0.5)
     {
         NavPath.Reset(Position);
         NavPath.Start = World.PosToTilePos(Position);
         NavPath.Destination = target;
         PathFinder.RequestPath(NavPath);
+        
+        // Wait a bit, then force pathfinding if it hasn't happened yet.
+        State = new Wait(this, thinkDuration, () =>
+        {
+            if (!NavPath.Found)
+            {
+                PathFinder.DemandPath(NavPath);
+            }
+            State = new Move(this);
+        });
     }
+    #endregion
 }

@@ -53,21 +53,21 @@ public class FrenzyBeacon : ActiveAbilityBeacon
 
     public override void Update()
     {
-        if (_active)
-        {
-            foreach (Minion minion in World.GetMinionsInRegion(World.PosToTilePos(_effectPos), (int)(1 + _effectRadius / 24)))
-            {
-                if (Raylib.CheckCollisionCircles(_effectPos, (float)_effectRadius, minion.Position, minion.Template.PhysicsRadius))
-                {
-                    minion.Frenzy = true;
-                }
-            }
-
-            if (Time.Scaled - TimeLastUsed > _effectDuration)
-            {
-                _active = false;
-            }
-        }
+        // if (_active)
+        // {
+        //     foreach (Minion minion in World.GetMinionsInRegion(World.PosToTilePos(_effectPos), (int)(1 + _effectRadius / 24)))
+        //     {
+        //         if (Raylib.CheckCollisionCircles(_effectPos, (float)_effectRadius, minion.Position, minion.Template.PhysicsRadius))
+        //         {
+        //             minion.Frenzy = true;
+        //         }
+        //     }
+        //
+        //     if (Time.Scaled - TimeLastUsed > _effectDuration)
+        //     {
+        //         _active = false;
+        //     }
+        // }
     }
 
     public override void Draw()

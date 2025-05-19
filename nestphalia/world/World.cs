@@ -486,13 +486,13 @@ public static class World
         int x = Screen.HCenter-500;
         
         int width = (int)(totalWidth * _swUpdate.Elapsed.TotalSeconds / totalSWTime);
-        Raylib.DrawRectangle(x, Screen.Top, width, 10, Color.Red);
+        Raylib.DrawRectangle(x, 0, width, 10, Color.Red);
         x += width;
         width = (int)(totalWidth * _swDraw.Elapsed.TotalSeconds / totalSWTime);
-        Raylib.DrawRectangle(x, Screen.Top, width, 10, Color.Green);
+        Raylib.DrawRectangle(x, 0, width, 10, Color.Green);
         x += width;
         width = totalWidth - x;
-        Raylib.DrawRectangle(x, Screen.Top, width, 10, Color.Gray);
+        Raylib.DrawRectangle(x, 0, width, 10, Color.Gray);
 
         totalSWTime = _swUpdate.Elapsed.TotalSeconds;
         x = Screen.HCenter - 500;

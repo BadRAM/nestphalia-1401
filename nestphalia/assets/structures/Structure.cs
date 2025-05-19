@@ -105,6 +105,7 @@ public class Structure : ISprite
 
     public virtual void Hurt(double damage)
     {
+        if (Health <= 0) { return; } // Guard against dying multiple times
         Health -= damage;
         if (Health <= 0)
         {
@@ -116,7 +117,6 @@ public class Structure : ISprite
     {
         _deathSound.PlayRandomPitch(SoundResource.WorldToPan(position.X));
         World.DestroyTile(X, Y);
-        // World.SetTile(Rubble.RubbleTemplate, Team, X, Y);
     }
     
     public Vector2 GetCenter()

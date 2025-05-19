@@ -3,7 +3,7 @@ using Raylib_cs;
 
 namespace nestphalia;
 
-public class BroodMinionTemplate : BasicMinionTemplate
+public class BroodMinionTemplate : MinionTemplate
 {
     public double SpawnInterval;
     public int SpawnsOnDeath;
@@ -38,7 +38,7 @@ public class BroodMinionTemplate : BasicMinionTemplate
     }
 }
     
-public class BroodMinion : BasicMinion
+public class BroodMinion : Minion
 {
     private double _lastSpawnTime;
     private BroodMinionTemplate _template;
@@ -55,17 +55,17 @@ public class BroodMinion : BasicMinion
         if (_template.SpawnInterval > 0 && Time.Scaled - _lastSpawnTime >= _template.SpawnInterval)
         {
             _lastSpawnTime = Time.Scaled;
-            _template.SpawnedMinion.Instantiate(Team, Position, NavPath.Clone());
+            _template.SpawnedMinion.Instantiate(Team, Position, NavPath.Clone(_template.SpawnedMinion.Name));
         }
     }
 
-    protected override void Die()
+    public override void Die()
     {
         base.Die();
         for (int i = 0; i < _template.SpawnsOnDeath; i++)
         {
-            // new Vector2((float)(Random.Shared.NextDouble()-0.5), (float)(Random.Shared.NextDouble()-0.5))
-            _template.SpawnedMinion.Instantiate(Team, Position, null);
+            Vector2 offset = new Vector2((float)(Random.Shared.NextDouble() - 0.5), (float)(Random.Shared.NextDouble() - 0.5));
+            _template.SpawnedMinion.Instantiate(Team, Position + offset, null);
         }
     }
 }

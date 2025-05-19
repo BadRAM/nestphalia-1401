@@ -240,7 +240,7 @@ public class EditorScene : Scene
     private void PathTestTool()
     {
         NavPath navPath = new NavPath("editor", new Int2D(28, 11), World.GetMouseTilePos(), World.RightTeam);
-        PathFinder.FindPath(navPath);
+        PathFinder.DemandPath(navPath);
         
         BeginMode2D(World.Camera);
         

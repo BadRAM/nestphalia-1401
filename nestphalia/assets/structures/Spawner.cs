@@ -61,7 +61,7 @@ public class Spawner : Structure
             {
                 Console.WriteLine($"Creating a minion without a path, PathQueueLength: {PathFinder.GetQueueLength()}");
             }
-            _template.Minion.Instantiate(Team, position, _navPath.Clone());
+            _template.Minion.Instantiate(Team, position, _navPath.Clone(_template.Minion.Name));
             _spawnsRemaining--;
             _lastSpawnTime = Time.Scaled;
         }
@@ -104,6 +104,7 @@ public class Spawner : Structure
         return false;
     }
     
+    // Todo: Move the target selection into Team
     private void Retarget()
     {
         List<Sortable<Int2D>> targets = new List<Sortable<Int2D>>();
@@ -143,7 +144,7 @@ public class Spawner : Structure
         _navPath.Destination = _targetTile;
         if (_template.Minion.PathFromNest())
         {
-            PathFinder.FindPath(_navPath);
+            PathFinder.DemandPath(_navPath);
         }
     }
 }

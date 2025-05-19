@@ -26,27 +26,19 @@ public class FlyingMinion : Minion
     {
         IsFlying = true;
     }
-
-    public override void Update()
-    {
-        
-        // if the next tile in our path is adjacent and solid, then attack it
-        if (!TryAttack())
-        {
-            NextPos = World.GetTileCenter(NavPath.Destination);
-            Position = Position.MoveTowards(NextPos, AdjustedSpeed() * Time.DeltaTime);
-            if (NavPath.TargetReached(Position))
-            {
-                Retarget();
-            }
-        }
-
-        Frenzy = false;
-    }
-
-    public override void SetTarget(Int2D target)
+    
+    // Flying Minions don't need pathfinding
+    public override void SetTarget(Int2D target, double thinkDuration = 0.2)
     {
         NavPath.Reset(Position);
         NavPath.Destination = target;
+        
+        State = new Wait(this, thinkDuration, () => { State = new Move(this); });
+    }
+
+    // Flying minions can't get lost
+    protected override bool CheckIfLost()
+    {
+        return false; 
     }
 }

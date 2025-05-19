@@ -29,6 +29,7 @@ Programming todo:
 - Minion state machine
 - Settings menu scene
 - ~~minion facing flicker~~
+- Make Frenzy Beacon work again
 
 
 ----- Premature Optimizations -----

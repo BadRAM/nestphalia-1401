@@ -28,7 +28,7 @@ public class RallyBeacon : ActiveAbilityBeacon
         {
             if (minion.Team == Team)
             {
-                minion.SetTarget(World.PosToTilePos(targetPosition));
+                minion.SetTarget(World.PosToTilePos(targetPosition), World.Random.NextDouble() * 0.4 + 0.1);
             }
         }
     }

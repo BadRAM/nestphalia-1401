@@ -34,16 +34,21 @@ public class SapperMinion : Minion
     public SapperMinion(SapperMinionTemplate template, Team team, Vector2 position, NavPath? navPath) : base(template, team, position, navPath)
     {
         _template = template;
-        Retarget();
-        PathFinder.RequestPath(NavPath);
+        // We call from base to prevent resharper complaining about calling virtual method in constructor
+        base.SetTarget(GetNewTarget());
     }
 
-    public override void Update()
+    protected override void OnAttack()
     {
-        NextPos = World.GetTileCenter(NavPath.NextTile(Position));
-        
-        // become
-        if (!_attacking && NavPath.Found && NavPath.TargetReached(Position))
+        base.OnAttack();
+        _attacking = false;
+        SetTarget(OriginTile);
+    }
+
+    // Re-enter burrow when returning.
+    protected override void OnTargetReached()
+    {
+        if (!_attacking && NavPath.Destination == OriginTile)
         {
             if (World.GetTile(OriginTile) is Spawner s)
             {
@@ -55,35 +60,20 @@ public class SapperMinion : Minion
             }
             Die();
         }
-        
-        // if the next tile in our path is adjacent and solid, then attack it
-        if (_attacking && TryAttack())
-        {
-            _attacking = false;
-            NavPath.Reset(Position);
-            NavPath.Destination = OriginTile;
-            PathFinder.RequestPath(NavPath);
-        }
         else
         {
-            // if we're at our final destination, ask for a new path. (Don't ask for a new path if we already have)
-            if (NavPath.Found && NavPath.TargetReached(Position))
-            {
-                Retarget();
-                PathFinder.RequestPath(NavPath);
-            }
-            // else, move towards next tile on path.
-            Position = Position.MoveTowards(NextPos, AdjustedSpeed() * Time.DeltaTime);
+            base.OnTargetReached();
         }
+    }
 
-        Frenzy = false;
+    // Refuse to go anywhere but home if attack is spent
+    public override void SetTarget(Int2D target, double thinkDuration = 0.5)
+    {
+        base.SetTarget(!_attacking ? OriginTile : target, thinkDuration);
     }
 
     public override void Draw()
     {
-        //base.Draw();
-        //Color c = _attacking ? new Color(200, 100, 100, 64) : new Color(100, 200, 100, 64);
-        //Raylib.DrawCircle((int)Position.X, (int)Position.Y, _template.PhysicsRadius, new Color(200, 100, 100, 64));
         Z = Position.Y + (IsFlying ? 240 : 0);
 
         Texture2D texture = _attacking ? _template.Texture : _template.RetreatingTexture;

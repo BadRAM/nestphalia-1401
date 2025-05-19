@@ -243,7 +243,7 @@ public static class Assets
                 250, 
                 0, 
                 50,
-                new BasicMinionTemplate
+                new MinionTemplate
                 (
                     "minion_ant",
                     "Ant", 
@@ -333,7 +333,7 @@ public static class Assets
                 1200,
                 8,
                 50,
-                new BasicMinionTemplate
+                new MinionTemplate
                 (
                     "minion_snail",
                     "Snail", 
@@ -407,7 +407,7 @@ public static class Assets
                     10,
                     1,
                     24,
-                    new BasicMinionTemplate
+                    new MinionTemplate
                     (
                         "minion_spiderling",
                         "Spiderling", 

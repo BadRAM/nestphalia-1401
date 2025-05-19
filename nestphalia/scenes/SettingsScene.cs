@@ -12,7 +12,7 @@ public static class SettingsScene
     public static bool MusicMute;
     public static bool WindowScale;
     public static bool AccessibleFont;
-
+    
     public static bool RestartNeeded;
     
     // TODO: Settings menu

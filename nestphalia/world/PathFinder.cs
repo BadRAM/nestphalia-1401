@@ -5,7 +5,7 @@ namespace nestphalia;
 
 public static class PathFinder
 {
-    private static Queue<NavPath> _pathQueue = new Queue<NavPath>();
+    private static List<NavPath> _pathQueue = new List<NavPath>();
 
     private static PathNode?[,] _nodeGrid = new PathNode?[World.BoardWidth,World.BoardHeight];
     private static List<PathNode> _nodeQueue = new List<PathNode>();
@@ -63,7 +63,7 @@ public static class PathFinder
         }
         
         // One function call
-        _pathQueue.Enqueue(navPath);
+        _pathQueue.Add(navPath);
     }
 
     public static void ServeQueue(int max)
@@ -72,7 +72,14 @@ public static class PathFinder
         for (int i = 0; i < max; i++)
         {
             if (_pathQueue.Count == 0)  return;
-            FindPath(_pathQueue.Dequeue());
+            NavPath p = _pathQueue[0];
+            _pathQueue.RemoveAt(0);
+            if (p.Found) // Catch queue duplicates
+            {
+                Console.WriteLine($"{p.Requester} requested pathing on a navPath that's already been found.");
+                continue;
+            }
+            FindPath(p);
             if (i == max-1)
             {
                 Console.WriteLine($"Max path calc in {(Raylib.GetTime() - startTime) * 1000}ms, Queue length: {GetQueueLength()}");
@@ -90,11 +97,21 @@ public static class PathFinder
         _pathQueue.Clear();
     }
 
+    // Called to force a path to be found NOW! 
+    public static void DemandPath(NavPath navPath)
+    {
+        if (_pathQueue.Remove(navPath))
+        {
+            Console.WriteLine($"{navPath.Requester}'s path jumped the queue");
+        }
+        FindPath(navPath);
+    }
+
     // FindPath is normally called by ServeQueue, but can be called directly if an immediate path is needed.
-    public static void FindPath(NavPath navPath)
+    private static void FindPath(NavPath navPath)
     {
         // Guard against invalid path request
-        Debug.Assert(!navPath.Found);
+        // Debug.Assert(!navPath.Found);
         if (navPath.Found)
         {
             Console.WriteLine($"{navPath.Requester} requested pathing on a navPath that's already been found.");
