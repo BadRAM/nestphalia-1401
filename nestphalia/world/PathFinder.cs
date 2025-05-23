@@ -3,6 +3,7 @@ using Raylib_cs;
 
 namespace nestphalia;
 
+// Warning: Pathfinder uses static variables too much, and cannot run on multiple threads as a result. Making Pathfinder not static would fix.
 public static class PathFinder
 {
     private static List<NavPath> _pathQueue = new List<NavPath>();
@@ -44,71 +45,8 @@ public static class PathFinder
         }
     }
 
-    public static void RequestPath(NavPath navPath)
-    {
-        // One thousand guards
-        Debug.Assert(!navPath.Found);
-        //Debug.Assert(!_pathQueue.Contains(navPath));
-        if (_pathQueue.Contains(navPath))
-        {
-            Console.WriteLine($"{navPath.Requester} double requested a path");
-            return;
-        }
-        //Debug.Assert(navPath.Requester != "Beetle");
-        if (navPath.Start == navPath.Destination)
-        {
-            Console.WriteLine($"{navPath.Requester} requested a zero length path.");
-            navPath.Found = true;
-            return;
-        }
-        
-        // One function call
-        _pathQueue.Add(navPath);
-    }
-
-    public static void ServeQueue(int max)
-    {
-        double startTime = Raylib.GetTime();
-        for (int i = 0; i < max; i++)
-        {
-            if (_pathQueue.Count == 0)  return;
-            NavPath p = _pathQueue[0];
-            _pathQueue.RemoveAt(0);
-            if (p.Found) // Catch queue duplicates
-            {
-                Console.WriteLine($"{p.Requester} requested pathing on a navPath that's already been found.");
-                continue;
-            }
-            FindPath(p);
-            if (i == max-1)
-            {
-                Console.WriteLine($"Max path calc in {(Raylib.GetTime() - startTime) * 1000}ms, Queue length: {GetQueueLength()}");
-            }
-        }
-    }
-    
-    public static int GetQueueLength()
-    {
-        return _pathQueue.Count;
-    }
-
-    public static void ClearQueue()
-    {
-        _pathQueue.Clear();
-    }
-
-    // Called to force a path to be found NOW! 
-    public static void DemandPath(NavPath navPath)
-    {
-        if (_pathQueue.Remove(navPath))
-        {
-            Console.WriteLine($"{navPath.Requester}'s path jumped the queue");
-        }
-        FindPath(navPath);
-    }
-
     // FindPath is normally called by ServeQueue, but can be called directly if an immediate path is needed.
-    private static void FindPath(NavPath navPath)
+    public static void FindPath(NavPath navPath)
     {
         // Guard against invalid path request
         // Debug.Assert(!navPath.Found);

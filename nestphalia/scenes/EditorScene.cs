@@ -35,6 +35,7 @@ public class EditorScene : Scene
     public void Start(Action exitAction, Fort fortToLoad, CampaignSaveData? data = null)
     {
         _startPrevScene = exitAction; // exitAction is usually the start function of the scene that invoked the editor
+        _fort = fortToLoad;
         _brush = null;
         _toolActive = EditorTool.Erase;
         _data = data;
@@ -153,7 +154,7 @@ public class EditorScene : Scene
         World.Draw();
         
         _fort.Name = TextEntry(-592, 172, _fort.Name);
-        if (Button300(-592, 212, "Save Changes")) Resources.SaveFort(_fort.Name, _fort.Path);
+        if (Button300(-592, 212, "Save Changes")) Resources.SaveFort(_fort);
         if (Button300(-592, 252, "Exit")) _startPrevScene();
         
         // Bottom center buttons
@@ -240,7 +241,7 @@ public class EditorScene : Scene
     private void PathTestTool()
     {
         NavPath navPath = new NavPath("editor", new Int2D(28, 11), World.GetMouseTilePos(), World.RightTeam);
-        PathFinder.DemandPath(navPath);
+        PathFinder.FindPath(navPath);
         
         BeginMode2D(World.Camera);
         

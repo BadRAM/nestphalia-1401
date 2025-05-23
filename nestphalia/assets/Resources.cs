@@ -111,21 +111,21 @@ public static class Resources
 
         //Sounds.Add(new SoundResource("explosion", LoadSound("resources/sfx/explosion.wav"), 8));
         
-        CampaignLevels.Add(LoadFort(Directory.GetCurrentDirectory() + "/resources/level1.fort"));
-        CampaignLevels.Add(LoadFort(Directory.GetCurrentDirectory() + "/resources/level2.fort"));
-        CampaignLevels.Add(LoadFort(Directory.GetCurrentDirectory() + "/resources/level3.fort"));
-        CampaignLevels.Add(LoadFort(Directory.GetCurrentDirectory() + "/resources/level4.fort"));
-        CampaignLevels.Add(LoadFort(Directory.GetCurrentDirectory() + "/resources/level5.fort"));
-        CampaignLevels.Add(LoadFort(Directory.GetCurrentDirectory() + "/resources/level6.fort"));
-        CampaignLevels.Add(LoadFort(Directory.GetCurrentDirectory() + "/resources/level7.fort"));
-        CampaignLevels.Add(LoadFort(Directory.GetCurrentDirectory() + "/resources/level8.fort"));
-        CampaignLevels.Add(LoadFort(Directory.GetCurrentDirectory() + "/resources/level9.fort"));
-        CampaignLevels.Add(LoadFort(Directory.GetCurrentDirectory() + "/resources/level10.fort"));
-        CampaignLevels.Add(LoadFort(Directory.GetCurrentDirectory() + "/resources/level11.fort"));
-        CampaignLevels.Add(LoadFort(Directory.GetCurrentDirectory() + "/resources/level12.fort"));
-        CampaignLevels.Add(LoadFort(Directory.GetCurrentDirectory() + "/resources/level13.fort"));
-        CampaignLevels.Add(LoadFort(Directory.GetCurrentDirectory() + "/resources/level14.fort"));
-        CampaignLevels.Add(LoadFort(Directory.GetCurrentDirectory() + "/resources/level15.fort"));
+        CampaignLevels.Add(LoadFort("/resources/level1.fort"));
+        CampaignLevels.Add(LoadFort("/resources/level2.fort"));
+        CampaignLevels.Add(LoadFort("/resources/level3.fort"));
+        CampaignLevels.Add(LoadFort("/resources/level4.fort"));
+        CampaignLevels.Add(LoadFort("/resources/level5.fort"));
+        CampaignLevels.Add(LoadFort("/resources/level6.fort"));
+        CampaignLevels.Add(LoadFort("/resources/level7.fort"));
+        CampaignLevels.Add(LoadFort("/resources/level8.fort"));
+        CampaignLevels.Add(LoadFort("/resources/level9.fort"));
+        CampaignLevels.Add(LoadFort("/resources/level10.fort"));
+        CampaignLevels.Add(LoadFort("/resources/level11.fort"));
+        CampaignLevels.Add(LoadFort("/resources/level12.fort"));
+        CampaignLevels.Add(LoadFort("/resources/level13.fort"));
+        CampaignLevels.Add(LoadFort("/resources/level14.fort"));
+        CampaignLevels.Add(LoadFort("/resources/level15.fort"));
         // CampaignLevels.Add(LoadFort("/resources/level16.fort"));
     }
     
@@ -179,11 +179,11 @@ public static class Resources
         Font = accessible ? _accessibleFont : _defaultFont;
     }
 
-    public static void SaveFort(string fortName, string path)
+    public static void SaveFort(Fort fort)
     {
         //if (right) World.Flip();
-        Fort fort = new Fort(fortName, path);
-        fort.Name = fortName;
+        // Fort fort = new Fort(fortName, path);
+        // fort.Name = fortName;
         
         for (int x = 0; x < 20; x++)
         {
@@ -197,21 +197,30 @@ public static class Resources
         
         string jsonString = JsonSerializer.Serialize(fort, SourceGenerationContext.Default.Fort);
         //Console.WriteLine($"JSON fort looks like: {jsonString}");
-        File.WriteAllText(path + "/" + fortName + ".fort", jsonString);
+        File.WriteAllText(Directory.GetCurrentDirectory() + fort.Path + "/" + fort.Name + ".fort", jsonString);
     }
 
+    // Takes relative path
     public static Fort? LoadFort(string filepath)
     {
-        if (!Path.Exists(filepath)) return null;
+        filepath = Directory.GetCurrentDirectory() + filepath;
+        if (!Path.Exists(filepath))
+        {
+            Console.WriteLine($"Failed to find fort at {filepath}");
+            return null;
+        }
         string jsonString = File.ReadAllText(filepath);
         Fort fort = JsonSerializer.Deserialize<Fort>(jsonString, SourceGenerationContext.Default.Fort)!;
         fort.UpdateCost();
         fort.Path = Path.GetDirectoryName(filepath)!;
+        fort.Path = fort.Path.Substring(Directory.GetCurrentDirectory().Length);
+        Console.WriteLine($"Loaded {fort.Name}, path: {fort.Path}");
         return fort;
     }
 
     public static string GetUnusedFortName(string path)
     {
+        path = Directory.GetCurrentDirectory() + path;
         int number = 1;
         while (true)
         {

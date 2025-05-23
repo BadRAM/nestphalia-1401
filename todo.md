@@ -17,7 +17,6 @@ Programming todo:
 - ~~Refactor Minion.Hurt() to not need a damagesource~~
 - ~~Campaign rebalance, use 'funding' instead of direct cash stores, or Pay to build the fort every mission~~
 - ~~Allow multiple campaign designs~~
-- Help text/tutorial
 - Orphaned sapper beetles will seek another burrow
 - Limit total spiderlings a spider can spawn
 - ~~try compiling for web~~
@@ -26,10 +25,11 @@ Programming todo:
 - ~~Fix minion collision with wall corners~~
 - Minion melee attack animation
 - Minion render layers
-- Minion state machine
+- ~~Minion state machine~~
 - Settings menu scene
 - ~~minion facing flicker~~
 - Make Frenzy Beacon work again
+- ~~Fix determinism~~
 
 
 ----- Premature Optimizations -----
@@ -39,10 +39,15 @@ Programming todo:
     - ~~Battlescene should accept callback function to report victory~~
   - ~~Integrate Screen.HCenter/VCenter into GUI functions~~
   - Minion
-    - State machine
+    - ~~State machine~~
     - ~~Extract physics~~
   - World
     - make it not static
+  - Team
+    - ~~Move pathqueue and some pathfinding into team~~
+    - Move target selection into team
+  - Pathfinder
+    - Make it not static so it can be multithreaded
 
 - Game Logic optimizations
   - ~~profile tile entities separately by ID~~

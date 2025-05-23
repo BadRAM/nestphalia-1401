@@ -17,4 +17,10 @@ public static class Time
         Scaled += DeltaTime * TimeScale;
         Real = Raylib.GetTime();
     }
+
+    public static void Reset()
+    {
+        Scaled = 0;
+        Unscaled = 0;
+    }
 }

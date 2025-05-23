@@ -121,6 +121,7 @@ public partial class Minion : ISprite
     public virtual void Update()
     {
         State.Update();
+        Z = Position.Y + (IsFlying ? 240 : 0);
     }
 
     protected virtual void OnTargetReached()
@@ -135,7 +136,7 @@ public partial class Minion : ISprite
     
     public virtual void Draw()
     {
-        Z = Position.Y + (IsFlying ? 240 : 0);
+        // Z = Position.Y + (IsFlying ? 240 : 0);
 
         Vector2 pos = new Vector2((int)Position.X - Template.Texture.Width / 2f, (int)Position.Y - Template.Texture.Width / 2f);
         bool flip = NextPos.X > (int)Position.X;
@@ -236,8 +237,8 @@ public partial class Minion : ISprite
 
         // NavPath.Reset(Position);
         int i = Math.Min(targets.Count, 16);
-        // i = Math.Min(World.Random.Next(i), World.Random.Next(i));
-        i = World.Random.WeightedRandom(i);
+        i = Math.Min(World.RandomInt(i), World.RandomInt(i));
+        // i = World.Random.WeightedRandom(i);
         return targets[i].Value;
     }
     
@@ -318,14 +319,14 @@ public partial class Minion : ISprite
         NavPath.Reset(Position);
         NavPath.Start = World.PosToTilePos(Position);
         NavPath.Destination = target;
-        PathFinder.RequestPath(NavPath);
+        Team.RequestPath(NavPath);
         
         // Wait a bit, then force pathfinding if it hasn't happened yet.
         State = new Wait(this, thinkDuration, () =>
         {
             if (!NavPath.Found)
             {
-                PathFinder.DemandPath(NavPath);
+                Team.DemandPath(NavPath);
             }
             State = new Move(this);
         });

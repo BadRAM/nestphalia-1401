@@ -222,7 +222,7 @@ public class CampaignScene : Scene
             }
             else if (index < _directories.Length + _fortFiles.Length) // This is a fort
             {
-                string fortPath = _fortFiles[index - _directories.Length];
+                string fortPath = _fortFiles[index - _directories.Length].Substring(Directory.GetCurrentDirectory().Length);
                 if (GUI.Button300(-600, i * 40 - 240,
                         Path.GetFileNameWithoutExtension(fortPath), _selectedFort != index))
                 {
@@ -230,7 +230,7 @@ public class CampaignScene : Scene
                     _fort = Resources.LoadFort(fortPath);
                     _fort.Name = Path.GetFileNameWithoutExtension(fortPath);
                     _fort.Comment = _fort.FortSummary();
-                    _fort.Path = Path.GetDirectoryName(fortPath);
+                    // _fort.Path = fortPath;
                     _fortValidityMessage = _fort.IsValid(_data);
                     _selectedFort = index;
                 }
@@ -239,7 +239,7 @@ public class CampaignScene : Scene
             {
                 if (GUI.Button300(-600, i * 40 - 240, "+  New Fort  +"))
                 {
-                    string path = Directory.GetCurrentDirectory() + "/forts/Campaign/" + _activeDirectory;
+                    string path = "/forts/Campaign/" + _activeDirectory;
                     Fort f = new Fort(Resources.GetUnusedFortName(path), path);
                     new EditorScene().Start(Start, f, _data);
                 }

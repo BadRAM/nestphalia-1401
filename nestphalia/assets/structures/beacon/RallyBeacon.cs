@@ -28,7 +28,7 @@ public class RallyBeacon : ActiveAbilityBeacon
         {
             if (minion.Team == Team)
             {
-                minion.SetTarget(World.PosToTilePos(targetPosition), World.Random.NextDouble() * 0.4 + 0.1);
+                minion.SetTarget(World.PosToTilePos(targetPosition), World.RandomDouble() * 0.4 + 0.1);
             }
         }
     }
@@ -49,7 +49,7 @@ public class RallyBeacon : ActiveAbilityBeacon
 
         if (value * mult > minimumValue * 10)
         {
-            return World.GetTileCenter(targets[World.Random.Next(0, targets.Count)]);
+            return World.GetTileCenter(targets[World.RandomInt(0, targets.Count)]);
         }
         return null;
     }

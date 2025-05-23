@@ -59,7 +59,7 @@ public class Spawner : Structure
         {
             if (!_navPath.Found)
             {
-                Console.WriteLine($"Creating a minion without a path, PathQueueLength: {PathFinder.GetQueueLength()}");
+                Console.WriteLine($"Creating a minion without a path, PathQueueLength: {Team.GetQueueLength()}");
             }
             _template.Minion.Instantiate(Team, position, _navPath.Clone(_template.Minion.Name));
             _spawnsRemaining--;
@@ -74,7 +74,7 @@ public class Spawner : Structure
         _navPath.Destination = _targetTile;
         if (_template.Minion.PathFromNest())
         {
-            PathFinder.RequestPath(_navPath);
+            Team.RequestPath(_navPath);
         }
         else
         {
@@ -132,7 +132,7 @@ public class Spawner : Structure
             return;
         }
         
-        int i = World.Random.WeightedRandom(targets.Count);
+        int i = World.WeightedRandom(targets.Count);
         // Console.WriteLine($"Picked target {i}");
         _targetTile = targets[i].Value;
     }
@@ -144,7 +144,7 @@ public class Spawner : Structure
         _navPath.Destination = _targetTile;
         if (_template.Minion.PathFromNest())
         {
-            PathFinder.DemandPath(_navPath);
+            Team.DemandPath(_navPath);
         }
     }
 }

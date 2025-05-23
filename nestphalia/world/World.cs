@@ -16,7 +16,7 @@ public static class World
     public static List<Projectile> Projectiles = new List<Projectile>();
     public static List<Projectile> ProjectilesToRemove = new List<Projectile>();
     public static List<ISprite> Sprites = new List<ISprite>();
-    public static Random Random = new Random();
+    private static Random _random = new Random();
     public static double WaveDuration = 20;
     public static bool PreWave;
     public static double PreWaveOffset = 1.6;
@@ -62,6 +62,7 @@ public static class World
     
     private static void Initialize()
     {
+        Time.Reset();
         Camera.Target = new Vector2(BoardWidth * 12, BoardHeight * 12);
         Camera.Offset = new Vector2(Screen.HCenter, Screen.VCenter) * GUI.GetWindowScale();
         Camera.Rotation = 0;
@@ -69,7 +70,6 @@ public static class World
         Minions.Clear();
         Projectiles.Clear();
         Sprites.Clear();
-        PathFinder.ClearQueue();
         #if DEBUG
         _swEntitiesByID.Clear();
         #endif
@@ -82,7 +82,6 @@ public static class World
         DrawDebugInfo = false;
         
         LeftTeam = new Team("Player", false, Color.Blue);
-        LeftTeam.IsPlayerControlled = true;
         RightTeam = new Team("Enemy", true, Color.Red);
 
         for (int x = 0; x < BoardWidth; x++)
@@ -146,7 +145,7 @@ public static class World
     {
         Initialize();
         
-        Random = deterministic ? new Random(123) : new Random();
+        _random = deterministic ? new Random(123) : new Random();
         
         // set up floor tile checkerboard
         for (int x = 0; x < BoardWidth; x++)
@@ -169,6 +168,8 @@ public static class World
         RightTeam.Name = rightFort.Name;
         RightTeam.IsPlayerControlled = rightIsPlayer;
         RightTeam.Initialize();
+        
+        Determinator.Start(deterministic);
 
         _battleStarted = true;
     }
@@ -286,7 +287,11 @@ public static class World
         _swUpdateProjectiles.Stop();
         
         _swUpdatePathfinder.Start();
-        Task pathfinderTask = Task.Run(() => PathFinder.ServeQueue(10));
+        // LeftTeam.ServeQueue(10);
+        // RightTeam.ServeQueue(10);
+        Task pathfinderTask = Task.Run(() => { LeftTeam.ServeQueue(10); RightTeam.ServeQueue(10); });
+        // Task leftPathfinderTask = Task.Run(() => LeftTeam.ServeQueue(10));
+        // Task rightPathfinderTask = Task.Run(() => RightTeam.ServeQueue(10));
         _swUpdatePathfinder.Stop();
         
         _swUpdateMinionsCollide.Start();
@@ -305,7 +310,10 @@ public static class World
         
         _swUpdatePathfinder.Start();
         pathfinderTask.Wait();
+        // rightPathfinderTask.Wait();
         _swUpdatePathfinder.Stop();
+        
+        Determinator.Update();
         
         _swUpdate.Stop();
     }
@@ -477,6 +485,7 @@ public static class World
             $"Sprites: {Sprites.Count}\n" +
             $"Zoom: {Camera.Zoom}\n" +
             $"Tile {GetMouseTilePos().ToString()}\n" +
+            $"Fate: {(Determinator.Fate == Determinator.FateModes.Guarding ? "SET IN STONE" : Determinator.battleName)}\n" +
             // $"Total collision checks: {_totalCollideChecks/1000}k\n" +
             // $"ms/1k checks: {((_swUpdateMinionsCollide.Elapsed.TotalMilliseconds * 1000) / _totalCollideChecks).ToString("N4")}\n\n" +
             $"{tileTypeTotals}\n" +
@@ -638,5 +647,29 @@ public static class World
     public static Vector2 GetTileCenter(Int2D tilePos)
     {
         return GetTileCenter(tilePos.X, tilePos.Y);
+    }
+    
+    public static int RandomInt(int max)
+    {
+        //Determinator.Stacks += Environment.StackTrace + "\n\n";
+        return _random.Next(max);
+    }
+
+    public static int RandomInt(int min, int max)
+    {
+        //Determinator.Stacks += Environment.StackTrace + "\n\n";
+        return _random.Next(min, max);
+    }
+
+    public static int WeightedRandom(int max)
+    {
+        //Determinator.Stacks += Environment.StackTrace + "\n\n";
+        return _random.WeightedRandom(max);
+    }
+
+    public static double RandomDouble()
+    {
+        //Determinator.Stacks += Environment.StackTrace + "\n\n";
+        return _random.NextDouble();
     }
 }

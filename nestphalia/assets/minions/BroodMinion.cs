@@ -64,7 +64,7 @@ public class BroodMinion : Minion
         base.Die();
         for (int i = 0; i < _template.SpawnsOnDeath; i++)
         {
-            Vector2 offset = new Vector2((float)(Random.Shared.NextDouble() - 0.5), (float)(Random.Shared.NextDouble() - 0.5));
+            Vector2 offset = new Vector2((float)(World.RandomDouble() - 0.5), (float)(World.RandomDouble() - 0.5));
             _template.SpawnedMinion.Instantiate(Team, Position + offset, null);
         }
     }

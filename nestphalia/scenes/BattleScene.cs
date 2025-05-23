@@ -15,6 +15,8 @@ public class BattleScene : Scene
     private bool _pathFinderDebug;
     private Action<Team?> _battleOverCallback;
     private SceneState _state;
+
+    private string _log;
     
     private enum SceneState
     {
@@ -38,6 +40,8 @@ public class BattleScene : Scene
         Time.TimeScale = 1;
         Program.CurrentScene = this;
         World.InitializeBattle(leftFort, rightFort, leftIsPlayer, rightIsPlayer, deterministic);
+
+        _log += $"first random: {World.RandomInt(100)}\n";
         
         Resources.PlayMusicByName("jesper-kyd-highlands");
     }
@@ -51,7 +55,6 @@ public class BattleScene : Scene
         if (_state == SceneState.BattleActive)
         {
             UpdateWorld();
-            CheckWinner(); // If winner is found, changes state to BattleFinished
         }
         
         // ----- DRAW PHASE -----
@@ -78,6 +81,7 @@ public class BattleScene : Scene
                 DrawRectangle(0,0,Screen.Left,Screen.Bottom,new Color(0,0,0,128));
                 DrawTextCentered(0, -48, "BATTLE OVER!", 48);
                 DrawTextCentered(0, 0, $"{_winner.Name} is victorious!", 48);
+                if (World.DrawDebugInfo) DrawTextCentered(0, 100, $"{_log}");
                 if (Button100(-50, 30, "Return"))
                 {
                     SetMasterVolume(1f); // if F is still held, restore full volume.
@@ -117,7 +121,7 @@ public class BattleScene : Scene
         {
             Time.TimeScale = 1;
             Time.UpdateTime();
-            World.Update();
+            UpdateWorld();
             Time.TimeScale = 0;
         }
         
@@ -187,16 +191,18 @@ public class BattleScene : Scene
     private void UpdateWorld()
     {
         double startTime = GetTime();
-            
+        
         World.Update();
-
+        CheckWinner();
+        
         _skips = 0;
         if (IsKeyDown(KeyboardKey.F))
         {
-            while ((GetTime() - startTime) + ((GetTime() - startTime) / (_skips + 1)) < 0.016)
+            while (_state == SceneState.BattleActive && (GetTime() - startTime) + ((GetTime() - startTime) / (_skips + 1)) < 0.016)
             {
                 Time.UpdateTime();
                 World.Update();
+                CheckWinner();
                 _skips++;
             }
         }
@@ -208,11 +214,13 @@ public class BattleScene : Scene
         {
             _winner = World.RightTeam;
             _state = SceneState.BattleFinished;
+            _log += $"last random: {World.RandomInt(100)}";
         }
         if (World.RightTeam.GetHealth() <= 0)
         {
             _winner = World.LeftTeam;
             _state = SceneState.BattleFinished;
+            _log += $"last random: {World.RandomInt(100)}";
         }
     }
     

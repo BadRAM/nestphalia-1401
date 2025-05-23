@@ -488,8 +488,16 @@ public static class Assets
         // );
     }
 
-    public static StructureTemplate? GetTileByID(string ID)
+    public static StructureTemplate? GetStructureByID(string ID)
     {
-        return Structures.FirstOrDefault(x => x.ID == ID);
+        foreach (StructureTemplate structureTemplate in Structures)
+        {
+            if (structureTemplate.ID == ID)
+            {
+                return structureTemplate;
+            }
+        }
+        return null;
+        // return Structures.FirstOrDefault(x => x.ID == ID);
     }
 }

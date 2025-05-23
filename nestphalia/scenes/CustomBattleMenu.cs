@@ -148,14 +148,14 @@ public class CustomBattleMenu : Scene
                     Console.WriteLine("Loading " + Path.GetFileName(fortPath));
                     if (_loadingLeftSide)
                     {
-                        _leftFort = Resources.LoadFort(fortPath);
+                        _leftFort = Resources.LoadFort(fortPath.Substring(Directory.GetCurrentDirectory().Length));
                         _leftFort.Name = Path.GetFileNameWithoutExtension(fortPath);
                         _leftFort.Comment = _leftFort.FortSummary();
                         _leftFort.LoadToBoard(false);
                     }
                     else
                     {
-                        _rightFort = Resources.LoadFort(fortPath);
+                        _rightFort = Resources.LoadFort(fortPath.Substring(Directory.GetCurrentDirectory().Length));
                         _rightFort.Name = Path.GetFileNameWithoutExtension(fortPath);
                         _rightFort.Comment = _rightFort.FortSummary();
                         _rightFort.LoadToBoard(true);
@@ -168,7 +168,7 @@ public class CustomBattleMenu : Scene
             {
                 if (GUI.Button300(-600, i * 40 - 240, "+  New Fort  +"))
                 {
-                    string path = Directory.GetCurrentDirectory() + "/forts/" + _activeDirectory;
+                    string path = "/forts/" + _activeDirectory;
                     Fort f = new Fort(Resources.GetUnusedFortName(path), path);
                     new EditorScene().Start(Start, f);
                 }

@@ -49,7 +49,6 @@ public static class Utils
     }
 }
 
-// Todo: Maybe this will be more performant if it implements IComparable?
 public class Sortable<T>
 {
     public double Order;

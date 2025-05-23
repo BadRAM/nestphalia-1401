@@ -14,13 +14,14 @@ public class HopperMinionTemplate : MinionTemplate
         Register(new HopperMinion(this, team, position, navPath));
     }
 }
-    
+
 public class HopperMinion : Minion
 {
-    public HopperMinion(MinionTemplate template, Team team, Vector2 position, NavPath? navPath) : base(template, team, position, navPath)
+    public HopperMinion(MinionTemplate template, Team team, Vector2 position, NavPath? navPath) : base(template, team,
+        position, navPath)
     {
     }
-    
+
     public override void Update()
     {
         if (State is Move)
@@ -31,17 +32,17 @@ public class HopperMinion : Minion
             {
                 Structure? structureAhead = World.GetTile((Int2D)ahead);
 
-                if (structureAhead == null || 
-                    (!structureAhead.PhysSolid() && 
+                if (structureAhead == null ||
+                    (!structureAhead.PhysSolid() &&
                      (structureAhead.Team != Team || structureAhead is not Minefield)))
                 {
                     Vector2 to = World.GetTileCenter((Int2D)ahead);
-                    to += new Vector2(World.Random.Next(17) - 8, World.Random.Next(23) - 11);
+                    to += new Vector2(World.RandomInt(17) - 8, World.RandomInt(23) - 11);
                     State = new Jump(this, to, 0.25, 0.5, 0.25);
                 }
             }
         }
-        
+
         base.Update();
     }
 }

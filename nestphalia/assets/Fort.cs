@@ -13,7 +13,7 @@ public class Fort
     public Fort(string name, string path)
     {
         Name = name;
-        Path = Directory.GetCurrentDirectory() + path;
+        Path = path;
     }
 
     // This constructor is for the json deserializer, please use the other one for creating new forts.
@@ -27,11 +27,11 @@ public class Fort
             {
                 if (rightSide)
                 {
-                    World.SetTile(Assets.GetTileByID(Board[x+y*20]), World.RightTeam, 46-x,y+1);
+                    World.SetTile(Assets.GetStructureByID(Board[x+y*20]), World.RightTeam, 46-x,y+1);
                 }
                 else
                 {
-                    World.SetTile(Assets.GetTileByID(Board[x+y*20]), World.LeftTeam, x+1,y+1);
+                    World.SetTile(Assets.GetStructureByID(Board[x+y*20]), World.LeftTeam, x+1,y+1);
                 }
             }
         }
@@ -49,7 +49,7 @@ public class Fort
         {
             for (int y = 0; y < 20; ++y)
             {
-                StructureTemplate? t = Assets.GetTileByID(Board[x+y*20]);
+                StructureTemplate? t = Assets.GetStructureByID(Board[x+y*20]);
                 if (t == null) continue;
                 structureCount++;
                 totalCost += t.Price;
@@ -78,7 +78,7 @@ public class Fort
         {
             for (int y = 0; y < 20; ++y)
             {
-                StructureTemplate? t = Assets.GetTileByID(Board[x+y*20]);
+                StructureTemplate? t = Assets.GetStructureByID(Board[x+y*20]);
                 if (t == null) continue;
                 totalCost += t.Price;
                 if (t is SpawnerTemplate) nestCount++;
@@ -117,7 +117,7 @@ public class Fort
         {
             for (int y = 0; y < 20; ++y)
             {
-                StructureTemplate? t = Assets.GetTileByID(Board[x+y*20]);
+                StructureTemplate? t = Assets.GetStructureByID(Board[x+y*20]);
                 if (t == null) continue;
                 totalCost += t.Price;
             }

@@ -66,7 +66,7 @@ public class SpawnBoostBeacon : ActiveAbilityBeacon
         
         targets = targets.OrderByDescending(o => o.Order).ToList();
         
-        int i = World.Random.WeightedRandom(targets.Count);
+        int i = World.WeightedRandom(targets.Count);
         // Console.WriteLine($"Picked target {i}");
         return World.GetTileCenter(targets[i].Value);
     }

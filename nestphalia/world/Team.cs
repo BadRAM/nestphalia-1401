@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Net;
 using System.Numerics;
 using Raylib_cs;
@@ -5,7 +6,6 @@ using Raylib_cs;
 namespace nestphalia;
 
 // TODO: Cache target list here
-// TODO: Cache nav weight here
 public class Team
 {
     public string Name;
@@ -25,6 +25,9 @@ public class Team
     private double _timeLastAbilityUsed = -10;
     private double _maxHealth;
     private double _health;
+
+    private List<NavPath> _pathQueue = new List<NavPath>();
+    private List<NavPath> _priorityPathQueue = new List<NavPath>();
 
     public Team(string name, bool isRightSide, Color unitTint)
     {
@@ -72,6 +75,85 @@ public class Team
         World.StructureChanged += OnStructureChanged;
     }
 
+    #region Path Queue
+    public void RequestPath(NavPath navPath)
+    {
+        // One thousand guards
+        Debug.Assert(!navPath.Found);
+        //Debug.Assert(!_pathQueue.Contains(navPath));
+        if (_pathQueue.Contains(navPath))
+        {
+            Console.WriteLine($"{navPath.Requester} double requested a path");
+            return;
+        }
+        //Debug.Assert(navPath.Requester != "Beetle");
+        if (navPath.Start == navPath.Destination)
+        {
+            Console.WriteLine($"{navPath.Requester} requested a zero length path.");
+            navPath.Found = true;
+            return;
+        }
+        
+        // One function call
+        _pathQueue.Add(navPath);
+    }
+    
+    // Called to force a path to be found the next time the queue is served! 
+    public void DemandPath(NavPath navPath)
+    {
+        if (_pathQueue.Remove(navPath))
+        {
+            Console.WriteLine($"{navPath.Requester}'s path jumped the queue");
+        }
+        _priorityPathQueue.Add(navPath);
+        //PathFinder.FindPath(navPath);
+    }
+
+    public void ServeQueue(int max)
+    {
+        double startTime = Raylib.GetTime();
+        int i = 0;
+        while (_priorityPathQueue.Count > 0)
+        {
+            NavPath p = _priorityPathQueue[0];
+            _priorityPathQueue.RemoveAt(0);
+            if (p.Found) // Catch queue duplicates
+            {
+                Console.WriteLine($"{p.Requester} requested priority pathing from Team {Name} on a navPath that's already been found.");
+                continue;
+            }
+            PathFinder.FindPath(p);
+            i++;
+        }
+        for (; i < max; i++)
+        {
+            if (_pathQueue.Count == 0)  return;
+            NavPath p = _pathQueue[0];
+            _pathQueue.RemoveAt(0);
+            if (p.Found) // Catch queue duplicates
+            {
+                Console.WriteLine($"{p.Requester} requested pathing from Team {Name} on a navPath that's already been found.");
+                continue;
+            }
+            PathFinder.FindPath(p);
+        }
+        if (i >= max-1)
+        {
+            Console.WriteLine($"Max path calc, {i} in {(Raylib.GetTime() - startTime) * 1000}ms, Queue length: {GetQueueLength()}");
+        }
+    }
+    
+    public int GetQueueLength()
+    {
+        return _pathQueue.Count;
+    }
+
+    public void ClearQueue()
+    {
+        _pathQueue.Clear();
+    }
+    #endregion
+    
     public double GetHateFor(int x, int y)
     {
         return _hateMap[x, y];
@@ -171,7 +253,7 @@ public class Team
         }
         else
         {
-            int i = World.Random.Next(BeaconCap);
+            int i = World.RandomInt(BeaconCap);
             if ((Beacons[i]?.IsReady() ?? false) && Time.Scaled - _timeLastAbilityUsed > 8)
             {
                 Vector2? targetPos = Beacons[i]?.SelectPosition();
@@ -264,7 +346,6 @@ public class Team
                 }
             }
         }
-
         return weight;
     }
     
