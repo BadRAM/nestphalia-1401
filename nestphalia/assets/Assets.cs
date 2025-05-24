@@ -166,7 +166,7 @@ public static class Assets
                 "Rally Stratagem", 
                 "Commands all your bugs to a single target\n\n\"Strength in numbers! They can't stop all " +
                 "\nof us!\"", 
-                Resources.GetTextureByName("flag1"), 
+                Resources.GetTextureByName("flag1"),
                 100,
                 750,
                 3,
@@ -236,9 +236,9 @@ public static class Assets
             new SpawnerTemplate
             (
                 "nest_ant",
-                "Anthill", 
+                "Anthill",
                 "",
-                Resources.GetTextureByName("spawner"), 
+                Resources.GetTextureByName("spawner"),
                 50, 
                 250, 
                 0, 
@@ -247,8 +247,8 @@ public static class Assets
                 (
                     "minion_ant",
                     "Ant", 
-                    "\nAntz is made for Fightin and Winnin!",
-                    Resources.GetTextureByName("smant"), 
+                    "\nThanks, ants. Thants.",
+                    Resources.GetTextureByName("ant12px"), 
                     20, 
                     0, 
                     5, 
@@ -456,36 +456,6 @@ public static class Assets
                 4
             )
         );
-        
-        // Structures.Add
-        // (
-        //     new SpawnerTemplate
-        //     (
-        //         "nest_fake",
-        //         "TinyAnthill",
-        //         "",
-        //         Resources.GetTextureByName("spawner"),
-        //         80,
-        //         50,
-        //         99,
-        //         50,
-        //         new MinionTemplate
-        //         (
-        //             "minion_fake",
-        //             "Ant",
-        //             "",
-        //             Resources.GetTextureByName("wabbit"),
-        //             10,
-        //             0,
-        //             5, 
-        //             30,
-        //             3
-        //         ), 
-        //         0,
-        //         0,
-        //         0.25
-        //     )
-        // );
     }
 
     public static StructureTemplate? GetStructureByID(string ID)
@@ -498,6 +468,5 @@ public static class Assets
             }
         }
         return null;
-        // return Structures.FirstOrDefault(x => x.ID == ID);
     }
 }

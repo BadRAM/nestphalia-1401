@@ -12,12 +12,16 @@ public partial class Minion
         public BaseState(Minion minion) { Me = minion; } 
         
         public abstract void Update();
+        public abstract int GetAnimFrame();
         public new abstract string ToString();
     }
 
     // Move acts as the 'default' state, that other states can safely return to without arguments
     protected class Move : BaseState
     {
+        private int _animFrame;
+        private int _animCounter;
+        
         public Move(Minion minion) : base(minion) { }
         public override string ToString() { return "Move"; }
 
@@ -48,6 +52,17 @@ public partial class Minion
             
             // If no state change is needed, move towards NextPos
             Me.Position = Me.Position.MoveTowards(Me.NextPos, Me.AdjustedSpeed() * Time.DeltaTime); // else: Move
+            _animCounter++;
+            if (_animCounter >= 2)
+            {
+                _animFrame = (_animFrame + 1) % 4;
+                _animCounter = 0;
+            }
+        }
+
+        public override int GetAnimFrame()
+        {
+            return _animFrame;
         }
     }
 
@@ -78,6 +93,11 @@ public partial class Minion
                 _attackStartedTime = Time.Scaled;
             }
         }
+
+        public override int GetAnimFrame()
+        {
+            return 0;
+        }
     }
 
     protected class Wait : BaseState
@@ -100,6 +120,11 @@ public partial class Minion
                 _finishAction();
             }
             Debug.Assert(_waitRemaining >= 0);
+        }
+
+        public override int GetAnimFrame()
+        {
+            return 0;
         }
     }
 
@@ -152,6 +177,15 @@ public partial class Minion
                 Me.Position = _to;
                 Me.State = new Wait(Me, _landingLag, () => { Me.State = new Move(Me); });
             }
+        }
+
+        public override int GetAnimFrame()
+        {
+            if (Time.Scaled - _started < _squatDuration) // Waiting in jumpSquat
+            {
+                return 5;
+            }
+            return 4;
         }
     }
 }

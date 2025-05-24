@@ -136,13 +136,18 @@ public partial class Minion : ISprite
     
     public virtual void Draw()
     {
-        // Z = Position.Y + (IsFlying ? 240 : 0);
+        int frame = State.GetAnimFrame();
 
-        Vector2 pos = new Vector2((int)Position.X - Template.Texture.Width / 2f, (int)Position.Y - Template.Texture.Width / 2f);
+        int size = Template.Texture.Height / 2;
+        Vector2 pos = new Vector2((int)Position.X - size / 2f, (int)Position.Y - size / 2f);
         bool flip = NextPos.X > (int)Position.X;
-        Rectangle source = new Rectangle(flip ? Template.Texture.Width : 0, 0, flip ? Template.Texture.Width : -Template.Texture.Width, Template.Texture.Height);
+        Rectangle source = new Rectangle(flip ? size : 0, 0, flip ? size : -size, size);
+        source.X = size * frame;
+        Raylib.DrawTextureRec(Template.Texture, source, pos, Color.White);
+        
+        source.Y += size;
         Raylib.DrawTextureRec(Template.Texture, source, pos, Team.UnitTint);
-
+        
         DrawHealthBar();
         DrawDebug();
     }
@@ -246,8 +251,8 @@ public partial class Minion : ISprite
     {
         if (Health < Template.MaxHealth)
         {
-            Vector2 start = Position - new Vector2(Template.Texture.Width / 2f, Template.Texture.Height / 2f + 2);
-            Vector2 end = start + new Vector2((float)(Template.Texture.Width * (Health / Template.MaxHealth)), 0);
+            Vector2 start = Position - new Vector2(Template.PhysicsRadius, Template.PhysicsRadius + 2);
+            Vector2 end = start + new Vector2((float)(2 * Template.PhysicsRadius * (Health / Template.MaxHealth)), 0);
             Raylib.DrawLineEx(start, end, 1, new Color(32, 192, 32, 255));
         }
     }

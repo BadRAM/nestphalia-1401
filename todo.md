@@ -13,7 +13,13 @@ Programming todo:
   - Ranged attack bug
   - Another flyer. Ladybug? Flies until attacked.
   - Snail rework
+  - Beetle rework. Attacks can damage the ball?
   - Centipede that gets longer and shorter
+  - Tower with a big sawblade on an arm that slowly orbits
+  - Springboard trap that launches a bug towards the other fort based on it's weight
+  - Glue paper rework - Maybe it just works forever, but only affects bugs standing on it?
+- Minion Status Effect System
+- Make Frenzy Beacon work again
 - ~~Refactor Minion.Hurt() to not need a damagesource~~
 - ~~Campaign rebalance, use 'funding' instead of direct cash stores, or Pay to build the fort every mission~~
 - ~~Allow multiple campaign designs~~
@@ -23,13 +29,14 @@ Programming todo:
 - Make nests solid again
 - Help text / Tutorial
 - ~~Fix minion collision with wall corners~~
-- Minion melee attack animation
+- Minion animation
 - Minion render layers
 - ~~Minion state machine~~
-- Settings menu scene
 - ~~minion facing flicker~~
-- Make Frenzy Beacon work again
 - ~~Fix determinism~~
+- ~~Settings menu scene~~
+- Fix High DPI mode
+- Add button to relaunch game when High DPI mode toggle selected
 
 
 ----- Premature Optimizations -----

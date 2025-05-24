@@ -83,13 +83,19 @@ public static class Resources
     private static Font _defaultFont;
     public static Music MusicPlaying;
     
+    // public static Shader TeamColorShader;
+    // private static int _teamColorLoc;
     
     public static void Load()
     {
         MissingTexture = LoadTexture("resources/sprites/missingtex.png");
+        
         _accessibleFont = LoadFont("resources/pixelplay16.png");
         _defaultFont = LoadFont("resources/alagard.png");
         Font = Settings.Saved.AccessibleFont ? _accessibleFont : _defaultFont;
+        
+        // TeamColorShader = LoadShader("", "resources/TeamColor.glsl");
+        // _teamColorLoc = GetShaderLocation(TeamColorShader, "teamColor1");
         
         foreach (string path in Directory.GetFiles(Directory.GetCurrentDirectory() + "/resources/sprites"))
         {
@@ -161,10 +167,13 @@ public static class Resources
             {
                 Console.WriteLine($" - {m.Name}");
             }
-            // MusicPlaying = Music[0].Music;
-            // PlayMusicStream(MusicPlaying);
         }
     }
+
+    // public static void SetTeamColor(Color color)
+    // {
+    //     SetShaderValue(TeamColorShader, _teamColorLoc, color, ShaderUniformDataType.Vec4);
+    // }
     
     public static void RestartMusic()
     {
