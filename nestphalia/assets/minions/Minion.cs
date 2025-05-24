@@ -136,19 +136,8 @@ public partial class Minion : ISprite
     
     public virtual void Draw()
     {
-        int frame = State.GetAnimFrame();
-
-        int size = Template.Texture.Height / 2;
-        Vector2 pos = new Vector2((int)Position.X - size / 2f, (int)Position.Y - size / 2f);
-        bool flip = NextPos.X > (int)Position.X;
-        Rectangle source = new Rectangle(flip ? size : 0, 0, flip ? size : -size, size);
-        source.X = size * frame;
-        Raylib.DrawTextureRec(Template.Texture, source, pos, Color.White);
-        
-        source.Y += size;
-        Raylib.DrawTextureRec(Template.Texture, source, pos, Team.UnitTint);
-        
-        DrawHealthBar();
+        DrawBug(State.GetAnimFrame());
+        DrawDecorators();
         DrawDebug();
     }
     #endregion
@@ -246,15 +235,31 @@ public partial class Minion : ISprite
         // i = World.Random.WeightedRandom(i);
         return targets[i].Value;
     }
-    
-    protected void DrawHealthBar()
+
+    protected void DrawBug(int frame)
     {
+        int size = Template.Texture.Height / 2;
+        Vector2 pos = new Vector2((int)Position.X - size / 2f, (int)Position.Y - size / 2f);
+        bool flip = NextPos.X > (int)Position.X;
+        Rectangle source = new Rectangle(flip ? size : 0, 0, flip ? size : -size, size);
+        source.X = size * frame;
+        Raylib.DrawTextureRec(Template.Texture, source, pos, Color.White);
+        source.Y += size;
+        Raylib.DrawTextureRec(Template.Texture, source, pos, Team.UnitTint);
+    }
+    
+    protected void DrawDecorators()
+    {
+        // Health Bar
         if (Health < Template.MaxHealth)
         {
             Vector2 start = Position - new Vector2(Template.PhysicsRadius, Template.PhysicsRadius + 2);
             Vector2 end = start + new Vector2((float)(2 * Template.PhysicsRadius * (Health / Template.MaxHealth)), 0);
             Raylib.DrawLineEx(start, end, 1, new Color(32, 192, 32, 255));
         }
+        
+        // State Decorators
+        State.DrawDecorators();
     }
 
     protected void DrawDebug()
@@ -334,7 +339,7 @@ public partial class Minion : ISprite
                 Team.DemandPath(NavPath);
             }
             State = new Move(this);
-        });
+        }, Resources.GetTextureByName("particle_confused"));
     }
     #endregion
 }

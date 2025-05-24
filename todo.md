@@ -30,7 +30,8 @@ Programming todo:
 - Help text / Tutorial
 - ~~Fix minion collision with wall corners~~
 - Minion animation
-- Minion render layers
+  - Add standing frame
+- ~~Minion render layers~~
 - ~~Minion state machine~~
 - ~~minion facing flicker~~
 - ~~Fix determinism~~

@@ -10,7 +10,7 @@ public static class Physics
     public static bool CollideMinion(Minion a, Minion b)
     {
         Debug.Assert(b != a);
-
+        
         if (b.IsFlying != a.IsFlying) return false;
         if (!Raylib.CheckCollisionCircles(a.Position, a.Template.PhysicsRadius, b.Position, b.Template.PhysicsRadius)) return false;
         if (a.Position == b.Position) // bump away if both minions are in the exact same position
@@ -23,8 +23,8 @@ public static class Physics
         Vector2 delta = a.Position - b.Position;
         float weightRatio = a.Template.PhysicsRadius / (a.Template.PhysicsRadius + b.Template.PhysicsRadius);
         float penDepth = (a.Template.PhysicsRadius + b.Template.PhysicsRadius - delta.Length());
-        a.Push(delta.Normalized() * Math.Min(penDepth * (1f-weightRatio), 0.5f));
-        b.Push(delta.Normalized() * Math.Min(penDepth * weightRatio * -1, 0.5f));
+        a.Push(delta.Normalized() * Math.Min(penDepth * (1f-weightRatio), 30 * (float)Time.DeltaTime));
+        b.Push(delta.Normalized() * Math.Min(penDepth * weightRatio * -1, 30 * (float)Time.DeltaTime));
         return true;
     }
     

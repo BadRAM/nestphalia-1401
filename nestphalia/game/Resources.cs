@@ -74,9 +74,9 @@ public class MusicResource
 public static class Resources
 {
     public static Texture2D MissingTexture;
-    private static List<SpriteResource> _sprites = new List<SpriteResource>();
-    private static List<SoundResource> _sounds = new List<SoundResource>();
-    private static List<MusicResource> _music = new List<MusicResource>();
+    private static Dictionary<String, SpriteResource> _sprites = new Dictionary<String, SpriteResource>();
+    private static Dictionary<String, SoundResource> _sounds = new Dictionary<String, SoundResource>();
+    private static Dictionary<String, MusicResource> _music = new Dictionary<String, MusicResource>();
     public static List<Fort> CampaignLevels = new List<Fort>();
     public static Font Font;
     private static Font _accessibleFont;
@@ -99,21 +99,24 @@ public static class Resources
         
         foreach (string path in Directory.GetFiles(Directory.GetCurrentDirectory() + "/resources/sprites"))
         {
-            _sprites.Add(new SpriteResource(Path.GetFileNameWithoutExtension(path), LoadTexture("resources/sprites/" + Path.GetFileName(path))));
+            SpriteResource r = new SpriteResource(Path.GetFileNameWithoutExtension(path), LoadTexture("resources/sprites/" + Path.GetFileName(path)));
+            _sprites.Add(r.Name, r);
         }
         
         foreach (string path in Directory.GetFiles(Directory.GetCurrentDirectory() + "/resources/sfx"))
         {
-            _sounds.Add(new SoundResource(Path.GetFileNameWithoutExtension(path), LoadSound("resources/sfx/" + Path.GetFileName(path)), 16));
+            SoundResource r = new SoundResource(Path.GetFileNameWithoutExtension(path), LoadSound("resources/sfx/" + Path.GetFileName(path)), 16);
+            _sounds.Add(r.Name, r);
         }
         
         foreach (string path in Directory.GetFiles(Directory.GetCurrentDirectory() + "/resources/music"))
         {
-            _music.Add(new MusicResource(Path.GetFileNameWithoutExtension(path), LoadMusicStream("resources/music/" + Path.GetFileName(path))));
+            MusicResource r = new MusicResource(Path.GetFileNameWithoutExtension(path), LoadMusicStream("resources/music/" + Path.GetFileName(path)));
+            _music.Add(r.Name, r);
         }
 
-        MusicPlaying = _music[0].Music;
-        PlayMusicStream(MusicPlaying);
+        //MusicPlaying = _music["unreal_technology_demo_95_-_unreals"].Music;
+        //PlayMusicStream(MusicPlaying);
 
         //Sounds.Add(new SoundResource("explosion", LoadSound("resources/sfx/explosion.wav"), 8));
         
@@ -137,14 +140,18 @@ public static class Resources
     
     public static Texture2D GetTextureByName(string name)
     {
-        SpriteResource? s = _sprites.FirstOrDefault(x => x.Name == name);
-        return s?.Tex ?? MissingTexture;
+        if (!_sprites.ContainsKey(name)) return MissingTexture;
+        return _sprites[name].Tex;
+        // SpriteResource? s = _sprites.FirstOrDefault(x => x.Name == name);
+        // return s?.Tex ?? MissingTexture;
     }
     
     public static SoundResource GetSoundByName(string name)
     {
-        SoundResource? s = _sounds.FirstOrDefault(x => x.Name == name);
-        return s ?? _sounds[0];
+        if (!_sounds.ContainsKey(name)) return _sounds["shovel"];
+        return _sounds[name];
+        // SoundResource? s = _sounds.FirstOrDefault(x => x.Name == name);
+        // return s ?? _sounds[0];
     }
 
     public static void PlayMusicByName(string name)
@@ -152,7 +159,9 @@ public static class Resources
         StopMusicStream(MusicPlaying);
         if (Settings.Saved.MusicMute) return;
         
-        MusicResource? s = _music.FirstOrDefault(x => x.Name == name);
+        // MusicResource? s = _music.FirstOrDefault(x => x.Name == name);
+        MusicResource? s = null;
+        if (_music.ContainsKey(name)) s = _music[name];
         
         if (s != null)
         {
@@ -163,9 +172,9 @@ public static class Resources
         else
         {
             Console.WriteLine("MusicResource was null! Music names are:");
-            foreach (MusicResource m in _music)
+            foreach (KeyValuePair<string, MusicResource> m in _music.ToArray())
             {
-                Console.WriteLine($" - {m.Name}");
+                Console.WriteLine($" - {m.Key}");
             }
         }
     }
@@ -184,10 +193,11 @@ public static class Resources
 
     public static void Unload()
     {
-        foreach (SpriteResource spriteResource in _sprites)
+        foreach (KeyValuePair<string, SpriteResource> spriteResource in _sprites.ToArray())
         {
-            UnloadTexture(spriteResource.Tex);
+            UnloadTexture(spriteResource.Value.Tex);
         }
+        _sprites.Clear();
     }
 
     public static void SetFontAccessibility(bool accessible)

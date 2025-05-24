@@ -82,7 +82,7 @@ public class SapperMinion : Minion
         Rectangle source = new Rectangle(flip ? texture.Width : 0, 0, flip ? texture.Width : -texture.Width, texture.Height);
         Raylib.DrawTextureRec(texture, source, pos, Team.UnitTint);
         
-        DrawHealthBar();
+        DrawDecorators();
         DrawDebug();
     }
 }

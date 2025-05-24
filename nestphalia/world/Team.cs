@@ -33,7 +33,9 @@ public class Team
     {
         Name = name;
         IsRightSide = isRightSide;
-        UnitTint = unitTint;
+        // UnitTint = unitTint;
+        Color[] colors = { Color.Red, Color.Blue, Color.Green, Color.Yellow, Color.Purple, Color.Pink, Color.Orange, Color.White, Color.Beige, Color.Black, Color.Brown, Color.DarkBlue, Color.Lime, Color.Magenta, Color.SkyBlue, Color.Violet, Color.Maroon, Color.Gold };
+        UnitTint = colors[Random.Shared.Next(colors.Length)];
         _abilitySlot = Resources.GetTextureByName("ability_slot");
         _healthBar = Resources.GetTextureByName("button_wide");
     }

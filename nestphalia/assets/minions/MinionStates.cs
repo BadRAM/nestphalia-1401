@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Numerics;
+using Raylib_cs;
 
 namespace nestphalia;
 
@@ -13,6 +14,7 @@ public partial class Minion
         
         public abstract void Update();
         public abstract int GetAnimFrame();
+        public virtual void DrawDecorators() {}
         public new abstract string ToString();
     }
 
@@ -62,7 +64,7 @@ public partial class Minion
 
         public override int GetAnimFrame()
         {
-            return _animFrame;
+            return _animFrame + 1;
         }
     }
 
@@ -104,11 +106,13 @@ public partial class Minion
     {
         private int _waitRemaining;
         private Action _finishAction;
+        private Texture2D? _decorator;
 
-        public Wait(Minion minion, double duration, Action finishAction) : base(minion)
+        public Wait(Minion minion, double duration, Action finishAction, Texture2D? decorator = null) : base(minion)
         {
             _waitRemaining = (int)(duration / Time.DeltaTime);
             _finishAction = finishAction;
+            _decorator = decorator;
         }
         public override string ToString() { return "Wait"; }
         
@@ -125,6 +129,12 @@ public partial class Minion
         public override int GetAnimFrame()
         {
             return 0;
+        }
+
+        public override void DrawDecorators()
+        {
+            if (_decorator == null) return;
+            Raylib.DrawTexture(_decorator ?? Resources.MissingTexture, (int)Me.Position.X, (int)(Me.Position.Y - (Me.Template.PhysicsRadius + 6)), Color.White);
         }
     }
 
@@ -185,7 +195,7 @@ public partial class Minion
             {
                 return 5;
             }
-            return 4;
+            return 6;
         }
     }
 }

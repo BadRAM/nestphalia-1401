@@ -98,7 +98,7 @@ public class BattleScene : Scene
                 }
                 if (Button100(-50, 80, "Resume"))
                 {
-                    _state = SceneState.BattleActive;
+                    TogglePaused();
                 }
                 if (Button100(-50, 120, "Quit"))
                 {
@@ -118,17 +118,7 @@ public class BattleScene : Scene
     {
         if (IsKeyPressed(KeyboardKey.P) || IsKeyPressed(KeyboardKey.Escape))
         {
-            switch (_state)
-            {
-                case SceneState.BattleActive:
-                    _state = SceneState.Paused;
-                    Time.TimeScale = 0;
-                    break;
-                case SceneState.Paused:
-                    _state = SceneState.BattleActive;
-                    Time.TimeScale = 1;
-                    break;
-            }
+            TogglePaused();
         }
         if (_state == SceneState.Paused && IsKeyPressed(KeyboardKey.O)) // Frame step
         {
@@ -218,6 +208,21 @@ public class BattleScene : Scene
                 CheckWinner();
                 _skips++;
             }
+        }
+    }
+
+    public void TogglePaused()
+    {
+        switch (_state)
+        {
+            case SceneState.BattleActive:
+                _state = SceneState.Paused;
+                Time.TimeScale = 0;
+                break;
+            case SceneState.Paused:
+                _state = SceneState.BattleActive;
+                Time.TimeScale = 1;
+                break;
         }
     }
     
