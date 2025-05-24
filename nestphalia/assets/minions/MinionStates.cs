@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Numerics;
 
 namespace nestphalia;
@@ -81,24 +82,24 @@ public partial class Minion
 
     protected class Wait : BaseState
     {
-        private double _waitRemaining;
+        private int _waitRemaining;
         private Action _finishAction;
 
         public Wait(Minion minion, double duration, Action finishAction) : base(minion)
         {
-            _waitRemaining = duration;
+            _waitRemaining = (int)(duration / Time.DeltaTime);
             _finishAction = finishAction;
         }
         public override string ToString() { return "Wait"; }
-
         
         public override void Update()
         {
-            _waitRemaining -= Time.DeltaTime;
-            if (_waitRemaining <= 0)
+            _waitRemaining--;
+            if (_waitRemaining == 0)
             {
                 _finishAction();
             }
+            Debug.Assert(_waitRemaining >= 0);
         }
     }
 

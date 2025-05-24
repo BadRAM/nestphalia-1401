@@ -23,7 +23,8 @@ public class BattleScene : Scene
         StartPending,
         BattleActive,
         BattleFinished,
-        Paused
+        Paused,
+        PausedSettings
     }
     
     public void Start(Fort leftFort, Fort rightFort, Action<Team?> battleOverCallback, bool leftIsPlayer = true, bool rightIsPlayer = false, bool deterministic = false)
@@ -91,10 +92,22 @@ public class BattleScene : Scene
             case SceneState.Paused:
                 DrawRectangle(0,0,Screen.Left,Screen.Bottom,new Color(0,0,0,128));
                 DrawTextCentered(0, 0, "PAUSED", 48);
-                if (Button100(-50, 30, "Quit"))
+                if (Button100(-50, 40, "Settings"))
+                {
+                    _state = SceneState.PausedSettings;
+                }
+                if (Button100(-50, 80, "Resume"))
+                {
+                    _state = SceneState.BattleActive;
+                }
+                if (Button100(-50, 120, "Quit"))
                 {
                     _battleOverCallback(null);
                 }
+                break;
+            case SceneState.PausedSettings:
+                DrawRectangle(0,0,Screen.Left,Screen.Bottom,new Color(0,0,0,128));
+                if (Settings.DrawSettingsMenu()) _state = SceneState.Paused;
                 break;
         }
         

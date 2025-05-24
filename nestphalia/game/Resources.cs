@@ -39,7 +39,7 @@ public class SoundResource
     
     public void Play(float pan = 0.5f, float pitch = 1f, float volume = 0.75f)
     {
-        if (SettingsScene.SFXMute || IsSoundPlaying(_soundBuffer[_bufferIndex])) return;
+        if (Settings.Saved.SFXMute || IsSoundPlaying(_soundBuffer[_bufferIndex])) return;
         SetSoundPan(_soundBuffer[_bufferIndex], pan);
         SetSoundPitch(_soundBuffer[_bufferIndex], pitch);
         SetSoundVolume(_soundBuffer[_bufferIndex], volume);
@@ -89,7 +89,7 @@ public static class Resources
         MissingTexture = LoadTexture("resources/sprites/missingtex.png");
         _accessibleFont = LoadFont("resources/pixelplay16.png");
         _defaultFont = LoadFont("resources/alagard.png");
-        Font = SettingsScene.AccessibleFont ? _accessibleFont : _defaultFont;
+        Font = Settings.Saved.AccessibleFont ? _accessibleFont : _defaultFont;
         
         foreach (string path in Directory.GetFiles(Directory.GetCurrentDirectory() + "/resources/sprites"))
         {
@@ -144,7 +144,7 @@ public static class Resources
     public static void PlayMusicByName(string name)
     {
         StopMusicStream(MusicPlaying);
-        if (SettingsScene.MusicMute) return;
+        if (Settings.Saved.MusicMute) return;
         
         MusicResource? s = _music.FirstOrDefault(x => x.Name == name);
         
@@ -164,6 +164,13 @@ public static class Resources
             // MusicPlaying = Music[0].Music;
             // PlayMusicStream(MusicPlaying);
         }
+    }
+    
+    public static void RestartMusic()
+    {
+        StopMusicStream(MusicPlaying);
+        if (Settings.Saved.MusicMute) return;
+        PlayMusicStream(MusicPlaying);
     }
 
     public static void Unload()
@@ -235,12 +242,4 @@ public static class Resources
             number++;
         }
     }
-}
-
-[JsonSourceGenerationOptions(WriteIndented = true)]
-[JsonSerializable(typeof(Fort))]
-[JsonSerializable(typeof(CampaignSaveData))]
-[JsonSerializable(typeof(SettingsScene.SavedSettings))]
-internal partial class SourceGenerationContext : JsonSerializerContext
-{
 }

@@ -11,9 +11,9 @@ static class Program
 	
     public static void Main()
     {
-	    SettingsScene.Load();
+	    Settings.Load();
 	    ConfigFlags flags = ConfigFlags.ResizableWindow;
-	    if (SettingsScene.WindowScale) flags |= ConfigFlags.HighDpiWindow;
+	    if (Settings.Saved.WindowScale) flags |= ConfigFlags.HighDpiWindow;
 
 	    SetConfigFlags(flags);
 	    InitWindow(1200, 600, "2-fort");
@@ -61,10 +61,10 @@ static class Program
 
         Console.WriteLine("Quitting time!");
 
-        if (SettingsScene.RestartNeeded)
+        if (Settings.RestartNeeded)
         {
-	        SettingsScene.WindowScale = !SettingsScene.WindowScale;
-	        SettingsScene.Save();
+	        Settings.Saved.WindowScale = !Settings.Saved.WindowScale;
+	        Settings.Save();
         }
         
 	    Resources.Unload();

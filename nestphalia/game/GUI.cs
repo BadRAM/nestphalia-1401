@@ -27,7 +27,7 @@ public static class GUI
 
     public static Vector2 GetWindowScale()
     {
-        if (SettingsScene.WindowScale)
+        if (Settings.Saved.WindowScale)
         {
             return GetWindowScaleDPI();
         }
