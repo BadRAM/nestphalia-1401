@@ -5,7 +5,7 @@ namespace nestphalia;
 
 public class HopperMinionTemplate : MinionTemplate
 {
-    public HopperMinionTemplate(string id, string name, string description, Texture2D texture, double maxHealth, double armor, double damage, double speed, float physicsRadius, double attackCooldown = 1) : base(id, name, description, texture, maxHealth, armor, damage, speed, physicsRadius, attackCooldown)
+    public HopperMinionTemplate(string id, string name, string description, Texture2D texture, double maxHealth, double armor, double damage, double speed, float physicsRadius, double attackDuration = 1) : base(id, name, description, texture, maxHealth, armor, damage, speed, physicsRadius, attackDuration)
     {
     }
     

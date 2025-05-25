@@ -25,7 +25,7 @@ public partial class Minion
         private int _animCounter;
         
         public Move(Minion minion) : base(minion) { }
-        public override string ToString() { return "Move"; }
+        public override string ToString() { return $"Move, frame: {_animFrame}, counter: {_animCounter}"; }
 
         public override void Update()
         {
@@ -55,7 +55,7 @@ public partial class Minion
             // If no state change is needed, move towards NextPos
             Me.Position = Me.Position.MoveTowards(Me.NextPos, Me.AdjustedSpeed() * Time.DeltaTime); // else: Move
             _animCounter++;
-            if (_animCounter >= 2)
+            if (_animCounter >= Me.Template.WalkAnimDelay)
             {
                 _animFrame = (_animFrame + 1) % 4;
                 _animCounter = 0;
@@ -89,7 +89,7 @@ public partial class Minion
             
             // Attack if ready
             Me._timeOfLastAction = Time.Scaled;
-            if (Time.Scaled - _attackStartedTime >= Me.Template.AttackCooldown)
+            if (Time.Scaled - _attackStartedTime >= Me.Template.AttackDuration)
             {
                 Me.OnAttack();
                 _attackStartedTime = Time.Scaled;

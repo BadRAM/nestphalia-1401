@@ -6,13 +6,15 @@ namespace nestphalia;
 // This is a minion that targets a wall, delivers a large explosive to it, and then retreats back to it's nest.
 public class SapperMinionTemplate : MinionTemplate
 {
-    public Texture2D RetreatingTexture;
+    // public Texture2D RetreatingTexture;
+    public Texture2D BombTexture;
     
-    public SapperMinionTemplate(string id, string name, string description, Texture2D texture, Texture2D retreatingTexture, double maxHealth, double armor, double damage, double speed, float physicsRadius) : base(id, name, description, texture, maxHealth, armor, damage, speed, physicsRadius, 0)
+    
+    public SapperMinionTemplate(string id, string name, string description, Texture2D texture, Texture2D bombTexture, double maxHealth, double armor, double damage, double speed, float physicsRadius) : base(id, name, description, texture, maxHealth, armor, damage, speed, physicsRadius, 0)
     {
-        RetreatingTexture = retreatingTexture;
-        Projectile = new MortarShellTemplate($"{id}_bomb", Resources.GetTextureByName("sapper_bomb"), damage, 0.4, 4, 0);
-        AttackCooldown = 0;
+        BombTexture = bombTexture;
+        Projectile = new MortarShellTemplate($"{id}_bomb", bombTexture, damage, 0.4, 4, 0);
+        AttackDuration = 0;
     }
 
     public override void Instantiate(Team team, Vector2 position, NavPath? navPath)
@@ -74,14 +76,16 @@ public class SapperMinion : Minion
 
     public override void Draw()
     {
-        Z = Position.Y + (IsFlying ? 240 : 0);
-
-        Texture2D texture = _attacking ? _template.Texture : _template.RetreatingTexture;
-        Vector2 pos = new Vector2((int)Position.X - texture.Width / 2, (int)Position.Y - texture.Height / 2);
-        bool flip = NextPos.X > (int)Position.X;
-        Rectangle source = new Rectangle(flip ? texture.Width : 0, 0, flip ? texture.Width : -texture.Width, texture.Height);
-        Raylib.DrawTextureRec(texture, source, pos, Team.UnitTint);
+        // Draw the bomb
+        if (_attacking)
+        {
+            int size = _template.BombTexture.Height;
+            bool flip = NextPos.X > Position.X;
+            Vector2 pos = new Vector2((flip ? 12 : -12) + Position.X - size / 2f, Position.Y - size / 2f);
+            Raylib.DrawTextureV(_template.BombTexture, pos, Color.White);
+        }
         
+        DrawBug(State.GetAnimFrame() + (_attacking ? 0 : 5));
         DrawDecorators();
         DrawDebug();
     }

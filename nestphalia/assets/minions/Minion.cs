@@ -14,11 +14,12 @@ public class MinionTemplate
     public double Armor;
     public double Damage;
     public ProjectileTemplate Projectile;
-    public double AttackCooldown;
+    public double AttackDuration;
     public double Speed;
     public float PhysicsRadius; // This is a float because Raylib.CheckCircleOverlap() wants floats
+    public int WalkAnimDelay;
 
-    public MinionTemplate(string id, string name, string description, Texture2D texture, double maxHealth, double armor, double damage, double speed, float physicsRadius, double attackCooldown = 1)
+    public MinionTemplate(string id, string name, string description, Texture2D texture, double maxHealth, double armor, double damage, double speed, float physicsRadius, double attackDuration = 1, int walkAnimDelay = 2)
     {
         ID = id;
         Name = name;
@@ -28,9 +29,10 @@ public class MinionTemplate
         Armor = armor;
         Damage = damage;
         Projectile = new ProjectileTemplate($"{id}_attack", Resources.GetTextureByName("minion_bullet"), damage, 400);
-        AttackCooldown = attackCooldown;
+        AttackDuration = attackDuration;
         Speed = speed;
         PhysicsRadius = physicsRadius;
+        WalkAnimDelay = walkAnimDelay;
     }
 
     // Implementations of Instantiate() must call Register!
@@ -51,7 +53,7 @@ public class MinionTemplate
             $"HP: {MaxHealth}\n" +
             (Armor == 0 ? "" : $"Armor: {Armor}\n") +
             $"Speed: {Speed}\n" +
-            $"Damage: {Projectile.Damage} ({Projectile.Damage / AttackCooldown}/s)\n" +
+            $"Damage: {Projectile.Damage} ({Projectile.Damage / AttackDuration}/s)\n" +
             $"Size: {PhysicsRadius * 2}\n" +
             $"{Description}";
     }
@@ -87,6 +89,7 @@ public partial class Minion : ISprite
     // Private State - Try to encapsulate these into state classes
     private Vector2 _collisionOffset;
     private double _timeOfLastAction;
+    private Color? _tintOverride;
     
     public double Z { get; set; }
     
@@ -99,6 +102,9 @@ public partial class Minion : ISprite
         OriginTile = World.PosToTilePos(position);
         Health = Template.MaxHealth;
         _timeOfLastAction = Time.Scaled;
+        Color[] colors = { Color.Red, Color.Blue, Color.Green, Color.Yellow, Color.Purple, Color.Pink, Color.Orange, Color.White, Color.Beige, Color.Black, Color.Brown, Color.DarkBlue, Color.Lime, Color.Magenta, Color.SkyBlue, Color.Violet, Color.Maroon, Color.Gold };
+        _tintOverride = colors[Random.Shared.Next(colors.Length)];
+        
         State = new Move(this);
 
         if (navPath != null)
@@ -239,13 +245,13 @@ public partial class Minion : ISprite
     protected void DrawBug(int frame)
     {
         int size = Template.Texture.Height / 2;
-        Vector2 pos = new Vector2((int)Position.X - size / 2f, (int)Position.Y - size / 2f);
-        bool flip = NextPos.X > (int)Position.X;
+        Vector2 pos = new Vector2(Position.X - size / 2f, Position.Y - size / 2f);
+        bool flip = NextPos.X > Position.X;
         Rectangle source = new Rectangle(flip ? size : 0, 0, flip ? size : -size, size);
         source.X = size * frame;
         Raylib.DrawTextureRec(Template.Texture, source, pos, Color.White);
         source.Y += size;
-        Raylib.DrawTextureRec(Template.Texture, source, pos, Team.UnitTint);
+        Raylib.DrawTextureRec(Template.Texture, source, pos, _tintOverride ?? Team.UnitTint);
     }
     
     protected void DrawDecorators()

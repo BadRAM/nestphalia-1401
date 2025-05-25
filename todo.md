@@ -29,8 +29,15 @@ Programming todo:
 - Make nests solid again
 - Help text / Tutorial
 - ~~Fix minion collision with wall corners~~
-- Minion animation
-  - Add standing frame
+- ~~Minion animation~~
+  - ~~Add standing frame~~
+  - Attack anim?
+  - ~~Jump anim + hoppers~~
+  - ~~Sappers~~
+  - ~~Spidermom + spiderling~~
+  - ~~Bees~~
+  - ~~Frog~~
+- ~~States can draw special decorators~~
 - ~~Minion render layers~~
 - ~~Minion state machine~~
 - ~~minion facing flicker~~

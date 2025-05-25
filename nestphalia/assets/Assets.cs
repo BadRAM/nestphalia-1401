@@ -368,8 +368,8 @@ public static class Assets
                     "minion_sapper_beetle",
                     "Beetle",
                     "\nWide load coming through!",
-                    Resources.GetTextureByName("sapper_attacking"),
-                    Resources.GetTextureByName("sapper_retreating"),
+                    Resources.GetTextureByName("sapper"),
+                    Resources.GetTextureByName("sapper_bomb"),
                     55,
                     2,
                     250,
@@ -419,7 +419,8 @@ public static class Assets
                         55,
                         2,
                         0.5
-                    )
+                    ),
+                    walkAnimDelay:5
                 ), 
                 1, 
                 0.5,

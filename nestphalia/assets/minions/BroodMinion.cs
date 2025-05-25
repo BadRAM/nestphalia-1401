@@ -9,8 +9,8 @@ public class BroodMinionTemplate : MinionTemplate
     public int SpawnsOnDeath;
     public MinionTemplate SpawnedMinion;
     
-    public BroodMinionTemplate(string id, string name, string description, Texture2D texture, double maxHealth, double armor, double damage, double speed, float physicsRadius, double spawnInterval, int spawnsOnDeath, MinionTemplate spawnedMinion, double attackCooldown = 1) 
-        : base(id, name, description, texture, maxHealth, armor, damage, speed, physicsRadius, attackCooldown)
+    public BroodMinionTemplate(string id, string name, string description, Texture2D texture, double maxHealth, double armor, double damage, double speed, float physicsRadius, double spawnInterval, int spawnsOnDeath, MinionTemplate spawnedMinion, double attackDuration = 1, int walkAnimDelay = 2) 
+        : base(id, name, description, texture, maxHealth, armor, damage, speed, physicsRadius, attackDuration, walkAnimDelay)
     {
         SpawnInterval = spawnInterval;
         SpawnsOnDeath = spawnsOnDeath;
@@ -29,7 +29,7 @@ public class BroodMinionTemplate : MinionTemplate
             $"HP: {MaxHealth}\n" +
             (Armor == 0 ? "" : $"Armor: {Armor}\n") +
             $"Speed: {Speed}\n" +
-            $"Damage: {Projectile.Damage} ({Projectile.Damage / AttackCooldown}/s)\n" +
+            $"Damage: {Projectile.Damage} ({Projectile.Damage / AttackDuration}/s)\n" +
             $"Size: {PhysicsRadius * 2}\n" +
             $"spawns 1 {SpawnedMinion.Name} every {SpawnInterval}s\n" +
             $"spawns {SpawnsOnDeath} on death\n\n" +
