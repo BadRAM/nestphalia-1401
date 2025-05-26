@@ -102,8 +102,8 @@ public partial class Minion : ISprite
         OriginTile = World.PosToTilePos(position);
         Health = Template.MaxHealth;
         _timeOfLastAction = Time.Scaled;
-        Color[] colors = { Color.Red, Color.Blue, Color.Green, Color.Yellow, Color.Purple, Color.Pink, Color.Orange, Color.White, Color.Beige, Color.Black, Color.Brown, Color.DarkBlue, Color.Lime, Color.Magenta, Color.SkyBlue, Color.Violet, Color.Maroon, Color.Gold };
-        _tintOverride = colors[Random.Shared.Next(colors.Length)];
+        // Color[] colors = { Color.Red, Color.Blue, Color.Green, Color.Yellow, Color.Purple, Color.Pink, Color.Orange, Color.White, Color.Beige, Color.Black, Color.Brown, Color.DarkBlue, Color.Lime, Color.Magenta, Color.SkyBlue, Color.Violet, Color.Maroon, Color.Gold };
+        // _tintOverride = colors[Random.Shared.Next(colors.Length)];
         
         State = new Move(this);
 
@@ -196,7 +196,15 @@ public partial class Minion : ISprite
     
     public void ApplyPush()
     {
-        Position += _collisionOffset;
+        // Cap push force to 12 px/frame, hopefully this will prevent bugs from getting embedded in walls by mega crowd crush events
+        if (_collisionOffset.Length() > 6)
+        {
+            Position += _collisionOffset.Normalized() * 6;
+        }
+        else
+        {
+            Position += _collisionOffset;
+        }
         _collisionOffset = Vector2.Zero;
     }
 

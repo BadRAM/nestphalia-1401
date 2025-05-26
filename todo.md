@@ -6,8 +6,6 @@ Programming todo:
 ----- V2 -----
 
 - Game intro cutscene
-- Redesign the campaign forts
-- Nice campaign screen with a map and paths appearing every time you unlock a new level. Nonlinear campaign?
 - Nice title screen
 - 2-3 more bugs & towers
   - Ranged attack bug
@@ -20,13 +18,15 @@ Programming todo:
   - Glue paper rework - Maybe it just works forever, but only affects bugs standing on it?
 - Minion Status Effect System
 - Make Frenzy Beacon work again
+- Make nests solid again
+- Redesign the campaign forts
+- Nice campaign screen with a map and paths appearing every time you unlock a new level. Nonlinear campaign?
 - ~~Refactor Minion.Hurt() to not need a damagesource~~
 - ~~Campaign rebalance, use 'funding' instead of direct cash stores, or Pay to build the fort every mission~~
 - ~~Allow multiple campaign designs~~
 - Orphaned sapper beetles will seek another burrow
 - Limit total spiderlings a spider can spawn
 - ~~try compiling for web~~
-- Make nests solid again
 - Help text / Tutorial
 - ~~Fix minion collision with wall corners~~
 - ~~Minion animation~~
@@ -43,8 +43,16 @@ Programming todo:
 - ~~minion facing flicker~~
 - ~~Fix determinism~~
 - ~~Settings menu scene~~
+  - Music and SFX volume sliders
 - Fix High DPI mode
 - Add button to relaunch game when High DPI mode toggle selected
+- Assets from json
+- More Sounds
+  - Bespoke music from music peoples
+  - Button hover and new button click
+  - Bug Death
+  - Bug take damage
+  - Tower Shoot
 
 
 ----- Premature Optimizations -----
@@ -74,6 +82,8 @@ Programming todo:
   - ~~Multi Threading~~
     - ~~multithreading collision made the game slower~~
     - ~~Giving pathfinding a background task while collision detection happens on the main thread seems to be helping a little bit.~~
+  - ~~Terrain collision doesn't need to figure out what sector (side/corner/center) of the tile it's in because for each tile you consider you already know from the offset.~~
+  - Fix left side tug of war bias
 
 - Pathfinding optimizations:
   - ~~note: published builds seem to run about 2x faster than debug mode in IDE~~
@@ -95,7 +105,6 @@ Programming todo:
   - ~~Path outwards from start and destination simultaneously, finishing as soon as the two sides touch~~
     - ~~Before: 0.850 release~~
     - ~~After:  0.045 release :')~~
-  - Give each team it's own pathfinder and pathqueue (this will prevent one team from jamming the other's pathing by filling the pathqueue)
 
 - Emergency Measure: Reduce tickrate from 60 to 30. This is easy to do just by changing timescale and framerate, but results in noticeably choppier gameplay. Interpolation would probably eat into the benefits somewhat but could easily still be worth it.
 
@@ -109,9 +118,9 @@ Programming todo:
 - Inventory system
 - Many more bugs and towers than current
 - Better fear evaluation, make bugs more scared of staying in scary places than passing through them.
-- Assets from json
 - Minion vs Minion melee
 - Post battle screen
+- Multiple team colors via shader & rgb swizzling, or channel splitting assets at load time, or something.
 
 
 Design todo:

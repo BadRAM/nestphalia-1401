@@ -390,16 +390,16 @@ public static class Assets
                 "Spider Nest", 
                 "",
                 Resources.GetTextureByName("spawner4"), 
-                50, 
-                2500, 
-                13, 
+                50,
+                2500,
+                13,
                 50,
                 new BroodMinionTemplate
                 (
                     "minion_spider",
                     "Spider Broodmother",
                     "",
-                    Resources.GetTextureByName("spidermom"), 
+                    Resources.GetTextureByName("spidermom"),
                     100, 
                     0, 
                     20, 
@@ -454,6 +454,36 @@ public static class Assets
                 ), 
                 1, 
                 0.25,
+                4
+            )
+        );
+        
+        Structures.Add
+        (
+            new SpawnerTemplate
+            (
+                "nest_hero",
+                "Hero Spawner",
+                "",
+                Resources.GetTextureByName("spawner4"),
+                50,
+                10000000000,
+                999,
+                50,
+                new HeroMinionTemplate
+                (
+                    "minion_hero",
+                    "Hero",
+                    "it's you!",
+                    Resources.GetTextureByName("snail"),
+                    50000,
+                    1000,
+                    50,
+                    20,
+                    8
+                ), 
+                1, 
+                0,
                 4
             )
         );

@@ -304,7 +304,7 @@ public static class World
             m.ApplyPush();
             Physics.CollideTerrain(m);
             // m.CollideTerrain();
-            m.ApplyPush();
+            // m.ApplyPush();
         }
         _swUpdateMinionsPostCollide.Stop();
         
@@ -575,11 +575,13 @@ public static class World
 
     public static Structure? GetTile(Int2D tilePos)
     {
+        if (tilePos.X < 0 || tilePos.X >= BoardWidth || tilePos.Y < 0 || tilePos.Y >= BoardHeight) return null;
         return _board[tilePos.X,tilePos.Y];
     }
     
     public static Structure? GetTile(int x, int y)
     {
+        if (x < 0 || x >= BoardWidth || y < 0 || y >= BoardHeight) return null;
         return _board[x,y];
     }
 

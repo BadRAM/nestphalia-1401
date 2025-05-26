@@ -32,56 +32,85 @@ public static class Physics
     {
         if (minion.IsFlying) return;
         Int2D tilePos = World.PosToTilePos(minion.Position);
-        Vector2 displace = Vector2.Zero;
-        Vector2 displaceCorner = Vector2.Zero;
+        int x = tilePos.X;
+        int y = tilePos.Y;
+        Vector2 tileCenter = World.GetTileCenter(x, y);
         
-        for (int x = tilePos.X-1; x < tilePos.X+3; ++x)
+        bool c = World.GetTile(x, y)?.PhysSolid() ?? false;
+        bool n = (World.GetTile(x, y-1)?.PhysSolid() ?? false) || y <= 0;
+        bool s = (World.GetTile(x, y+1)?.PhysSolid() ?? false) || y >= World.BoardHeight-1;
+        bool w = (World.GetTile(x-1, y)?.PhysSolid() ?? false) || x <= 0;
+        bool e = (World.GetTile(x+1, y)?.PhysSolid() ?? false) || x >= World.BoardWidth-1;
+        bool nw = World.GetTile(x-1, y-1)?.PhysSolid() ?? false;
+        bool ne = World.GetTile(x+1, y-1)?.PhysSolid() ?? false;
+        bool sw = World.GetTile(x-1, y+1)?.PhysSolid() ?? false;
+        bool se = World.GetTile(x+1, y+1)?.PhysSolid() ?? false;
+
+        // Handle being clipped inside a wall
+        if (c)
         {
-            for (int y = tilePos.Y-1; y < tilePos.Y+3; ++y)
+            Console.WriteLine($"{minion.Template.Name} is inside a wall!");
+            List<Vector2> ejectPos = new List<Vector2>();
+            if (!n) ejectPos.Add(new Vector2(minion.Position.X, (tileCenter.Y - 12) - minion.Template.PhysicsRadius));
+            if (!s) ejectPos.Add(new Vector2(minion.Position.X, (tileCenter.Y + 12) + minion.Template.PhysicsRadius));
+            if (!w) ejectPos.Add(new Vector2((tileCenter.X - 12) - minion.Template.PhysicsRadius, minion.Position.Y));
+            if (!e) ejectPos.Add(new Vector2((tileCenter.X + 12) + minion.Template.PhysicsRadius, minion.Position.Y));
+            if (ejectPos.Count == 0)
             {
-                // guard against out of bounds, non-solid tiles, and origin Hive
-                if (x < 0 || 
-                    x >= World.BoardWidth || 
-                    y < 0 || 
-                    y >= World.BoardHeight || 
-                    !(World.GetTile(x,y)?.PhysSolid() ?? false) ||
-                    new Int2D(x,y) == minion.OriginTile
-                    ) continue;
-                Vector2 c = World.GetTileCenter(x, y);
-                Rectangle b = World.GetTileBounds(x, y);
-                if (!Raylib.CheckCollisionCircleRec(minion.Position, minion.Template.PhysicsRadius, b)) continue;
+                Console.WriteLine($"{minion.Template.Name} is trapped inside a wall with no way out! wall collision has been skipped.");
+                return;
+            }
+
+            Vector2 minDisplacementEject = ejectPos[0];
+            for (int i = 1; i < ejectPos.Count; i++)
+            {
+                if ((minion.Position - ejectPos[i]).Length() < (minion.Position - minDisplacementEject).Length())
                 {
-                    if (minion.Position.X > b.X && minion.Position.X < b.X + b.Width) // circle center is in tile X band
-                    {
-                        // Find desired Y for above or below cases
-                        displace.Y = 
-                            (minion.Position.Y > c.Y ?
-                                b.Y + b.Height + minion.Template.PhysicsRadius : 
-                                b.Y - minion.Template.PhysicsRadius
-                            ) - minion.Position.Y;
-                        // _collisionOffset.Y = (float)desiredY - Position.Y;
-                    }
-                    else if (minion.Position.Y > b.Y && minion.Position.Y < b.Y + b.Height) // Circle Center is in tile Y band 
-                    {
-                        displace.X = 
-                            (minion.Position.X > c.X ?
-                                b.X + b.Width + minion.Template.PhysicsRadius : 
-                                b.X - minion.Template.PhysicsRadius
-                            ) - minion.Position.X;
-                    }
-                    else // Circle Center is in tile corner region
-                    {
-                        Vector2 corner = new Vector2
-                        (
-                            minion.Position.X < c.X ? b.X : b.X + b.Width,
-                            minion.Position.Y < c.Y ? b.Y : b.Y + b.Height
-                        );
-                        Vector2 delta = minion.Position - corner;
-                        displaceCorner += delta.Normalized() * (minion.Template.PhysicsRadius - delta.Length());
-                    }
+                    minDisplacementEject = ejectPos[i];
                 }
             }
+            minion.Position = minDisplacementEject;
+            return;
         }
-        minion.Push(displace == Vector2.Zero ? displaceCorner : displace);
+        
+        // Handle wall collision
+        if (n && minion.Position.Y - minion.Template.PhysicsRadius < tileCenter.Y - 12)
+        {
+            minion.Position.Y = (tileCenter.Y - 12) + minion.Template.PhysicsRadius;
+        }
+        else if (s && minion.Position.Y + minion.Template.PhysicsRadius > tileCenter.Y + 12)
+        {
+            minion.Position.Y = (tileCenter.Y + 12) - minion.Template.PhysicsRadius;
+        }
+        if (w && minion.Position.X - minion.Template.PhysicsRadius < tileCenter.X - 12)
+        {
+            minion.Position.X = (tileCenter.X - 12) + minion.Template.PhysicsRadius;
+        }
+        else if (e && minion.Position.X + minion.Template.PhysicsRadius > tileCenter.X + 12)
+        {
+            minion.Position.X = (tileCenter.X + 12) - minion.Template.PhysicsRadius;
+        }
+
+        // Handle corner collision
+        if (nw && !n && !w && Raylib.CheckCollisionPointCircle(tileCenter + new Vector2(-12, -12), minion.Position, minion.Template.PhysicsRadius))
+        {
+            Vector2 delta = minion.Position - (tileCenter + new Vector2(-12, -12));
+            minion.Position += delta.Normalized() * (minion.Template.PhysicsRadius - delta.Length());
+        }
+        if (ne && !n && !e && Raylib.CheckCollisionPointCircle(tileCenter + new Vector2(12, -12), minion.Position, minion.Template.PhysicsRadius))
+        {
+            Vector2 delta = minion.Position - (tileCenter + new Vector2(12, -12));
+            minion.Position += delta.Normalized() * (minion.Template.PhysicsRadius - delta.Length());
+        }
+        if (sw && !s && !w && Raylib.CheckCollisionPointCircle(tileCenter + new Vector2(-12, 12), minion.Position, minion.Template.PhysicsRadius))
+        {
+            Vector2 delta = minion.Position - (tileCenter + new Vector2(-12, 12));
+            minion.Position += delta.Normalized() * (minion.Template.PhysicsRadius - delta.Length());
+        }
+        if (se && !s && !e && Raylib.CheckCollisionPointCircle(tileCenter + new Vector2(12, 12), minion.Position, minion.Template.PhysicsRadius))
+        {
+            Vector2 delta = minion.Position - (tileCenter + new Vector2(12, 12));
+            minion.Position += delta.Normalized() * (minion.Template.PhysicsRadius - delta.Length());
+        }
     }
 }
