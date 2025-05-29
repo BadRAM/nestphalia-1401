@@ -15,6 +15,9 @@ public class BattleScene : Scene
     private bool _pathFinderDebug;
     private Action<Team?> _battleOverCallback;
     private SceneState _state;
+    
+    private List<Vector2> CameraShakeQueue = new List<Vector2>();
+
 
     private string _log;
     
@@ -56,6 +59,7 @@ public class BattleScene : Scene
         if (_state == SceneState.BattleActive)
         {
             UpdateWorld();
+            DoCameraShake();
         }
         
         // ----- DRAW PHASE -----
@@ -154,6 +158,11 @@ public class BattleScene : Scene
             World.Camera.Offset.Y -= 4;
         }
 
+        if (IsKeyPressed(KeyboardKey.Y))
+        {
+            StartCameraShake(0.2, 6);
+        }
+
         if (IsKeyPressed(KeyboardKey.Q))
         {
             _pathFinderDebug = !_pathFinderDebug;
@@ -242,5 +251,43 @@ public class BattleScene : Scene
         }
     }
     
-    
+    public void StartCameraShake(double duration, double intensity)
+    {
+        StopCameraShake();
+        
+        int frameDuration = (int)(duration / Time.DeltaTime);
+
+        Vector2 offset = new Vector2(Random.Shared.NextSingle()-0.5f, Random.Shared.NextSingle()-0.5f) * 2 * (float)intensity;
+        CameraShakeQueue.Add(offset);
+        
+        for (int i = 0; i < frameDuration; i++)
+        {
+            CameraShakeQueue.Add(offset * -1);
+            offset = new Vector2(Random.Shared.NextSingle()-0.5f, Random.Shared.NextSingle()-0.5f) * 2 * (float)intensity;
+            CameraShakeQueue[^1] += offset;
+        }
+        
+        CameraShakeQueue.Add(offset * -1);
+
+        // Shuffle the camera shake queue
+        // CameraShakeQueue = CameraShakeQueue.OrderBy(_ => Random.Shared.Next()).ToList();
+    }
+
+    public void StopCameraShake()
+    {
+        while (CameraShakeQueue.Count > 0)
+        {
+            World.Camera.Offset += CameraShakeQueue[^1];
+            CameraShakeQueue.RemoveAt(CameraShakeQueue.Count-1);
+        }
+    }
+
+    private void DoCameraShake()
+    {
+        if (CameraShakeQueue.Count > 0)
+        {
+            World.Camera.Offset += CameraShakeQueue[^1];
+            CameraShakeQueue.RemoveAt(CameraShakeQueue.Count-1);
+        }
+    }
 }

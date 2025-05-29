@@ -19,7 +19,7 @@ public class SapperMinionTemplate : MinionTemplate
 
     public override void Instantiate(Team team, Vector2 position, NavPath? navPath)
     {
-        Register(new SapperMinion(this, team, position, navPath));
+        World.RegisterMinion(new SapperMinion(this, team, position, navPath));
     }
     
     public override bool PathFromNest()

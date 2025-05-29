@@ -11,7 +11,7 @@ public class HopperMinionTemplate : MinionTemplate
     
     public override void Instantiate(Team team, Vector2 position, NavPath? navPath)
     {
-        Register(new HopperMinion(this, team, position, navPath));
+        World.RegisterMinion(new HopperMinion(this, team, position, navPath));
     }
 }
 

@@ -17,10 +17,10 @@ public static class World
     public static List<Projectile> ProjectilesToRemove = new List<Projectile>();
     public static List<ISprite> Sprites = new List<ISprite>();
     private static Random _random = new Random();
-    public static double WaveDuration = 20;
-    public static bool PreWave;
-    public static double PreWaveOffset = 1.6;
-    public static double FirstWaveTime = 0;
+    private static double WaveDuration = 20;
+    private static bool PreWave;
+    private static double PreWaveOffset = 1.6;
+    private static double FirstWaveTime = 0;
     public static int Wave = 0;
     public static Camera2D Camera;
     public static Team LeftTeam;
@@ -369,7 +369,6 @@ public static class World
                     for (int j = i+1; j < MinionGrid[x, y].Count; j++)
                     {
                         Physics.CollideMinion(MinionGrid[x, y][i], MinionGrid[x, y][j]);
-                        //MinionGrid[x, y][i].CollideMinion(MinionGrid[x, y][j]);
                         // _totalCollideChecks++;
                     }
 
@@ -380,7 +379,6 @@ public static class World
                             for (int j = 0; j < MinionGrid[x + 1, y - 1].Count; j++)
                             {
                                 Physics.CollideMinion(MinionGrid[x, y][i], MinionGrid[x + 1, y - 1][j]);
-                                // MinionGrid[x, y][i].CollideMinion(MinionGrid[x + 1, y - 1][j]);
                                 // _totalCollideChecks++;
                             }
                         }
@@ -388,7 +386,6 @@ public static class World
                         for (int j = 0; j < MinionGrid[x + 1, y].Count; j++)
                         {
                             Physics.CollideMinion(MinionGrid[x, y][i], MinionGrid[x + 1, y][j]);
-                            // MinionGrid[x, y][i].CollideMinion(MinionGrid[x + 1, y][j]);
                             // _totalCollideChecks++;
                         }
 
@@ -397,7 +394,6 @@ public static class World
                             for (int j = 0; j < MinionGrid[x + 1, y + 1].Count; j++)
                             {
                                 Physics.CollideMinion(MinionGrid[x, y][i], MinionGrid[x + 1, y + 1][j]);
-                                // MinionGrid[x, y][i].CollideMinion(MinionGrid[x + 1, y + 1][j]);
                                 // _totalCollideChecks++;
                             }
                         }
@@ -408,7 +404,6 @@ public static class World
                         for (int j = 0; j < MinionGrid[x, y + 1].Count; j++)
                         {
                             Physics.CollideMinion(MinionGrid[x, y][i], MinionGrid[x, y + 1][j]);
-                            // MinionGrid[x, y][i].CollideMinion(MinionGrid[x, y + 1][j]);
                             // _totalCollideChecks++;
                         }
                     }
@@ -541,6 +536,12 @@ public static class World
         Raylib.DrawRectangle(x, 10, width, 20, Color.Gray);
     }
     
+    public static void RegisterMinion(Minion minion)
+    {
+        Minions.Add(minion);
+        Sprites.Add(minion);
+    }
+    
     public static void SetTile(StructureTemplate? tile, Team team, int x, int y)
     {
         if (_board[x, y] != null)
@@ -598,15 +599,9 @@ public static class World
         List<Minion> minions = new List<Minion>();
         for (int x = Math.Max(center.X - radius, 0); x <= Math.Min(center.X + radius, BoardWidth-1); x++)
         {
-            //if (x < 0 || x >= BoardWidth) continue;
             for (int y = Math.Max(center.Y - radius, 0); y <= Math.Min(center.Y + radius, BoardHeight-1); y++)
             {
-                // if (y < 0 || y >= BoardHeight) continue;
                 minions.AddRange(MinionGrid[x,y]);
-                // foreach (Minion m in MinionGrid[x,y])
-                // {
-                //     minions.Add(m);
-                // }
             }
         }
         return minions;

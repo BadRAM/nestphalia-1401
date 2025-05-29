@@ -19,7 +19,7 @@ public class BroodMinionTemplate : MinionTemplate
     
     public override void Instantiate(Team team, Vector2 position, NavPath? navPath)
     {
-        Register(new BroodMinion(this, team, position, navPath));
+        World.RegisterMinion(new BroodMinion(this, team, position, navPath));
     }
 
     public override string GetStats()

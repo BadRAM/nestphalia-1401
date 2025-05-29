@@ -38,12 +38,7 @@ public class MinionTemplate
     // Implementations of Instantiate() must call Register!
     public virtual void Instantiate(Team team, Vector2 position, NavPath? navPath)
     {
-        Register(new Minion(this, team, position, navPath));
-    }
-    private protected void Register(Minion minion)
-    {
-        World.Minions.Add(minion);
-        World.Sprites.Add(minion);
+        World.RegisterMinion(new Minion(this, team, position, navPath));
     }
     
     public virtual string GetStats()
@@ -197,9 +192,9 @@ public partial class Minion : ISprite
     public void ApplyPush()
     {
         // Cap push force to 12 px/frame, hopefully this will prevent bugs from getting embedded in walls by mega crowd crush events
-        if (_collisionOffset.Length() > 6)
+        if (_collisionOffset.Length() > 12)
         {
-            Position += _collisionOffset.Normalized() * 6;
+            Position += _collisionOffset.Normalized() * 12;
         }
         else
         {

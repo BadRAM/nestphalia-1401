@@ -36,7 +36,6 @@ public static class Physics
         int y = tilePos.Y;
         Vector2 tileCenter = World.GetTileCenter(x, y);
         
-        bool c = World.GetTile(x, y)?.PhysSolid() ?? false;
         bool n = (World.GetTile(x, y-1)?.PhysSolid() ?? false) || y <= 0;
         bool s = (World.GetTile(x, y+1)?.PhysSolid() ?? false) || y >= World.BoardHeight-1;
         bool w = (World.GetTile(x-1, y)?.PhysSolid() ?? false) || x <= 0;
@@ -45,11 +44,11 @@ public static class Physics
         bool ne = World.GetTile(x+1, y-1)?.PhysSolid() ?? false;
         bool sw = World.GetTile(x-1, y+1)?.PhysSolid() ?? false;
         bool se = World.GetTile(x+1, y+1)?.PhysSolid() ?? false;
+        bool c = World.GetTile(x, y)?.PhysSolid() ?? false;
 
         // Handle being clipped inside a wall
         if (c)
         {
-            Console.WriteLine($"{minion.Template.Name} is inside a wall!");
             List<Vector2> ejectPos = new List<Vector2>();
             if (!n) ejectPos.Add(new Vector2(minion.Position.X, (tileCenter.Y - 12) - minion.Template.PhysicsRadius));
             if (!s) ejectPos.Add(new Vector2(minion.Position.X, (tileCenter.Y + 12) + minion.Template.PhysicsRadius));

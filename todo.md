@@ -6,7 +6,11 @@ Programming todo:
 ----- V2 -----
 
 - Game intro cutscene
+- Dialog boxes and scripted events at start of levels
+- Camera shake
+- Scripted camera move
 - Nice title screen
+- Nice credits screen
 - 2-3 more bugs & towers
   - Ranged attack bug
   - Another flyer. Ladybug? Flies until attacked.
@@ -16,11 +20,19 @@ Programming todo:
   - Tower with a big sawblade on an arm that slowly orbits
   - Springboard trap that launches a bug towards the other fort based on it's weight
   - Glue paper rework - Maybe it just works forever, but only affects bugs standing on it?
+  - Multitarget tower, attacks 3 units simultaneously, but can't focus all attacks on one target
+  - Penetrating tower, like spike roller from bloons
+  - Direct damage minions in radius stratagem
+  - Freeze minions in radius stratagem
+  - Build new wall/tower stratagem (Can it build in the neutral zone, or even the enemy fort?)
+
+- Crush damage
 - Minion Status Effect System
 - Make Frenzy Beacon work again
 - Make nests solid again
 - Redesign the campaign forts
 - Nice campaign screen with a map and paths appearing every time you unlock a new level. Nonlinear campaign?
+- Corpses/bloodstains to indicate fear
 - ~~Refactor Minion.Hurt() to not need a damagesource~~
 - ~~Campaign rebalance, use 'funding' instead of direct cash stores, or Pay to build the fort every mission~~
 - ~~Allow multiple campaign designs~~
