@@ -7,8 +7,9 @@ Programming todo:
 
 - Game intro cutscene
 - Dialog boxes and scripted events at start of levels
-- Camera shake
+- ~~Camera shake~~
 - Scripted camera move
+- Start of battle dialog
 - Nice title screen
 - Nice credits screen
 - 2-3 more bugs & towers
@@ -25,7 +26,6 @@ Programming todo:
   - Direct damage minions in radius stratagem
   - Freeze minions in radius stratagem
   - Build new wall/tower stratagem (Can it build in the neutral zone, or even the enemy fort?)
-
 - Crush damage
 - Minion Status Effect System
 - Make Frenzy Beacon work again
@@ -33,14 +33,9 @@ Programming todo:
 - Redesign the campaign forts
 - Nice campaign screen with a map and paths appearing every time you unlock a new level. Nonlinear campaign?
 - Corpses/bloodstains to indicate fear
-- ~~Refactor Minion.Hurt() to not need a damagesource~~
-- ~~Campaign rebalance, use 'funding' instead of direct cash stores, or Pay to build the fort every mission~~
-- ~~Allow multiple campaign designs~~
 - Orphaned sapper beetles will seek another burrow
 - Limit total spiderlings a spider can spawn
-- ~~try compiling for web~~
 - Help text / Tutorial
-- ~~Fix minion collision with wall corners~~
 - ~~Minion animation~~
   - ~~Add standing frame~~
   - Attack anim?
@@ -54,6 +49,9 @@ Programming todo:
 - ~~Minion state machine~~
 - ~~minion facing flicker~~
 - ~~Fix determinism~~
+- Team colored structures, Stratagem banners in particular
+- Animated structures
+  - Stratagems raise their flag as they charge, or is it when they activate?
 - ~~Settings menu scene~~
   - Music and SFX volume sliders
 - Fix High DPI mode

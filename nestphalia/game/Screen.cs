@@ -1,5 +1,6 @@
 using System.Numerics;
 using Raylib_cs;
+using static Raylib_cs.Raylib;
 
 namespace nestphalia;
 
@@ -25,7 +26,20 @@ public static class Screen
 
     public static void Initialize()
     {
-        //WhiteNoise = Raylib.GenImageWhiteNoise(1024, 1024, 0.5f);
+        ConfigFlags flags = ConfigFlags.ResizableWindow;
+        if (Settings.Saved.WindowScale) flags |= ConfigFlags.HighDpiWindow;
+
+        SetConfigFlags(flags);
+        InitWindow(1200, 600, "2-fort");
+        SetWindowMinSize((int)(GetWindowScaleDPI().X * 1200), (int)(GetWindowScaleDPI().Y * 600));
+        SetTargetFPS(60);
+        SetExitKey(KeyboardKey.Null);
+        SetMouseScale(1, 1);
+        UpdateBounds();
+    }
+
+    public static void Load()
+    {
         Tile1 = Resources.GetTextureByName("floor1");
         Tile2 = Resources.GetTextureByName("floor2");
         
@@ -81,23 +95,27 @@ public static class Screen
     
     public static void UpdateBounds()
     {
+        Console.WriteLine($"WindowScale = {GUI.GetWindowScale()}");
+
         Vector2 scale = GUI.GetWindowScale();
         Console.WriteLine($"Scale is X:{scale.X},Y:{scale.Y}");
         
-        Left = (int)(Raylib.GetScreenWidth() / scale.X);
-        Bottom = (int)(Raylib.GetScreenHeight() / scale.Y);
+        Left = (int)(GetScreenWidth() / scale.X);
+        Bottom = (int)(GetScreenHeight() / scale.Y);
 
         if (Left < MinWidth || Bottom < MinHeight)
         {
-            Raylib.SetWindowSize(Math.Max(Left, MinWidth), Math.Max(Bottom, MinHeight));
-            Left = Raylib.GetScreenWidth();
-            Bottom = Raylib.GetScreenHeight();
+            SetWindowSize(Math.Max(Left, MinWidth), Math.Max(Bottom, MinHeight));
+            Left = GetScreenWidth();
+            Bottom = GetScreenHeight();
         }
         
         HCenter = Left / 2;
         VCenter = Bottom / 2;
 
         RegenerateBackground();
+        
+        SetWindowMinSize((int)(GetWindowScaleDPI().X * 1200), (int)(Raylib.GetWindowScaleDPI().Y * 600));
     }
 
     public static void DrawBackground(Color tint)
@@ -106,10 +124,10 @@ public static class Screen
         {
             for (int y = 0; y <= Bottom/24; y++)
             {
-                Raylib.DrawTexture(backgroundNoise[x][y] ? Tile1 : Tile2, x * 24, y * 24 - 12, tint);
+                DrawTexture(backgroundNoise[x][y] ? Tile1 : Tile2, x * 24, y * 24 - 12, tint);
             }
         }
-        Raylib.DrawRectangle(HCenter - 600, VCenter - 300, 1200, 600, new Color(10, 10, 10, 64));
-        Raylib.DrawTexture(_graffiti[_graffitiPicked], _graffitiPosX, _graffitiPosY, Color.White);
+        DrawRectangle(HCenter - 600, VCenter - 300, 1200, 600, new Color(10, 10, 10, 64));
+        DrawTexture(_graffiti[_graffitiPicked], _graffitiPosX, _graffitiPosY, Color.White);
     }
 }

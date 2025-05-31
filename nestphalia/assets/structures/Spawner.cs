@@ -89,11 +89,15 @@ public class Spawner : Structure
         _nextWaveSpawnBonus = 0;
     }
 
-    public void AddSpawnBonus(int bonus)
+    public override void Destroy()
     {
-        _nextWaveSpawnBonus += bonus;
+        base.Destroy();
+        if (Team.IsPlayerControlled && Program.CurrentScene is BattleScene battle)
+        {
+            battle.StartCameraShake(0.2, 4);
+        }
     }
-    
+
     public override bool NavSolid(Team team)
     {
         return team != Team;
@@ -102,6 +106,11 @@ public class Spawner : Structure
     public override bool PhysSolid()
     {
         return false;
+    }
+    
+    public void AddSpawnBonus(int bonus)
+    {
+        _nextWaveSpawnBonus += bonus;
     }
     
     // Todo: Move the target selection into Team

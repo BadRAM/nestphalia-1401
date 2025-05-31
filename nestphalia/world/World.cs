@@ -66,7 +66,7 @@ public static class World
         Camera.Target = new Vector2(BoardWidth * 12, BoardHeight * 12);
         Camera.Offset = new Vector2(Screen.HCenter, Screen.VCenter) * GUI.GetWindowScale();
         Camera.Rotation = 0;
-        Camera.Zoom = GUI.GetWindowScale().X;
+        Camera.Zoom = 1;
         Minions.Clear();
         Projectiles.Clear();
         Sprites.Clear();
