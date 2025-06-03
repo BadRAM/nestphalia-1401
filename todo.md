@@ -15,6 +15,7 @@ Programming todo:
 - 2-3 more bugs & towers
   - Ranged attack bug
   - Another flyer. Ladybug? Flies until attacked.
+    - Requires 3d engine
   - Snail rework
   - Beetle rework. Attacks can damage the ball?
   - Centipede that gets longer and shorter
@@ -115,6 +116,11 @@ Programming todo:
   - ~~Path outwards from start and destination simultaneously, finishing as soon as the two sides touch~~
     - ~~Before: 0.850 release~~
     - ~~After:  0.045 release :')~~
+  - When a lot of minions are told to target one spot, generate a full nodegrid then get all their paths from that.
+    - Whenever a path is calculated, searth the pathqueue for paths with the same destination or source, then discard all set nodes(if source shared)/antinodes(if dest shared) and solve from there.
+    - https://www.redblobgames.com/pathfinding/tower-defense/
+    - https://www.redblobgames.com/blog/2024-04-27-flow-field-pathfinding/
+    - https://www.roguebasin.com/index.php?title=Dijkstra_Maps_Visualized
 
 - Emergency Measure: Reduce tickrate from 60 to 30. This is easy to do just by changing timescale and framerate, but results in noticeably choppier gameplay. Interpolation would probably eat into the benefits somewhat but could easily still be worth it.
 

@@ -1,20 +1,31 @@
 Lore
 ====
+The big questions:
+Why are the bugs fighting?
+How much tech/magic do the bugs have?
+What aesthetics/art/architecture is popular in bug society?
+
+You are an ant queen, spawn of the Empress of all ants, but with little right to the throne. While managing a small colony in a distant corner of the region, a friend from your youth in the capitol bursts in to inform you that the Empress has been killed and her throne taken by a pretender king! You are bid to return and free the empire from his dominion, but between you and the imperial core are three other realms that won't allow you to march your army through unhindered, and you'll need more supplies and technologies if you're to stand a chance against the imperial core...
+
+Cicadas keep the history of the world, and every 17 years they emerge and recount the history of the preceding cycles before dying and all of it being lost.
 
 
 Campaign Plan
 =============
-Your origins: TBD
+Your origins:
+ - Ant queen, 300th in line to rule the ant empire, currently managing a small colony in a distant corner of the region.
 The world:
 Four bug kingdoms, Blue, Yellow, Green, and Red, arranged like
- R
+ R 
 Y G
- B
-Red: Ant kingdom. Hard forts that use everything in the game. Final Boss: Frog, the pretender king
-Yellow: Bee kingdom, expect many flyers. rewards are strong against ground. Final Boss: Queen bee, the self important
+ B 
+Red: Ant empire. Hard forts that use everything in the game. Final Boss: Frog, the pretender king
+Yellow: Bee realm, expect many flyers. rewards are strong against ground. Final Boss: Queen bee, the self important
 Green: Beetle kingdom, rewards are strong against air. Final Boss: Hercules, the hero of legend
 Blue: Bug republic (Hansneatic league?), assorted shitter bugs, rewards are basic kit. Final Boss: Snederick of Snaxony, Leader-Elect of the autonomous bug republic (big snail)
 You start in the bottom corner of blue. Forts have paths to neighboring forts that you unlock for defeating them, but paths out of a country don't work until you defeat the capitol, so you must defeat either Y or G before you can attack R, and cannot attack either before clearing B.
+
+
 
 
 Screen Hierarchy:

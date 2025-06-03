@@ -22,6 +22,13 @@ public class BattleScene : Scene
     private List<Vector2> CameraShakeQueue = new List<Vector2>();
 
     private DialogBox _dialogBox;
+    private List<DialogBox> _dialogQueue = new List<DialogBox>()
+    {
+        new DialogBox("I Won't let you ruin my perfect perfect plan!         \nSacrifices MUST be made!!!", DialogBox.Mode.Left, Resources.GetTextureByName("kray")),
+        new DialogBox("What about that big opening in the wall?", DialogBox.Mode.Right, Resources.GetTextureByName("knux")),
+        new DialogBox("How could my perfect perfect plan be defeated so easily!", DialogBox.Mode.Both, Resources.GetTextureByName("knux"), Resources.GetTextureByName("kray")),
+        new DialogBox("Kray gave up...")
+    };
     
     private string _log;
     
@@ -179,10 +186,12 @@ public class BattleScene : Scene
             _pathFinderDebug = !_pathFinderDebug;
         }
 
-        if (IsKeyPressed(KeyboardKey.T))
+        if (IsKeyPressed(KeyboardKey.T) && _dialogQueue.Count > 0)
         {
             Time.TimeScale = 0;
-            _dialogBox = new DialogBox("I Won't let you ruin my perfect plan!         \nSacrifices MUST be made!!!", Resources.GetTextureByName("kray"));
+            _dialogBox = _dialogQueue[0];
+            _dialogBox.Start();
+            _dialogQueue.RemoveAt(0);
             _state = SceneState.Dialogue;
         }
         if (_state == SceneState.Dialogue && IsKeyPressed(KeyboardKey.Space))

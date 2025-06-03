@@ -16,9 +16,9 @@ public static class Screen
     public static int Top = 0;
     public static int Bottom;
     //public static Image WhiteNoise = Raylib.GenImageWhiteNoise(1024, 1024, 0.5f);
-    public static List<List<bool>> backgroundNoise = new List<List<bool>>();
-    public static Texture2D Tile1;
-    public static Texture2D Tile2;
+    private static List<List<bool>> _backgroundNoise = new List<List<bool>>();
+    private static Texture2D _tile1;
+    private static Texture2D _tile2;
     private static List<Texture2D> _graffiti = new List<Texture2D>();
     private static int _graffitiPosX;
     private static int _graffitiPosY;
@@ -40,8 +40,8 @@ public static class Screen
 
     public static void Load()
     {
-        Tile1 = Resources.GetTextureByName("floor1");
-        Tile2 = Resources.GetTextureByName("floor2");
+        _tile1 = Resources.GetTextureByName("floor1");
+        _tile2 = Resources.GetTextureByName("floor2");
         
         _graffiti.Add(Resources.GetTextureByName("tag_badram_isopod"));
         _graffiti.Add(Resources.GetTextureByName("tag_badram_kilroy"));
@@ -64,14 +64,14 @@ public static class Screen
 
     public static void RegenerateBackground()
     {
-        backgroundNoise.Clear();
+        _backgroundNoise.Clear();
         
-        while (backgroundNoise.Count <= Left/24)
+        while (_backgroundNoise.Count <= Left/24)
         {
-            backgroundNoise.Add(new List<bool>());
+            _backgroundNoise.Add(new List<bool>());
         }
 
-        foreach (List<bool> row in backgroundNoise)
+        foreach (List<bool> row in _backgroundNoise)
         {
             while (row.Count <= Bottom/24)
             {
@@ -124,7 +124,7 @@ public static class Screen
         {
             for (int y = 0; y <= Bottom/24; y++)
             {
-                DrawTexture(backgroundNoise[x][y] ? Tile1 : Tile2, x * 24, y * 24 - 12, tint);
+                DrawTexture(_backgroundNoise[x][y] ? _tile1 : _tile2, x * 24, y * 24 - 12, tint);
             }
         }
         DrawRectangle(HCenter - 600, VCenter - 300, 1200, 600, new Color(10, 10, 10, 64));
