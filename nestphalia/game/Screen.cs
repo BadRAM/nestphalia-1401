@@ -30,8 +30,8 @@ public static class Screen
         if (Settings.Saved.WindowScale) flags |= ConfigFlags.HighDpiWindow;
 
         SetConfigFlags(flags);
+        Vector2 scaleDpi = Settings.Saved.WindowScale ? GetWindowScaleDPI() : Vector2.One;
         InitWindow(1200, 600, "2-fort");
-        SetWindowMinSize((int)(GetWindowScaleDPI().X * 1200), (int)(GetWindowScaleDPI().Y * 600));
         SetTargetFPS(60);
         SetExitKey(KeyboardKey.Null);
         SetMouseScale(1, 1);
@@ -114,8 +114,9 @@ public static class Screen
         VCenter = Bottom / 2;
 
         RegenerateBackground();
-        
-        SetWindowMinSize((int)(GetWindowScaleDPI().X * 1200), (int)(Raylib.GetWindowScaleDPI().Y * 600));
+
+        Vector2 scaleDpi = Settings.Saved.WindowScale ? GetWindowScaleDPI() : Vector2.One;
+        SetWindowMinSize((int)(scaleDpi.X * 1200), (int)(scaleDpi.Y * 600));
     }
 
     public static void DrawBackground(Color tint)

@@ -66,4 +66,10 @@ public class LightningBolt : Projectile
             Raylib.DrawLineEx(start, end, 1, c);
         }
     }
+
+    // Make sure lightning draws on top of everything around it.
+    public override double GetDrawOrder()
+    {
+        return Position.Y + 80;
+    }
 }

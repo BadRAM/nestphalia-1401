@@ -86,7 +86,7 @@ public class Projectile : ISprite
         Raylib.DrawTexture(Template.Texture, (int)Position.X - Template.Texture.Width/2, (int)(Position.Y - Template.Texture.Width/2 - Position.Z), Color.White);
     }
 
-    public double GetDrawOrder()
+    public virtual double GetDrawOrder()
     {
         return Position.Y;
     }
