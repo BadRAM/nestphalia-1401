@@ -75,6 +75,7 @@ public partial class Minion : ISprite
     // Public State
     public Vector3 Position;
     public double Health;
+    public double Armor;
     public bool IsFlying;
     public Int2D OriginTile;
     protected Vector2 NextPos; // This is the world space position the minion is currently trying to reach
@@ -98,6 +99,7 @@ public partial class Minion : ISprite
         NextPos = position.XY();
         OriginTile = World.PosToTilePos(position);
         Health = Template.MaxHealth;
+        Armor = Template.Armor;
         _timeOfLastAction = Time.Scaled;
         // // Party mode, randomly colors all minions
         // Color[] colors = { Color.Red, Color.Blue, Color.Green, Color.Yellow, Color.Purple, Color.Pink, Color.Orange, Color.White, Color.Beige, Color.Black, Color.Brown, Color.DarkBlue, Color.Lime, Color.Magenta, Color.SkyBlue, Color.Violet, Color.Maroon, Color.Gold };
@@ -182,7 +184,7 @@ public partial class Minion : ISprite
     }
         
     // Returns move speed adjusted for glue, mine anxiety, etc.
-    protected double AdjustedSpeed()
+    protected virtual double AdjustedSpeed()
     {
         double adjustedSpeed = Template.Speed;
         Structure? structure = World.GetTileAtPos(Position);
@@ -316,12 +318,12 @@ public partial class Minion : ISprite
         _collisionOffset += distance;
     }
     
-    public void Hurt(double damage, Projectile? damageSource = null)
+    public virtual void Hurt(double damage, Projectile? damageSource = null)
     {
         // guard against second bullet in same frame.
         if (Health <= 0) return;
 
-        Health -= Math.Max(1, damage - Template.Armor);
+        Health -= Math.Max(1, damage - Armor);
         if (Health <= 0)
         {
             Team.AddFearOf(Template.MaxHealth/10, World.PosToTilePos(Position));

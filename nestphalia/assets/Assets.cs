@@ -350,6 +350,38 @@ public static class Assets
                 1
             )
         );
+        
+        // TODO: Balanced stats for ladybugs, current stats were picked for easier testing.
+        Structures.Add
+        (
+            new SpawnerTemplate
+            (
+                "nest_ladybug",
+                "Ladybug Lounge",
+                "Ladybugs fly until they are hit, then walk the rest of the way.",
+                Resources.GetTextureByName("spawner4"),
+                80,
+                2500,
+                11,
+                50,
+                new FlyUntilHitMinionTemplate
+                (
+                    "minion_ladybug",
+                    "Ladybug",
+                    "\nWe're coming in hot!",
+                    Resources.GetTextureByName("ladybug"),
+                    55,
+                    10,
+                    15,
+                    45,
+                    25,
+                    6
+                ), 
+                4, 
+                1,
+                1
+            )
+        );
 
         Structures.Add
         (

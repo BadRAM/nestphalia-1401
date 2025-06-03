@@ -27,9 +27,12 @@ public class FlyingMinion : Minion
     private int _currentFrame;
     private int _frameCounter;
     private FlyingMinionTemplate _template;
+    protected bool WantToFly;
+    protected int FlyAnimIndex = 0;
     
     public FlyingMinion(FlyingMinionTemplate template, Team team, Vector3 position, NavPath? navPath) : base(template, team, position, navPath)
     {
+        WantToFly = true;
         IsFlying = true;
         _currentFrame = World.RandomInt(4);
         _template = template;
@@ -38,20 +41,50 @@ public class FlyingMinion : Minion
     public override void Update()
     {
         base.Update();
-        Position.Z = Position.Z.MoveTowards((float)_template.CruisingHeight, (float)(12 * Time.DeltaTime));
-        _frameCounter++;
-        if (_frameCounter >= 2)
+
+        if (WantToFly && !IsFlying)
         {
-            _currentFrame++;
-            _currentFrame %= 4;
-            _frameCounter = 0;
+            IsFlying = true;
+        }
+
+        if (!WantToFly && IsFlying && Position.Z == 0)
+        {
+            IsFlying = false;
+        }
+
+        if (IsFlying)
+        {
+            if (State is Move)
+            {
+                if (WantToFly)
+                {
+                    Position.Z = Position.Z.MoveTowards((float)_template.CruisingHeight, (float)(12 * Time.DeltaTime));
+                }
+                else
+                {
+                    Position.Z = Position.Z.MoveTowards(0f, (float)(48 * Time.DeltaTime));
+                }
+            }
+            
+            _frameCounter++;
+            if (_frameCounter >= 2)
+            {
+                _currentFrame++;
+                _currentFrame %= 4;
+                _frameCounter = 0;
+            }
         }
     }
     
     public override void Draw()
     {
+        if (!IsFlying)
+        {
+            base.Draw();
+            return;
+        }
         // Always pingpong the wings instead of using state anim frame
-        DrawBug(_currentFrame == 3 ? 1 : _currentFrame);
+        DrawBug((_currentFrame == 3 ? 1 : _currentFrame) + FlyAnimIndex);
         DrawDecorators();
         DrawDebug();
     }
@@ -59,6 +92,12 @@ public class FlyingMinion : Minion
     // Flying Minions don't need pathfinding
     public override void SetTarget(Int2D target, double thinkDuration = 0.2)
     {
+        if (!IsFlying)
+        {
+            base.SetTarget(target, thinkDuration);
+            return;
+        }
+        
         NavPath.Reset(Position);
         NavPath.Destination = target;
         
@@ -68,6 +107,11 @@ public class FlyingMinion : Minion
     // Flying minions can't get lost
     protected override bool CheckIfLost()
     {
-        return false; 
+        if (!IsFlying)
+        {
+            return base.CheckIfLost();
+        }
+        
+        return false;
     }
 }

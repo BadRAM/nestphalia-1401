@@ -6,11 +6,11 @@ public static class Utils
 {
     public static float MoveTowards(this float start, float target, float maxDistanceDelta)
     {
-        if (target - start < maxDistanceDelta)
+        if (Math.Abs(target - start) < maxDistanceDelta)
         {
             return target;
         } 
-        return start > target ? start - maxDistanceDelta : start + maxDistanceDelta;
+        return (start > target) ? (start - maxDistanceDelta) : (start + maxDistanceDelta);
     }
     
     public static double MoveTowards(this double start, double target, double maxDistanceDelta)

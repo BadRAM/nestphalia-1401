@@ -77,6 +77,7 @@ Programming todo:
   - Minion
     - ~~State machine~~
     - ~~Extract physics~~
+    - Move flying behavior into base minion
   - World
     - make it not static
   - Team
