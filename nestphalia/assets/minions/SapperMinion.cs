@@ -17,7 +17,7 @@ public class SapperMinionTemplate : MinionTemplate
         AttackDuration = 0;
     }
 
-    public override void Instantiate(Team team, Vector2 position, NavPath? navPath)
+    public override void Instantiate(Team team, Vector3 position, NavPath? navPath)
     {
         World.RegisterMinion(new SapperMinion(this, team, position, navPath));
     }
@@ -33,7 +33,7 @@ public class SapperMinion : Minion
     private SapperMinionTemplate _template;
     private bool _attacking = true;
     
-    public SapperMinion(SapperMinionTemplate template, Team team, Vector2 position, NavPath? navPath) : base(template, team, position, navPath)
+    public SapperMinion(SapperMinionTemplate template, Team team, Vector3 position, NavPath? navPath) : base(template, team, position, navPath)
     {
         _template = template;
         // We call from base to prevent resharper complaining about calling virtual method in constructor

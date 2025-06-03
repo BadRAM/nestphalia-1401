@@ -98,7 +98,7 @@ public class Tower : Structure
             if (_target != null)
             {
                 _shootSound.PlayRandomPitch(SoundResource.WorldToPan(position.X), 0.15f);
-                _template.Projectile.Instantiate(_target, this, position - Vector2.UnitY * _template.ProjectileOffset);
+                _template.Projectile.Instantiate(_target, this, position.XYZ(_template.ProjectileOffset));
                 _timeLastFired = Time.Scaled;
             }
         }
@@ -150,7 +150,7 @@ public class Tower : Structure
             Minion m = nearbyMinions[i];
             if (m.Team == Team) continue;
             if ((m.IsFlying && !_template.CanHitFlying) || (!m.IsFlying && !_template.CanHitGround)) continue;
-            double d = Vector2.Distance(nearbyMinions[i].Position, position);
+            double d = Vector2.Distance(nearbyMinions[i].Position.XY(), position);
             if (d < _template.Range && d < minDist)
             {
                 minDist = d;
@@ -169,7 +169,7 @@ public class Tower : Structure
         foreach (Minion m in nearbyMinions)
         {
             if ((m.IsFlying && !_template.CanHitFlying) || (!m.IsFlying && !_template.CanHitGround)) continue;
-            if (m.Team != Team && Vector2.Distance(m.Position, position) < _template.Range)
+            if (m.Team != Team && Vector2.Distance(m.Position.XY(), position) < _template.Range)
             {
                 ValidTargets.Add(m);
             }
@@ -186,7 +186,7 @@ public class Tower : Structure
     protected Minion? FindTargetRandomFocus()
     {
         Minion? random = _target;
-        if (random != null && random.Health > 0 && Vector2.Distance(random.Position, position) < _template.Range) return random;
+        if (random != null && random.Health > 0 && Vector2.Distance(random.Position.XY(), position) < _template.Range) return random;
         return FindTargetRandom();
     }
 }

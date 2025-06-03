@@ -17,7 +17,7 @@ public class BroodMinionTemplate : MinionTemplate
         SpawnedMinion = spawnedMinion;
     }
     
-    public override void Instantiate(Team team, Vector2 position, NavPath? navPath)
+    public override void Instantiate(Team team, Vector3 position, NavPath? navPath)
     {
         World.RegisterMinion(new BroodMinion(this, team, position, navPath));
     }
@@ -43,7 +43,7 @@ public class BroodMinion : Minion
     private double _lastSpawnTime;
     private BroodMinionTemplate _template;
     
-    public BroodMinion(BroodMinionTemplate template, Team team, Vector2 position, NavPath navPath) : base(template, team, position, navPath)
+    public BroodMinion(BroodMinionTemplate template, Team team, Vector3 position, NavPath navPath) : base(template, team, position, navPath)
     {
         _lastSpawnTime = Time.Scaled;
         _template = template;
@@ -64,7 +64,7 @@ public class BroodMinion : Minion
         base.Die();
         for (int i = 0; i < _template.SpawnsOnDeath; i++)
         {
-            Vector2 offset = new Vector2((float)(World.RandomDouble() - 0.5), (float)(World.RandomDouble() - 0.5));
+            Vector3 offset = new Vector3((float)(World.RandomDouble() - 0.5), (float)(World.RandomDouble() - 0.5), 0f);
             _template.SpawnedMinion.Instantiate(Team, Position + offset, null);
         }
     }

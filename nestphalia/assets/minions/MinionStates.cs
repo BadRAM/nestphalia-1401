@@ -53,7 +53,7 @@ public partial class Minion
             }
             
             // If no state change is needed, move towards NextPos
-            Me.Position = Me.Position.MoveTowards(Me.NextPos, Me.AdjustedSpeed() * Time.DeltaTime); // else: Move
+            Me.Position = Me.Position.MoveTowardsXY(Me.NextPos, Me.AdjustedSpeed() * Time.DeltaTime); // else: Move
             _animCounter++;
             if (_animCounter >= Me.Template.WalkAnimDelay)
             {
@@ -159,7 +159,7 @@ public partial class Minion
             _started = Time.Scaled;
             
             Me.NavPath.Skip();
-            _from = Me.Position;
+            _from = Me.Position.XY();
             Me.NavPath.Skip();
             Me.UpdateNextPos();
         }
@@ -178,13 +178,13 @@ public partial class Minion
                 double t = (Time.Scaled - (_started + _squatDuration)) / _jumpDuration;
                 double arcOffset = Math.Sin(t * Math.PI) * _height;
             
-                Me.Position = Vector2.Lerp(_from, _to, (float)t);
-                Me.Position.Y -= (float)arcOffset;
+                Me.Position = Vector2.Lerp(_from, _to, (float)t).XYZ();
+                Me.Position.Z = (float)arcOffset;
             }
             else // Jump finished
             {
                 Me.IsFlying = false;
-                Me.Position = _to;
+                Me.Position = _to.XYZ();
                 Me.State = new Wait(Me, _landingLag, () => { Me.State = new Move(Me); });
             }
         }

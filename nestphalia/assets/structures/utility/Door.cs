@@ -40,14 +40,14 @@ public class Door : Structure
                 if (m.IsFlying) continue;
                 if (m.Team == Team)
                 {
-                    if (Raylib.CheckCollisionCircles(position, (float)_template.Range, m.Position, m.Template.PhysicsRadius))
+                    if (Raylib.CheckCollisionCircles(position, (float)_template.Range, m.Position.XY(), m.Template.PhysicsRadius))
                     {
                         _isOpen = true;
                     }
                 }
                 else
                 {
-                    if (Raylib.CheckCollisionCircleRec(m.Position, m.Template.PhysicsRadius, World.GetTileBounds(X, Y)))
+                    if (Raylib.CheckCollisionCircleRec(m.Position.XY(), m.Template.PhysicsRadius, World.GetTileBounds(X, Y)))
                     {
                         _isOpen = true;
                     }
@@ -60,14 +60,14 @@ public class Door : Structure
             {
                 if (!m.IsFlying && 
                     m.Team == Team && 
-                    Raylib.CheckCollisionCircles(position, (float)_template.Range, m.Position, m.Template.PhysicsRadius))
+                    Raylib.CheckCollisionCircles(position, (float)_template.Range, m.Position.XY(), m.Template.PhysicsRadius))
                 {
                     _isOpen = true;
                 }
             }
         }
 
-        Z = position.Y - (_isOpen ? 24 : 0);
+        // _zOffset = position.Y - (_isOpen ? 24 : 0);
     }
 
     public override bool NavSolid(Team team)

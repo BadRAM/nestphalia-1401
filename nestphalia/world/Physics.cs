@@ -12,7 +12,7 @@ public static class Physics
         Debug.Assert(b != a);
         
         if (b.IsFlying != a.IsFlying) return false;
-        if (!Raylib.CheckCollisionCircles(a.Position, a.Template.PhysicsRadius, b.Position, b.Template.PhysicsRadius)) return false;
+        if (!Raylib.CheckCollisionCircles(a.Position.XY(), a.Template.PhysicsRadius, b.Position.XY(), b.Template.PhysicsRadius)) return false;
         if (a.Position == b.Position) // bump away if both minions are in the exact same position
         {
             a.Push(new Vector2( 0.1f,  0.1f));
@@ -20,7 +20,7 @@ public static class Physics
             return true;
         }
         
-        Vector2 delta = a.Position - b.Position;
+        Vector2 delta = a.Position.XY() - b.Position.XY();
         float weightRatio = a.Template.PhysicsRadius / (a.Template.PhysicsRadius + b.Template.PhysicsRadius);
         float penDepth = (a.Template.PhysicsRadius + b.Template.PhysicsRadius - delta.Length());
         a.Push(delta.Normalized() * Math.Min(penDepth * (1f-weightRatio), 30 * (float)Time.DeltaTime));
@@ -63,12 +63,12 @@ public static class Physics
             Vector2 minDisplacementEject = ejectPos[0];
             for (int i = 1; i < ejectPos.Count; i++)
             {
-                if ((minion.Position - ejectPos[i]).Length() < (minion.Position - minDisplacementEject).Length())
+                if ((minion.Position.XY() - ejectPos[i]).Length() < (minion.Position.XY() - minDisplacementEject).Length())
                 {
                     minDisplacementEject = ejectPos[i];
                 }
             }
-            minion.Position = minDisplacementEject;
+            minion.Position = minDisplacementEject.XYZ();
             return;
         }
         
@@ -91,24 +91,24 @@ public static class Physics
         }
 
         // Handle corner collision
-        if (nw && !n && !w && Raylib.CheckCollisionPointCircle(tileCenter + new Vector2(-12, -12), minion.Position, minion.Template.PhysicsRadius))
+        if (nw && !n && !w && Raylib.CheckCollisionPointCircle(tileCenter + new Vector2(-12, -12), minion.Position.XY(), minion.Template.PhysicsRadius))
         {
-            Vector2 delta = minion.Position - (tileCenter + new Vector2(-12, -12));
+            Vector3 delta = minion.Position - (tileCenter.XYZ() + new Vector3(-12, -12, 0));
             minion.Position += delta.Normalized() * (minion.Template.PhysicsRadius - delta.Length());
         }
-        if (ne && !n && !e && Raylib.CheckCollisionPointCircle(tileCenter + new Vector2(12, -12), minion.Position, minion.Template.PhysicsRadius))
+        if (ne && !n && !e && Raylib.CheckCollisionPointCircle(tileCenter + new Vector2(12, -12), minion.Position.XY(), minion.Template.PhysicsRadius))
         {
-            Vector2 delta = minion.Position - (tileCenter + new Vector2(12, -12));
+            Vector3 delta = minion.Position - (tileCenter.XYZ() + new Vector3(12, -12, 0));
             minion.Position += delta.Normalized() * (minion.Template.PhysicsRadius - delta.Length());
         }
-        if (sw && !s && !w && Raylib.CheckCollisionPointCircle(tileCenter + new Vector2(-12, 12), minion.Position, minion.Template.PhysicsRadius))
+        if (sw && !s && !w && Raylib.CheckCollisionPointCircle(tileCenter + new Vector2(-12, 12), minion.Position.XY(), minion.Template.PhysicsRadius))
         {
-            Vector2 delta = minion.Position - (tileCenter + new Vector2(-12, 12));
+            Vector3 delta = minion.Position - (tileCenter.XYZ() + new Vector3(-12, 12, 0));
             minion.Position += delta.Normalized() * (minion.Template.PhysicsRadius - delta.Length());
         }
-        if (se && !s && !e && Raylib.CheckCollisionPointCircle(tileCenter + new Vector2(12, 12), minion.Position, minion.Template.PhysicsRadius))
+        if (se && !s && !e && Raylib.CheckCollisionPointCircle(tileCenter + new Vector2(12, 12), minion.Position.XY(), minion.Template.PhysicsRadius))
         {
-            Vector2 delta = minion.Position - (tileCenter + new Vector2(12, 12));
+            Vector3 delta = minion.Position - (tileCenter.XYZ() + new Vector3(12, 12, 0));
             minion.Position += delta.Normalized() * (minion.Template.PhysicsRadius - delta.Length());
         }
     }

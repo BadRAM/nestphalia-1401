@@ -435,7 +435,7 @@ public static class World
         _swDraw.Restart();
         Raylib.BeginMode2D(Camera);
 
-        Sprites = Sprites.OrderBy(o => o.Z).ToList();
+        Sprites = Sprites.OrderBy(o => o.GetDrawOrder()).ToList();
 
         foreach (ISprite s in Sprites)
         {
@@ -615,6 +615,14 @@ public static class World
         y = Math.Clamp(y, 0, BoardHeight - 1);
         return new Int2D(x, y);
     }
+    public static Int2D PosToTilePos(Vector3 position)
+    {
+        int x = (int) position.X      / 24;
+        int y = (int)(position.Y - 8) / 24;
+        x = Math.Clamp(x, 0, BoardWidth - 1);
+        y = Math.Clamp(y, 0, BoardHeight - 1);
+        return new Int2D(x, y);
+    }
 
     public static Int2D GetMouseTilePos()
     {
@@ -632,6 +640,11 @@ public static class World
     }
 
     public static Structure? GetTileAtPos(Vector2 position)
+    {
+        return GetTile(PosToTilePos(position));
+    }
+    
+    public static Structure? GetTileAtPos(Vector3 position)
     {
         return GetTile(PosToTilePos(position));
     }

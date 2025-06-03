@@ -40,10 +40,10 @@ public class FrenzyBeacon : ActiveAbilityBeacon
         foreach (Minion minion in World.Minions)
         {
             if (minion.Team != Team) continue;
-            double d = Vector2.Distance(minion.Position, World.GetTileCenter(minion.GetTargetTile()));
+            double d = Vector2.Distance(minion.Position.XY(), World.GetTileCenter(minion.GetTargetTile()));
             if (d <= minimumValue)
             {
-                bestPos = minion.Position;
+                bestPos = minion.Position.XY();
                 bestValue = d;
             }
         }

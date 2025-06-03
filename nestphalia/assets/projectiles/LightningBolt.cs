@@ -9,7 +9,7 @@ public class LightningBoltTemplate : ProjectileTemplate
     {
     }
 
-    public override void Instantiate(object target, object source, Vector2 position)
+    public override void Instantiate(object target, object source, Vector3 position)
     {
         LightningBolt p = new LightningBolt(this, position, target, source);
         World.Projectiles.Add(p);
@@ -20,15 +20,15 @@ public class LightningBoltTemplate : ProjectileTemplate
 public class LightningBolt : Projectile
 {
     private double _timeFired;
-    private List<Vector2> _points;
+    private List<Vector3> _points;
     private double _duration = 0.4;
     
-    public LightningBolt(LightningBoltTemplate template, Vector2 position, object target, object source) : base(template, position, target, source)
+    public LightningBolt(LightningBoltTemplate template, Vector3 position, object target, object source) : base(template, position, target, source)
     {
         _timeFired = Time.Scaled;
-        _points = new List<Vector2>();
+        _points = new List<Vector3>();
         _points.Add(position);
-        Vector2 targetPos = position;
+        Vector3 targetPos = position;
         if (target is Minion m)
         {
             targetPos = m.Position;
@@ -37,9 +37,11 @@ public class LightningBolt : Projectile
         for (int i = 0; i < 8; i++)
         {
             float r = (3 - Math.Abs(i - 4)) * 10;
-            _points.Add(Vector2.Lerp(position, targetPos, (float)i / 8) + new Vector2((Random.Shared.NextSingle()-0.5f) * r, (Random.Shared.NextSingle()-0.5f) * r));
+            Vector3 point = Vector3.Lerp(position, targetPos, (float)i / 8);
+            point += new Vector3((Random.Shared.NextSingle() - 0.5f) * r, 
+                                 (Random.Shared.NextSingle() - 0.5f) * r, 0f);
+            _points.Add(point);
         }
-        Z = position.Y + 80;
     }
 
     public override void Update()
@@ -57,7 +59,11 @@ public class LightningBolt : Projectile
         if (Time.Scaled - _timeFired >= _duration/2) c = Color.Black;
         for (int i = 0; i < _points.Count-1; i++)
         {
-            Raylib.DrawLineEx(_points[i], _points[i+1], 1, c);
+            Vector2 start = _points[i].XY();
+            start.Y -= _points[i].Z;
+            Vector2 end = _points[i+1].XY();
+            end.Y -= _points[i+1].Z;
+            Raylib.DrawLineEx(start, end, 1, c);
         }
     }
 }

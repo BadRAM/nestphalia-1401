@@ -12,10 +12,10 @@ Programming todo:
 - Start of battle dialog
 - Nice title screen
 - Nice credits screen
+- ~~3d Engine~~
 - 2-3 more bugs & towers
   - Ranged attack bug
   - Another flyer. Ladybug? Flies until attacked.
-    - Requires 3d engine
   - Snail rework
   - Beetle rework. Attacks can damage the ball?
   - Centipede that gets longer and shorter
@@ -40,6 +40,8 @@ Programming todo:
 - ~~Minion animation~~
   - ~~Add standing frame~~
   - Attack anim?
+    - Special minion attack projectile type, slash effect? pow?
+    - Animate the minion's position a little in and out
   - ~~Jump anim + hoppers~~
   - ~~Sappers~~
   - ~~Spidermom + spiderling~~
@@ -127,7 +129,6 @@ Programming todo:
 
 ----- Postponed to team bug fort 2 -----
 
-- 3d engine
 - Tournament campaign
 - Worker units
 - Multitile structures

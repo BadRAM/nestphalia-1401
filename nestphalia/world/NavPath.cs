@@ -51,7 +51,7 @@ public class NavPath
         return null;
     }
     
-    public bool TargetReached(Vector2 position)
+    public bool TargetReached(Vector3 position)
     {
         return World.PosToTilePos(position) == Destination;
     }
@@ -64,7 +64,7 @@ public class NavPath
         return p;
     }
     
-    public void Reset(Vector2 position)
+    public void Reset(Vector3 position)
     {
         Found = false;
         Waypoints.Clear();

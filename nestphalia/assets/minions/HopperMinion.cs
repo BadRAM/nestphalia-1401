@@ -9,7 +9,7 @@ public class HopperMinionTemplate : MinionTemplate
     {
     }
     
-    public override void Instantiate(Team team, Vector2 position, NavPath? navPath)
+    public override void Instantiate(Team team, Vector3 position, NavPath? navPath)
     {
         World.RegisterMinion(new HopperMinion(this, team, position, navPath));
     }
@@ -17,7 +17,7 @@ public class HopperMinionTemplate : MinionTemplate
 
 public class HopperMinion : Minion
 {
-    public HopperMinion(MinionTemplate template, Team team, Vector2 position, NavPath? navPath) : base(template, team,
+    public HopperMinion(MinionTemplate template, Team team, Vector3 position, NavPath? navPath) : base(template, team,
         position, navPath)
     {
     }

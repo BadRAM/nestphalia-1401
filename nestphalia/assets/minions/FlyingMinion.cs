@@ -5,11 +5,13 @@ namespace nestphalia;
 
 public class FlyingMinionTemplate : MinionTemplate
 {
+    public double CruisingHeight = 32;
+    
     public FlyingMinionTemplate(string id, string name, string description, Texture2D texture, double maxHealth, double armor, double damage, double speed, float physicsRadius, double attackDuration = 1) : base(id, name, description, texture, maxHealth, armor, damage, speed, physicsRadius, attackDuration)
     {
     }
     
-    public override void Instantiate(Team team, Vector2 position, NavPath? navPath)
+    public override void Instantiate(Team team, Vector3 position, NavPath? navPath)
     {
         World.RegisterMinion(new FlyingMinion(this, team, position, navPath));
     }
@@ -24,16 +26,19 @@ public class FlyingMinion : Minion
 {
     private int _currentFrame;
     private int _frameCounter;
+    private FlyingMinionTemplate _template;
     
-    public FlyingMinion(MinionTemplate template, Team team, Vector2 position, NavPath? navPath) : base(template, team, position, navPath)
+    public FlyingMinion(FlyingMinionTemplate template, Team team, Vector3 position, NavPath? navPath) : base(template, team, position, navPath)
     {
         IsFlying = true;
         _currentFrame = World.RandomInt(4);
+        _template = template;
     }
     
     public override void Update()
     {
         base.Update();
+        Position.Z = Position.Z.MoveTowards((float)_template.CruisingHeight, (float)(12 * Time.DeltaTime));
         _frameCounter++;
         if (_frameCounter >= 2)
         {

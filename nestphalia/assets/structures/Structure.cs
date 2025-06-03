@@ -61,7 +61,7 @@ public class Structure : ISprite
 
     private SoundResource _deathSound;
 
-    public double Z { get; set; }
+    //protected double _zOffset;
 
     public Structure(StructureTemplate template, Team team, int x, int y)
     {
@@ -69,7 +69,7 @@ public class Structure : ISprite
         X = x;
         Y = y;
         position = new Vector2(x*24+12, y*24+20);
-        Z = position.Y;
+        //_zOffset = 0;
         
         Health = template.MaxHealth;
         Team = team;
@@ -92,6 +92,15 @@ public class Structure : ISprite
         Raylib.DrawTexture(Template.Texture, x, y, new Color(t,t,t,255));
     }
 
+    // Structures can use _zOffset to push themselves behind things that walk over them.
+    // Alternatively, we can just flatten tiles that aren't solid, so bugs can step on them.
+    // even more alternatively, we can just use the top edge of the grid square.
+    public double GetDrawOrder()
+    {
+        // return position.Y + _zOffset;
+        // return position.Y - (PhysSolid() ? 24 : 0);
+        return position.Y - 12;
+    }
 
     public virtual bool NavSolid(Team team)
     {

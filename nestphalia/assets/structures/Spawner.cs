@@ -61,7 +61,7 @@ public class Spawner : Structure
             {
                 Console.WriteLine($"Creating a minion without a path, PathQueueLength: {Team.GetQueueLength()}");
             }
-            _template.Minion.Instantiate(Team, position, _navPath.Clone(_template.Minion.Name));
+            _template.Minion.Instantiate(Team, position.XYZ(), _navPath.Clone(_template.Minion.Name));
             _spawnsRemaining--;
             _lastSpawnTime = Time.Scaled;
         }
@@ -70,7 +70,7 @@ public class Spawner : Structure
     public override void PreWaveEffect()
     {
         Retarget();
-        _navPath.Reset(position);
+        _navPath.Reset(position.XYZ());
         _navPath.Destination = _targetTile;
         if (_template.Minion.PathFromNest())
         {
@@ -149,7 +149,7 @@ public class Spawner : Structure
     public void SetTarget(Int2D target)
     {
         _targetTile = target;
-        _navPath.Reset(position);
+        _navPath.Reset(position.XYZ());
         _navPath.Destination = _targetTile;
         if (_template.Minion.PathFromNest())
         {

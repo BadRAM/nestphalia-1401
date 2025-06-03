@@ -44,7 +44,7 @@ public class Minefield : Structure
             _drawPoints[i] += new Vector2(World.RandomInt(-2, 2), World.RandomInt(-2, 2));
         }
 
-        Z = position.Y - 24;
+        // _zOffset = position.Y - 24;
     }
 
     public override void Update()
@@ -57,7 +57,7 @@ public class Minefield : Structure
             if (minion.Team != Team && !minion.IsFlying &&
                 Raylib.CheckCollisionCircles(
                     position, (float)_template.Range, 
-                    minion.Position,minion.Template.PhysicsRadius))
+                    minion.Position.XY(),minion.Template.PhysicsRadius))
             {
                 Trigger();
                 break;
@@ -79,7 +79,7 @@ public class Minefield : Structure
     {
         _armSound.PlayRandomPitch(SoundResource.WorldToPan(position.X));
         _chargesLeft--;
-        _template.Bomb.Instantiate(position + _drawPoints[_chargesLeft], this, position + _drawPoints[_chargesLeft]);
+        _template.Bomb.Instantiate((position + _drawPoints[_chargesLeft]).XYZ(), this, (position + _drawPoints[_chargesLeft]).XYZ());
         _timeLastTriggered = Time.Scaled;
         Health = Math.Max(_chargesLeft, Health);
         if (_chargesLeft <= 0) Destroy();

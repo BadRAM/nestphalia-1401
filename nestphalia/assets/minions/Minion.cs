@@ -10,6 +10,7 @@ public class MinionTemplate
     public string Name;
     public string Description;
     public Texture2D Texture;
+    public Texture2D ShadowTexture;
     public double MaxHealth;
     public double Armor;
     public double Damage;
@@ -25,6 +26,7 @@ public class MinionTemplate
         Name = name;
         Description = description;
         Texture = texture;
+        ShadowTexture = Resources.GetTextureByName("shadow");
         MaxHealth = maxHealth;
         Armor = armor;
         Damage = damage;
@@ -36,7 +38,7 @@ public class MinionTemplate
     }
 
     // Implementations of Instantiate() must call Register!
-    public virtual void Instantiate(Team team, Vector2 position, NavPath? navPath)
+    public virtual void Instantiate(Team team, Vector3 position, NavPath? navPath)
     {
         World.RegisterMinion(new Minion(this, team, position, navPath));
     }
@@ -71,7 +73,7 @@ public partial class Minion : ISprite
     protected NavPath NavPath;
     
     // Public State
-    public Vector2 Position;
+    public Vector3 Position;
     public double Health;
     public bool IsFlying;
     public Int2D OriginTile;
@@ -86,17 +88,18 @@ public partial class Minion : ISprite
     private double _timeOfLastAction;
     private Color? _tintOverride;
     
-    public double Z { get; set; }
+    // public double Z { get; set; }
     
-    public Minion(MinionTemplate template, Team team, Vector2 position, NavPath? navPath)
+    public Minion(MinionTemplate template, Team team, Vector3 position, NavPath? navPath)
     {
         Template = template;
         Team = team;
         Position = position;
-        NextPos = position;
+        NextPos = position.XY();
         OriginTile = World.PosToTilePos(position);
         Health = Template.MaxHealth;
         _timeOfLastAction = Time.Scaled;
+        // // Party mode, randomly colors all minions
         // Color[] colors = { Color.Red, Color.Blue, Color.Green, Color.Yellow, Color.Purple, Color.Pink, Color.Orange, Color.White, Color.Beige, Color.Black, Color.Brown, Color.DarkBlue, Color.Lime, Color.Magenta, Color.SkyBlue, Color.Violet, Color.Maroon, Color.Gold };
         // _tintOverride = colors[Random.Shared.Next(colors.Length)];
         
@@ -113,7 +116,6 @@ public partial class Minion : ISprite
             // PathFinder.RequestPath(NavPath);
             SetTarget(GetNewTarget());
         }
-        Z = Position.Y;
     }
 
     #region Events
@@ -122,7 +124,6 @@ public partial class Minion : ISprite
     public virtual void Update()
     {
         State.Update();
-        Z = Position.Y + (IsFlying ? 240 : 0);
     }
 
     protected virtual void OnTargetReached()
@@ -141,13 +142,14 @@ public partial class Minion : ISprite
         DrawDecorators();
         DrawDebug();
     }
+
     #endregion
     
     #region Protected Functions
     
     protected void UpdateNextPos()
     {
-        Vector2 pos = World.GetTileCenter(NavPath.NextTile(Position));
+        Vector2 pos = World.GetTileCenter(NavPath.NextTile(Position.XY()));
         if (pos != NextPos)
         {
             NextPos = pos;
@@ -169,10 +171,10 @@ public partial class Minion : ISprite
     protected bool CanAttack()
     {
         // Guard against out of range attacks
-        if (Vector2.Distance(Position, NextPos) > 24 + Template.PhysicsRadius) return false;
+        if (Vector2.Distance(Position.XY(), NextPos) > 24 + Template.PhysicsRadius) return false;
         Structure? t = World.GetTileAtPos(NextPos);
         // Guard against attacking tiles that could just be walked over
-        if (t == null || t is Rubble || (!t.NavSolid(Team) && NavPath.NextTile(Position) != NavPath.Destination)) return false;
+        if (t == null || t is Rubble || (!t.NavSolid(Team) && NavPath.NextTile(Position.XY()) != NavPath.Destination)) return false;
         // Guard against friendly tiles that can be traversed
         if (t.Team == Team && !t.PhysSolid()) return false; 
 
@@ -194,11 +196,11 @@ public partial class Minion : ISprite
         // Cap push force to 12 px/frame, hopefully this will prevent bugs from getting embedded in walls by mega crowd crush events
         if (_collisionOffset.Length() > 12)
         {
-            Position += _collisionOffset.Normalized() * 12;
+            Position += (_collisionOffset.Normalized() * 12).XYZ();
         }
         else
         {
-            Position += _collisionOffset;
+            Position += (_collisionOffset).XYZ();
         }
         _collisionOffset = Vector2.Zero;
     }
@@ -214,7 +216,7 @@ public partial class Minion : ISprite
                 Structure? s = World.GetTile(x, y);
                 if (s != null && s.Team != Team && s is not Rubble)
                 {
-                    targets.Add(new Sortable<Int2D>(-Vector2.Distance(Position, World.GetTileCenter(x,y)), new Int2D(x,y)));
+                    targets.Add(new Sortable<Int2D>(-Vector2.Distance(Position.XY(), World.GetTileCenter(x,y)), new Int2D(x,y)));
                 }
             }
         }
@@ -248,13 +250,19 @@ public partial class Minion : ISprite
     protected void DrawBug(int frame)
     {
         int size = Template.Texture.Height / 2;
-        Vector2 pos = new Vector2(Position.X - size / 2f, Position.Y - size / 2f);
+        Vector2 pos = new Vector2(Position.X - size / 2f, Position.Y - size / 2f - Position.Z);
         bool flip = NextPos.X > Position.X;
         Rectangle source = new Rectangle(flip ? size : 0, 0, flip ? size : -size, size);
         source.X = size * frame;
         Raylib.DrawTextureRec(Template.Texture, source, pos, Color.White);
         source.Y += size;
         Raylib.DrawTextureRec(Template.Texture, source, pos, _tintOverride ?? Team.UnitTint);
+        if (Position.Z > 0)
+        {
+            pos = new Vector2(Position.X - Template.ShadowTexture.Width / 2f, Position.Y - Template.ShadowTexture.Height / 2f);
+            if (World.GetTileAtPos(Position)?.PhysSolid() ?? false) pos.Y -= 8;
+            Raylib.DrawTextureV(Template.ShadowTexture, pos, Raylib.ColorAlpha(Color.White, Math.Min(Position.Z/12, 1)));
+        }
     }
     
     protected void DrawDecorators()
@@ -262,7 +270,7 @@ public partial class Minion : ISprite
         // Health Bar
         if (Health < Template.MaxHealth)
         {
-            Vector2 start = Position - new Vector2(Template.PhysicsRadius, Template.PhysicsRadius + 2);
+            Vector2 start = Position.XY() - new Vector2(Template.PhysicsRadius, Template.PhysicsRadius + 2 + Position.Z);
             Vector2 end = start + new Vector2((float)(2 * Template.PhysicsRadius * (Health / Template.MaxHealth)), 0);
             Raylib.DrawLineEx(start, end, 1, new Color(32, 192, 32, 255));
         }
@@ -273,11 +281,16 @@ public partial class Minion : ISprite
 
     protected void DrawDebug()
     {
-        if (Raylib.CheckCollisionPointCircle(Raylib.GetScreenToWorld2D(Raylib.GetMousePosition(), World.Camera), Position, 2*Template.PhysicsRadius))
+        if (Raylib.CheckCollisionPointCircle(Raylib.GetScreenToWorld2D(Raylib.GetMousePosition(), World.Camera), Position.XYZ2D(), 2*Template.PhysicsRadius))
         {
             if (World.DrawDebugInfo) Raylib.DrawCircleV(NextPos, 2, Color.Green);
+
+            if (Position.Z > 0)
+            {
+                Raylib.DrawLineV(Position.XYZ2D(), Position.XY(), Color.SkyBlue);
+            }
             
-            Vector2 path = Position;
+            Vector2 path = Position.XY();
             foreach (Int2D i in NavPath.Waypoints)
             {
                 Vector2 v = World.GetTileCenter(i);
@@ -349,6 +362,11 @@ public partial class Minion : ISprite
             }
             State = new Move(this);
         }, Resources.GetTextureByName("particle_confused"));
+    }
+    
+    public double GetDrawOrder()
+    {
+        return Position.Y;
     }
     #endregion
 }

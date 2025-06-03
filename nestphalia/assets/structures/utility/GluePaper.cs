@@ -25,7 +25,7 @@ public class GluePaper : Structure
     public GluePaper(GluePaperTemplate template, Team team, int x, int y) : base(template, team, x, y)
     {
         _template = template;
-        Z = position.Y - 24;
+        // _zOffset = position.Y - 24;
     }
 
     public override void Update()
