@@ -97,7 +97,7 @@ public static class World
         }
     }
 
-    public static void InitializeEditor()
+    public static void InitializeEditor(Fort fortToLoad)
     {
         Initialize();
         Camera.Target = new Vector2(22 * 12, BoardHeight * 12 + 8);
@@ -122,6 +122,10 @@ public static class World
                 _board[x,y] = null;
             }
         }
+        
+        fortToLoad.LoadToBoard(false);
+        LeftTeam.Initialize();
+        RightTeam.Initialize();
     }
 
     public static void InitializePreview()
@@ -681,5 +685,15 @@ public static class World
     {
         //Determinator.Stacks += Environment.StackTrace + "\n\n";
         return _random.NextDouble();
+    }
+
+    public static void EndBattle()
+    {
+        _battleOver = true;
+    }
+
+    public static bool IsBattleOver()
+    {
+        return _battleOver;
     }
 }

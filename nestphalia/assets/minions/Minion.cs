@@ -70,10 +70,11 @@ public partial class Minion : ISprite
     // Components
     public MinionTemplate Template;
     public Team Team;
-    protected NavPath NavPath;
+    public NavPath NavPath;
     
     // Public State
     public Vector3 Position;
+    public Vector3 DrawOffset;
     public double Health;
     public double Armor;
     public bool IsFlying;
@@ -114,8 +115,6 @@ public partial class Minion : ISprite
         else
         {
             NavPath = new NavPath(template.Name, Team);
-            // NavPath.Destination = GetNewTarget();
-            // PathFinder.RequestPath(NavPath);
             SetTarget(GetNewTarget());
         }
     }
@@ -151,6 +150,12 @@ public partial class Minion : ISprite
     
     protected void UpdateNextPos()
     {
+        if (IsFlying && NavPath.Found)
+        {
+            NextPos = World.GetTileCenter(NavPath.Destination);
+            _timeOfLastAction = Time.Scaled;
+            return;
+        }
         Vector2 pos = World.GetTileCenter(NavPath.NextTile(Position.XY()));
         if (pos != NextPos)
         {
@@ -163,7 +168,7 @@ public partial class Minion : ISprite
     {
         if (Time.Scaled - _timeOfLastAction > 5)
         {
-            Console.WriteLine($"{Template.Name} got lost");
+            // Console.WriteLine($"{Template.Name} got lost");
             _timeOfLastAction = Time.Scaled;
             return true;
         }
@@ -172,6 +177,8 @@ public partial class Minion : ISprite
 
     protected bool CanAttack()
     {
+        // Don't attack while we're on top of structures
+        if (World.GetTileAtPos(Position)?.PhysSolid() ?? false) return false;
         // Guard against out of range attacks
         if (Vector2.Distance(Position.XY(), NextPos) > 24 + Template.PhysicsRadius) return false;
         Structure? t = World.GetTileAtPos(NextPos);
@@ -252,18 +259,19 @@ public partial class Minion : ISprite
     protected void DrawBug(int frame)
     {
         int size = Template.Texture.Height / 2;
-        Vector2 pos = new Vector2(Position.X - size / 2f, Position.Y - size / 2f - Position.Z);
+        Vector2 pos = new Vector2(Position.X - size / 2f, Position.Y - size / 2f - Position.Z) + DrawOffset.XYZ2D();
+        if (!IsFlying && (World.GetTileAtPos(Position)?.PhysSolid() ?? false)) pos.Y -= 8;
         bool flip = NextPos.X > Position.X;
         Rectangle source = new Rectangle(flip ? size : 0, 0, flip ? size : -size, size);
         source.X = size * frame;
         Raylib.DrawTextureRec(Template.Texture, source, pos, Color.White);
         source.Y += size;
         Raylib.DrawTextureRec(Template.Texture, source, pos, _tintOverride ?? Team.UnitTint);
-        if (Position.Z > 0)
+        if (Position.Z + DrawOffset.Z > 0)
         {
-            pos = new Vector2(Position.X - Template.ShadowTexture.Width / 2f, Position.Y - Template.ShadowTexture.Height / 2f);
+            pos = new Vector2(Position.X - Template.ShadowTexture.Width / 2f, Position.Y - Template.ShadowTexture.Height / 2f) + DrawOffset.XY();
             if (World.GetTileAtPos(Position)?.PhysSolid() ?? false) pos.Y -= 8;
-            Raylib.DrawTextureV(Template.ShadowTexture, pos, Raylib.ColorAlpha(Color.White, Math.Min(Position.Z/12, 1)));
+            Raylib.DrawTextureV(Template.ShadowTexture, pos, Raylib.ColorAlpha(Color.White, Math.Min((Position.Z + DrawOffset.Z)/12, 1)));
         }
     }
     
@@ -293,18 +301,20 @@ public partial class Minion : ISprite
             }
             
             Vector2 path = Position.XY();
-            foreach (Int2D i in NavPath.Waypoints)
+            foreach (Int2D i in NavPath.Points)
             {
                 Vector2 v = World.GetTileCenter(i);
                 Raylib.DrawLine((int)path.X, (int)path.Y, (int)v.X, (int)v.Y, Color.Lime);
                 path = v;
             }
 
-            if (NavPath.Waypoints.Count == 0)
+            if (NavPath.Points.Count == 0)
             {
                 Vector2 v = World.GetTileCenter(NavPath.Destination);
                 Raylib.DrawLine((int)path.X, (int)path.Y, (int)v.X, (int)v.Y, Color.Lime);
             }
+            
+            Raylib.DrawCircleV(World.GetTileCenter(NavPath.Destination), 3, Color.Red);
             
             if (World.DrawDebugInfo) GUI.DrawTextLeft((int)Position.X, (int)Position.Y, State.ToString(), guiSpace: false);
         }
@@ -354,21 +364,51 @@ public partial class Minion : ISprite
         NavPath.Start = World.PosToTilePos(Position);
         NavPath.Destination = target;
         Team.RequestPath(NavPath);
-        
+
+        WaitForPath(thinkDuration);
+    }
+
+    public virtual NavPath WaitForPath(double thinkDuration = 0.5)
+    {
         // Wait a bit, then force pathfinding if it hasn't happened yet.
-        State = new Wait(this, thinkDuration, () =>
-        {
-            if (!NavPath.Found)
+        SetState(new Wait(this, thinkDuration, () =>
             {
-                Team.DemandPath(NavPath);
-            }
-            State = new Move(this);
-        }, Resources.GetTextureByName("particle_confused"));
+                if (!NavPath.Found)
+                {
+                    Team.DemandPath(NavPath);
+                }
+                SetState(new Move(this));
+            }, 
+            Resources.GetTextureByName("particle_confused")));
+        return NavPath;
     }
     
     public double GetDrawOrder()
     {
         return Position.Y;
+    }
+
+    public bool SetState(BaseState state)
+    {
+        return State.Exit(state);
+    }
+
+    public void SetStateFlee(List<Int2D> escapePoints)
+    {
+        NavPath.Reset(Position);
+        NavPath.Start = World.PosToTilePos(Position);
+        NavPath.Points.AddRange(escapePoints);
+        Team.RequestPath(NavPath);
+
+        SetState(new Wait(this, 0.1, () =>
+            {
+                if (!NavPath.Found)
+                {
+                    Team.DemandPath(NavPath);
+                }
+                SetState(new Flee(this));
+            }, 
+            Resources.GetTextureByName("particle_confused")));
     }
     #endregion
 }

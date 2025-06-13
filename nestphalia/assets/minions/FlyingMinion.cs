@@ -40,6 +40,12 @@ public class FlyingMinion : Minion
     
     public override void Update()
     {
+        // ugly hack to prevent fliers from following paths.
+        // if (NavPath.Found && IsFlying && NavPath.Points.Count > 0 )
+        // {
+        //     NavPath.Points.Clear();
+        // }
+        
         base.Update();
 
         if (WantToFly && !IsFlying)
@@ -100,10 +106,10 @@ public class FlyingMinion : Minion
         
         NavPath.Reset(Position);
         NavPath.Destination = target;
-        
-        State = new Wait(this, thinkDuration, () => { State = new Move(this); }, Resources.GetTextureByName("particle_confused"));
+
+        SetState(new Wait(this, thinkDuration, () => { State = new Move(this); }));
     }
-    
+
     // Flying minions can't get lost
     protected override bool CheckIfLost()
     {

@@ -29,6 +29,8 @@ public class Team
     private List<NavPath> _pathQueue = new List<NavPath>();
     private List<NavPath> _priorityPathQueue = new List<NavPath>();
 
+    public PathFinder PathFinder = new PathFinder();
+
     public Team(string name, bool isRightSide, Color unitTint)
     {
         Name = name;
@@ -106,7 +108,6 @@ public class Team
             Console.WriteLine($"{navPath.Requester}'s path jumped the queue");
         }
         _priorityPathQueue.Add(navPath);
-        //PathFinder.FindPath(navPath);
     }
 
     public void ServeQueue(int max)
@@ -139,7 +140,7 @@ public class Team
         }
         if (i >= max-1)
         {
-            Console.WriteLine($"Max path calc, {i} in {(Raylib.GetTime() - startTime) * 1000}ms, Queue length: {GetQueueLength()}");
+            Console.WriteLine($"Max path calc, {i} in {((Raylib.GetTime() - startTime) * 1000):N3}ms, Queue length: {GetQueueLength()}");
         }
     }
     
@@ -229,6 +230,7 @@ public class Team
             }
         }
         
+        if (World.IsBattleOver()) return;
         // use abilities
         if (IsPlayerControlled)
         {
@@ -351,6 +353,7 @@ public class Team
     
     private void OnStructureChanged(object? sender, Int2D pos)
     {
+        Console.WriteLine($"Structure changed at {pos}!");
         _weightMap[pos.X, pos.Y] = CalculateWeight(pos.X, pos.Y);
         _navSolidMap[pos.X, pos.Y] = World.GetTile(pos.X, pos.Y)?.NavSolid(this) ?? false;
     }

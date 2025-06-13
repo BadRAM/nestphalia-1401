@@ -38,7 +38,7 @@ public class HopperMinion : Minion
                 {
                     Vector2 to = World.GetTileCenter((Int2D)ahead);
                     to += new Vector2(World.RandomInt(17) - 8, World.RandomInt(23) - 11);
-                    State = new Jump(this, to, 0.25, 0.5, 0.25);
+                    SetState(new Jump(this, to, 0.25, 0.5, 0.25));
                 }
             }
         }

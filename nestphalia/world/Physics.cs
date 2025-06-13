@@ -56,7 +56,7 @@ public static class Physics
             if (!e) ejectPos.Add(new Vector2((tileCenter.X + 12) + minion.Template.PhysicsRadius, minion.Position.Y));
             if (ejectPos.Count == 0)
             {
-                Console.WriteLine($"{minion.Template.Name} is trapped inside a wall with no way out! wall collision has been skipped.");
+                // Console.WriteLine($"{minion.Template.Name} is trapped inside a wall with no way out! wall collision has been skipped.");
                 return;
             }
 

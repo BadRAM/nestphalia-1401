@@ -25,6 +25,8 @@ public class EditorScene : Scene
     private int _beaconCount;
     private Texture2D _bg;
 
+    private PathFinder pathFinder = new PathFinder();
+
     private enum EditorTool
     { 
         Brush,
@@ -45,9 +47,8 @@ public class EditorScene : Scene
         Program.CurrentScene = this;
         Screen.RegenerateBackground();
         _bg = Resources.GetTextureByName("editor_bg");
-        World.InitializeEditor();
+        World.InitializeEditor(_fort);
         World.Camera.Offset = new Vector2(Screen.HCenter, Screen.VCenter);
-        _fort.LoadToBoard(false);
         Resources.PlayMusicByName("so_lets_get_killed");
         
         UpdateFortStats();
@@ -241,12 +242,12 @@ public class EditorScene : Scene
     private void PathTestTool()
     {
         NavPath navPath = new NavPath("editor", new Int2D(28, 11), World.GetMouseTilePos(), World.RightTeam);
-        PathFinder.FindPath(navPath);
+        pathFinder.FindPath(navPath);
         
         BeginMode2D(World.Camera);
         
         Vector2 path = World.GetTileCenter(navPath.Start);
-        foreach (Int2D i in navPath.Waypoints)
+        foreach (Int2D i in navPath.Points)
         {
             Vector2 v = World.GetTileCenter(i);
             if (i.X < 22)
@@ -258,7 +259,7 @@ public class EditorScene : Scene
         
         EndMode2D();
     }
-
+    
     private void EraseTool()
     {
         if (IsMouseButtonDown(MouseButton.Left))

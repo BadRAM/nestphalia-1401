@@ -24,13 +24,18 @@ public class RallyBeacon : ActiveAbilityBeacon
     public override void Activate(Vector2 targetPosition)
     {
         base.Activate(targetPosition);
+        List<NavPath> paths = new List<NavPath>();
         foreach (Minion minion in World.Minions)
         {
             if (minion.Team == Team)
             {
-                minion.SetTarget(World.PosToTilePos(targetPosition), World.RandomDouble() * 0.4 + 0.1);
+                NavPath n = minion.WaitForPath(World.RandomDouble() * 0.4 + 0.1);
+                n.Reset(minion.Position);
+                n.Destination = World.PosToTilePos(targetPosition);
+                paths.Add(n);
             }
         }
+        Team.PathFinder.FindPathsBatched(paths);
     }
 
     public override Vector2? SelectPosition(double minimumValue)

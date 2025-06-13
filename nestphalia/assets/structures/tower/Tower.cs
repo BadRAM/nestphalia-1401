@@ -72,6 +72,8 @@ public class Tower : Structure
     public override void Update()
     {
         base.Update();
+
+        if (World.IsBattleOver()) return;
         
         if (Time.Scaled - _timeLastFired > 60/_template.RateOfFire)
         {
@@ -131,7 +133,7 @@ public class Tower : Structure
         }
 
         double reduction = -(e.GetHateFor(X, Y) / protectedArea.Count);
-        Console.WriteLine($"Tower at {X},{Y} destroyed, reducing {protectedArea.Count} surrounding tiles fear by {reduction}");
+        // Console.WriteLine($"Tower at {X},{Y} destroyed, reducing {protectedArea.Count} surrounding tiles fear by {reduction}");
         while (protectedArea.Count > 0)
         {
             e.AddFearOf(reduction, protectedArea.Dequeue());

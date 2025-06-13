@@ -4,49 +4,44 @@ using Raylib_cs;
 namespace nestphalia;
 
 // Warning: Pathfinder uses static variables too much, and cannot run on multiple threads as a result. Making Pathfinder not static would fix.
-public static class PathFinder
+public class PathFinder
 {
-    private static List<NavPath> _pathQueue = new List<NavPath>();
+    private List<NavPath> _pathQueue = new List<NavPath>();
 
-    private static PathNode?[,] _nodeGrid = new PathNode?[World.BoardWidth,World.BoardHeight];
-    private static List<PathNode> _nodeQueue = new List<PathNode>();
-    private static int _nodes;
-    private static List<PathNode> _antinodeQueue = new List<PathNode>();
-    private static int _antinodes;
-    private static bool _anti;
+    private PathNode?[,] _nodeGrid = new PathNode?[World.BoardWidth,World.BoardHeight];
+    private List<PathNode> _nodeQueue = new List<PathNode>();
+    private int _nodes;
+    private List<PathNode> _antinodeQueue = new List<PathNode>();
+    private int _antinodes;
+    private bool _anti;
     
-    private static Stopwatch _swTotalTime = new Stopwatch();
-    private static int _totalPaths = 0;
+    private Stopwatch _swTotalTime = new Stopwatch();
+    private int _totalPaths = 0;
     
     #if DEBUG
-    private static long _totalNodes = 0;
-    private static Stopwatch _swMisc = new Stopwatch();
-    private static Stopwatch _swFindNext = new Stopwatch();
-    private static Stopwatch _swAddNodes = new Stopwatch();
+    private long _totalNodes = 0;
+    private Stopwatch _swMisc = new Stopwatch();
+    private Stopwatch _swFindNext = new Stopwatch();
+    private Stopwatch _swAddNodes = new Stopwatch();
     #endif
     
     private class PathNode
     {
-        public Int2D Pos;
+        public readonly Int2D Pos;
+        public readonly Int2D PrevNode;
         public double Weight;
-        public Int2D PrevNode;
         public bool Anti;
         
-        public PathNode(Int2D pos, Int2D prevNode)
+        public PathNode(Int2D pos, Int2D prevNode, bool anti = false)
         {
             Pos = pos;
             PrevNode = prevNode;
-        }
-
-        public PathNode GetPrevNode()
-        {
-            Debug.Assert(_nodeGrid[PrevNode.X, PrevNode.Y] != null);
-            return _nodeGrid[PrevNode.X, PrevNode.Y] ?? this;
+            Anti = anti;
         }
     }
 
     // FindPath is normally called by ServeQueue, but can be called directly if an immediate path is needed.
-    public static void FindPath(NavPath navPath)
+    public void FindPath(NavPath navPath, bool batchMode = false)
     {
         // Guard against invalid path request
         // Debug.Assert(!navPath.Found);
@@ -56,48 +51,68 @@ public static class PathFinder
             return;
         }
         
-        // Start of pathing
         _swTotalTime.Start();
         _totalPaths++;
-        
+
+        // ----- Clean up after previous pathing ------------------------------------------------------------------
+        // We leave the data behind after pathing for debug visualization, and for batch pathing
         Array.Clear(_nodeGrid);
         _nodeQueue.Clear();
+        _nodes = 0;
         _antinodeQueue.Clear();
+        _antinodes = 0;
+        PathNode n = new PathNode(Int2D.Zero, Int2D.Zero);
         
-        PathNode n = new PathNode(navPath.Start, navPath.Start);
-        _nodeQueue.Add(n);
-        
-        n = new PathNode(navPath.Destination, navPath.Destination);
-        _antinodeQueue.Add(n);
-        
-        #if DEBUG
-        int count = 0;
-        #endif
+        // ----- Add start and endpoint nodes ---------------------------------------------------------------------
+        _nodeQueue.Add(new PathNode(navPath.Start, navPath.Start));
+        if (navPath.Points.Count == 0)
+        {
+            _antinodeQueue.Add(new PathNode(navPath.Destination, navPath.Destination, true));
+        }
+        else
+        {
+            foreach (Int2D navPathPoint in navPath.Points)
+            {
+                _antinodeQueue.Add(new PathNode(navPathPoint, navPathPoint, true));
+            }
+            navPath.Points.Clear();
+        }
+
         // ===== Path Solver Loop =====================================================================================
         while (true)
         {
             #if DEBUG
             _swMisc.Start();
-            count++;
             #endif
             
-            // Guard against no-path scenarios
+            // Exit if either queue runs out of nodes.
             Debug.Assert(_nodeQueue.Count != 0 && _antinodeQueue.Count != 0);
+            // if (_nodeQueue.Count == 0 || _antinodeQueue.Count == 0)
+            // {
+            //     #if DEBUG
+            //     _swMisc.Stop();
+            //     #endif
+            //     break;
+            // }
 
             // ----- Decide if this loop will be node or antinode -------------------------------------------------
             _anti = _nodes > _antinodes;
+            if (_nodeQueue[^1].Weight == 0)     _anti = false;
+            if (_antinodeQueue[^1].Weight == 0) _anti = true;
+            if (batchMode)                      _anti = true;
             
             #if DEBUG
             _swMisc.Stop();
             _swFindNext.Start();
             #endif
 
-            // ----- Select Node ----------------------------------------------------------------------------------
+            // ----- Select Node and set it into the nodegrid -----------------------------------------------------
             n = PopMinNode();
             
             #if DEBUG
             _swFindNext.Stop();
             _swMisc.Start();
+            _totalNodes++;
             #endif
             
             if (_nodeGrid[n.Pos.X, n.Pos.Y] != null)
@@ -114,9 +129,6 @@ public static class PathFinder
                 continue;
             }
             
-            // ----- Process selected node ------------------------------------------------------------------------
-            _nodeGrid[n.Pos.X,n.Pos.Y] = n;
-            
             if (_anti)
             {
                 _antinodes++;
@@ -125,6 +137,18 @@ public static class PathFinder
             {
                 _nodes++;
             }
+
+            // Batchmode stops once the entire board is filled with antinodes
+            if (batchMode && _antinodes >= World.BoardHeight * World.BoardWidth)
+            {
+                #if DEBUG
+                _swMisc.Stop();
+                #endif
+                return; // <----- !!! EARLY RETURN HERE, TO AVOID TOUCHING THE NAVPATH !!!
+            }
+            
+            // ----- Process selected node ------------------------------------------------------------------------
+            _nodeGrid[n.Pos.X,n.Pos.Y] = n;
             
             #if DEBUG
             _swMisc.Stop();
@@ -196,6 +220,15 @@ public static class PathFinder
             
             #if DEBUG
             _swAddNodes.Stop();
+            if (Raylib.IsKeyDown(KeyboardKey.Q))
+            {
+                Raylib.BeginDrawing();
+                Raylib.ClearBackground(new Color(16, 8, 4, 255));
+                World.DrawFloor();
+                World.Draw();
+                DrawDebug();
+                Raylib.EndDrawing();
+            }
             #endif
         }
         
@@ -208,104 +241,119 @@ public static class PathFinder
         // Build the first half by walking the nodes
         while (true)
         {
-            navPath.Waypoints.Insert(0, nn.Pos);
+            navPath.Points.Insert(0, nn.Pos);
             if (nn.PrevNode == nn.Pos) break;
-            nn = nn.GetPrevNode();
+            nn = GetPrevNode(nn);
         }
         
         // Build the second half by walking the antinodes
         while (true)
         {
-            navPath.Waypoints.Add(an.Pos);
+            navPath.Points.Add(an.Pos);
             if (an.PrevNode == an.Pos) break;
-            an = an.GetPrevNode();
+            an = GetPrevNode(an);
         }
+        navPath.Destination = an.Pos;
         
         // Set the flag to let the minion know we're done
         navPath.Found = true;
         
-        #if DEBUG
-        _totalNodes += count;
-        _totalNodes += _nodeQueue.Count;
-        #endif
-        
         _swTotalTime.Stop();
     }
+
+    // Calculates a flow map based on the first navpath's targets, then samples it to solve all the remaining paths.
+    // Warning! All navpaths must have identical destinations!
+    public void FindPathsBatched(List<NavPath> navPaths)
+    {
+        Stopwatch sw = new Stopwatch();
+        sw.Start();
+        FindPath(navPaths[0], true);
+
+        foreach (NavPath navPath in navPaths)
+        {
+            PathNode an = _nodeGrid[navPath.Start.X, navPath.Start.Y];
+            navPath.Points.Clear();
+            
+            // Build the path by walking the antinodes
+            while (true)
+            {
+                navPath.Points.Add(an.Pos);
+                if (an.PrevNode == an.Pos) break;
+                an = GetPrevNode(an);
+            }
+            navPath.Destination = an.Pos;
+        
+            // Set the flag to let the minion know we're done
+            navPath.Found = true;
+        }
+        sw.Stop();
+        Console.WriteLine($"Batch pathed {navPaths.Count} bugs in {sw.Elapsed.TotalMilliseconds:N3}ms, {(sw.Elapsed.TotalMilliseconds / navPaths.Count):N4}ms/path");
+    }
     
-    private static PathNode PopMinNode()
+    private PathNode PopMinNode()
     {
         List<PathNode> queue = _anti ? _antinodeQueue : _nodeQueue;
-        
-        double min = queue[0].Weight;
-        int mindex = 0;
-        for (int i = 1; i < queue.Count; i++)
-        {
-            if (queue[i].Weight < min)
-            {
-                min = queue[i].Weight;
-                mindex = i;
-            }
-        }
-        
-        PathNode p = queue[mindex];
-        queue[mindex] = queue[^1];
+        PathNode p = queue[^1];
         queue.RemoveAt(queue.Count-1);
         return p;
     }
 
-    private static void AddWeightedNode(Int2D prevNode, int x, int y, double moveDistance, Team team, NavPath path)
+    private void AddWeightedNode(Int2D prevNode, int x, int y, double moveDistance, Team team, NavPath path)
     {
         if (_nodeGrid[x, y] != null) return;
        
         // Create new node
         PathNode n = new PathNode(new Int2D(x, y), prevNode);
-        n.Weight = n.GetPrevNode().Weight;
+        n.Weight = GetPrevNode(n).Weight;
         n.Weight += moveDistance;
-        // n.Weight += team.GetFearOf(x, y);
         n.Weight += team.GetTileWeight(x, y);
 
         n.Anti = _anti;
         // Register node
-        if (!_anti)
+        List<PathNode> q = _anti ? _antinodeQueue : _nodeQueue;
+        for(int i = q.Count-1; i >= 0; i--)
         {
-            _nodeQueue.Add(n);
+            if (n.Weight < q[i].Weight)
+            {
+                q.Insert(i+1, n);
+                return;
+            }
         }
-        else
-        {
-            _antinodeQueue.Add(n);
-        }
+        q.Insert(0, n);
     }
     
-    public static void DrawDebug()
+    private PathNode GetPrevNode(PathNode node)
+    {
+        if (node == null) return null;
+        return _nodeGrid[node.PrevNode.X, node.PrevNode.Y];
+    }
+    
+    public void DrawDebug()
     {
         Raylib.BeginMode2D(World.Camera);
 
-        double maxWeight = 0;
-        for (int i = 0; i < World.BoardWidth; i++)
+        for (int x = 0; x < World.BoardWidth; x++)
+        for (int y = 0; y < World.BoardHeight; y++)
         {
-            for (int j = 0; j < World.BoardHeight; j++)
+            if (_nodeGrid[x, y] != null && GetPrevNode(_nodeGrid[x, y]) != null)
             {
-                if (_nodeGrid[i, j] != null && _nodeGrid[i, j]?.GetPrevNode().Weight > maxWeight)
-                {
-                    maxWeight = _nodeGrid[i, j]?.GetPrevNode().Weight ?? 0;
-                }
+                // int t = (int)((_nodeGrid[i, j]?.Weight ?? 0) / maxWeight * 255);
+                Color c = (_nodeGrid[x, y]?.Anti ?? false) ? Color.Blue : Color.Red;
+                Raylib.DrawLineEx(World.GetTileCenter(x, y), World.GetTileCenter(GetPrevNode(_nodeGrid[x, y]).Pos), 2, c);
+                if (GetPrevNode(_nodeGrid[x, y]) == _nodeGrid[x, y]) Raylib.DrawCircleV(World.GetTileCenter(x,y), 4, c);
             }
-        }
-
-        for (int i = 0; i < World.BoardWidth; i++)
-        {
-            for (int j = 0; j < World.BoardHeight; j++)
+            else
             {
-                if (_nodeGrid[i, j] != null && _nodeGrid[i, j]?.GetPrevNode() != null)
+                int r = 1;
+                foreach (PathNode pathNode in _nodeQueue)
                 {
-                    int t = (int)((_nodeGrid[i, j]?.Weight ?? 0) / maxWeight * 255);
-                    Color c = t > 255 ? Color.Pink : new Color(t, 255-t, t, 255);
-                    Raylib.DrawLineV(World.GetTileCenter(i, j), World.GetTileCenter(_nodeGrid[i, j]?.GetPrevNode().Pos ?? new Int2D(0,0)), c);
+                    if (pathNode.Pos.X == x && pathNode.Pos.Y == y) r++;
                 }
-                else
+                foreach (PathNode pathNode in _antinodeQueue)
                 {
-                    Raylib.DrawCircleV(World.GetTileCenter(i,j), 4, Color.Red);
+                    if (pathNode.Pos.X == x && pathNode.Pos.Y == y) r++;
                 }
+                Raylib.DrawCircleV(World.GetTileCenter(x,y), r, Color.Green);
             }
         }
         Raylib.EndMode2D();
@@ -327,24 +375,24 @@ public static class PathFinder
         debugText += $"AddNodes: {_swAddNodes.ElapsedMilliseconds}ms\n";
         
         int totalWidth = 1000;
-        int x = Screen.HCenter-500;
+        int barX = Screen.HCenter-500;
         int width = (int)(totalWidth * _swMisc.ElapsedMilliseconds / totalSWTime);
         
-        Raylib.DrawRectangle(x, Screen.VCenter-300, width, 40, Color.Gray);
-        GUI.DrawTextLeft(x, Screen.VCenter-290, $"Misc: {(int)(100 * _swMisc.ElapsedMilliseconds / totalSWTime)}%");
-        x += width;
+        Raylib.DrawRectangle(barX, Screen.VCenter-300, width, 40, Color.Gray);
+        GUI.DrawTextLeft(barX, Screen.VCenter-290, $"Misc: {(int)(100 * _swMisc.ElapsedMilliseconds / totalSWTime)}%");
+        barX += width;
         width = (int)(totalWidth * _swFindNext.ElapsedMilliseconds / totalSWTime);
-        Raylib.DrawRectangle(x, Screen.VCenter-300, width, 40, Color.Green);
-        GUI.DrawTextLeft(x, Screen.VCenter-290, $"FindNext: {(int)(100 * _swFindNext.ElapsedMilliseconds / totalSWTime)}%");
-        x += width;
+        Raylib.DrawRectangle(barX, Screen.VCenter-300, width, 40, Color.Green);
+        GUI.DrawTextLeft(barX, Screen.VCenter-290, $"FindNext: {(int)(100 * _swFindNext.ElapsedMilliseconds / totalSWTime)}%");
+        barX += width;
         width = (int)(totalWidth * _swAddNodes.ElapsedMilliseconds / totalSWTime);
-        Raylib.DrawRectangle(x, Screen.VCenter-300, width, 40, Color.SkyBlue);
-        GUI.DrawTextLeft(x, Screen.VCenter-290, $"AddNodes: {(int)(100 * _swAddNodes.ElapsedMilliseconds / totalSWTime)}%");
-        x += width;
+        Raylib.DrawRectangle(barX, Screen.VCenter-300, width, 40, Color.SkyBlue);
+        GUI.DrawTextLeft(barX, Screen.VCenter-290, $"AddNodes: {(int)(100 * _swAddNodes.ElapsedMilliseconds / totalSWTime)}%");
+        barX += width;
         
-        width = totalWidth - x;
-        Raylib.DrawRectangle(x, Screen.VCenter-300, width, 40, Color.Gray);
-        GUI.DrawTextLeft(x, Screen.VCenter-290, $"Out of loop: {100 * width / totalWidth}%");
+        width = totalWidth - barX;
+        Raylib.DrawRectangle(barX, Screen.VCenter-300, width, 40, Color.Gray);
+        GUI.DrawTextLeft(barX, Screen.VCenter-290, $"Out of loop: {100 * width / totalWidth}%");
         #endif
 
         GUI.DrawTextLeft(350, -250, debugText);

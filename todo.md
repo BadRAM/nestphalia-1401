@@ -1,5 +1,28 @@
  == This file is for BadRAM's personal organization. ==
 
+
+Project management todo:
+========================
+
+- Title change?
+- Get art design package ready for Numb Dame
+  - Art Design Document
+    - Color Palette
+    - Example of audio crunch level, general music references.
+    - Key visuals in palette
+    - Features of visual style
+      - Level of detail in rendering? (detail + lighting + texturing)
+      - Textured or smooth?
+      - Lighting? (specular, shading)
+      - Detail? (Are large flat areas allowed or should everything be greebled?)
+      - Number of colors per sprite
+      - Number of shades per color
+      - Contrasting cartoonish and photo-derived assets or no?
+      - Prerendered 3d elements?
+      - Outlines? Only for bugs or background?
+  - Campaign plot summary
+  - Intro Cutscene storyboard
+
 Programming todo:
 =================
 
@@ -7,15 +30,13 @@ Programming todo:
 
 - Game intro cutscene
 - Dialog boxes and scripted events at start of levels
-- ~~Camera shake~~
-- Scripted camera move
-- Start of battle dialog
+  - Allow dialog boxes to provide a list of choices
+  - SFX?
 - Nice title screen
 - Nice credits screen
-- ~~3d Engine~~
 - 2-3 more bugs & towers
   - Ranged attack bug
-  - Another flyer. Ladybug? Flies until attacked.
+  - ~~Another flyer. Ladybug? Flies until attacked.~~
   - Snail rework
   - Beetle rework. Attacks can damage the ball?
   - Centipede that gets longer and shorter
@@ -31,12 +52,23 @@ Programming todo:
 - Minion Status Effect System
 - Make Frenzy Beacon work again
 - Make nests solid again
+- Command console
+  - Interface
+  - Command format, usable by json levels to script battle events.
 - Redesign the campaign forts
+- Better level format, 
+  - allow structures in center
+  - customize floor
+  - scripted events
+  - soil texture triangle (meaningless)
 - Nice campaign screen with a map and paths appearing every time you unlock a new level. Nonlinear campaign?
 - Corpses/bloodstains to indicate fear
+- Balance decision: Should flight grant immunity to explosions? Currently it does not.
 - Orphaned sapper beetles will seek another burrow
-- Limit total spiderlings a spider can spawn
 - Help text / Tutorial
+  - Dialog box
+  - Campaign intro tutorial
+  - Bugspedia
 - ~~Minion animation~~
   - ~~Add standing frame~~
   - Attack anim?
@@ -57,7 +89,7 @@ Programming todo:
   - Stratagems raise their flag as they charge, or is it when they activate?
 - ~~Settings menu scene~~
   - Music and SFX volume sliders
-- Fix High DPI mode
+- ~~Fix High DPI mode~~
 - Add button to relaunch game when High DPI mode toggle selected
 - Assets from json
 - More Sounds
@@ -66,6 +98,9 @@ Programming todo:
   - Bug Death
   - Bug take damage
   - Tower Shoot
+- Custom Cursor
+- Fix path preview
+- Screen edge scroll (off by default)
 
 
 ----- Premature Optimizations -----
@@ -80,11 +115,13 @@ Programming todo:
     - Move flying behavior into base minion
   - World
     - make it not static
+  - BattleScene
+    - Camera shake stores just the last offset.
   - Team
     - ~~Move pathqueue and some pathfinding into team~~
     - Move target selection into team
   - Pathfinder
-    - Make it not static so it can be multithreaded
+    - ~~Make it not static so it can be multithreaded~~
 
 - Game Logic optimizations
   - ~~profile tile entities separately by ID~~
@@ -139,6 +176,7 @@ Programming todo:
 - Minion vs Minion melee
 - Post battle screen
 - Multiple team colors via shader & rgb swizzling, or channel splitting assets at load time, or something.
+- Limit total spiderlings a spider can spawn
 
 
 Design todo:
@@ -151,13 +189,10 @@ Design todo:
   - 
  - Minions
   - Ranged Minion that shoots over walls
-  - Grasshopper
-  - Frog
   - Dragonfly
   - Centipede
   - Roach
   - Earwig
-  - Spider - Produces spiderlings while alive, turns into many spiderlings when killed
   - Fly
   - Flea
   - Worm
@@ -185,9 +220,3 @@ Design todo:
  - Reloading turrets - Turrets run out of ammo?
  - Can walk along the top of walls?
  - Harvest worker resource, mushrooms? which sprout randomly everywhere on the map.
-
-
-Project management todo:
-========================
-
-

@@ -35,25 +35,25 @@ static class Program
         while (!WindowShouldClose())
         {
 	        Time.UpdateTime();
-
+			
 	        if (IsWindowResized())
 	        {
 		        Screen.UpdateBounds();
 	        }
-
+			
 	        GUI.UpdateCursor();
 	        
 			CurrentScene.Update();
-
+			
 	        if (Time.Scaled <= 1)
 	        {
 		        SetMusicVolume(Resources.MusicPlaying, MathF.Min((float)Time.Scaled, 0.3f));
 	        }
 	        UpdateMusicStream(Resources.MusicPlaying);
         }
-
+		
         Console.WriteLine("Quitting time!");
-
+		
         if (Settings.RestartNeeded)
         {
 	        Settings.Saved.WindowScale = !Settings.Saved.WindowScale;

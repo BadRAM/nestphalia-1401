@@ -6,7 +6,7 @@ namespace nestphalia;
 
 public partial class Minion
 {
-    protected abstract class BaseState
+    public abstract class BaseState
     {
         protected Minion Me;
         
@@ -16,10 +16,17 @@ public partial class Minion
         public abstract int GetAnimFrame();
         public virtual void DrawDecorators() {}
         public new abstract string ToString();
+
+        // This is called to tell a state to exit early and load nextState. The state can return false to signal that it has ignored the request.
+        public virtual bool Exit(BaseState nextState)
+        {
+            Me.State = nextState;
+            return true;
+        } 
     }
 
     // Move acts as the 'default' state, that other states can safely return to without arguments
-    protected class Move : BaseState
+    public class Move : BaseState
     {
         private int _animFrame;
         private int _animCounter;
@@ -29,7 +36,7 @@ public partial class Minion
 
         public override void Update()
         {
-            // If we've reached the current node of the path, change to the next node. Also checks if we're lost
+            // If we've reached the current node of the path, change to the next node
             Me.UpdateNextPos();
             
             // If we've gotten lost, ask for a new path
@@ -68,7 +75,7 @@ public partial class Minion
         }
     }
 
-    protected class Attack : BaseState
+    public class Attack : BaseState
     {
         private double _attackStartedTime;
 
@@ -102,7 +109,7 @@ public partial class Minion
         }
     }
 
-    protected class Wait : BaseState
+    public class Wait : BaseState
     {
         private int _waitRemaining;
         private Action _finishAction;
@@ -138,7 +145,7 @@ public partial class Minion
         }
     }
 
-    protected class Jump : BaseState
+    public class Jump : BaseState
     {
         private Vector2 _from;
         private Vector2 _to;
@@ -198,5 +205,57 @@ public partial class Minion
             return 6;
         }
     }
-}
+    
+    public class Cheer : BaseState
+    {
+        public Cheer(Minion minion) : base(minion) { }
+        public override string ToString() { return $"Cheer"; }
 
+        public override void Update()
+        {
+            // Do the wave!
+            Me.DrawOffset = Vector3.UnitZ * (float)Math.Max((Math.Abs((Time.Scaled + Me.Position.X/150) % 3 - 1.5)-1.25)*4, 0) * 6;
+        }
+
+        public override int GetAnimFrame()
+        {
+            return 0;
+        }
+    }
+    
+    public class Flee : BaseState
+    {
+        private int _animFrame;
+        private int _animCounter;
+
+        public Flee(Minion minion) : base(minion) { }
+        public override string ToString() { return $"Flee"; }
+        
+        public override void Update()
+        {
+            // If we've reached the current node of the path, change to the next node
+            Me.UpdateNextPos();
+            
+            // If we've reached the end of our path, request a new path and change to waiting state
+            if (Me.NavPath.TargetReached(Me.Position))
+            {
+                Me.Die();
+                return;
+            }
+            
+            // If no state change is needed, move towards NextPos
+            Me.Position = Me.Position.MoveTowardsXY(Me.NextPos, Me.AdjustedSpeed() * Time.DeltaTime); // else: Move
+            _animCounter++;
+            if (_animCounter >= Me.Template.WalkAnimDelay)
+            {
+                _animFrame = (_animFrame + 1) % 4;
+                _animCounter = 0;
+            }
+        }
+
+        public override int GetAnimFrame()
+        {
+            return _animFrame + 1;
+        }
+    }
+}

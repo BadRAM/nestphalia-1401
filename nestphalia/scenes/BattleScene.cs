@@ -17,10 +17,13 @@ public class BattleScene : Scene
     private SceneState _state;
 
     private double _zoomLevel = 5;
-    private List<Double> _ZoomLevels = new List<Double>() {0.05, 0.1, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3, 3.5, 4, 5, 6, 7, 8, 10, 12, 14, 16}; 
+    private readonly List<Double> _zoomLevels = [0.05, 0.1, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3, 3.5, 4, 5, 6, 7, 8, 10, 12, 14, 16]; 
     
-    private List<Vector2> CameraShakeQueue = new List<Vector2>();
-
+    // private List<Vector2> CameraShakeQueue = new List<Vector2>();
+    private Vector2 _cameraShakeDisplacement = Vector2.Zero;
+    private double _cameraShakeIntensity = 6;
+    private double _cameraShakeRemaining = 0;
+    
     private DialogBox _dialogBox;
     private List<DialogBox> _dialogQueue = new List<DialogBox>()
     {
@@ -53,13 +56,13 @@ public class BattleScene : Scene
         _winner = null;
         _state = SceneState.BattleActive;
         _battleOverCallback = battleOverCallback;
-        int zoomIndex = _ZoomLevels.IndexOf(GetWindowScaleDPI().X);
+        int zoomIndex = _zoomLevels.IndexOf(GetWindowScaleDPI().X);
         _zoomLevel = zoomIndex == -1 ? 1 : zoomIndex;
         
         Time.TimeScale = 1;
         Program.CurrentScene = this;
         World.InitializeBattle(leftFort, rightFort, leftIsPlayer, rightIsPlayer, deterministic);
-        World.Camera.Zoom = (float)_ZoomLevels[(int)_zoomLevel];
+        World.Camera.Zoom = (float)_zoomLevels[(int)_zoomLevel];
         _log += $"first random: {World.RandomInt(100)}\n";
         
         Resources.PlayMusicByName("jesper-kyd-highlands");
@@ -71,7 +74,7 @@ public class BattleScene : Scene
         HandleInputs();
 
         // ----- WORLD UPDATE PHASE -----
-        if (_state == SceneState.BattleActive)
+        if (_state == SceneState.BattleActive || _state == SceneState.BattleFinished)
         {
             UpdateWorld();
             DoCameraShake();
@@ -84,7 +87,8 @@ public class BattleScene : Scene
         World.DrawFloor();
         World.Draw();
         
-        if (_pathFinderDebug) PathFinder.DrawDebug();
+        if (_pathFinderDebug) World.LeftTeam.PathFinder.DrawDebug();
+        // if (_pathFinderDebug) World.RightTeam.PathFinder.DrawDebug();
 
         switch (_state)
         {
@@ -101,7 +105,7 @@ public class BattleScene : Scene
                 }
                 break;
             case SceneState.BattleFinished:
-                DrawRectangle(0,0,Screen.Left,Screen.Bottom,new Color(0,0,0,128));
+                DrawRectangle(Screen.HCenter-250,Screen.VCenter-150, 500, 300,new Color(0,0,0,128));
                 DrawTextCentered(0, -48, "BATTLE OVER!", 48);
                 DrawTextCentered(0, 0, $"{_winner.Name} is victorious!", 48);
                 if (World.DrawDebugInfo) DrawTextCentered(0, 100, $"{_log}");
@@ -112,19 +116,26 @@ public class BattleScene : Scene
                 }
                 break;
             case SceneState.Paused:
-                DrawRectangle(0,0,Screen.Left,Screen.Bottom,new Color(0,0,0,128));
-                DrawTextCentered(0, 0, "PAUSED", 48);
-                if (Button100(-50, 40, "Settings"))
+                if (World.DrawDebugInfo || _pathFinderDebug)
                 {
-                    _state = SceneState.PausedSettings;
+                    DrawTextCentered(0, -Screen.Bottom/2, "PAUSED", 48);
                 }
-                if (Button100(-50, 80, "Resume"))
+                else
                 {
-                    TogglePaused();
-                }
-                if (Button100(-50, 120, "Quit"))
-                {
-                    _battleOverCallback(null);
+                    DrawRectangle(0,0,Screen.Left,Screen.Bottom,new Color(0,0,0,128));
+                    DrawTextCentered(0, 0, "PAUSED", 48);
+                    if (Button100(-50, 40, "Settings"))
+                    {
+                        _state = SceneState.PausedSettings;
+                    }
+                    if (Button100(-50, 80, "Resume"))
+                    {
+                        TogglePaused();
+                    }
+                    if (Button100(-50, 120, "Quit"))
+                    {
+                        _battleOverCallback(null);
+                    }
                 }
                 break;
             case SceneState.PausedSettings:
@@ -229,8 +240,8 @@ public class BattleScene : Scene
             // if (wheel < 0) scaleFactor = 1.0f/scaleFactor;
             // World.Camera.Zoom = Math.Clamp(World.Camera.Zoom + wheel * 0.25f, 0.25f, 8f);
             _zoomLevel += wheel;
-            _zoomLevel = Math.Clamp(_zoomLevel, 0, _ZoomLevels.Count-1);
-            World.Camera.Zoom = (float)_ZoomLevels[(int)Math.Floor(_zoomLevel)];
+            _zoomLevel = Math.Clamp(_zoomLevel, 0, _zoomLevels.Count-1);
+            World.Camera.Zoom = (float)_zoomLevels[(int)Math.Floor(_zoomLevel)];
         }
     }
 
@@ -242,9 +253,9 @@ public class BattleScene : Scene
         World.Update();
         CheckWinner();
         
-        _skips = 0;
-        if (IsKeyDown(KeyboardKey.F))
+        if (_state == SceneState.BattleActive && IsKeyDown(KeyboardKey.F))
         {
+            _skips = 0;
             while (_state == SceneState.BattleActive && (GetTime() - startTime) + ((GetTime() - startTime) / (_skips + 1)) < 0.016)
             {
                 Time.UpdateTime();
@@ -272,57 +283,89 @@ public class BattleScene : Scene
     
     private void CheckWinner()
     {
-        if (World.LeftTeam.GetHealth() <= 0)
+        if (_winner != null) return;
+
+        Team loser = World.LeftTeam;
+        if (World.LeftTeam.GetHealth() <= 0 || IsKeyDown(KeyboardKey.Minus))
         {
             _winner = World.RightTeam;
-            _state = SceneState.BattleFinished;
-            _log += $"last random: {World.RandomInt(100)}";
+            loser = World.LeftTeam;
         }
         if (World.RightTeam.GetHealth() <= 0)
         {
             _winner = World.LeftTeam;
-            _state = SceneState.BattleFinished;
+            loser = World.RightTeam;
+        }
+
+        if (_winner != null)
+        {
             _log += $"last random: {World.RandomInt(100)}";
+            _state = SceneState.BattleFinished;
+            World.EndBattle();
+            
+            List<Int2D> edges = new List<Int2D>();
+            for (int x = 0; x < World.BoardWidth; x++)
+            for (int y = 0; y < World.BoardHeight; y++)
+            {
+                if (x == 0 || y == 0 || x == World.BoardWidth-1 || y == World.BoardHeight-1)
+                {
+                    edges.Add(new Int2D(x,y));
+                }
+            }
+
+            List<NavPath> paths = new List<NavPath>();
+            foreach (Minion minion in World.Minions)
+            {
+                if (minion.Team == _winner)
+                {
+                    minion.SetState(new Minion.Cheer(minion));
+                }
+                else
+                {
+                    minion.SetState(new Minion.Flee(minion));
+                    NavPath n = minion.NavPath;
+                    n.Reset(minion.Position);
+                    // n.Points = new List<Int2D>(edges);
+                    paths.Add(n);
+                }
+            }
+
+            if (paths.Count > 0)
+            {
+                paths[0].Points = new List<Int2D>(edges);
+                loser.PathFinder.FindPathsBatched(paths);
+            }
         }
     }
     
     public void StartCameraShake(double duration, double intensity)
     {
-        StopCameraShake();
-        
-        int frameDuration = (int)(duration / Time.DeltaTime);
-
-        Vector2 offset = new Vector2(Random.Shared.NextSingle()-0.5f, Random.Shared.NextSingle()-0.5f) * 2 * (float)intensity;
-        CameraShakeQueue.Add(offset);
-        
-        for (int i = 0; i < frameDuration; i++)
-        {
-            CameraShakeQueue.Add(offset * -1);
-            offset = new Vector2(Random.Shared.NextSingle()-0.5f, Random.Shared.NextSingle()-0.5f) * 2 * (float)intensity;
-            CameraShakeQueue[^1] += offset;
-        }
-        
-        CameraShakeQueue.Add(offset * -1);
-
-        // Shuffle the camera shake queue
-        // CameraShakeQueue = CameraShakeQueue.OrderBy(_ => Random.Shared.Next()).ToList();
+        _cameraShakeRemaining += duration;
+        _cameraShakeIntensity = intensity;
     }
 
     public void StopCameraShake()
     {
-        while (CameraShakeQueue.Count > 0)
-        {
-            World.Camera.Offset += CameraShakeQueue[^1];
-            CameraShakeQueue.RemoveAt(CameraShakeQueue.Count-1);
-        }
+        World.Camera.Offset -= _cameraShakeDisplacement;
+        _cameraShakeDisplacement = Vector2.Zero;
+        _cameraShakeRemaining = 0;
+        _cameraShakeIntensity = 0;
     }
 
     private void DoCameraShake()
     {
-        if (CameraShakeQueue.Count > 0)
+        if (_cameraShakeRemaining > 0)
         {
-            World.Camera.Offset += CameraShakeQueue[^1];
-            CameraShakeQueue.RemoveAt(CameraShakeQueue.Count-1);
+            World.Camera.Offset -= _cameraShakeDisplacement;
+            _cameraShakeDisplacement = new Vector2
+                (Random.Shared.NextSingle() - 0.5f, Random.Shared.NextSingle() - 0.5f) * 2 * (float)_cameraShakeIntensity;
+            World.Camera.Offset += _cameraShakeDisplacement;
+            _cameraShakeRemaining = Math.Max(_cameraShakeRemaining - Time.DeltaTime, 0);
+        }
+        else if (_cameraShakeDisplacement != Vector2.Zero)
+        {
+            World.Camera.Offset -= _cameraShakeDisplacement;
+            _cameraShakeDisplacement = Vector2.Zero;
         }
     }
 }

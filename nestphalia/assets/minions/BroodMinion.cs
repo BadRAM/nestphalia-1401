@@ -52,7 +52,7 @@ public class BroodMinion : Minion
     public override void Update()
     {
         base.Update();
-        if (_template.SpawnInterval > 0 && Time.Scaled - _lastSpawnTime >= _template.SpawnInterval)
+        if (_template.SpawnInterval > 0 && Time.Scaled - _lastSpawnTime >= _template.SpawnInterval && !World.IsBattleOver())
         {
             _lastSpawnTime = Time.Scaled;
             _template.SpawnedMinion.Instantiate(Team, Position, NavPath.Clone(_template.SpawnedMinion.Name));
@@ -62,6 +62,7 @@ public class BroodMinion : Minion
     public override void Die()
     {
         base.Die();
+        if (World.IsBattleOver()) return;
         for (int i = 0; i < _template.SpawnsOnDeath; i++)
         {
             Vector3 offset = new Vector3((float)(World.RandomDouble() - 0.5), (float)(World.RandomDouble() - 0.5), 0f);

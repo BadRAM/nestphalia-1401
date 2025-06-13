@@ -26,6 +26,10 @@ Blue: Bug republic (Hansneatic league?), assorted shitter bugs, rewards are basi
 You start in the bottom corner of blue. Forts have paths to neighboring forts that you unlock for defeating them, but paths out of a country don't work until you defeat the capitol, so you must defeat either Y or G before you can attack R, and cannot attack either before clearing B.
 
 
+Tutorial Plan:
+==============
+ - Tell the player to go to battle with a premade fort that is guaranteed to lose, so that the player understands how a battle works before designing their first fort.
+ - Provide a Bugspedia (Tome of bug lore? Nestpedia?) with explanations of more complex subjects like hate, fear, and 
 
 
 Screen Hierarchy:
