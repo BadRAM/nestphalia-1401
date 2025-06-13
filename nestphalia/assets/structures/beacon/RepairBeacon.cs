@@ -60,17 +60,15 @@ public class RepairBeacon : ActiveAbilityBeacon
         double bestScore = double.MinValue;
         
         for (int x = 0; x < World.BoardWidth; x++)
+        for (int y = 0; y < World.BoardHeight; y++)
         {
-            for (int y = 0; y < World.BoardHeight; y++)
+            Structure? structure = World.GetTile(x,y);
+            if (structure?.Team == Team && structure is Rubble rubble)
             {
-                Structure? structure = World.GetTile(x,y);
-                if (structure?.Team == Team && structure is Rubble rubble)
+                if (rubble.DestroyedStructure.Price > bestScore)
                 {
-                    if (rubble.DestroyedStructure.Price > bestScore)
-                    {
-                        bestScore = rubble.DestroyedStructure.Price;
-                        bestPos = World.GetTileCenter(x, y);
-                    }
+                    bestScore = rubble.DestroyedStructure.Price;
+                    bestPos = World.GetTileCenter(x, y);
                 }
             }
         }

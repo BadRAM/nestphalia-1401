@@ -124,13 +124,11 @@ public class Tower : Structure
 
         Queue<Int2D> protectedArea = new Queue<Int2D>();
         for (int x = 0; x < World.BoardWidth; x++)
+        for (int y = 0; y < World.BoardHeight; y++)
         {
-            for (int y = 0; y < World.BoardHeight; y++)
-            {
-                if (Vector2.Distance(World.GetTileCenter(x,y), position) > _template.Range) continue;
-                if (e.GetFearOf(x, y) > 0) protectedArea.Enqueue(new Int2D(x,y));
-            }
-        }
+            if (Vector2.Distance(World.GetTileCenter(x,y), position) > _template.Range) continue;
+            if (e.GetFearOf(x, y) > 0) protectedArea.Enqueue(new Int2D(x,y));
+        }   
 
         double reduction = -(e.GetHateFor(X, Y) / protectedArea.Count);
         // Console.WriteLine($"Tower at {X},{Y} destroyed, reducing {protectedArea.Count} surrounding tiles fear by {reduction}");

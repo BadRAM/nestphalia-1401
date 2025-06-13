@@ -43,35 +43,33 @@ public class Team
     public void Initialize()
     {
         for (int x = 0; x < World.BoardWidth; x++)
+        for (int y = 0; y < World.BoardHeight; y++)
         {
-            for (int y = 0; y < World.BoardHeight; y++)
+            _fearMap[x, y] = 0;
+
+            Structure? s = World.GetTile(x, y);
+            if (s == null) continue;
+            if (s.Team != this)
             {
-                _fearMap[x, y] = 0;
-
-                Structure? s = World.GetTile(x, y);
-                if (s == null) continue;
-                if (s.Team != this)
-                {
-                    _hateMap[x, y] = s.Template.BaseHate;
-                }
-                else
-                {
-                    _hateMap[x, y] = 0;
-                    if (s is ActiveAbilityBeacon b)
-                    {
-                        Beacons.Add(b);
-                    }
-
-                    if (s is Spawner spawner)
-                    {
-                        _maxHealth += spawner.Health;
-                    }
-                }
-
-                _weightMap[x, y] = CalculateWeight(x, y);
-                _navSolidMap[x, y] = World.GetTile(x, y)?.NavSolid(this) ?? false;
+                _hateMap[x, y] = s.Template.BaseHate;
             }
+            else
+            {
+                _hateMap[x, y] = 0;
+                if (s is ActiveAbilityBeacon b)
+                {
+                    Beacons.Add(b);
+                }
+
+                if (s is Spawner spawner)
+                {
+                    _maxHealth += spawner.Health;
+                }
+            }
+            _weightMap[x, y] = CalculateWeight(x, y);
+            _navSolidMap[x, y] = World.GetTile(x, y)?.NavSolid(this) ?? false;
         }
+        
         while (Beacons.Count < BeaconCap) Beacons.Add(null);
 
         World.StructureChanged += OnStructureChanged;
@@ -215,17 +213,15 @@ public class Team
         // update health
         _health = 0;
         for (int x = 0; x < World.BoardWidth; x++)
+        for (int y = 0; y < World.BoardHeight; y++)
         {
-            for (int y = 0; y < World.BoardHeight; y++)
+            Structure? s = World.GetTile(x, y);
+            if (s == null) continue;
+            if (s.Team == this)
             {
-                Structure? s = World.GetTile(x, y);
-                if (s == null) continue;
-                if (s.Team == this)
+                if (s is Spawner spawner)
                 {
-                    if (s is Spawner spawner)
-                    {
-                        _health += spawner.Health;
-                    }
+                    _health += spawner.Health;
                 }
             }
         }
@@ -272,17 +268,15 @@ public class Team
         {
             Raylib.BeginMode2D(World.Camera);
             for (int x = 0; x < World.BoardWidth; x++)
+            for (int y = 0; y < World.BoardHeight; y++)
             {
-                for (int y = 0; y < World.BoardHeight; y++)
+                Raylib.DrawCircleV(World.GetTileCenter(x,y), (float)(GetFearOf(x,y)/10), new Color(128,  128, 255, 128));
+                Raylib.DrawCircleV(World.GetTileCenter(x,y), (float)(GetHateFor(x,y)/10), new Color(255, 0, 128, 128));
+                if (GetFearOf(x,y) < 0)
                 {
-                    Raylib.DrawCircleV(World.GetTileCenter(x,y), (float)(GetFearOf(x,y)/10), new Color(128,  128, 255, 128));
-                    Raylib.DrawCircleV(World.GetTileCenter(x,y), (float)(GetHateFor(x,y)/10), new Color(255, 0, 128, 128));
-                    if (GetFearOf(x,y) < 0)
-                    {
-                        Raylib.DrawCircleV(World.GetTileCenter(x,y), 12, new Color(255, 255, 0, 128));
-                    }
-                    Raylib.DrawCircleV(World.GetTileCenter(x,y), MathF.Min((float)(_weightMap[x,y]/10), 10), new Color(255,  64, 255, 128));
+                    Raylib.DrawCircleV(World.GetTileCenter(x,y), 12, new Color(255, 255, 0, 128));
                 }
+                Raylib.DrawCircleV(World.GetTileCenter(x,y), MathF.Min((float)(_weightMap[x,y]/10), 10), new Color(255,  64, 255, 128));
             }
             Raylib.EndMode2D();
         }
@@ -353,7 +347,7 @@ public class Team
     
     private void OnStructureChanged(object? sender, Int2D pos)
     {
-        Console.WriteLine($"Structure changed at {pos}!");
+        // Console.WriteLine($"Structure changed at {pos}!");
         _weightMap[pos.X, pos.Y] = CalculateWeight(pos.X, pos.Y);
         _navSolidMap[pos.X, pos.Y] = World.GetTile(pos.X, pos.Y)?.NavSolid(this) ?? false;
     }

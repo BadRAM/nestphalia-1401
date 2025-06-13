@@ -85,12 +85,11 @@ public static class World
         RightTeam = new Team("Enemy", true, Color.Red);
 
         for (int x = 0; x < BoardWidth; x++)
+        for (int y = 0; y < BoardHeight; y++)
         {
-            for (int y = 0; y < BoardHeight; y++)
-            {
-                MinionGrid[x, y] = new List<Minion>();
-            }
+            MinionGrid[x, y] = new List<Minion>();
         }
+        
         foreach (List<Minion> minionList in MinionGrid)
         {
             minionList.Clear();
@@ -104,23 +103,21 @@ public static class World
         
         // set up floor tile checkerboard
         for (int x = 0; x < BoardWidth; x++)
+        for (int y = 0; y < BoardHeight; y++)
         {
-            for (int y = 0; y < BoardHeight; y++)
+            if (x > 21)
             {
-                if (x > 21)
-                {
-                    _floor[x, y] = Assets.FloorTiles[2].Instantiate(x, y);
-                }
-                else if (x == 0 || x == 21 || y == 0 || y == 21)
-                {
-                    _floor[x, y] = Assets.FloorTiles[1].Instantiate(x, y);
-                }
-                else
-                {
-                    _floor[x,y] = (x%2 != y%2) ? Assets.FloorTiles[0].Instantiate(x,y) : Assets.FloorTiles[1].Instantiate(x,y);
-                }
-                _board[x,y] = null;
+                _floor[x, y] = Assets.FloorTiles[2].Instantiate(x, y);
             }
+            else if (x == 0 || x == 21 || y == 0 || y == 21)
+            {
+                _floor[x, y] = Assets.FloorTiles[1].Instantiate(x, y);
+            }
+            else
+            {
+                _floor[x,y] = (x%2 != y%2) ? Assets.FloorTiles[0].Instantiate(x,y) : Assets.FloorTiles[1].Instantiate(x,y);
+            }
+            _board[x,y] = null;
         }
         
         fortToLoad.LoadToBoard(false);
@@ -136,12 +133,10 @@ public static class World
         
         // set up floor tile checkerboard
         for (int x = 0; x < BoardWidth; x++)
+        for (int y = 0; y < BoardHeight; y++)
         {
-            for (int y = 0; y < BoardHeight; y++)
-            {
-                _floor[x,y] = (x%2 != y%2) ? Assets.FloorTiles[0].Instantiate(x,y) : Assets.FloorTiles[1].Instantiate(x,y);
-                _board[x,y] = null;
-            }
+            _floor[x,y] = (x%2 != y%2) ? Assets.FloorTiles[0].Instantiate(x,y) : Assets.FloorTiles[1].Instantiate(x,y);
+            _board[x,y] = null;
         }
     }
     
@@ -153,12 +148,10 @@ public static class World
         
         // set up floor tile checkerboard
         for (int x = 0; x < BoardWidth; x++)
+        for (int y = 0; y < BoardHeight; y++)
         {
-            for (int y = 0; y < BoardHeight; y++)
-            {
-                _floor[x,y] = (x%2 != y%2) ? Assets.FloorTiles[0].Instantiate(x,y) : Assets.FloorTiles[1].Instantiate(x,y);
-                _board[x,y] = null;
-            }
+            _floor[x,y] = (x%2 != y%2) ? Assets.FloorTiles[0].Instantiate(x,y) : Assets.FloorTiles[1].Instantiate(x,y);
+            _board[x,y] = null;
         }
         
         // Load forts to board
@@ -226,21 +219,19 @@ public static class World
         
         _swUpdateBoard.Start();
         for (int x = 0; x < BoardWidth; ++x)
+        for (int y = 0; y < BoardHeight; ++y)
         {
-            for (int y = 0; y < BoardHeight; ++y)
-            {
-                if (_board[x,y] == null) continue;
-                #if DEBUG
-                string key = _board[x,y].Template.ID;
-                if (!_swEntitiesByID.ContainsKey(key)) _swEntitiesByID.Add(key, new EntityTracker());
-                _swEntitiesByID[key].SW.Start();
-                #endif
-                _board[x,y].Update();
-                #if DEBUG
-                _swEntitiesByID[key].SW.Stop();
-                _swEntitiesByID[key].Count++;
-                #endif
-            }
+            if (_board[x,y] == null) continue;
+            #if DEBUG
+            string key = _board[x,y].Template.ID;
+            if (!_swEntitiesByID.ContainsKey(key)) _swEntitiesByID.Add(key, new EntityTracker());
+            _swEntitiesByID[key].SW.Start();
+            #endif
+            _board[x,y].Update();
+            #if DEBUG
+            _swEntitiesByID[key].SW.Stop();
+            _swEntitiesByID[key].Count++;
+            #endif
         }
         _swUpdateBoard.Stop();
         
@@ -334,11 +325,9 @@ public static class World
                     Wave++;
                     PreWave = false;
                     for (int x = 0; x < BoardWidth; ++x)
+                    for (int y = 0; y < BoardHeight; ++y)
                     {
-                        for (int y = 0; y < BoardHeight; ++y)
-                        {
-                            _board[x, y]?.WaveEffect();
-                        }
+                        _board[x, y]?.WaveEffect();
                     }
                 }
             }
@@ -350,11 +339,9 @@ public static class World
 
                     PreWave = true;
                     for (int x = 0; x < BoardWidth; ++x)
+                    for (int y = 0; y < BoardHeight; ++y)
                     {
-                        for (int y = 0; y < BoardHeight; ++y)
-                        {
-                            _board[x, y]?.PreWaveEffect();
-                        }
+                        _board[x, y]?.PreWaveEffect();
                     }
                 }
             }
@@ -365,51 +352,49 @@ public static class World
     {
         // _totalCollideChecks = 0;
         for (int x = 0; x < BoardWidth; x++) // Iterate MinionGrid Columns
+        for (int y = 0; y < BoardHeight; y++) // Iterate MinionGrid Rows
         {
-            for (int y = 0; y < BoardHeight; y++) // Iterate MinionGrid Rows
+            for (int i = 0; i < MinionGrid[x, y].Count; i++) // Iterate Minions in cell at x,y
             {
-                for (int i = 0; i < MinionGrid[x, y].Count; i++) // Iterate Minions in cell at x,y
+                for (int j = i+1; j < MinionGrid[x, y].Count; j++)
                 {
-                    for (int j = i+1; j < MinionGrid[x, y].Count; j++)
-                    {
-                        Physics.CollideMinion(MinionGrid[x, y][i], MinionGrid[x, y][j]);
-                        // _totalCollideChecks++;
-                    }
+                    Physics.CollideMinion(MinionGrid[x, y][i], MinionGrid[x, y][j]);
+                    // _totalCollideChecks++;
+                }
 
-                    if (x < BoardWidth - 1)
+                if (x < BoardWidth - 1)
+                {
+                    if (y > 0)
                     {
-                        if (y > 0)
+                        for (int j = 0; j < MinionGrid[x + 1, y - 1].Count; j++)
                         {
-                            for (int j = 0; j < MinionGrid[x + 1, y - 1].Count; j++)
-                            {
-                                Physics.CollideMinion(MinionGrid[x, y][i], MinionGrid[x + 1, y - 1][j]);
-                                // _totalCollideChecks++;
-                            }
-                        }
-
-                        for (int j = 0; j < MinionGrid[x + 1, y].Count; j++)
-                        {
-                            Physics.CollideMinion(MinionGrid[x, y][i], MinionGrid[x + 1, y][j]);
+                            Physics.CollideMinion(MinionGrid[x, y][i], MinionGrid[x + 1, y - 1][j]);
                             // _totalCollideChecks++;
                         }
+                    }
 
-                        if (y < BoardHeight - 1)
-                        {
-                            for (int j = 0; j < MinionGrid[x + 1, y + 1].Count; j++)
-                            {
-                                Physics.CollideMinion(MinionGrid[x, y][i], MinionGrid[x + 1, y + 1][j]);
-                                // _totalCollideChecks++;
-                            }
-                        }
+                    for (int j = 0; j < MinionGrid[x + 1, y].Count; j++)
+                    {
+                        Physics.CollideMinion(MinionGrid[x, y][i], MinionGrid[x + 1, y][j]);
+                        // _totalCollideChecks++;
                     }
 
                     if (y < BoardHeight - 1)
                     {
-                        for (int j = 0; j < MinionGrid[x, y + 1].Count; j++)
+                        for (int j = 0; j < MinionGrid[x + 1, y + 1].Count; j++)
                         {
-                            Physics.CollideMinion(MinionGrid[x, y][i], MinionGrid[x, y + 1][j]);
+                            Physics.CollideMinion(MinionGrid[x, y][i], MinionGrid[x + 1, y + 1][j]);
                             // _totalCollideChecks++;
                         }
+                    }
+                }
+
+                if (y < BoardHeight - 1)
+                {
+                    for (int j = 0; j < MinionGrid[x, y + 1].Count; j++)
+                    {
+                        Physics.CollideMinion(MinionGrid[x, y][i], MinionGrid[x, y + 1][j]);
+                        // _totalCollideChecks++;
                     }
                 }
             }
@@ -421,14 +406,9 @@ public static class World
         Raylib.BeginMode2D(Camera);
         
         for (int x = 0; x < BoardWidth; ++x)
+        for (int y = 0; y < BoardHeight; ++y)
         {
-            for (int y = 0; y < BoardHeight; ++y)
-            {
-                _floor[x,y].Draw(x*24, y*24);
-                // // Hate/fear debug
-                //Raylib.DrawCircle((int)pos.X, (int)pos.Y, (int)(LeftTeam.GetHateFor(x,y)/20), Raylib.RED);
-                //Raylib.DrawCircle((int)pos.X, (int)pos.Y, (int)LeftTeam.GetFearOf(x,y), Raylib.BLUE);
-            }
+            _floor[x,y].Draw(x*24, y*24);
         }
         
         Raylib.EndMode2D();
@@ -602,11 +582,9 @@ public static class World
         radius--;
         List<Minion> minions = new List<Minion>();
         for (int x = Math.Max(center.X - radius, 0); x <= Math.Min(center.X + radius, BoardWidth-1); x++)
+        for (int y = Math.Max(center.Y - radius, 0); y <= Math.Min(center.Y + radius, BoardHeight-1); y++)
         {
-            for (int y = Math.Max(center.Y - radius, 0); y <= Math.Min(center.Y + radius, BoardHeight-1); y++)
-            {
-                minions.AddRange(MinionGrid[x,y]);
-            }
+            minions.AddRange(MinionGrid[x,y]);
         }
         return minions;
     }

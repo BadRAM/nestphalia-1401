@@ -219,14 +219,12 @@ public partial class Minion : ISprite
         List<Sortable<Int2D>> targets = new List<Sortable<Int2D>>();
         
         for (int x = 0; x < World.BoardWidth; ++x)
+        for (int y = 0; y < World.BoardHeight; ++y)
         {
-            for (int y = 0; y < World.BoardHeight; ++y)
+            Structure? s = World.GetTile(x, y);
+            if (s != null && s.Team != Team && s is not Rubble)
             {
-                Structure? s = World.GetTile(x, y);
-                if (s != null && s.Team != Team && s is not Rubble)
-                {
-                    targets.Add(new Sortable<Int2D>(-Vector2.Distance(Position.XY(), World.GetTileCenter(x,y)), new Int2D(x,y)));
-                }
+                targets.Add(new Sortable<Int2D>(-Vector2.Distance(Position.XY(), World.GetTileCenter(x,y)), new Int2D(x,y)));
             }
         }
         

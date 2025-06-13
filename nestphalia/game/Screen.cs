@@ -122,11 +122,9 @@ public static class Screen
     public static void DrawBackground(Color tint)
     {
         for (int x = 0; x <= Left/24; x++)
+        for (int y = 0; y <= Bottom/24; y++)
         {
-            for (int y = 0; y <= Bottom/24; y++)
-            {
-                DrawTexture(_backgroundNoise[x][y] ? _tile1 : _tile2, x * 24, y * 24 - 12, tint);
-            }
+            DrawTexture(_backgroundNoise[x][y] ? _tile1 : _tile2, x * 24, y * 24 - 12, tint);
         }
         DrawRectangle(HCenter - 600, VCenter - 300, 1200, 600, new Color(10, 10, 10, 64));
         DrawTexture(_graffiti[_graffitiPicked], _graffitiPosX, _graffitiPosY, Color.White);

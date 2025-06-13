@@ -299,14 +299,12 @@ public class EditorScene : Scene
     private void SellAll()
     {
         for (int x = 0; x < World.BoardWidth; ++x)
+        for (int y = 0; y < World.BoardHeight; ++y)
         {
-            for (int y = 0; y < World.BoardHeight; ++y)
-            {
-                Structure? t = World.GetTile(x, y);
-                if (t == null) continue;
-                if (!_sandboxMode) _data.Money += t.Template.Price;
-                World.SetTile(null, World.LeftTeam, x, y);
-            }
+            Structure? t = World.GetTile(x, y);
+            if (t == null) continue;
+            if (!_sandboxMode) _data.Money += t.Template.Price;
+            World.SetTile(null, World.LeftTeam, x, y);
         }
         
         _sellAllConfirm = false;
@@ -322,18 +320,16 @@ public class EditorScene : Scene
         double totalCost = 0;
         
         for (int x = 0; x < World.BoardWidth; ++x)
+        for (int y = 0; y < World.BoardHeight; ++y)
         {
-            for (int y = 0; y < World.BoardHeight; ++y)
-            {
-                Structure? t = World.GetTile(x, y);
-                if (t == null) continue;
-                structureCount++;
-                totalCost += t.Template.Price;
-                if (t is ActiveAbilityBeacon) beaconCount++;
-                else if (t.Template.Class == StructureTemplate.StructureClass.Utility) utilityCount++;
-                else if (t.Template.Class == StructureTemplate.StructureClass.Tower) turretCount++;
-                else if (t.Template.Class == StructureTemplate.StructureClass.Nest) nestCount++;
-            }
+            Structure? t = World.GetTile(x, y);
+            if (t == null) continue;
+            structureCount++;
+            totalCost += t.Template.Price;
+            if (t is ActiveAbilityBeacon) beaconCount++;
+            else if (t.Template.Class == StructureTemplate.StructureClass.Utility) utilityCount++;
+            else if (t.Template.Class == StructureTemplate.StructureClass.Tower) turretCount++;
+            else if (t.Template.Class == StructureTemplate.StructureClass.Nest) nestCount++;
         }
 
         _nestCount = nestCount;

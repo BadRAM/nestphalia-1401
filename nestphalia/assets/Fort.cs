@@ -22,17 +22,15 @@ public class Fort
     public void LoadToBoard(bool rightSide)
     {
         for (int x = 0; x < 20; x++)
+        for (int y = 0; y < 20; y++)
         {
-            for (int y = 0; y < 20; y++)
+            if (rightSide)
             {
-                if (rightSide)
-                {
-                    World.SetTile(Assets.GetStructureByID(Board[x+y*20]), World.RightTeam, 46-x,y+1);
-                }
-                else
-                {
-                    World.SetTile(Assets.GetStructureByID(Board[x+y*20]), World.LeftTeam, x+1,y+1);
-                }
+                World.SetTile(Assets.GetStructureByID(Board[x+y*20]), World.RightTeam, 46-x,y+1);
+            }
+            else
+            {
+                World.SetTile(Assets.GetStructureByID(Board[x+y*20]), World.LeftTeam, x+1,y+1);
             }
         }
     }
@@ -46,17 +44,15 @@ public class Fort
         double totalCost = 0;
         
         for (int x = 0; x < 20; ++x)
+        for (int y = 0; y < 20; ++y)
         {
-            for (int y = 0; y < 20; ++y)
-            {
-                StructureTemplate? t = Assets.GetStructureByID(Board[x+y*20]);
-                if (t == null) continue;
-                structureCount++;
-                totalCost += t.Price;
-                if (t.Class == StructureTemplate.StructureClass.Utility) utilityCount++;
-                if (t.Class == StructureTemplate.StructureClass.Tower) turretCount++;
-                if (t.Class == StructureTemplate.StructureClass.Nest) nestCount++;
-            }
+            StructureTemplate? t = Assets.GetStructureByID(Board[x+y*20]);
+            if (t == null) continue;
+            structureCount++;
+            totalCost += t.Price;
+            if (t.Class == StructureTemplate.StructureClass.Utility) utilityCount++;
+            if (t.Class == StructureTemplate.StructureClass.Tower) turretCount++;
+            if (t.Class == StructureTemplate.StructureClass.Nest) nestCount++;
         }
 
         return $"{Name}\n" +
@@ -75,16 +71,14 @@ public class Fort
         bool illegalBuilding = false;
         
         for (int x = 0; x < 20; ++x)
+        for (int y = 0; y < 20; ++y)
         {
-            for (int y = 0; y < 20; ++y)
-            {
-                StructureTemplate? t = Assets.GetStructureByID(Board[x+y*20]);
-                if (t == null) continue;
-                totalCost += t.Price;
-                if (t is SpawnerTemplate) nestCount++;
-                if (t is ActiveAbilityBeaconTemplate) stratagemCount++;
-                if (t.LevelRequirement > campaign.Level) illegalBuilding = true;
-            }
+            StructureTemplate? t = Assets.GetStructureByID(Board[x+y*20]);
+            if (t == null) continue;
+            totalCost += t.Price;
+            if (t is SpawnerTemplate) nestCount++;
+            if (t is ActiveAbilityBeaconTemplate) stratagemCount++;
+            if (t.LevelRequirement > campaign.Level) illegalBuilding = true;
         }
 
         string reason = "";
@@ -101,11 +95,9 @@ public class Fort
     public void SaveBoard()
     {
         for (int x = 0; x < 20; x++)
+        for (int y = 0; y < 20; y++)
         {
-            for (int y = 0; y < 20; y++)
-            {
-                Board[x+y*20] = World.GetTile(x+1,y+1)?.Template.ID ?? "";
-            }
+            Board[x+y*20] = World.GetTile(x+1,y+1)?.Template.ID ?? "";
         }
     }
 
@@ -114,14 +106,12 @@ public class Fort
         double totalCost = 0;
         
         for (int x = 0; x < 20; ++x)
+        for (int y = 0; y < 20; ++y)
         {
-            for (int y = 0; y < 20; ++y)
-            {
-                StructureTemplate? t = Assets.GetStructureByID(Board[x+y*20]);
-                if (t == null) continue;
-                totalCost += t.Price;
-            }
-        } 
+            StructureTemplate? t = Assets.GetStructureByID(Board[x+y*20]);
+            if (t == null) continue;
+            totalCost += t.Price;
+        }
         
         TotalCost = totalCost;
     }

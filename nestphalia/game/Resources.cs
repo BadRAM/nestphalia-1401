@@ -207,22 +207,14 @@ public static class Resources
 
     public static void SaveFort(Fort fort)
     {
-        //if (right) World.Flip();
-        // Fort fort = new Fort(fortName, path);
-        // fort.Name = fortName;
-        
         for (int x = 0; x < 20; x++)
+        for (int y = 0; y < 20; y++)
         {
-            for (int y = 0; y < 20; y++)
-            {
-                fort.Board[x+y*20] = World.GetTile(x+1,y+1)?.Template.ID ?? "";
-            }
+            fort.Board[x+y*20] = World.GetTile(x+1,y+1)?.Template.ID ?? "";
         }
-        
         fort.Comment = fort.FortSummary();
-        
+
         string jsonString = JsonSerializer.Serialize(fort, SourceGenerationContext.Default.Fort);
-        //Console.WriteLine($"JSON fort looks like: {jsonString}");
         File.WriteAllText(Directory.GetCurrentDirectory() + fort.Path + "/" + fort.Name + ".fort", jsonString);
     }
 
