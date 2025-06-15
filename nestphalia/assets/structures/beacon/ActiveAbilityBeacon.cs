@@ -1,4 +1,5 @@
 using System.Numerics;
+using Newtonsoft.Json.Linq;
 using Raylib_cs;
 
 namespace nestphalia;
@@ -6,15 +7,15 @@ namespace nestphalia;
 public abstract class ActiveAbilityBeaconTemplate : StructureTemplate
 {
     public double Cooldown;
-    public double CooldownReduction;
+    // public double CooldownReduction;
     public Texture2D AbilityIcon;
     
-    public ActiveAbilityBeaconTemplate(string id, string name, string description, Texture2D texture, double maxHealth, double price, int levelRequirement, double baseHate, double cooldown, double cooldownReduction, Texture2D abilityIcon) : base(id, name, description, texture, maxHealth, price, levelRequirement, baseHate)
+    public ActiveAbilityBeaconTemplate(JObject jObject) : base(jObject)
     {
-        Cooldown = cooldown;
-        CooldownReduction = cooldownReduction;
-        AbilityIcon = abilityIcon;
-        Class = StructureClass.Tower;
+        Cooldown = jObject.Value<double?>("cooldown") ?? throw new ArgumentNullException();;
+        // CooldownReduction = cooldownReduction;
+        AbilityIcon = Resources.GetTextureByName(jObject.Value<string?>("abilityIcon") ?? "");
+        Class = jObject.Value<StructureClass?>("class") ?? StructureClass.Tower;
     }
 }
 

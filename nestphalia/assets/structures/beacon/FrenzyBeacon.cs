@@ -1,11 +1,12 @@
 using System.Numerics;
+using Newtonsoft.Json.Linq;
 using Raylib_cs;
 
 namespace nestphalia;
 
 public class FrenzyBeaconTemplate : ActiveAbilityBeaconTemplate
 {
-    public FrenzyBeaconTemplate(string id, string name, string description, Texture2D texture, double maxHealth, double price, int levelRequirement, double baseHate, double cooldown, double cooldownReduction, Texture2D abilityIcon) : base(id, name, description, texture, maxHealth, price, levelRequirement, baseHate, cooldown, cooldownReduction, abilityIcon)
+    public FrenzyBeaconTemplate(JObject jObject) : base(jObject)
     {
     }
 

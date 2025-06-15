@@ -1,10 +1,11 @@
+using Newtonsoft.Json.Linq;
 using Raylib_cs;
 
 namespace nestphalia;
 
 public class HazardSignTemplate : StructureTemplate
 {
-    public HazardSignTemplate(string id, string name, string description, Texture2D texture, double maxHealth, double price, int levelRequirement, double baseHate) : base(id, name, description, texture, maxHealth, price, levelRequirement, baseHate) {}
+    public HazardSignTemplate(JObject jObject) : base(jObject) {}
 
     public override Structure Instantiate(Team team, int x, int y)
     {

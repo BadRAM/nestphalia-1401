@@ -1,11 +1,12 @@
 using System.Numerics;
+using Newtonsoft.Json.Linq;
 using Raylib_cs;
 
 namespace nestphalia;
 
 public class RallyBeaconTemplate : ActiveAbilityBeaconTemplate
 {
-    public RallyBeaconTemplate(string id, string name, string description, Texture2D texture, double maxHealth, double price, int levelRequirement, double baseHate, double cooldown, double cooldownReduction, Texture2D abilityIcon) : base(id, name, description, texture, maxHealth, price, levelRequirement, baseHate, cooldown, cooldownReduction, abilityIcon)
+    public RallyBeaconTemplate(JObject jObject) : base(jObject)
     {
     }
 

@@ -1,28 +1,34 @@
 using System.Numerics;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Raylib_cs;
 
 namespace nestphalia;
 
-public class ProjectileTemplate
+public class ProjectileTemplate : JsonAsset
 {
-    public string ID;
+    [JsonProperty(Order = -3)]
     public Texture2D Texture;
     public double Damage;
     public double Speed;
 
-    public ProjectileTemplate(string id, Texture2D texture, double damage, double speed)
+    // public ProjectileTemplate(string id, Texture2D texture, double damage, double speed) : base(new JObject())
+    // {
+    //     ID = id;
+    //     Damage = damage;
+    //     Speed = speed;
+    //     Texture = texture;
+    // }
+    
+    public ProjectileTemplate(JObject jObject) : base(jObject)
     {
-        ID = id;
-        Damage = damage;
-        Speed = speed;
-        Texture = texture;
+        Damage = jObject.Value<double?>("damage") ?? 0;
+        Speed = jObject.Value<double?>("speed") ?? 0;
+        Texture = Resources.GetTextureByName(jObject.Value<string?>("texture") ?? "");
     }
 
     public virtual void Instantiate(object target, object source, Vector3 position)
     {
-        // Vector3 pos = V.Zero;
-        // if (source is Minion m) pos = m.Position;
-        // if (source is Structure s) pos = s.GetCenter();
         Projectile p = new Projectile(this, position, target, source);
         World.Projectiles.Add(p);
         World.Sprites.Add(p);
@@ -33,7 +39,6 @@ public class Projectile : ISprite
 {
     public ProjectileTemplate Template;
     public Vector3 Position;
-    // public Vector2 Position;
     public Object Target;
     public Object Source;
 

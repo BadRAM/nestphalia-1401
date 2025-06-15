@@ -1,4 +1,5 @@
 using System.Numerics;
+using Newtonsoft.Json.Linq;
 using Raylib_cs;
 
 namespace nestphalia;
@@ -8,10 +9,12 @@ public class DoorTemplate : StructureTemplate
     public double Range;
     public Texture2D OpenTexture;
     
-    public DoorTemplate(string id, string name, string description, Texture2D texture, Texture2D openTexture, double maxHealth, double price, int levelRequirement, double baseHate, double range) : base(id, name, description, texture, maxHealth, price, levelRequirement, baseHate)
+    public DoorTemplate(JObject jObject) : base(jObject)
     {
-        OpenTexture = openTexture;
-        Range = range;
+        Texture = Resources.GetTextureByName(jObject.Value<string?>("texture") ?? "");
+
+        OpenTexture = Resources.GetTextureByName(jObject.Value<string?>("openTexture") ?? "");
+        Range = jObject.Value<double?>("range") ?? 32;
     }
     
     public override Door Instantiate(Team team, int x, int y)

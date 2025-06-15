@@ -1,11 +1,12 @@
 using System.Numerics;
+using Newtonsoft.Json.Linq;
 using Raylib_cs;
 
 namespace nestphalia;
 
 public class HopperMinionTemplate : MinionTemplate
 {
-    public HopperMinionTemplate(string id, string name, string description, Texture2D texture, double maxHealth, double armor, double damage, double speed, float physicsRadius, double attackDuration = 1) : base(id, name, description, texture, maxHealth, armor, damage, speed, physicsRadius, attackDuration)
+    public HopperMinionTemplate(JObject jObject) : base(jObject)
     {
     }
     

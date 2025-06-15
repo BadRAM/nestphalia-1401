@@ -1,12 +1,13 @@
 using System.Diagnostics;
 using System.Numerics;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Raylib_cs;
 
 namespace nestphalia;
 
-public class MinionTemplate
+public class MinionTemplate : JsonAsset
 {
-    public string ID; // Minions don't really need this since they're defined as a part of their nests, which already have IDs
     public string Name;
     public string Description;
     public Texture2D Texture;
@@ -20,21 +21,22 @@ public class MinionTemplate
     public float PhysicsRadius; // This is a float because Raylib.CheckCircleOverlap() wants floats
     public int WalkAnimDelay;
 
-    public MinionTemplate(string id, string name, string description, Texture2D texture, double maxHealth, double armor, double damage, double speed, float physicsRadius, double attackDuration = 1, int walkAnimDelay = 2)
+    public MinionTemplate(JObject jObject) : base(jObject)
     {
-        ID = id;
-        Name = name;
-        Description = description;
-        Texture = texture;
+        Name = jObject.Value<string?>("name") ?? throw new ArgumentNullException();
+        Description = jObject.Value<string?>("description") ?? "";
+        Texture = Resources.GetTextureByName(jObject.Value<string?>("texture") ?? "");
         ShadowTexture = Resources.GetTextureByName("shadow");
-        MaxHealth = maxHealth;
-        Armor = armor;
-        Damage = damage;
-        Projectile = new ProjectileTemplate($"{id}_attack", Resources.GetTextureByName("minion_bullet"), damage, 400);
-        AttackDuration = attackDuration;
-        Speed = speed;
-        PhysicsRadius = physicsRadius;
-        WalkAnimDelay = walkAnimDelay;
+        MaxHealth = jObject.Value<double?>("maxHealth") ?? throw new ArgumentNullException();
+        Armor = jObject.Value<double?>("armor") ?? 0;
+        Damage = jObject.Value<double?>("damage") ?? 0;
+        AttackDuration = jObject.Value<double?>("attackDuration") ?? 1;
+        Speed = jObject.Value<double?>("speed") ?? 0;
+        PhysicsRadius = jObject.Value<int?>("physicsRadius") ?? throw new ArgumentNullException();
+        WalkAnimDelay = jObject.Value<int?>("walkAnimDelay") ?? 2;
+
+        string j = $@"{{""id"": ""{ID}_attack"", ""texture"": ""minion_bullet"", ""damage"": {Damage}, ""speed"": 400}}";
+        Projectile = new ProjectileTemplate(JObject.Parse(j));
     }
 
     // Implementations of Instantiate() must call Register!

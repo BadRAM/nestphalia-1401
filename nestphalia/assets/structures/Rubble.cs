@@ -1,11 +1,13 @@
 using System.Reflection.Metadata.Ecma335;
+using Newtonsoft.Json.Linq;
 using Raylib_cs;
 
 namespace nestphalia;
 
 public class Rubble : Structure
 {
-    public static readonly StructureTemplate RubbleTemplate = new StructureTemplate("rubble", "rubble", "", Resources.GetTextureByName("rubble"), 0, 0, 0, 0);
+    private const string jsonTemplate = @"{""id"": ""rubble"", ""name"": ""rubble"", ""texture"": ""rubble""}";
+    public static readonly StructureTemplate RubbleTemplate = new StructureTemplate(JObject.Parse(jsonTemplate));
     public StructureTemplate DestroyedStructure;
     
     public Rubble(StructureTemplate template, Team team, int x, int y) : base(RubbleTemplate, team, x, y)

@@ -1,4 +1,5 @@
 using System.Numerics;
+using Newtonsoft.Json.Linq;
 using Raylib_cs;
 
 namespace nestphalia;
@@ -7,7 +8,7 @@ public class FlyingMinionTemplate : MinionTemplate
 {
     public double CruisingHeight = 32;
     
-    public FlyingMinionTemplate(string id, string name, string description, Texture2D texture, double maxHealth, double armor, double damage, double speed, float physicsRadius, double attackDuration = 1) : base(id, name, description, texture, maxHealth, armor, damage, speed, physicsRadius, attackDuration)
+    public FlyingMinionTemplate(JObject jObject) : base(jObject)
     {
     }
     

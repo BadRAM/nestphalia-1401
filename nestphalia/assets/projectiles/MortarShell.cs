@@ -1,4 +1,5 @@
 using System.Numerics;
+using Newtonsoft.Json.Linq;
 using Raylib_cs;
 
 namespace nestphalia;
@@ -9,11 +10,11 @@ public class MortarShellTemplate : ProjectileTemplate
     public double ArcHeight;
     public float BlastRadius;
         
-    public MortarShellTemplate(string id, Texture2D texture, double damage, double arcDuration, double arcHeight, float blastRadius) : base(id, texture, damage, 0)
+    public MortarShellTemplate(JObject jObject) : base(jObject)
     {
-        ArcDuration = arcDuration;
-        ArcHeight = arcHeight;
-        BlastRadius = blastRadius;
+        ArcDuration = jObject.Value<double?>("arcDuration") ?? throw new ArgumentNullException();
+        ArcHeight = jObject.Value<double?>("arcHeight") ?? throw new ArgumentNullException();
+        BlastRadius = jObject.Value<float?>("blastRadius") ?? 0;
     }
 
     public override void Instantiate(object target, object source, Vector3 position)

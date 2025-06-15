@@ -29,6 +29,7 @@ Programming todo:
 ----- V2 -----
 
 - Game intro cutscene
+- Loading screen
 - Dialog boxes and scripted events at start of levels
   - Allow dialog boxes to provide a list of choices
   - SFX?
@@ -55,13 +56,13 @@ Programming todo:
 - Command console
   - Interface
   - Command format, usable by json levels to script battle events.
-- Redesign the campaign forts
 - Better level format, 
   - allow structures in center
   - customize floor
   - scripted events
   - soil texture triangle (meaningless)
 - Nice campaign screen with a map and paths appearing every time you unlock a new level. Nonlinear campaign?
+- Design campaign levels
 - Corpses/bloodstains to indicate fear
 - Balance decision: Should flight grant immunity to explosions? Currently it does not.
 - Orphaned sapper beetles will seek another burrow
@@ -101,6 +102,7 @@ Programming todo:
 - Custom Cursor
 - Fix path preview
 - Screen edge scroll (off by default)
+- Migrate old JSON functions to newtonsoft
 
 
 ----- Premature Optimizations -----
@@ -156,11 +158,11 @@ Programming todo:
   - ~~Path outwards from start and destination simultaneously, finishing as soon as the two sides touch~~
     - ~~Before: 0.850 release~~
     - ~~After:  0.045 release :')~~
-  - When a lot of minions are told to target one spot, generate a full nodegrid then get all their paths from that.
-    - Whenever a path is calculated, searth the pathqueue for paths with the same destination or source, then discard all set nodes(if source shared)/antinodes(if dest shared) and solve from there.
-    - https://www.redblobgames.com/pathfinding/tower-defense/
-    - https://www.redblobgames.com/blog/2024-04-27-flow-field-pathfinding/
-    - https://www.roguebasin.com/index.php?title=Dijkstra_Maps_Visualized
+  - ~~When a lot of minions are told to target one spot, generate a full nodegrid then get all their paths from that.~~
+    - ~~Whenever a path is calculated, searth the pathqueue for paths with the same destination or source, then discard all set nodes(if source shared)/antinodes(if dest shared) and solve from there. - Probably too limiting.~~
+    - ~~https://www.redblobgames.com/pathfinding/tower-defense/~~
+    - ~~https://www.redblobgames.com/blog/2024-04-27-flow-field-pathfinding/~~
+    - ~~https://www.roguebasin.com/index.php?title=Dijkstra_Maps_Visualized~~
 
 - Emergency Measure: Reduce tickrate from 60 to 30. This is easy to do just by changing timescale and framerate, but results in noticeably choppier gameplay. Interpolation would probably eat into the benefits somewhat but could easily still be worth it.
 

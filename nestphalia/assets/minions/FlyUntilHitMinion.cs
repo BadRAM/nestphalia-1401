@@ -1,4 +1,5 @@
 using System.Numerics;
+using Newtonsoft.Json.Linq;
 using Raylib_cs;
 
 namespace nestphalia;
@@ -7,10 +8,9 @@ public class FlyUntilHitMinionTemplate : FlyingMinionTemplate
 {
     public double LandSpeed;
     
-    public FlyUntilHitMinionTemplate(string id, string name, string description, Texture2D texture, double maxHealth, double armor, double damage, double speed, double landSpeed, float physicsRadius, double attackDuration = 1, int walkAnimDelay = 2) 
-        : base(id, name, description, texture, maxHealth, armor, damage, speed, physicsRadius, attackDuration)
+    public FlyUntilHitMinionTemplate(JObject jObject) : base(jObject)
     {
-        LandSpeed = landSpeed;
+        LandSpeed = jObject.Value<double?>("landSpeed") ?? throw new ArgumentNullException();
     }
     
     public override void Instantiate(Team team, Vector3 position, NavPath? navPath)

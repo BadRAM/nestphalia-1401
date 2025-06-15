@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Numerics;
+using Newtonsoft.Json.Linq;
 using Raylib_cs;
 
 namespace nestphalia;
@@ -18,26 +19,23 @@ public class TowerTemplate : StructureTemplate
     
     public double Range;
     public ProjectileTemplate Projectile;
-    // public float Damage;
     public double RateOfFire;
-    // public TurretTargetSelector TargetSelector;
     public TargetSelector TargetMode;
     public bool CanHitFlying;
     public bool CanHitGround;
-    public int ProjectileOffset;
+    public int ProjectileOriginZ;
 
-    public TowerTemplate(string id, string name, string description, Texture2D texture, double maxHealth, double price, int levelRequirement, double baseHate, double range, ProjectileTemplate projectile, int projectileOffset, double rateOfFire, TargetSelector targetMode, bool canHitGround, bool canHitFlying) 
-        : base(id, name, description, texture, maxHealth, price, levelRequirement, baseHate)
+    public TowerTemplate(JObject jObject) : base(jObject)
     {
-        Range = range;
-        Projectile = projectile;
-        ProjectileOffset = projectileOffset;
-        //Damage = damage;
-        RateOfFire = rateOfFire;
-        TargetMode = targetMode;
-        CanHitGround = canHitGround;
-        CanHitFlying = canHitFlying;
-        Class = StructureClass.Tower;
+        Name = jObject.Value<string?>("name") ?? throw new ArgumentNullException();
+        Range = jObject.Value<double?>("range") ?? throw new ArgumentNullException();
+        Projectile = Assets.LoadJsonAsset<ProjectileTemplate>(jObject.Value<JObject?>("projectile"));
+        ProjectileOriginZ = jObject.Value<int?>("projectileOriginZ") ?? 8;
+        RateOfFire = jObject.Value<double?>("rateOfFire") ?? throw new ArgumentNullException();
+        TargetMode = (TargetSelector)(jObject.Value<int?>("targetMode") ?? throw new ArgumentNullException());
+        CanHitGround = jObject.Value<bool?>("canHitGround") ?? true;
+        CanHitFlying = jObject.Value<bool?>("canHitFlying") ?? true;
+        Class = jObject.Value<StructureClass?>("class") ?? StructureClass.Tower;
     }
     
     public override Tower Instantiate(Team team, int x, int y)
@@ -100,7 +98,7 @@ public class Tower : Structure
             if (_target != null)
             {
                 _shootSound.PlayRandomPitch(SoundResource.WorldToPan(position.X), 0.15f);
-                _template.Projectile.Instantiate(_target, this, position.XYZ(_template.ProjectileOffset));
+                _template.Projectile.Instantiate(_target, this, position.XYZ(_template.ProjectileOriginZ));
                 _timeLastFired = Time.Scaled;
             }
         }

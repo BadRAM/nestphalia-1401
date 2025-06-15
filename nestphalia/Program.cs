@@ -1,6 +1,5 @@
-﻿using System.Diagnostics;
-using System.Numerics;
-using Raylib_cs;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using static Raylib_cs.Raylib;
 namespace nestphalia;
 
@@ -64,5 +63,16 @@ static class Program
         
 	    CloseAudioDevice();     
         //CloseWindow();
+    }
+
+    public static void TestJson()
+    {
+	    string jsonString = @"{""key1"":""value1"",""key2"":2}";
+	    JObject jObject = JObject.Parse(jsonString);
+        
+	    Console.WriteLine($"jObject.ToString():\n{jObject.ToString()}");
+	    Console.WriteLine($"jObject.Value<double?>(\"key2\") ?? 0: {jObject.Value<double?>("key2") ?? 0}");
+	    Console.WriteLine($"jObject.Value<double?>(\"key3\") ?? 0: {jObject.Value<double?>("key3") ?? 0}");
+	    // Console.WriteLine($"jObject.Value<double?>(\"key1\") ?? 0:\n{jObject.Value<double?>("key1") ?? 0}");
     }
 }

@@ -1,11 +1,13 @@
 using System.Numerics;
+using System.Threading.Tasks.Dataflow;
+using Newtonsoft.Json.Linq;
 using Raylib_cs;
 
 namespace nestphalia;
 
 public class LightningBoltTemplate : ProjectileTemplate
 {
-    public LightningBoltTemplate(string id, double damage) : base(id, Resources.MissingTexture, damage, 0)
+    public LightningBoltTemplate(JObject jObject) : base(jObject)
     {
     }
 

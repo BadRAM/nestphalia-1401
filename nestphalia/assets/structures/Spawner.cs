@@ -1,4 +1,5 @@
 using System.Net.NetworkInformation;
+using Newtonsoft.Json.Linq;
 using Raylib_cs;
 
 namespace nestphalia;
@@ -10,13 +11,13 @@ public class SpawnerTemplate : StructureTemplate
     public double WaveGrowth;
     public double TimeBetweenSpawns;
     
-    public SpawnerTemplate(string id, string name, string description, Texture2D texture, double maxHealth, double price, int levelRequirement, double baseHate, MinionTemplate minion, int waveSize, double waveGrowth, double timeBetweenSpawns) : base(id, name, description, texture, maxHealth, price, levelRequirement, baseHate)
+    public SpawnerTemplate(JObject jObject) : base(jObject)
     {
-        Minion = minion;
-        WaveSize = waveSize;
-        WaveGrowth = waveGrowth;
-        TimeBetweenSpawns = timeBetweenSpawns;
-        Class = StructureClass.Nest;
+        Minion = Assets.LoadJsonAsset<MinionTemplate>(jObject.Value<JObject?>("minion"));
+        WaveSize = jObject.Value<int?>("waveSize") ?? throw new ArgumentNullException();
+        WaveGrowth = jObject.Value<int?>("waveGrowth") ?? throw new ArgumentNullException();
+        TimeBetweenSpawns = jObject.Value<double?>("timeBetweenSpawns") ?? throw new ArgumentNullException();
+        Class = jObject.Value<StructureClass?>("class") ?? StructureClass.Nest;
     }
     
     public override Spawner Instantiate(Team team, int x, int y)

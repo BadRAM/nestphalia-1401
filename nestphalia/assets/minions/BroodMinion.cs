@@ -1,4 +1,5 @@
 using System.Numerics;
+using Newtonsoft.Json.Linq;
 using Raylib_cs;
 
 namespace nestphalia;
@@ -9,12 +10,11 @@ public class BroodMinionTemplate : MinionTemplate
     public int SpawnsOnDeath;
     public MinionTemplate SpawnedMinion;
     
-    public BroodMinionTemplate(string id, string name, string description, Texture2D texture, double maxHealth, double armor, double damage, double speed, float physicsRadius, double spawnInterval, int spawnsOnDeath, MinionTemplate spawnedMinion, double attackDuration = 1, int walkAnimDelay = 2) 
-        : base(id, name, description, texture, maxHealth, armor, damage, speed, physicsRadius, attackDuration, walkAnimDelay)
+    public BroodMinionTemplate(JObject jObject) : base(jObject)
     {
-        SpawnInterval = spawnInterval;
-        SpawnsOnDeath = spawnsOnDeath;
-        SpawnedMinion = spawnedMinion;
+        SpawnInterval = jObject.Value<double?>("spawnInterval") ?? 0;
+        SpawnsOnDeath = jObject.Value<int?>("spawnsOnDeath") ?? 0;
+        SpawnedMinion = Assets.LoadJsonAsset<MinionTemplate>(jObject.Value<JObject?>("spawnedMinion")) ?? throw new ArgumentNullException();
     }
     
     public override void Instantiate(Team team, Vector3 position, NavPath? navPath)

@@ -1,4 +1,5 @@
 using System.Numerics;
+using Newtonsoft.Json.Linq;
 using Raylib_cs;
 
 namespace nestphalia;
@@ -10,13 +11,13 @@ public class MinefieldTemplate : StructureTemplate
     public double Range;
     public double Cooldown;
     
-    public MinefieldTemplate(string id, string name, string description, Texture2D texture, double maxHealth, double price, int levelRequirement, double baseHate, int maxCharges, ProjectileTemplate bomb, double range, double cooldown) : base(id, name, description, texture, maxHealth, price, levelRequirement, baseHate)
+    public MinefieldTemplate(JObject jObject) : base(jObject)
     {
-        MaxCharges = maxCharges;
-        Bomb = bomb;
-        Range = range;
-        Cooldown = cooldown;
-        Class = StructureClass.Tower;
+        MaxCharges = jObject.Value<int?>("maxCharges") ?? throw new ArgumentNullException();
+        Bomb = Assets.LoadJsonAsset<ProjectileTemplate>(jObject.Value<JObject?>("bomb"));
+        Range = jObject.Value<double?>("range") ?? throw new ArgumentNullException();
+        Cooldown = jObject.Value<double?>("cooldown") ?? throw new ArgumentNullException();
+        Class = jObject.Value<StructureClass?>("class") ?? StructureClass.Tower;
     }
 
     public override Minefield Instantiate(Team team, int x, int y)

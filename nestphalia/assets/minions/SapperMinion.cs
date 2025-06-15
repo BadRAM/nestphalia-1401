@@ -1,4 +1,5 @@
 using System.Numerics;
+using Newtonsoft.Json.Linq;
 using Raylib_cs;
 
 namespace nestphalia;
@@ -10,11 +11,13 @@ public class SapperMinionTemplate : MinionTemplate
     public Texture2D BombTexture;
     
     
-    public SapperMinionTemplate(string id, string name, string description, Texture2D texture, Texture2D bombTexture, double maxHealth, double armor, double damage, double speed, float physicsRadius) : base(id, name, description, texture, maxHealth, armor, damage, speed, physicsRadius, 0)
+    public SapperMinionTemplate(JObject jObject) : base(jObject)
     {
-        BombTexture = bombTexture;
-        Projectile = new MortarShellTemplate($"{id}_bomb", bombTexture, damage, 0.4, 4, 0);
+        BombTexture = Resources.GetTextureByName(jObject.Value<string?>("bombTexture") ?? "");
         AttackDuration = 0;
+
+        string j = $@"{{""id"": ""{ID}_bomb"", ""texture"": ""{jObject.Value<string?>("bombTexture") ?? ""}"", ""arcDuration"": 0.4, ""arcHeight"": 4, ""damage"": {Damage}}}";
+        Projectile = new MortarShellTemplate(JObject.Parse(j));
     }
 
     public override void Instantiate(Team team, Vector3 position, NavPath? navPath)

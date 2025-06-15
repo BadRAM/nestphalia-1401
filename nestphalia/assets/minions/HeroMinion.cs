@@ -1,14 +1,14 @@
 using System.Numerics;
+using System.Runtime.InteropServices.JavaScript;
+using Newtonsoft.Json.Linq;
 using Raylib_cs;
 
 namespace nestphalia;
 
 public class HeroMinionTemplate : MinionTemplate
 {
-    public HeroMinionTemplate(string id, string name, string description, Texture2D texture, double maxHealth, double armor, double damage, double speed, float physicsRadius, double attackDuration = 1, int walkAnimDelay = 2) 
-        : base(id, name, description, texture, maxHealth, armor, damage, speed, physicsRadius, attackDuration, walkAnimDelay)
+    public HeroMinionTemplate(JObject jObject) : base(jObject)
     {
-
     }
     
     public override void Instantiate(Team team, Vector3 position, NavPath? navPath)

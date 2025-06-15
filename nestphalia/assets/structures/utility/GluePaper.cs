@@ -1,14 +1,14 @@
 using System.Numerics;
 using System.Security.Cryptography;
+using Newtonsoft.Json.Linq;
 using Raylib_cs;
 
 namespace nestphalia;
 
 public class GluePaperTemplate : StructureTemplate
 {
-    public GluePaperTemplate(string id, string name, string description, Texture2D texture, double maxHealth, double price, int levelRequirement, double baseHate) : base(id, name, description, texture, maxHealth, price, levelRequirement, baseHate)
+    public GluePaperTemplate(JObject jObject) : base(jObject)
     {
-        //Class = StructureClass.Tower;
     }
 
     public override GluePaper Instantiate(Team team, int x, int y)

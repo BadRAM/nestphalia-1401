@@ -1,11 +1,12 @@
 using System.Numerics;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Raylib_cs;
 
 namespace nestphalia;
 
-public class StructureTemplate
+public class StructureTemplate : JsonAsset
 {
-    public string ID;
     public string Name;
     public string Description;
     public Texture2D Texture;
@@ -22,17 +23,16 @@ public class StructureTemplate
         Nest
     }
     
-    public StructureTemplate(string id, string name, string description, Texture2D texture, double maxHealth, double price, int levelRequirement, double baseHate)
+    public StructureTemplate(JObject jObject) : base(jObject)
     {
-        Name = name;
-        Texture = texture;
-        MaxHealth = maxHealth;
-        Price = price;
-        LevelRequirement = levelRequirement;
-        BaseHate = baseHate;
-        ID = id;
-        Description = description;
-        Class = StructureClass.Utility;
+        Name = jObject.Value<string?>("name") ?? throw new ArgumentNullException();
+        Description = jObject.Value<string?>("description") ?? "";
+        Texture = Resources.GetTextureByName(jObject.Value<string?>("texture") ?? "");
+        MaxHealth = jObject.Value<double?>("maxHealth") ?? 0;
+        Price = jObject.Value<double?>("price") ?? 0;
+        LevelRequirement = jObject.Value<int?>("levelRequirement") ?? 0;
+        BaseHate = jObject.Value<double?>("baseHate") ?? 0;
+        Class = jObject.Value<StructureClass?>("class") ?? StructureClass.Utility;
     }
     
     public virtual Structure Instantiate(Team team, int x, int y)
