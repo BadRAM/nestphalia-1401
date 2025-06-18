@@ -171,10 +171,10 @@ public static class Resources
         }
         else
         {
-            Console.WriteLine("MusicResource was null! Music names are:");
+            GameConsole.WriteLine("MusicResource was null! Music names are:");
             foreach (KeyValuePair<string, MusicResource> m in _music.ToArray())
             {
-                Console.WriteLine($" - {m.Key}");
+                GameConsole.WriteLine($" - {m.Key}");
             }
         }
     }
@@ -224,7 +224,7 @@ public static class Resources
         filepath = Directory.GetCurrentDirectory() + filepath;
         if (!Path.Exists(filepath))
         {
-            Console.WriteLine($"Failed to find fort at {filepath}");
+            GameConsole.WriteLine($"Failed to find fort at {filepath}");
             return null;
         }
         string jsonString = File.ReadAllText(filepath);
@@ -232,7 +232,7 @@ public static class Resources
         fort.UpdateCost();
         fort.Path = Path.GetDirectoryName(filepath)!;
         fort.Path = fort.Path.Substring(Directory.GetCurrentDirectory().Length);
-        Console.WriteLine($"Loaded {fort.Name}, path: {fort.Path}");
+        GameConsole.WriteLine($"Loaded {fort.Name}, path: {fort.Path}");
         return fort;
     }
 

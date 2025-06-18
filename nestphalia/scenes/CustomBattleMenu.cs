@@ -38,7 +38,7 @@ public class CustomBattleMenu : Scene
     
     public override void Update()
     {
-        if (Raylib.IsKeyPressed(KeyboardKey.Escape))
+        if (Input.Pressed(Input.Action.Exit))
         {
             new MenuScene().Start();
         }
@@ -145,7 +145,7 @@ public class CustomBattleMenu : Scene
                 if (GUI.Button300(-600, i * 40 - 240,
                         Path.GetFileNameWithoutExtension(fortPath)))
                 {
-                    Console.WriteLine("Loading " + Path.GetFileName(fortPath));
+                    GameConsole.WriteLine("Loading " + Path.GetFileName(fortPath));
                     if (_loadingLeftSide)
                     {
                         _leftFort = Resources.LoadFort(fortPath.Substring(Directory.GetCurrentDirectory().Length));

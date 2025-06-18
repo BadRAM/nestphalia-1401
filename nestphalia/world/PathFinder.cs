@@ -47,7 +47,7 @@ public class PathFinder
         // Debug.Assert(!navPath.Found);
         if (navPath.Found)
         {
-            Console.WriteLine($"{navPath.Requester} requested pathing on a navPath that's already been found.");
+            GameConsole.WriteLine($"{navPath.Requester} requested pathing on a navPath that's already been found.");
             return;
         }
         
@@ -220,7 +220,7 @@ public class PathFinder
             
             #if DEBUG
             _swAddNodes.Stop();
-            if (Raylib.IsKeyDown(KeyboardKey.Q))
+            if (Input.Held(Input.Action.PathDebug))
             {
                 Raylib.BeginDrawing();
                 Raylib.ClearBackground(new Color(16, 8, 4, 255));
@@ -287,7 +287,7 @@ public class PathFinder
             navPath.Found = true;
         }
         sw.Stop();
-        Console.WriteLine($"Batch pathed {navPaths.Count} bugs in {sw.Elapsed.TotalMilliseconds:N3}ms, {(sw.Elapsed.TotalMilliseconds / navPaths.Count):N4}ms/path");
+        GameConsole.WriteLine($"Batch pathed {navPaths.Count} bugs in {sw.Elapsed.TotalMilliseconds:N3}ms, {(sw.Elapsed.TotalMilliseconds / navPaths.Count):N4}ms/path");
     }
     
     private PathNode PopMinNode()

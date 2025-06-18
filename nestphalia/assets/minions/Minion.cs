@@ -1,6 +1,4 @@
-using System.Diagnostics;
 using System.Numerics;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Raylib_cs;
 
@@ -245,7 +243,7 @@ public partial class Minion : ISprite
 
         if (targets.Count == 0)
         {
-            Console.WriteLine($"{Template.Name} wants to retarget but can't see any valid targets!");
+            GameConsole.WriteLine($"{Template.Name} wants to retarget but can't see any valid targets!");
             return new Int2D(0,0);
         }
 

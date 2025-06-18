@@ -51,7 +51,7 @@ static class Program
 	        UpdateMusicStream(Resources.MusicPlaying);
         }
 		
-        Console.WriteLine("Quitting time!");
+        GameConsole.WriteLine("Quitting time!");
 		
         if (Settings.RestartNeeded)
         {
@@ -61,18 +61,7 @@ static class Program
         
 	    Resources.Unload();
         
-	    CloseAudioDevice();     
+	    CloseAudioDevice();
         //CloseWindow();
-    }
-
-    public static void TestJson()
-    {
-	    string jsonString = @"{""key1"":""value1"",""key2"":2}";
-	    JObject jObject = JObject.Parse(jsonString);
-        
-	    Console.WriteLine($"jObject.ToString():\n{jObject.ToString()}");
-	    Console.WriteLine($"jObject.Value<double?>(\"key2\") ?? 0: {jObject.Value<double?>("key2") ?? 0}");
-	    Console.WriteLine($"jObject.Value<double?>(\"key3\") ?? 0: {jObject.Value<double?>("key3") ?? 0}");
-	    // Console.WriteLine($"jObject.Value<double?>(\"key1\") ?? 0:\n{jObject.Value<double?>("key1") ?? 0}");
     }
 }

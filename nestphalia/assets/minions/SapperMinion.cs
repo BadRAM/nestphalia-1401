@@ -61,7 +61,7 @@ public class SapperMinion : Minion
             }
             else
             {
-                Console.WriteLine("SapperMinion tried to award bonus spawn to a null/non-nest structure!");
+                GameConsole.WriteLine("SapperMinion tried to award bonus spawn to a null/non-nest structure!");
             }
             Die();
         }

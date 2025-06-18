@@ -11,8 +11,8 @@ public static class Screen
     
     public static int HCenter;
     public static int VCenter;
-    public static int Left;
-    public static int Right = 0;
+    public static int Left = 0;
+    public static int Right;
     public static int Top = 0;
     public static int Bottom;
     //public static Image WhiteNoise = Raylib.GenImageWhiteNoise(1024, 1024, 0.5f);
@@ -31,7 +31,7 @@ public static class Screen
 
         SetConfigFlags(flags);
         Vector2 scaleDpi = Settings.Saved.WindowScale ? GetWindowScaleDPI() : Vector2.One;
-        InitWindow(1200, 600, "2-fort");
+        InitWindow(1200, 600, "Nestphalia 1401");
         SetTargetFPS(60);
         SetExitKey(KeyboardKey.Null);
         SetMouseScale(1, 1);
@@ -66,7 +66,7 @@ public static class Screen
     {
         _backgroundNoise.Clear();
         
-        while (_backgroundNoise.Count <= Left/24)
+        while (_backgroundNoise.Count <= Right/24)
         {
             _backgroundNoise.Add(new List<bool>());
         }
@@ -95,22 +95,23 @@ public static class Screen
     
     public static void UpdateBounds()
     {
-        Console.WriteLine($"WindowScale = {GUI.GetWindowScale()}");
+        GameConsole.WriteLine($"WindowScale = {GUI.GetWindowScale()}");
 
         Vector2 scale = GUI.GetWindowScale();
-        Console.WriteLine($"Scale is X:{scale.X},Y:{scale.Y}");
+        GameConsole.WriteLine($"Scale is X:{scale.X},Y:{scale.Y}");
         
-        Left = (int)(GetScreenWidth() / scale.X);
+        Right = (int)(GetScreenWidth() / scale.X);
         Bottom = (int)(GetScreenHeight() / scale.Y);
 
-        if (Left < MinWidth || Bottom < MinHeight)
+        if (Right < MinWidth || Bottom < MinHeight)
         {
-            SetWindowSize(Math.Max(Left, MinWidth), Math.Max(Bottom, MinHeight));
-            Left = GetScreenWidth();
+            GameConsole.WriteLine("Window undersized, resizing...");
+            SetWindowSize(Math.Max(Right, MinWidth), Math.Max(Bottom, MinHeight));
+            Right = GetScreenWidth();
             Bottom = GetScreenHeight();
         }
         
-        HCenter = Left / 2;
+        HCenter = Right / 2;
         VCenter = Bottom / 2;
 
         RegenerateBackground();
@@ -121,7 +122,7 @@ public static class Screen
 
     public static void DrawBackground(Color tint)
     {
-        for (int x = 0; x <= Left/24; x++)
+        for (int x = 0; x <= Right/24; x++)
         for (int y = 0; y <= Bottom/24; y++)
         {
             DrawTexture(_backgroundNoise[x][y] ? _tile1 : _tile2, x * 24, y * 24 - 12, tint);

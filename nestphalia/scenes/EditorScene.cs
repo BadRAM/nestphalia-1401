@@ -118,7 +118,7 @@ public class EditorScene : Scene
             }
         }
 
-        if (IsKeyPressed(KeyboardKey.Escape)) _startPrevScene();
+        if (Input.Pressed(Input.Action.Exit)) _startPrevScene();
         
         // lazy hack so resizing the window doesn't offset the viewport
         World.Camera.Zoom = GetWindowScale().X;
@@ -279,7 +279,7 @@ public class EditorScene : Scene
     {
         if (_brush == null) 
         {
-            Console.WriteLine("Tried to use null brush!");
+            GameConsole.WriteLine("Tried to use null brush!");
             _toolActive = EditorTool.Erase;
             return;
         }

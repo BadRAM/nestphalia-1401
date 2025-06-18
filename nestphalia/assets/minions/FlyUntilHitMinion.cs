@@ -1,6 +1,5 @@
 using System.Numerics;
 using Newtonsoft.Json.Linq;
-using Raylib_cs;
 
 namespace nestphalia;
 
@@ -41,7 +40,7 @@ public class FlyUntilHitMinion : FlyingMinion
         {
             SetTarget(NavPath.Destination);
             Armor = Template.Armor;
-            Console.WriteLine($"{Template.ID} landed safely.");
+            // GameConsole.WriteLine($"{Template.ID} landed safely.");
         }
     }
 

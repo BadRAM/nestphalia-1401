@@ -8,6 +8,7 @@
         <Nullable>enable</Nullable>
         <LangVersion>12</LangVersion>
         <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
+        <PublishTrimmed>true</PublishTrimmed>
     </PropertyGroup>
 
     <ItemGroup>
@@ -15,23 +16,14 @@
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
         </None>
-    </ItemGroup>
-
-    <ItemGroup>
         <None Update="forts/**/*">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
         </None>
-    </ItemGroup>
-
-    <ItemGroup>
         <None Update="readme.txt">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
         </None>
-    </ItemGroup>
-
-    <ItemGroup>
         <None Update="credits.txt">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <ExcludeFromSingleFile>true</ExcludeFromSingleFile>

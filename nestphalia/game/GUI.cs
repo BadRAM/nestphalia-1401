@@ -151,7 +151,7 @@ public static class GUI
                 key = GetCharPressed();  // Check next character in the queue
             }
     
-            if (IsKeyPressed(KeyboardKey.Backspace) && text.Length > 0)
+            if ((IsKeyPressed(KeyboardKey.Backspace) || IsKeyPressedRepeat(KeyboardKey.Backspace)) && text.Length > 0)
             {
                 text = text.Substring(0, text.Length - 1);
             }

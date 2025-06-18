@@ -27,10 +27,10 @@ public class BattleScene : Scene
     private DialogBox _dialogBox;
     private List<DialogBox> _dialogQueue = new List<DialogBox>()
     {
-        new DialogBox("I Won't let you ruin my perfect perfect plan!         \nSacrifices MUST be made!!!", DialogBox.Mode.Left, Resources.GetTextureByName("kray")),
-        new DialogBox("What about that big opening in the wall?", DialogBox.Mode.Right, Resources.GetTextureByName("knux")),
-        new DialogBox("How could my perfect perfect plan be defeated so easily!", DialogBox.Mode.Both, Resources.GetTextureByName("knux"), Resources.GetTextureByName("kray")),
-        new DialogBox("Kray gave up...")
+        // new DialogBox("I Won't let you ruin my perfect perfect plan!         \nSacrifices MUST be made!!!", DialogBox.Mode.Left, Resources.GetTextureByName("kray")),
+        // new DialogBox("What about that big opening in the wall?", DialogBox.Mode.Right, Resources.GetTextureByName("knux")),
+        // new DialogBox("How could my perfect perfect plan be defeated so easily!", DialogBox.Mode.Both, Resources.GetTextureByName("knux"), Resources.GetTextureByName("kray")),
+        // new DialogBox("Kray gave up...")
     };
     
     private string _log;
@@ -98,9 +98,9 @@ public class BattleScene : Scene
                 _dialogBox.Draw();
                 break;
             case SceneState.BattleActive:
-                if (IsKeyDown(KeyboardKey.F))
+                if (Input.Pressed(Input.Action.FastForward))
                 {
-                    DrawRectangle(0,0,Screen.Left,Screen.Bottom,new Color(0,0,0,128));
+                    DrawRectangle(0,0,Screen.Right,Screen.Bottom,new Color(0,0,0,128));
                     DrawTextCentered(0, 0, $"{_skips+1}X SPEED", 48);
                 }
                 break;
@@ -122,7 +122,7 @@ public class BattleScene : Scene
                 }
                 else
                 {
-                    DrawRectangle(0,0,Screen.Left,Screen.Bottom,new Color(0,0,0,128));
+                    DrawRectangle(0,0,Screen.Right,Screen.Bottom,new Color(0,0,0,128));
                     DrawTextCentered(0, 0, "PAUSED", 48);
                     if (Button100(-50, 40, "Settings"))
                     {
@@ -139,21 +139,22 @@ public class BattleScene : Scene
                 }
                 break;
             case SceneState.PausedSettings:
-                DrawRectangle(0,0,Screen.Left,Screen.Bottom,new Color(0,0,0,128));
+                DrawRectangle(0,0,Screen.Right,Screen.Bottom,new Color(0,0,0,128));
                 if (Settings.DrawSettingsMenu()) _state = SceneState.Paused;
                 break;
         }
         
+        GameConsole.Draw();
         EndDrawing();
     }
 
     private void HandleInputs()
     {
-        if (IsKeyPressed(KeyboardKey.P) || IsKeyPressed(KeyboardKey.Escape))
+        if (Input.Pressed(Input.Action.Pause) || Input.Pressed(Input.Action.Exit))
         {
             TogglePaused();
         }
-        if (_state == SceneState.Paused && IsKeyPressed(KeyboardKey.O)) // Frame step
+        if (_state == SceneState.Paused && Input.Pressed(Input.Action.FrameStep)) // Frame step
         {
             Time.TimeScale = 1;
             Time.UpdateTime();
@@ -161,43 +162,38 @@ public class BattleScene : Scene
             Time.TimeScale = 0;
         }
         
-        if (IsKeyPressed(KeyboardKey.F))
+        if (Input.Pressed(Input.Action.FastForward))
         {
             SetMasterVolume(0.25f);
         }
-        if (IsKeyReleased(KeyboardKey.F))
+        if (Input.Released(Input.Action.FastForward))
         {
             SetMasterVolume(1f);
         }
 
-        if (IsKeyDown(KeyboardKey.A))
+        if (Input.Held(Input.Action.CameraLeft))
         {
             World.Camera.Offset.X += 4;
         }
-        if (IsKeyDown(KeyboardKey.D))
+        if (Input.Held(Input.Action.CameraRight))
         {
             World.Camera.Offset.X -= 4;
         }
-        if (IsKeyDown(KeyboardKey.W))
+        if (Input.Held(Input.Action.CameraUp))
         {
             World.Camera.Offset.Y += 4;
         }
-        if (IsKeyDown(KeyboardKey.S))
+        if (Input.Held(Input.Action.CameraDown))
         {
             World.Camera.Offset.Y -= 4;
         }
 
-        if (IsKeyPressed(KeyboardKey.Y))
-        {
-            StartCameraShake(0.2, 6);
-        }
-
-        if (IsKeyPressed(KeyboardKey.Q))
+        if (Input.Pressed(Input.Action.PathDebug))
         {
             _pathFinderDebug = !_pathFinderDebug;
         }
 
-        if (IsKeyPressed(KeyboardKey.T) && _dialogQueue.Count > 0)
+        if (Input.Pressed(KeyboardKey.T) && _dialogQueue.Count > 0)
         {
             Time.TimeScale = 0;
             _dialogBox = _dialogQueue[0];
@@ -205,13 +201,13 @@ public class BattleScene : Scene
             _dialogQueue.RemoveAt(0);
             _state = SceneState.Dialogue;
         }
-        if (_state == SceneState.Dialogue && IsKeyPressed(KeyboardKey.Space))
+        if (_state == SceneState.Dialogue && Input.Pressed(Input.Action.AdvanceDialogue))
         {
             Time.TimeScale = 1;
             _state = SceneState.BattleActive;
         }
         
-        if (IsKeyPressed(KeyboardKey.F3))
+        if (Input.Pressed(Input.Action.Debug))
         {
             World.DrawDebugInfo = !World.DrawDebugInfo;
         }
@@ -253,7 +249,7 @@ public class BattleScene : Scene
         World.Update();
         CheckWinner();
         
-        if (_state == SceneState.BattleActive && IsKeyDown(KeyboardKey.F))
+        if (_state == SceneState.BattleActive && Input.Held(Input.Action.FastForward))
         {
             _skips = 0;
             while (_state == SceneState.BattleActive && (GetTime() - startTime) + ((GetTime() - startTime) / (_skips + 1)) < 0.016)
@@ -286,7 +282,7 @@ public class BattleScene : Scene
         if (_winner != null) return;
 
         Team loser = World.LeftTeam;
-        if (World.LeftTeam.GetHealth() <= 0 || IsKeyDown(KeyboardKey.Minus))
+        if (World.LeftTeam.GetHealth() <= 0 || Input.Pressed(KeyboardKey.Minus))
         {
             _winner = World.RightTeam;
             loser = World.LeftTeam;
@@ -366,6 +362,20 @@ public class BattleScene : Scene
         {
             World.Camera.Offset -= _cameraShakeDisplacement;
             _cameraShakeDisplacement = Vector2.Zero;
+        }
+    }
+
+    public void AddDialog(DialogBox dialogBox)
+    {
+        _dialogQueue.Add(dialogBox);
+
+        if (_state != SceneState.Dialogue)
+        {
+            Time.TimeScale = 0;
+            _dialogBox = _dialogQueue[0];
+            _dialogBox.Start();
+            _dialogQueue.RemoveAt(0);
+            _state = SceneState.Dialogue;
         }
     }
 }

@@ -83,13 +83,13 @@ public class Team
         //Debug.Assert(!_pathQueue.Contains(navPath));
         if (_pathQueue.Contains(navPath))
         {
-            Console.WriteLine($"{navPath.Requester} double requested a path");
+            GameConsole.WriteLine($"{navPath.Requester} double requested a path");
             return;
         }
         //Debug.Assert(navPath.Requester != "Beetle");
         if (navPath.Start == navPath.Destination)
         {
-            Console.WriteLine($"{navPath.Requester} requested a zero length path.");
+            GameConsole.WriteLine($"{navPath.Requester} requested a zero length path.");
             navPath.Found = true;
             return;
         }
@@ -103,7 +103,7 @@ public class Team
     {
         if (_pathQueue.Remove(navPath))
         {
-            Console.WriteLine($"{navPath.Requester}'s path jumped the queue");
+            GameConsole.WriteLine($"{navPath.Requester}'s path jumped the queue");
         }
         _priorityPathQueue.Add(navPath);
     }
@@ -118,7 +118,7 @@ public class Team
             _priorityPathQueue.RemoveAt(0);
             if (p.Found) // Catch queue duplicates
             {
-                Console.WriteLine($"{p.Requester} requested priority pathing from Team {Name} on a navPath that's already been found.");
+                GameConsole.WriteLine($"{p.Requester} requested priority pathing from Team {Name} on a navPath that's already been found.");
                 continue;
             }
             PathFinder.FindPath(p);
@@ -131,14 +131,14 @@ public class Team
             _pathQueue.RemoveAt(0);
             if (p.Found) // Catch queue duplicates
             {
-                Console.WriteLine($"{p.Requester} requested pathing from Team {Name} on a navPath that's already been found.");
+                GameConsole.WriteLine($"{p.Requester} requested pathing from Team {Name} on a navPath that's already been found.");
                 continue;
             }
             PathFinder.FindPath(p);
         }
         if (i >= max-1)
         {
-            Console.WriteLine($"Max path calc, {i} in {((Raylib.GetTime() - startTime) * 1000):N3}ms, Queue length: {GetQueueLength()}");
+            GameConsole.WriteLine($"Max path calc, {i} in {((Raylib.GetTime() - startTime) * 1000):N3}ms, Queue length: {GetQueueLength()}");
         }
     }
     
@@ -235,10 +235,10 @@ public class Team
                 Beacons[_usingAbility]?.Activate(Raylib.GetScreenToWorld2D(Raylib.GetMousePosition(), World.Camera));
                 _usingAbility = -1;
             }
-            if ((Beacons[0]?.IsReady() ?? false) && Raylib.IsKeyPressed(KeyboardKey.One))   _usingAbility = 0;
-            if ((Beacons[1]?.IsReady() ?? false) && Raylib.IsKeyPressed(KeyboardKey.Two))   _usingAbility = 1;
-            if ((Beacons[2]?.IsReady() ?? false) && Raylib.IsKeyPressed(KeyboardKey.Three)) _usingAbility = 2;
-            if ((Beacons[3]?.IsReady() ?? false) && Raylib.IsKeyPressed(KeyboardKey.Four))  _usingAbility = 3;
+            if ((Beacons[0]?.IsReady() ?? false) && Input.Pressed(Input.Action.Use1)) _usingAbility = 0;
+            if ((Beacons[1]?.IsReady() ?? false) && Input.Pressed(Input.Action.Use2)) _usingAbility = 1;
+            if ((Beacons[2]?.IsReady() ?? false) && Input.Pressed(Input.Action.Use3)) _usingAbility = 2;
+            if ((Beacons[3]?.IsReady() ?? false) && Input.Pressed(Input.Action.Use4)) _usingAbility = 3;
 
             int posX = IsRightSide ? Screen.HCenter + 450  : Screen.HCenter - 450;
             for (int i = 0; i < BeaconCap; i++)
@@ -264,7 +264,7 @@ public class Team
     public void Draw()
     {
         // fear/hate debug
-        if (Raylib.IsKeyDown(KeyboardKey.H))
+        if (Input.Held(KeyboardKey.H))
         {
             Raylib.BeginMode2D(World.Camera);
             for (int x = 0; x < World.BoardWidth; x++)

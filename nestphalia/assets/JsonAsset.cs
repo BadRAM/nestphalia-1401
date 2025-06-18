@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -10,15 +11,6 @@ public abstract class JsonAsset
     
     public JsonAsset(JObject jObject)
     {
-        if (!jObject.ContainsKey("id"))
-        {
-            Console.WriteLine("Tried to load a jsonAsset with no id!");
-            foreach (KeyValuePair<string,JToken?> keyValuePair in jObject)
-            {
-                Console.WriteLine($"    {keyValuePair.Key}: {keyValuePair.Value}");
-            }
-        }
-        // Debug.Assert(jObject.ContainsKey("id"));
-        ID = jObject.Value<string?>("id") ?? "error_no_id";
+        ID = jObject.Value<string?>("id") ?? throw new Exception("Tried to load a jsonAsset with no ID!");
     }
 }

@@ -103,6 +103,7 @@ Programming todo:
 - Fix path preview
 - Screen edge scroll (off by default)
 - Migrate old JSON functions to newtonsoft
+- Make project publish trimmable
 
 
 ----- Premature Optimizations -----

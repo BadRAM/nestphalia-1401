@@ -89,7 +89,7 @@ public class CampaignScene : Scene
             _data.Level++;
         }
         
-        if (Raylib.IsKeyPressed(KeyboardKey.Escape))
+        if (Input.Pressed(Input.Action.Exit))
         {
             new MenuScene().Start();
         }
@@ -226,7 +226,7 @@ public class CampaignScene : Scene
                 if (GUI.Button300(-600, i * 40 - 240,
                         Path.GetFileNameWithoutExtension(fortPath), _selectedFort != index))
                 {
-                    Console.WriteLine("Loading " + Path.GetFileName(fortPath));
+                    GameConsole.WriteLine("Loading " + Path.GetFileName(fortPath));
                     _fort = Resources.LoadFort(fortPath);
                     _fort.Name = Path.GetFileNameWithoutExtension(fortPath);
                     _fort.Comment = _fort.FortSummary();

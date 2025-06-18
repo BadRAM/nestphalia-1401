@@ -38,7 +38,7 @@
       "type": "StructureTemplate",
       "name": "Honey Pot",
       "description": "Decoy nest",
-      "texture": "honey",
+      "texture": "honeypot",
       "maxHealth": 75.0,
       "price": 35.0,
       "levelRequirement": 5,

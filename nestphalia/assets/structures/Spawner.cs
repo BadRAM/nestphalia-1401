@@ -1,6 +1,4 @@
-using System.Net.NetworkInformation;
 using Newtonsoft.Json.Linq;
-using Raylib_cs;
 
 namespace nestphalia;
 
@@ -60,7 +58,7 @@ public class Spawner : Structure
         {
             if (!_navPath.Found)
             {
-                Console.WriteLine($"Creating a minion without a path, PathQueueLength: {Team.GetQueueLength()}");
+                GameConsole.WriteLine($"Creating a minion without a path, PathQueueLength: {Team.GetQueueLength()}");
             }
             _template.Minion.Instantiate(Team, position.XYZ(), _navPath.Clone(_template.Minion.Name));
             _spawnsRemaining--;
@@ -136,7 +134,7 @@ public class Spawner : Structure
         
         if (targets.Count == 0)
         {
-            Console.WriteLine("NO TARGETS!");
+            GameConsole.WriteLine("NO TARGETS!");
             return;
         }
         
