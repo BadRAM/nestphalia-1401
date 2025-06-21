@@ -29,7 +29,7 @@ You start in the bottom corner of blue. Forts have paths to neighboring forts th
 Tutorial Plan:
 ==============
  - Tell the player to go to battle with a premade fort that is guaranteed to lose, so that the player understands how a battle works before designing their first fort.
- - Provide a Bugspedia (Tome of bug lore? Nestpedia?) with explanations of more complex subjects like hate, fear, and 
+ - Provide a Bugspedia (Tome of bug lore? Nestpedia?) with explanations of more complex subjects like hate, fear, and wave scaling, as well as stat cards for bugs
 
 
 Screen Hierarchy:
@@ -101,3 +101,30 @@ Playtest Notes
 - tell the player that nests are important
 - Tell the player what rmb does in editor
 - Corpses/bloodstains to indicate fear
+
+New Level Format Requirements
+=============================
+
+- ID
+- Name
+- Description
+- Location on world map
+- Connected level IDs
+- Reward amount
+- World Grid size
+- Background tiles
+- Structures for entire world
+- Start and finish dialogue
+- Enemy color
+
+
+- Custom editor
+
+Event Triggers
+  ----------
+- after an amount of time
+- when a hitpoint threshold is crossed
+- when a specific set of structures are destroyed
+- at the start of the battle
+- just before the battle end screen is shown
+- when a special minion passes a HP threshold

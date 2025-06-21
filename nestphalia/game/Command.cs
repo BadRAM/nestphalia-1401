@@ -24,17 +24,21 @@ public static class Command
         if (words.Count == 0) return "";
         string command = words[0].ToUpper();
         words.RemoveAt(0);
-
+        if (!_commands.ContainsKey(command)) return $"Command not recognized";
+        
         try
         {
-            if (_commands.ContainsKey(command)) return _commands[command].Invoke(string.Join(" ", words));
+            return _commands[command].Invoke(string.Join(" ", words));
         }
         catch (Exception e)
         {
+            #if DEBUG
             GameConsole.WriteLine(e.ToString());
+            #else
+            GameConsole.WriteLine(e.Message);
+            #endif
+            return "";
         }
-        
-        return $"Command not recognized";
     }
     
     [AttributeUsage(AttributeTargets.Method)]
@@ -113,7 +117,7 @@ public static class Command
     }
     
     [IsCommand("KILL", "Kill minions", 
-        "Usage: KILL [minionID]\n" +
+        "Usage: KILL [minionID] [team]\n" +
         " [minionID] if not included, kills all minions")]
     public static string Kill(string args)
     {
@@ -161,21 +165,52 @@ public static class Command
         return "";
     }
     
-    [IsCommand("DEMOLISH", "Destroy building at position", "")]
+    [IsCommand("DEMOLISH", "Destroy structure(s)", 
+        "Usage: DEMOLISH [x] [y] [width] [height]\n" +
+        " [x], [y] can be supplied \".\" to use mouse position\n" +
+        " [width], [height] default to 1")]
     public static string Demolish(string args)
     {
         List<string> words = new List<string>(args.Split(" "));
-        int x = words[0] == "~" ? World.GetMouseTilePos().X : int.Parse(words[0]);
-        int y = words[0] == "~" ? World.GetMouseTilePos().Y : int.Parse(words[1]);
-        
-        World.GetTile(x,y)?.Destroy();
+        int startX = words[0] == "." ? World.GetMouseTilePos().X : int.Parse(words[0]);
+        int startY = words[1] == "." ? World.GetMouseTilePos().Y : int.Parse(words[1]);
+        int w = 1;
+        if (words.Count >= 3) int.TryParse(words[2], out w);
+        int h = 1;
+        if (words.Count >= 4) int.TryParse(words[3], out h);
+
+        for (int x = startX; x < startX+w; x++)
+        for (int y = startY; y < startY+h; y++)
+        {
+            World.GetTile(x,y)?.Destroy();
+        }
         
         return "";
     }
 
-    [IsCommand("BUILD", "", "")]
+    [IsCommand("BUILD", "Create structure(s)", 
+        "Usage: BUILD [structure_id] [team] [x] [y] [width] [height]\n" +
+        " [team] must be LEFT or RIGHT\n" +
+        " [x], [y] can be supplied \".\" to use mouse position\n" +
+        " [width], [height] default to 1")]
     public static string Build(string args)
     {
+        List<string> words = new List<string>(args.Split(" "));
+        StructureTemplate structure = Assets.GetStructureByID(words[0]) ?? throw new Exception("Invalid structure ID!");
+        Team team = words[1].ToLower() == "left" ? World.LeftTeam : World.RightTeam;
+        int startX = words[2] == "." ? World.GetMouseTilePos().X : int.Parse(words[2]);
+        int startY = words[3] == "." ? World.GetMouseTilePos().Y : int.Parse(words[3]);
+        int w = 1;
+        if (words.Count >= 5) int.TryParse(words[4], out w);
+        int h = 1;
+        if (words.Count >= 6) int.TryParse(words[5], out h);
+
+        for (int x = startX; x < startX+w; x++)
+        for (int y = startY; y < startY+h; y++)
+        {
+            World.SetTile(structure, team, x, y);
+        }
+        
         return "";
     }
 }

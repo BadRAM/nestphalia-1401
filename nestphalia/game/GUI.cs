@@ -159,6 +159,41 @@ public static class GUI
         return text;
     }
     
+    public static string BigTextCopyPad(int x, int y, string label, string text, bool guiSpace = true)
+    {
+        if (guiSpace)
+        {
+            x += Screen.HCenter;
+            y += Screen.VCenter;
+        }
+        
+        bool hover = CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(x, y, 300, 40));
+
+        if (hover)
+        {
+            _cursorLook = MouseCursor.PointingHand;
+            
+            DrawRectangle(Screen.HCenter - 600, Screen.VCenter - 300, 600, 600, ColorAlpha(Color.Black, 0.5f));
+            DrawTextLeft(-598, -298, text);
+
+            if (IsMouseButtonPressed(MouseButton.Left))
+            {
+                text = GetClipboardText_();
+            }
+
+            if (IsMouseButtonPressed(MouseButton.Right))
+            {
+                SetClipboardText(text);
+            }
+        }
+        
+        Rectangle subSprite = new Rectangle(0, !hover ? 0 : 40, 300, 40);
+        DrawTextureRec(_buttonWideTexture, subSprite, new Vector2(x,y), Color.White);
+        DrawTextCentered(x+150, y+20, label, guiSpace:false);
+        
+        return text;
+    }
+    
     public static void UpdateCursor()
     {
         SetMouseCursor(_cursorLook);

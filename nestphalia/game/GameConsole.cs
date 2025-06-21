@@ -71,9 +71,9 @@ public static class GameConsole
             
             GUI.DrawTextLeft(4, y, "> " + _input, guiSpace:false);
             int i = LogHistory.Count-1;
-            while (y > -12 && i >= 0)
+            while (y > -14 && i >= 0)
             {
-                y -= 12;
+                y -= 14;
                 GUI.DrawTextLeft(4, y, LogHistory[i], guiSpace:false);
                 i--;
             }
