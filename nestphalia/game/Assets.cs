@@ -9,8 +9,11 @@ namespace nestphalia;
 // more consistent to access these functions through Resources.
 public static class Assets
 {
-    public static List<FloorTileTemplate> FloorTiles = new List<FloorTileTemplate>();
-    public static List<StructureTemplate> Structures = new List<StructureTemplate>();
+    private static Dictionary<string, FloorTileTemplate> _floorTiles = new Dictionary<string, FloorTileTemplate>();
+    public static FloorTileTemplate BlankFloor;
+    private static Dictionary<string, StructureTemplate> _structures = new Dictionary<string, StructureTemplate>();
+    private static Dictionary<string, Level> _levels = new Dictionary<string, Level>();
+
 
     // The lookup table must be used instead of reflection, so that static analysis knows not to trim the JsonAsset
     // constructor when publishing with trimmed assemblies. it also provides serializer stability if type names change internally.
@@ -58,9 +61,14 @@ public static class Assets
     
     public static void Load()
     {
-        FloorTiles.Add(new FloorTileTemplate("Floor1", Resources.GetTextureByName("floor1")));
-        FloorTiles.Add(new FloorTileTemplate("Floor2", Resources.GetTextureByName("floor2")));
-        FloorTiles.Add(new FloorTileTemplate("Blank", Resources.GetTextureByName("clear")));
+        _floorTiles.Clear();
+        _structures.Clear();
+        _levels.Clear();
+        
+        _floorTiles.Add("floor_1", new FloorTileTemplate("floor_1", Resources.GetTextureByName("floor1")));
+        _floorTiles.Add("floor_2", new FloorTileTemplate("floor_2", Resources.GetTextureByName("floor2")));
+        _floorTiles.Add("floor_empty", new FloorTileTemplate("floor_empty", Resources.GetTextureByName("clear")));
+        BlankFloor = _floorTiles["floor_empty"];
         
         foreach (string path in Directory.GetFiles(Directory.GetCurrentDirectory() + "/resources/content"))
         {
@@ -69,21 +77,49 @@ public static class Assets
                 JObject content = JObject.Parse(File.ReadAllText(path));
                 foreach (JObject structure in content.Value<JArray>("structures"))
                 {
-                    Structures.Add(LoadJsonAsset<StructureTemplate>(structure));
+                    StructureTemplate t = LoadJsonAsset<StructureTemplate>(structure);
+                    _structures.Add(t.ID, t);
                 }
+            }
+        }
+        
+        foreach (string path in Directory.GetFiles(Directory.GetCurrentDirectory() + "/resources/levels"))
+        {
+            if (Path.GetExtension(path).ToLower() == ".json")
+            {
+                Level level = new Level(File.ReadAllText(path));
+                _levels.Add(level.ID, level);
             }
         }
     }
 
-    public static StructureTemplate? GetStructureByID(string ID)
+    public static StructureTemplate? GetStructureByID(string? id)
     {
-        foreach (StructureTemplate structureTemplate in Structures)
-        {
-            if (structureTemplate.ID == ID)
-            {
-                return structureTemplate;
-            }
-        }
-        return null;
+        return _structures.GetValueOrDefault(id ?? "");
+    }
+
+    public static StructureTemplate[] GetAllStructures()
+    {
+        return _structures.Values.ToArray();
+    }
+
+    public static FloorTileTemplate? GetFloorTileByID(string id)
+    {
+        return _floorTiles.GetValueOrDefault(id ?? "");
+    }
+    
+    public static FloorTileTemplate[] GetAllFloorTiles()
+    {
+        return _floorTiles.Values.ToArray();
+    }
+
+    public static Level GetLevelByID(string id)
+    {
+        return _levels.GetValueOrDefault(id ?? "", _levels["level_arena"]);
+    }
+
+    public static Level[] GetAllLevels()
+    {
+        return _levels.Values.ToArray();
     }
 }

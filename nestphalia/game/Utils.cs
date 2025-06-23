@@ -1,9 +1,48 @@
+using System.Diagnostics;
 using System.Numerics;
+using System.Runtime.InteropServices;
 
 namespace nestphalia;
 
 public static class Utils
 {
+    public static void OpenFolder(string path)
+    {
+        // System.Diagnostics.Process.Start("explorer.exe", Directory.GetCurrentDirectory() + @"\forts");
+        path = Directory.GetCurrentDirectory() + path;
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            using Process fileOpener = new Process();
+            fileOpener.StartInfo.FileName = "explorer";
+            fileOpener.StartInfo.Arguments = path;
+            fileOpener.Start();
+            return;
+        }
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            using Process dbusShowItemsProcess = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = "dbus-send",
+                    Arguments = "--print-reply --dest=org.freedesktop.FileManager1 /org/freedesktop/FileManager1 org.freedesktop.FileManager1.ShowItems array:string:\"file://"+ path +"\" string:\"\"",
+                    UseShellExecute = true
+                }
+            };
+            dbusShowItemsProcess.Start();
+    
+            if (dbusShowItemsProcess.ExitCode == 0)
+            {            
+                // The dbus invocation can fail for a variety of reasons:
+                // - dbus is not available
+                // - no programs implement the service,
+                // - ...
+                return;
+            }
+        }
+    }
+    
     public static float MoveTowards(this float start, float target, float maxDistanceDelta)
     {
         if (Math.Abs(target - start) < maxDistanceDelta)

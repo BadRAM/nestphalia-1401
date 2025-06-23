@@ -10,38 +10,59 @@ public class Level
     public string ID = "";
     public string Name = "";
     public string Description = "";
+    public Color EnemyColor = Color.Red;
     public Int2D Location;
-    public string[] LeadsTo = new string[0];
-    public int Reward;
-    public Int2D WorldSize;
-    public string[,] FloorTiles = new string[0,0];
-    public string[,] Structures = new string[0,0];
+    public string[] LeadsTo = [];
+    public int MoneyReward;
+    public string[] UnlockReward = [];
+    public Int2D PlayerOffset = new Int2D(1,1); // The player fort is offset by this amount.
+    public int PlayerRotation; // The player fort is rotated 90 degrees clockwise this many times
     public string Script = "";
-    public Color EnemyColor;
+    public Int2D WorldSize = new Int2D(World.BoardWidth,World.BoardHeight);
+    public string[,] FloorTiles = new string[World.BoardWidth,World.BoardHeight];
+    public string[,] Structures = new string[World.BoardWidth,World.BoardHeight];
 
-    public Level() { }
-    
-    public Level(JObject jObject)
+    public Level()
     {
-        LoadValues(jObject);
+        for (int x = 0; x < WorldSize.X; x++)
+        for (int y = 0; y < WorldSize.Y; y++)
+        {
+            FloorTiles[x, y] = "floor_1";
+        }
     }
 
-    public void LoadValues(JObject jObject)
+    public Level(string jsonString)
     {
-        ID = jObject.Value<string>("ID") ?? ID;
-        Name = jObject.Value<string>("Name") ?? Name;
-        Description = jObject.Value<string>("Description") ?? Description;
-        Location = jObject.Value<JObject>("Location")?.ToObject<Int2D?>() ?? Location;
-        LeadsTo = jObject.Value<JArray>("LeadsTo")?.ToObject<string[]>() ?? LeadsTo;
-        Reward = jObject.Value<int?>("Reward") ?? Reward;
-        WorldSize = jObject.Value<JObject>("WorldSize")?.ToObject<Int2D?>() ?? WorldSize;
-        FloorTiles = jObject.Value<JArray>("FloorTiles")?.ToObject<string[,]>() ?? FloorTiles;
-        Structures = jObject.Value<JArray>("Structures")?.ToObject<string[,]>() ?? Structures;
-        Script = jObject.Value<string>("Script") ?? Script;
-        EnemyColor = jObject.Value<JObject>("Location")?.ToObject<Color?>() ?? EnemyColor;
+        LoadValues(jsonString);
     }
-    
-    
-    
-    
+
+    public void LoadValues(string jsonString)
+    {
+        JObject j = JObject.Parse(jsonString);
+        
+        ID = j.Value<string>("ID") ?? ID;
+        Name = j.Value<string>("Name") ?? Name;
+        Description = j.Value<string>("Description") ?? Description;
+        EnemyColor = j.Value<JObject>("EnemyColor")?.ToObject<Color?>() ?? EnemyColor;
+        Location = j.Value<JObject>("Location")?.ToObject<Int2D?>() ?? Location;
+        LeadsTo = j.Value<JArray>("LeadsTo")?.ToObject<string[]>() ?? LeadsTo;
+        MoneyReward = j.Value<int?>("MoneyReward") ?? MoneyReward;
+        UnlockReward = j.Value<JArray>("UnlockReward")?.ToObject<string[]>() ?? UnlockReward;
+        PlayerOffset = j.Value<JObject?>("PlayerOffset")?.ToObject<Int2D?>() ?? PlayerOffset;
+        PlayerRotation = j.Value<int?>("PlayerRotation") ?? PlayerRotation;
+        Script = j.Value<string>("Script") ?? Script;
+        WorldSize = j.Value<JObject>("WorldSize")?.ToObject<Int2D?>() ?? WorldSize;
+        FloorTiles = j.Value<JArray>("FloorTiles")?.ToObject<string[,]>() ?? FloorTiles;
+        Structures = j.Value<JArray>("Structures")?.ToObject<string[,]>() ?? Structures;
+    }
+
+    public void LoadToBoard()
+    {
+        for (int x = 0; x < World.BoardWidth; x++)
+        for (int y = 0; y < World.BoardHeight; y++)
+        {
+            World.SetFloorTile(Assets.GetFloorTileByID(FloorTiles[x,y]),x,y);
+            World.SetTile(Assets.GetStructureByID(Structures[x,y]),World.RightTeam,x,y);
+        }
+    }
 }

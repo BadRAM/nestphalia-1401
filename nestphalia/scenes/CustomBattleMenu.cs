@@ -23,8 +23,8 @@ public class CustomBattleMenu : Scene
 
         if (_leftFort  != null) _leftFort  = Resources.LoadFort(_leftFort.Path  + "/" + _leftFort.Name  + ".fort") ?? _leftFort;
         if (_rightFort != null) _rightFort = Resources.LoadFort(_rightFort.Path + "/" + _rightFort.Name + ".fort") ?? _rightFort;
-        _leftFort?.LoadToBoard(false);
-        _rightFort?.LoadToBoard(true);
+        _leftFort?.LoadToBoard(new Int2D(1,1),false);
+        _rightFort?.LoadToBoard(new Int2D(26, 1), true);
         _loadingLeftSide = true;
         _outcomeMessage = "";
         _activeDirectory = "";
@@ -73,10 +73,7 @@ public class CustomBattleMenu : Scene
         GUI.DrawTextLeft(100, -200, _rightFort?.FortSummary() ?? "");
         GUI.DrawTextCentered(0, 220, _outcomeMessage, 24);
         
-        if (GUI.Button300(300, -180, "Open Forts Folder"))
-        {
-            System.Diagnostics.Process.Start("explorer.exe", Directory.GetCurrentDirectory() + @"\forts");
-        }
+        if (GUI.Button300(300, -180, "Open Forts Folder")) Utils.OpenFolder(@"\forts");
         
         if (GUI.Button300(300, -140, $"Deterministic Mode {(_deterministicMode ? "On" : "Off")}"))
         {
@@ -91,7 +88,7 @@ public class CustomBattleMenu : Scene
         if (_leftFort != null && _rightFort != null &&
             GUI.Button300(-150, 260, "Begin!"))
         {
-            new BattleScene().Start(_leftFort, _rightFort, BattleOver, _leftIsPlayer, _rightIsPlayer, _deterministicMode);
+            new BattleScene().Start(Assets.GetLevelByID("level_arena"), _leftFort, _rightFort, BattleOver, _leftIsPlayer, _rightIsPlayer, _deterministicMode);
         }
         
         Raylib.EndDrawing();
@@ -151,14 +148,14 @@ public class CustomBattleMenu : Scene
                         _leftFort = Resources.LoadFort(fortPath.Substring(Directory.GetCurrentDirectory().Length));
                         _leftFort.Name = Path.GetFileNameWithoutExtension(fortPath);
                         _leftFort.Comment = _leftFort.FortSummary();
-                        _leftFort.LoadToBoard(false);
+                        _leftFort.LoadToBoard(new Int2D(1,1),false);
                     }
                     else
                     {
                         _rightFort = Resources.LoadFort(fortPath.Substring(Directory.GetCurrentDirectory().Length));
                         _rightFort.Name = Path.GetFileNameWithoutExtension(fortPath);
                         _rightFort.Comment = _rightFort.FortSummary();
-                        _rightFort.LoadToBoard(true);
+                        _rightFort.LoadToBoard(new Int2D(26, 1), true);
                     }
 
                     _loadingLeftSide = !_loadingLeftSide;

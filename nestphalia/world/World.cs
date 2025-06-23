@@ -4,10 +4,15 @@ using Raylib_cs;
 
 namespace nestphalia;
 
+public class GameWorld
+{
+    public static GameWorld Shared = new GameWorld();
+}
+
 public static class World
 {
-    public const int BoardWidth = 48;
-    public const int BoardHeight = 22;
+    public static int BoardWidth = 48;
+    public static int BoardHeight = 22;
     private static FloorTile[,] _floor = new FloorTile[BoardWidth, BoardHeight];
     private static Structure?[,] _board = new Structure?[BoardWidth, BoardHeight];
     public static List<Minion> Minions = new List<Minion>();
@@ -50,8 +55,7 @@ public static class World
     private static Dictionary<string, EntityTracker> _swEntitiesByID = new Dictionary<string, EntityTracker>();
 #endif
     // private static int _totalCollideChecks;
-    private static string _debugString;
-    
+    private static string _debugString = "";
     
     public static event EventHandler<Int2D> StructureChanged = delegate {};
     
@@ -107,20 +111,20 @@ public static class World
         {
             if (x > 21)
             {
-                _floor[x, y] = Assets.FloorTiles[2].Instantiate(x, y);
+                _floor[x, y] = Assets.BlankFloor.Instantiate(x, y);
             }
             else if (x == 0 || x == 21 || y == 0 || y == 21)
             {
-                _floor[x, y] = Assets.FloorTiles[1].Instantiate(x, y);
+                _floor[x, y] = Assets.GetFloorTileByID("floor_2").Instantiate(x, y);
             }
             else
             {
-                _floor[x,y] = (x%2 != y%2) ? Assets.FloorTiles[0].Instantiate(x,y) : Assets.FloorTiles[1].Instantiate(x,y);
+                _floor[x,y] = (x%2 != y%2) ? Assets.GetFloorTileByID("floor_1").Instantiate(x,y) : Assets.GetFloorTileByID("floor_2").Instantiate(x,y);
             }
             _board[x,y] = null;
         }
         
-        fortToLoad.LoadToBoard(false);
+        fortToLoad.LoadToBoard(new Int2D(1, 1), false);
         LeftTeam.Initialize();
         RightTeam.Initialize();
     }
@@ -135,40 +139,63 @@ public static class World
         for (int x = 0; x < BoardWidth; x++)
         for (int y = 0; y < BoardHeight; y++)
         {
-            _floor[x,y] = (x%2 != y%2) ? Assets.FloorTiles[0].Instantiate(x,y) : Assets.FloorTiles[1].Instantiate(x,y);
+            _floor[x,y] = (x%2 != y%2) ? Assets.GetFloorTileByID("floor_1").Instantiate(x,y) : Assets.GetFloorTileByID("floor_2").Instantiate(x,y);
             _board[x,y] = null;
         }
     }
     
-    public static void InitializeBattle(Fort leftFort, Fort rightFort, bool leftIsPlayer, bool rightIsPlayer, bool deterministic)
+    public static void InitializeBattle(Level level, Fort leftFort, Fort? rightFort, bool leftIsPlayer, bool rightIsPlayer, bool deterministic)
     {
         Initialize();
         
+        // TODO: let levels override seed
+        
         _random = deterministic ? new Random(123) : new Random();
+        
+        // TODO: Allow levels to change world size
+
+        // BoardWidth = level.WorldSize.X;
+        // BoardHeight = level.WorldSize.Y;
         
         // set up floor tile checkerboard
         for (int x = 0; x < BoardWidth; x++)
         for (int y = 0; y < BoardHeight; y++)
         {
-            _floor[x,y] = (x%2 != y%2) ? Assets.FloorTiles[0].Instantiate(x,y) : Assets.FloorTiles[1].Instantiate(x,y);
+            _floor[x,y] = (x%2 != y%2) ? Assets.GetFloorTileByID("floor_1").Instantiate(x,y) : Assets.GetFloorTileByID("floor_2").Instantiate(x,y);
             _board[x,y] = null;
         }
         
+        level.LoadToBoard();
+        
         // Load forts to board
-        leftFort.LoadToBoard(false);
-        rightFort.LoadToBoard(true);
+        leftFort.LoadToBoard(new Int2D(1,1), false);
+        rightFort?.LoadToBoard(new Int2D(26, 1), true);
         
         // Tell teams they can generate fear and hate
         LeftTeam.Name = leftFort.Name;
         LeftTeam.IsPlayerControlled = leftIsPlayer;
         LeftTeam.Initialize();
-        RightTeam.Name = rightFort.Name;
+        RightTeam.Name = level.Name;
         RightTeam.IsPlayerControlled = rightIsPlayer;
+        RightTeam.Color = level.EnemyColor;
+        GameConsole.WriteLine($"Rightteam color set to: {RightTeam.Color.ToString()}");
         RightTeam.Initialize();
         
         Determinator.Start(deterministic);
 
         _battleStarted = true;
+    }
+
+    public static void InitializeLevelEditor(Level level)
+    {
+        Initialize();
+        
+        for (int x = 0; x < BoardWidth; x++)
+        for (int y = 0; y < BoardHeight; y++)
+        {
+            _floor[x, y] = Assets.GetFloorTileByID(level.FloorTiles[x,y])?.Instantiate(x, y) ?? Assets.BlankFloor.Instantiate(x,y);
+            _board[x, y] = Assets.GetStructureByID(level.Structures[x, y])?.Instantiate(RightTeam, x, y);
+        }
     }
     
     public static void Update()
@@ -673,5 +700,15 @@ public static class World
     public static bool IsBattleOver()
     {
         return _battleOver;
+    }
+
+    public static void SetFloorTile(FloorTileTemplate tile, int x, int y)
+    {
+        _floor[x, y] = tile.Instantiate(x,y);
+    }
+
+    public static FloorTile GetFloorTile(int x, int y)
+    {
+        return _floor[x, y];
     }
 }

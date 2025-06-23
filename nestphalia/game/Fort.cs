@@ -1,3 +1,4 @@
+using System.Drawing;
 using System.Text.Json.Serialization;
 
 namespace nestphalia;
@@ -6,10 +7,10 @@ public class Fort
 {
     [JsonInclude] public string Name = "Your Fort";
     [JsonInclude] public string Comment = "It's a fort!";
-    [JsonInclude] public string[] Board = new string[20 * 20];
+    [JsonInclude] public string[] Board = new string[20 * 20]; // TODO: Make this a dimensional array, currently blocked by serialization strategy. New serializer could fix.
     [JsonIgnore] public string Path = "";
     [JsonIgnore] public double TotalCost;
-
+    
     public Fort(string name, string path)
     {
         Name = name;
@@ -19,18 +20,18 @@ public class Fort
     // This constructor is for the json deserializer, please use the other one for creating new forts.
     public Fort() { }
     
-    public void LoadToBoard(bool rightSide)
+    public void LoadToBoard(Int2D position, bool flip)
     {
         for (int x = 0; x < 20; x++)
         for (int y = 0; y < 20; y++)
         {
-            if (rightSide)
+            if (flip)
             {
-                World.SetTile(Assets.GetStructureByID(Board[x+y*20]), World.RightTeam, 46-x,y+1);
+                World.SetTile(Assets.GetStructureByID(Board[x+y*20]), World.RightTeam, (20 + position.X) - x,y + position.Y);
             }
             else
             {
-                World.SetTile(Assets.GetStructureByID(Board[x+y*20]), World.LeftTeam, x+1,y+1);
+                World.SetTile(Assets.GetStructureByID(Board[x+y*20]), World.LeftTeam, x + position.X,y + position.Y);
             }
         }
     }

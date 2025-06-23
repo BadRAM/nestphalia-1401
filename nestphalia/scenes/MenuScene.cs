@@ -40,6 +40,7 @@ public class MenuScene : Scene
             if (Settings.RestartNeeded) DrawTextLeft(155, 92, "Restart to apply changes");
             
             if (Button300(200, -40, "Level Editor")) new LevelEditorScene().Start();
+            if (Button300(200, -40, "Level Editor")) new LevelEditorScene().Start();
 
         
             DrawTextLeft(-590, 260, "By BadRAM and rosettedotnet\nWith music from the mod archive");

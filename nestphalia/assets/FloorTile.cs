@@ -5,16 +5,15 @@ namespace nestphalia;
 
 public class FloorTileTemplate
 {
-    public string Name;
+    public string ID;
     public Texture2D Texture;
     
-    public FloorTileTemplate(string name, Texture2D texture)
+    public FloorTileTemplate(string id, Texture2D texture)
     {
-        Name = name;
+        ID = id;
         Texture = texture;
     }
     
-    // gotta do it this way so child types can be instantiated the same way as parent
     public virtual FloorTile Instantiate(int x, int y)
     {
         return new FloorTile(this, x, y);

@@ -8,8 +8,8 @@ namespace nestphalia;
 
 public class BattleScene : Scene
 {
-    private Fort _leftFort;
-    private Fort _rightFort;
+    // private Fort _leftFort;
+    // private Fort _rightFort;
     private Team? _winner;
     private int _skips;
     private bool _pathFinderDebug;
@@ -47,11 +47,11 @@ public class BattleScene : Scene
         PausedSettings
     }
     
-    public void Start(Fort leftFort, Fort rightFort, Action<Team?> battleOverCallback, bool leftIsPlayer = true, bool rightIsPlayer = false, bool deterministic = false)
+    public void Start(Level level, Fort leftFort, Fort? rightFort, Action<Team?> battleOverCallback, bool leftIsPlayer = true, bool rightIsPlayer = false, bool deterministic = false)
     {
-        _leftFort = leftFort;
-        _rightFort = rightFort;
-        Debug.Assert(_leftFort != null && _rightFort != null);
+        // _leftFort = leftFort;
+        // _rightFort = rightFort;
+        // Debug.Assert(_leftFort != null && _rightFort != null);
         
         _winner = null;
         _state = SceneState.BattleActive;
@@ -61,7 +61,7 @@ public class BattleScene : Scene
         
         Time.TimeScale = 1;
         Program.CurrentScene = this;
-        World.InitializeBattle(leftFort, rightFort, leftIsPlayer, rightIsPlayer, deterministic);
+        World.InitializeBattle(level, leftFort, rightFort, leftIsPlayer, rightIsPlayer, deterministic);
         World.Camera.Zoom = (float)_zoomLevels[(int)_zoomLevel];
         _log += $"first random: {World.RandomInt(100)}\n";
         

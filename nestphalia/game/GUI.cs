@@ -117,6 +117,58 @@ public static class GUI
         }
         return false;
     }
+    
+    public static bool ButtonImage(int x, int y, Texture2D image, bool selected = false, bool guiSpace = true)
+    {
+        if (guiSpace)
+        {
+            x += Screen.HCenter;
+            y += Screen.VCenter;
+        }
+        
+        bool hover = CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(x, y, image.Width, image.Height));
+
+        if (selected) DrawRectangle(x-2, y-2, image.Width + 4, image.Height + 4, Color.White);
+        DrawTexture(image, x, y, Color.White);
+
+        if (hover)
+        {
+            _cursorLook = MouseCursor.PointingHand;
+            if (IsMouseButtonReleased(MouseButton.Left))
+            {
+                _buttonClickSFX.Play();
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    public static bool TileButton(int x, int y, Texture2D image, bool selected = false, bool guiSpace = true)
+    {
+        if (guiSpace)
+        {
+            x += Screen.HCenter;
+            y += Screen.VCenter;
+        }
+        
+        bool hover = CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(x, y, 24, 24));
+
+        if (selected) DrawRectangle(x-2, y-2, 28, 28, Color.White);
+        DrawTexture(image, x, y+24 - image.Height, Color.White);
+
+        if (hover)
+        {
+            _cursorLook = MouseCursor.PointingHand;
+            if (IsMouseButtonReleased(MouseButton.Left))
+            {
+                _buttonClickSFX.Play();
+                return true;
+            }
+        }
+        
+        return false;
+    }
 
     public static string TextEntry(int x, int y, string text, bool guiSpace = true)
     {
@@ -173,8 +225,8 @@ public static class GUI
         {
             _cursorLook = MouseCursor.PointingHand;
             
-            DrawRectangle(Screen.HCenter - 600, Screen.VCenter - 300, 600, 600, ColorAlpha(Color.Black, 0.5f));
-            DrawTextLeft(-598, -298, text);
+            DrawRectangle(Screen.HCenter, Screen.VCenter - 300, 600, 600, ColorAlpha(Color.Black, 0.5f));
+            DrawTextLeft(2, -298, text);
 
             if (IsMouseButtonPressed(MouseButton.Left))
             {

@@ -11,6 +11,11 @@
         <PublishTrimmed>true</PublishTrimmed>
         <PathMap>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)'))=./</PathMap>
     </PropertyGroup>
+    
+    <PropertyGroup Condition="'$(Configuration)'=='Release'">
+        <DebugSymbols>False</DebugSymbols>
+        <DebugType>None</DebugType>
+    </PropertyGroup>
 
     <ItemGroup>
         <None Update="resources/**/*">
@@ -38,6 +43,10 @@
     
     <ItemGroup>
       <ProjectReference Include="..\WrenSharp\WrenSharp\WrenSharp.csproj" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <Folder Include="resources\levels\" />
     </ItemGroup>
 
 </Project>

@@ -264,7 +264,7 @@ public partial class Minion : ISprite
         source.X = size * frame;
         Raylib.DrawTextureRec(Template.Texture, source, pos, Color.White);
         source.Y += size;
-        Raylib.DrawTextureRec(Template.Texture, source, pos, _tintOverride ?? Team.UnitTint);
+        Raylib.DrawTextureRec(Template.Texture, source, pos, _tintOverride ?? Team.Color);
         if (Position.Z + DrawOffset.Z > 0)
         {
             pos = new Vector2(Position.X - Template.ShadowTexture.Width / 2f, Position.Y - Template.ShadowTexture.Height / 2f) + DrawOffset.XY();

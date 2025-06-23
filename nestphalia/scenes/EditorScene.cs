@@ -9,6 +9,7 @@ public class EditorScene : Scene
 {
     private Action _startPrevScene;
     private CampaignSaveData? _data;
+    private List<StructureTemplate> _buildableStructures = new List<StructureTemplate>();
     private StructureTemplate? _brush;
     private EditorTool _toolActive;
     private Fort _fort;
@@ -56,25 +57,23 @@ public class EditorScene : Scene
         _newUtil = false;
         _newTower = false;
         _newNest = false;
+        
         if (!_sandboxMode)
         {
-            foreach (StructureTemplate template in Assets.Structures)
+            foreach (string s in _data.UnlockedStructures)
             {
-                if (template.LevelRequirement == _data.Level)
-                {
-                    switch (template.Class)
-                    {
-                        case StructureTemplate.StructureClass.Utility:
-                            _newUtil = true;
-                            break;
-                        case StructureTemplate.StructureClass.Tower:
-                            _newTower = true;
-                            break;
-                        case StructureTemplate.StructureClass.Nest:
-                            _newNest = true;
-                            break;
-                    }
-                }
+                _buildableStructures.Add(Assets.GetStructureByID(s));
+            }
+            
+            _newUtil = _data.NewUtil;
+            _newTower = _data.NewTower;
+            _newNest = _data.NewNest;
+        }
+        else
+        {
+            foreach (StructureTemplate s in Assets.GetAllStructures())
+            {
+                _buildableStructures.Add(s);
             }
         }
     }
@@ -205,9 +204,9 @@ public class EditorScene : Scene
     private void StructureList()
     {
         int y = 0;
-        for (int i = 0; i < Assets.Structures.Count; i++)
+        for (int i = 0; i < _buildableStructures.Count; i++)
         {
-            StructureTemplate s = Assets.Structures[i];
+            StructureTemplate s = _buildableStructures[i];
             if ((!_sandboxMode && s.LevelRequirement > _data.Level) || s.Class != _structureClassSelected) continue;
             string label = ((!_sandboxMode && s.LevelRequirement == _data.Level) ? "NEW! " : "") + s.Name +
                            " - $" + s.Price;

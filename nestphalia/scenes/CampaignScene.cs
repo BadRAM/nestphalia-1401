@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Numerics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -10,7 +11,11 @@ public class CampaignSaveData
     [JsonInclude] public double Money = 2000;
     [JsonInclude] public double Battles;
     [JsonInclude] public int Level;
-    
+    [JsonInclude] public List<string> UnlockedStructures;
+    [JsonInclude] public bool NewUtil = false;
+    [JsonInclude] public bool NewTower = false;
+    [JsonInclude] public bool NewNest = false;
+
     public void Save()
     {
         string jsonString = JsonSerializer.Serialize(this, SourceGenerationContext.Default.CampaignSaveData);
@@ -36,13 +41,14 @@ public class CampaignScene : Scene
     private int _selectedFort = -1;
     private Fort? _fort;
     private string _fortValidityMessage = "";
-    private int _selectedLevel = -1;
+    private Level? _selectedLevel;
     private string _outcomeText = "";
     private string _activeDirectory = "";
     private string[] _directories;
     private string[] _fortFiles;
     private int _fortListPage = 1;
     private double _prize;
+    private List<Level> _levels = new List<Level>();
 
     public CampaignScene()
     {
@@ -59,7 +65,7 @@ public class CampaignScene : Scene
 
     public void Start()
     {
-        _selectedLevel = -1;
+        // _selectedLevel = null;
         _selectedFort = -1;
         _prize = 0;
         Program.CurrentScene = this;
@@ -68,6 +74,7 @@ public class CampaignScene : Scene
         Resources.PlayMusicByName("hook_-_paranoya");
         _directories = Directory.GetDirectories(Directory.GetCurrentDirectory() + "/forts/Campaign/" + _activeDirectory);
         _fortFiles = Directory.GetFiles(Directory.GetCurrentDirectory() + "/forts/Campaign/" + _activeDirectory);
+        _levels = new List<Level>(Assets.GetAllLevels());
     }
     
     public override void Update()
@@ -103,45 +110,50 @@ public class CampaignScene : Scene
         GUI.DrawTextLeft(-200, -290, $"Bug Dollars: ${_data.Money}");
         
         ListForts();
-        
-        if (_data.Level >= 14 && GUI.Button300(300, -300, Resources.CampaignLevels[14].Name)) SelectOpponent(14);
-        if (_data.Level >= 13 && GUI.Button300(300, -260, Resources.CampaignLevels[13].Name)) SelectOpponent(13);
-        if (_data.Level >= 12 && GUI.Button300(300, -220, Resources.CampaignLevels[12].Name)) SelectOpponent(12);
-        if (_data.Level >= 11 && GUI.Button300(300, -180, Resources.CampaignLevels[11].Name)) SelectOpponent(11);
-        if (_data.Level >= 10 && GUI.Button300(300, -140, Resources.CampaignLevels[10].Name)) SelectOpponent(10);
-        if (_data.Level >=  9 && GUI.Button300(300, -100, Resources.CampaignLevels[ 9].Name)) SelectOpponent( 9);
-        if (_data.Level >=  8 && GUI.Button300(300,  -60, Resources.CampaignLevels[ 8].Name)) SelectOpponent( 8);
-        if (_data.Level >=  7 && GUI.Button300(300,  -20, Resources.CampaignLevels[ 7].Name)) SelectOpponent( 7);
-        if (_data.Level >=  6 && GUI.Button300(300,   20, Resources.CampaignLevels[ 6].Name)) SelectOpponent( 6);
-        if (_data.Level >=  5 && GUI.Button300(300,   60, Resources.CampaignLevels[ 5].Name)) SelectOpponent( 5);
-        if (_data.Level >=  4 && GUI.Button300(300,  100, Resources.CampaignLevels[ 4].Name)) SelectOpponent( 4);
-        if (_data.Level >=  3 && GUI.Button300(300,  140, Resources.CampaignLevels[ 3].Name)) SelectOpponent( 3);
-        if (_data.Level >=  2 && GUI.Button300(300,  180, Resources.CampaignLevels[ 2].Name)) SelectOpponent( 2);
-        if (_data.Level >=  1 && GUI.Button300(300,  220, Resources.CampaignLevels[ 1].Name)) SelectOpponent( 1);
-        if (_data.Level >=  0 && GUI.Button300(300,  260, Resources.CampaignLevels[ 0].Name)) SelectOpponent( 0);
 
-        if (_selectedLevel != -1)
+        for (int i = 0; i < _levels.Count; i++)
+        {
+            if (GUI.Button300(300, -300 + i*40, _levels[i].Name)) SelectOpponent(_levels[i]);
+        }
+        
+        // if (_data.Level >= 14 && GUI.Button300(300, -300, Resources.CampaignLevels[14].Name)) SelectOpponent(14);
+        // if (_data.Level >= 13 && GUI.Button300(300, -260, Resources.CampaignLevels[13].Name)) SelectOpponent(13);
+        // if (_data.Level >= 12 && GUI.Button300(300, -220, Resources.CampaignLevels[12].Name)) SelectOpponent(12);
+        // if (_data.Level >= 11 && GUI.Button300(300, -180, Resources.CampaignLevels[11].Name)) SelectOpponent(11);
+        // if (_data.Level >= 10 && GUI.Button300(300, -140, Resources.CampaignLevels[10].Name)) SelectOpponent(10);
+        // if (_data.Level >=  9 && GUI.Button300(300, -100, Resources.CampaignLevels[ 9].Name)) SelectOpponent( 9);
+        // if (_data.Level >=  8 && GUI.Button300(300,  -60, Resources.CampaignLevels[ 8].Name)) SelectOpponent( 8);
+        // if (_data.Level >=  7 && GUI.Button300(300,  -20, Resources.CampaignLevels[ 7].Name)) SelectOpponent( 7);
+        // if (_data.Level >=  6 && GUI.Button300(300,   20, Resources.CampaignLevels[ 6].Name)) SelectOpponent( 6);
+        // if (_data.Level >=  5 && GUI.Button300(300,   60, Resources.CampaignLevels[ 5].Name)) SelectOpponent( 5);
+        // if (_data.Level >=  4 && GUI.Button300(300,  100, Resources.CampaignLevels[ 4].Name)) SelectOpponent( 4);
+        // if (_data.Level >=  3 && GUI.Button300(300,  140, Resources.CampaignLevels[ 3].Name)) SelectOpponent( 3);
+        // if (_data.Level >=  2 && GUI.Button300(300,  180, Resources.CampaignLevels[ 2].Name)) SelectOpponent( 2);
+        // if (_data.Level >=  1 && GUI.Button300(300,  220, Resources.CampaignLevels[ 1].Name)) SelectOpponent( 1);
+        // if (_data.Level >=  0 && GUI.Button300(300,  260, Resources.CampaignLevels[ 0].Name)) SelectOpponent( 0);
+
+        if (_selectedLevel != null)
         {
             if (_selectedFort != -1)
             {
                 if (_fortValidityMessage == "")
                 {
-                    GUI.DrawTextLeft(-140, -60, $"{Resources.CampaignLevels[_selectedLevel].Name}\nFort cost: {_fort!.TotalCost} \nPrize: {_prize}");
-                    if (_data.Money >= _selectedLevel * 250 && GUI.Button300(-150, 20, "To Battle!"))
+                    GUI.DrawTextLeft(-140, -60, $"{_selectedLevel.Name}\nFort cost: {_fort!.TotalCost} \nPrize: {_prize}");
+                    if (GUI.Button300(-150, 20, "To Battle!"))
                     {
                         _data.Money -= _fort.TotalCost;
-                        new BattleScene().Start(_fort, Resources.CampaignLevels[_selectedLevel], BattleOver);
+                        new BattleScene().Start(_selectedLevel, _fort, null, BattleOver);
                     }
                 }
                 else
                 {
-                    GUI.DrawTextLeft(-140, -60, $"{Resources.CampaignLevels[_selectedLevel].Name}\nFort cost: {_fort!.TotalCost} \nPrize: {_prize}\n{_fortValidityMessage}");
+                    GUI.DrawTextLeft(-140, -60, $"{_selectedLevel.Name}\nFort cost: {_fort!.TotalCost} \nPrize: {_prize}\n{_fortValidityMessage}");
                     GUI.Button300(-150, 20, "To Battle!", false);
                 }
             }
             else
             {
-                GUI.DrawTextLeft(-140, -60, $"{Resources.CampaignLevels[_selectedLevel].Name}\nNo fort design selected! \nPrize: {_prize}");
+                GUI.DrawTextLeft(-140, -60, $"{_selectedLevel.Name}\nNo fort design selected! \nPrize: {_prize}");
                 GUI.Button300(-150, 20, "To Battle!", false);
             }
         }
@@ -161,17 +173,17 @@ public class CampaignScene : Scene
         _data.Battles++;
         if (winner?.IsPlayerControlled ?? false)
         {
-            _outcomeText = $"You destroyed {Resources.CampaignLevels[_selectedLevel].Name}!\n${_prize} prize earned.";
+            _outcomeText = $"You destroyed {_selectedLevel!.Name}!\n${_prize} prize earned.";
             _data.Money += _prize;
-            if (_data.Level == _selectedLevel)
-            {
-                _data.Level++;
-                _outcomeText += $"\nNew level and structure unlocked!";
-                if (_data.Level == 15)
-                {
-                    _outcomeText = "The capitol has fallen, you are the new bug emperor! \nCongratulations!";
-                }
-            }
+            // if (_data.Level == _selectedLevel)
+            // {
+            //     _data.Level++;
+            //     _outcomeText += $"\nNew level and structure unlocked!";
+            //     if (_data.Level == 15)
+            //     {
+            //         _outcomeText = "The capitol has fallen, you are the new bug emperor! \nCongratulations!";
+            //     }
+            // }
         }
         else
         {
@@ -247,10 +259,10 @@ public class CampaignScene : Scene
         }
     }
 
-    private void SelectOpponent(int select)
+    private void SelectOpponent(Level select)
     {
         _selectedLevel = select;
-        Resources.CampaignLevels[_selectedLevel].UpdateCost();
-        _prize = Math.Floor(Resources.CampaignLevels[_selectedLevel].TotalCost * 1.5) + (_selectedLevel == 0 ? 2000 : 0);
+        // _selectedLevel.UpdateCost();
+        _prize = _selectedLevel.MoneyReward;
     }
 }

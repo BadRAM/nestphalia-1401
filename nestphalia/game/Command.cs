@@ -1,5 +1,6 @@
 using System.Reflection;
 using Raylib_cs;
+using WrenSharp;
 
 namespace nestphalia;
 
@@ -86,6 +87,11 @@ public static class Command
         " Valid [mode]s: NONE, LEFT, RIGHT, BOTH")]
     public static string Dialog(string args)
     {
+        if (Program.CurrentScene is not BattleScene)
+        {
+            return "Can't show dialog in this scene!";
+        }
+        
         List<string> words = new List<string>(args.Split(" "));
         if (Enum.TryParse(words[0], true, out DialogBox.Mode mode))
         {
@@ -121,6 +127,11 @@ public static class Command
         " [minionID] if not included, kills all minions")]
     public static string Kill(string args)
     {
+        if (Program.CurrentScene is not BattleScene)
+        {
+            return "Can't do that in this scene!";
+        }
+        
         string id = args.Split(" ")[0].ToLower();
         int count = 0;
         for (int index = 0; index < World.Minions.Count; index++)
@@ -141,6 +152,11 @@ public static class Command
         " [side] can be Left, Right or Both. Default: Both ")]
     public static string Census(string args)
     {
+        if (Program.CurrentScene is not BattleScene)
+        {
+            return "Can't do that in this scene!";
+        }
+        
         string arg = args.Split(" ")[0].ToUpper();
         Team? team = null;
         if (arg == "LEFT") team = World.LeftTeam;
@@ -171,6 +187,11 @@ public static class Command
         " [width], [height] default to 1")]
     public static string Demolish(string args)
     {
+        if (Program.CurrentScene is not BattleScene)
+        {
+            return "Can't do that in this scene!";
+        }
+        
         List<string> words = new List<string>(args.Split(" "));
         int startX = words[0] == "." ? World.GetMouseTilePos().X : int.Parse(words[0]);
         int startY = words[1] == "." ? World.GetMouseTilePos().Y : int.Parse(words[1]);
@@ -195,6 +216,11 @@ public static class Command
         " [width], [height] default to 1")]
     public static string Build(string args)
     {
+        if (Program.CurrentScene is not BattleScene)
+        {
+            return "Can't do that in this scene!";
+        }
+        
         List<string> words = new List<string>(args.Split(" "));
         StructureTemplate structure = Assets.GetStructureByID(words[0]) ?? throw new Exception("Invalid structure ID!");
         Team team = words[1].ToLower() == "left" ? World.LeftTeam : World.RightTeam;

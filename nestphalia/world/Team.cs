@@ -17,7 +17,7 @@ public class Team
     public bool IsPlayerControlled;
     public List<ActiveAbilityBeacon?> Beacons = new List<ActiveAbilityBeacon?>();
     public const int BeaconCap = 4;
-    public Color UnitTint;
+    public Color Color;
     private Texture2D _abilitySlot;
     private Texture2D _healthBar;
     private int _usingAbility = -1;
@@ -31,11 +31,11 @@ public class Team
 
     public PathFinder PathFinder = new PathFinder();
 
-    public Team(string name, bool isRightSide, Color unitTint)
+    public Team(string name, bool isRightSide, Color color)
     {
         Name = name;
         IsRightSide = isRightSide;
-        UnitTint = unitTint;
+        Color = color;
         _abilitySlot = Resources.GetTextureByName("ability_slot");
         _healthBar = Resources.GetTextureByName("button_wide");
     }
