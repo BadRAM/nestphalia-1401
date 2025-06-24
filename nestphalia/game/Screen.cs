@@ -9,12 +9,22 @@ public static class Screen
     public static int MinWidth = 1200;
     public static int MinHeight = 600;
     
-    public static int HCenter;
-    public static int VCenter;
-    public static int Left = 0;
-    public static int Right;
-    public static int Top = 0;
-    public static int Bottom;
+    public static int CenterX;
+    public static int CenterY;
+    public static int LeftX = 0;
+    public static int RightX;
+    public static int TopY = 0;
+    public static int BottomY;
+    public static Vector2 TopLeft;
+    public static Vector2 Top;
+    public static Vector2 TopRight;
+    public static Vector2 Left;
+    public static Vector2 Center;
+    public static Vector2 Right;
+    public static Vector2 BottomLeft;
+    public static Vector2 Bottom;
+    public static Vector2 BottomRight;
+
     //public static Image WhiteNoise = Raylib.GenImageWhiteNoise(1024, 1024, 0.5f);
     private static List<List<bool>> _backgroundNoise = new List<List<bool>>();
     private static Texture2D _tile1;
@@ -66,14 +76,14 @@ public static class Screen
     {
         _backgroundNoise.Clear();
         
-        while (_backgroundNoise.Count <= Right/24)
+        while (_backgroundNoise.Count <= RightX/24)
         {
             _backgroundNoise.Add(new List<bool>());
         }
 
         foreach (List<bool> row in _backgroundNoise)
         {
-            while (row.Count <= Bottom/24)
+            while (row.Count <= BottomY/24)
             {
                 row.Add(Random.Shared.Next(2) == 0);
             }
@@ -83,10 +93,10 @@ public static class Screen
 
         while (true)
         {
-            _graffitiPosX = Random.Shared.Next(HCenter - 1000, HCenter + 1000);
-            _graffitiPosY = Random.Shared.Next(VCenter - 600, VCenter + 600);
+            _graffitiPosX = Random.Shared.Next(CenterX - 1000, CenterX + 1000);
+            _graffitiPosY = Random.Shared.Next(CenterY - 600, CenterY + 600);
 
-            if ((_graffitiPosX < HCenter - 664 || _graffitiPosX > HCenter + 600) && (_graffitiPosY < VCenter - 364 || _graffitiPosY > VCenter + 300) )
+            if ((_graffitiPosX < CenterX - 664 || _graffitiPosX > CenterX + 600) && (_graffitiPosY < CenterY - 364 || _graffitiPosY > CenterY + 300) )
             {
                 break;
             }
@@ -100,19 +110,29 @@ public static class Screen
         Vector2 scale = GUI.GetWindowScale();
         GameConsole.WriteLine($"Scale is X:{scale.X},Y:{scale.Y}");
         
-        Right = (int)(GetScreenWidth() / scale.X);
-        Bottom = (int)(GetScreenHeight() / scale.Y);
+        RightX = (int)(GetScreenWidth() / scale.X);
+        BottomY = (int)(GetScreenHeight() / scale.Y);
 
-        if (Right < MinWidth || Bottom < MinHeight)
+        if (RightX < MinWidth || BottomY < MinHeight)
         {
             GameConsole.WriteLine("Window undersized, resizing...");
-            SetWindowSize(Math.Max(Right, MinWidth), Math.Max(Bottom, MinHeight));
-            Right = GetScreenWidth();
-            Bottom = GetScreenHeight();
+            SetWindowSize(Math.Max(RightX, MinWidth), Math.Max(BottomY, MinHeight));
+            RightX = GetScreenWidth();
+            BottomY = GetScreenHeight();
         }
         
-        HCenter = Right / 2;
-        VCenter = Bottom / 2;
+        CenterX = RightX / 2;
+        CenterY = BottomY / 2;
+        
+        TopLeft = new Vector2(LeftX, TopY);
+        Top = new Vector2(CenterX, TopY);
+        TopRight = new Vector2(RightX, TopY);
+        Left = new Vector2(LeftX, CenterY);
+        Center = new Vector2(CenterX, CenterY);
+        Right = new Vector2(RightX, CenterY);
+        BottomLeft = new Vector2(LeftX, BottomY);
+        Bottom = new Vector2(CenterX, BottomY);
+        BottomRight = new Vector2(RightX, BottomY);
 
         RegenerateBackground();
 
@@ -122,12 +142,12 @@ public static class Screen
 
     public static void DrawBackground(Color tint)
     {
-        for (int x = 0; x <= Right/24; x++)
-        for (int y = 0; y <= Bottom/24; y++)
+        for (int x = 0; x <= RightX/24; x++)
+        for (int y = 0; y <= BottomY/24; y++)
         {
             DrawTexture(_backgroundNoise[x][y] ? _tile1 : _tile2, x * 24, y * 24 - 12, tint);
         }
-        DrawRectangle(HCenter - 600, VCenter - 300, 1200, 600, new Color(10, 10, 10, 64));
+        DrawRectangle(CenterX - 600, CenterY - 300, 1200, 600, new Color(10, 10, 10, 64));
         DrawTexture(_graffiti[_graffitiPicked], _graffitiPosX, _graffitiPosY, Color.White);
     }
 }

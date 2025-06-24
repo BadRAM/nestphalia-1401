@@ -35,8 +35,6 @@ public class BattleScene : Scene
     
     private string _log;
     
-    
-    
     private enum SceneState
     {
         StartPending,
@@ -98,14 +96,14 @@ public class BattleScene : Scene
                 _dialogBox.Draw();
                 break;
             case SceneState.BattleActive:
-                if (Input.Pressed(Input.Action.FastForward))
+                if (Input.Held(Input.Action.FastForward))
                 {
-                    DrawRectangle(0,0,Screen.Right,Screen.Bottom,new Color(0,0,0,128));
+                    DrawRectangle(0,0,Screen.RightX,Screen.BottomY,new Color(0,0,0,128));
                     DrawTextCentered(0, 0, $"{_skips+1}X SPEED", 48);
                 }
                 break;
             case SceneState.BattleFinished:
-                DrawRectangle(Screen.HCenter-250,Screen.VCenter-150, 500, 300,new Color(0,0,0,128));
+                DrawRectangle(Screen.CenterX-250,Screen.CenterY-150, 500, 300,new Color(0,0,0,128));
                 DrawTextCentered(0, -48, "BATTLE OVER!", 48);
                 DrawTextCentered(0, 0, $"{_winner.Name} is victorious!", 48);
                 if (World.DrawDebugInfo) DrawTextCentered(0, 100, $"{_log}");
@@ -118,11 +116,11 @@ public class BattleScene : Scene
             case SceneState.Paused:
                 if (World.DrawDebugInfo || _pathFinderDebug)
                 {
-                    DrawTextCentered(0, -Screen.Bottom/2, "PAUSED", 48);
+                    DrawTextCentered(0, -Screen.BottomY/2, "PAUSED", 48);
                 }
                 else
                 {
-                    DrawRectangle(0,0,Screen.Right,Screen.Bottom,new Color(0,0,0,128));
+                    DrawRectangle(0,0,Screen.RightX,Screen.BottomY,new Color(0,0,0,128));
                     DrawTextCentered(0, 0, "PAUSED", 48);
                     if (Button100(-50, 40, "Settings"))
                     {
@@ -139,7 +137,7 @@ public class BattleScene : Scene
                 }
                 break;
             case SceneState.PausedSettings:
-                DrawRectangle(0,0,Screen.Right,Screen.Bottom,new Color(0,0,0,128));
+                DrawRectangle(0,0,Screen.RightX,Screen.BottomY,new Color(0,0,0,128));
                 if (Settings.DrawSettingsMenu()) _state = SceneState.Paused;
                 break;
         }

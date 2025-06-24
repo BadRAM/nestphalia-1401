@@ -314,7 +314,7 @@ public partial class Minion : ISprite
             
             Raylib.DrawCircleV(World.GetTileCenter(NavPath.Destination), 3, Color.Red);
             
-            if (World.DrawDebugInfo) GUI.DrawTextLeft((int)Position.X, (int)Position.Y, State.ToString(), guiSpace: false);
+            if (World.DrawDebugInfo) GUI.DrawTextLeft((int)Position.X, (int)Position.Y, State.ToString(), anchor: Screen.TopLeft);
         }
     }
     #endregion

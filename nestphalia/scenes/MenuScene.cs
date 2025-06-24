@@ -9,10 +9,12 @@ namespace nestphalia;
 public class MenuScene : Scene
 {
     private bool _settingsOpen;
+    private Rectangle _panel;
     
     public void Start()
     {
         Program.CurrentScene = this;
+        _panel = new Rectangle(CenterX-200, CenterY-220, 401, 201);
         RegenerateBackground();
         Resources.PlayMusicByName("unreal_technology_demo_95_-_unreals");
     }
@@ -25,6 +27,9 @@ public class MenuScene : Scene
 
         if (!_settingsOpen)
         {
+            _panel = Draw9Slice(Resources.GetTextureByName("9slice"), _panel, Vector2.Zero, true, true);
+            Button300(30, 30, "Button on a window!", anchor: _panel.Position);
+            
             DrawTextCentered(0, -200, "NESTPHALIA 1401", 48);
             DrawTextLeft(-600, -300, "V2.0.0 - Conquest Update");
         

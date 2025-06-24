@@ -105,14 +105,14 @@ public class LevelEditorScene : Scene
         Raylib.DrawRectangleLinesEx(playerRect, 2, Raylib.ColorAlpha(Color.Blue, 0.8f));
         Raylib.EndMode2D();
 
-        Raylib.DrawRectangle(0, Screen.Top, 300, Screen.Bottom, Raylib.ColorAlpha(Color.Black, 0.5f));
+        Raylib.DrawRectangle(0, Screen.TopY, 300, Screen.BottomY, Raylib.ColorAlpha(Color.Black, 0.5f));
         
-        if (Button100(0, 0, "Floor", guiSpace:false))
+        if (Button100(0, 0, "Floor", anchor: Screen.TopLeft))
         {
             _toolActive = LevelEditorTool.FloorBrush;
             _selectedFloors.Clear();
         }
-        if (Button100(200, 0, "Structure", guiSpace:false))
+        if (Button100(200, 0, "Structure", anchor: Screen.TopLeft))
         {
             _toolActive = LevelEditorTool.StructureBrush;
             _selectedStructure = null;
@@ -122,21 +122,21 @@ public class LevelEditorScene : Scene
             }
         }
 
-        _idBuffer = TextEntry(0, 300, _idBuffer, guiSpace: false);
-        if (Button100(0, 340, "Save", guiSpace:false)) Save();
-        if (Button100(100, 340, "Folder", guiSpace:false)) Utils.OpenFolder(@"\resources\levels");
-        if (Button100(200, 340, "Load", guiSpace:false)) Load();
-        BigTextCopyPad(0, 380, "Full Level Data", JObject.FromObject(_level).ToString(), guiSpace:false);
+        _idBuffer = TextEntry(0, 300, _idBuffer, anchor: Screen.TopLeft);
+        if (Button100(0, 340, "Save", anchor: Screen.TopLeft)) Save();
+        if (Button100(100, 340, "Folder", anchor: Screen.TopLeft)) Utils.OpenFolder(@"\resources\levels");
+        if (Button100(200, 340, "Load", anchor: Screen.TopLeft)) Load();
+        BigTextCopyPad(0, 380, "Full Level Data", JObject.FromObject(_level).ToString(), anchor: Screen.TopLeft);
         
-        _levelBuffer = BigTextCopyPad(0, 460, "Level Metadata", _levelBuffer, guiSpace:false);
-        _scriptBuffer = BigTextCopyPad(0, 500, "Script", _scriptBuffer, guiSpace:false);
+        _levelBuffer = BigTextCopyPad(0, 460, "Level Metadata", _levelBuffer, anchor: Screen.TopLeft);
+        _scriptBuffer = BigTextCopyPad(0, 500, "Script", _scriptBuffer, anchor: Screen.TopLeft);
 
         if (_toolActive == LevelEditorTool.FloorBrush)
         {
             for (int i = 0; i < _floors.Count; i++)
             {
                 bool selected = _selectedFloors.Contains(_floors[i]);
-                if (TileButton((2) + (i%10)*28, 40 + (i/10)*28, _floors[i].Texture, selected, false))
+                if (TileButton((2) + (i%10)*28, 40 + (i/10)*28, _floors[i].Texture, selected, anchor: Screen.TopLeft))
                 {
                     if (selected)
                     {
@@ -149,7 +149,7 @@ public class LevelEditorScene : Scene
                 }
             }
 
-            if (Button100(0, 260, "Fill", guiSpace:false))
+            if (Button100(0, 260, "Fill", anchor: Screen.TopLeft))
             {
                 for (int x = 0; x < _level.WorldSize.X; x++)
                 for (int y = 0; y < _level.WorldSize.Y; y++)
@@ -166,12 +166,12 @@ public class LevelEditorScene : Scene
             for (int i = 0; i < _structures.Count; i++)
             {
                 bool selected = _selectedStructure == _structures[i];
-                if (TileButton((2) + (i%10)*28, 40 + (i/10)*28, _structures[i].Texture, selected, false))
+                if (TileButton((2) + (i%10)*28, 40 + (i/10)*28, _structures[i].Texture, selected, anchor: Screen.TopLeft))
                 {
                     _selectedStructure = _structures[i];
                 }
             }
-            if (Button100(0, 260, "Erase", guiSpace:false)) _selectedStructure = null;
+            if (Button100(0, 260, "Erase", anchor: Screen.TopLeft)) _selectedStructure = null;
         }
         
         Raylib.EndDrawing();

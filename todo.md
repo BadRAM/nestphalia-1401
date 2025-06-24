@@ -104,6 +104,7 @@ Programming todo:
 - Screen edge scroll (off by default)
 - Migrate old JSON functions to newtonsoft
 - Stateful GUI
+- Universal Popup queue system, either an explicit queue or a yield/callback system.
 
 
 ----- Premature Optimizations -----
@@ -117,7 +118,9 @@ Programming todo:
     - ~~Extract physics~~
     - Move flying behavior into base minion
   - World
-    - make it not static
+    - make it not static, with a singleton-like static reference
+    - keep it static, but move all it's state into a 'WorldState' object that isn't static.
+    - move all world function into a 'worldInstance' class, and leave World as a wrapper to it
   - BattleScene
     - Camera shake stores just the last offset.
   - Team

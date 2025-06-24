@@ -375,24 +375,24 @@ public class PathFinder
         debugText += $"AddNodes: {_swAddNodes.ElapsedMilliseconds}ms\n";
         
         int totalWidth = 1000;
-        int barX = Screen.HCenter-500;
+        int barX = Screen.CenterX-500;
         int width = (int)(totalWidth * _swMisc.ElapsedMilliseconds / totalSWTime);
         
-        Raylib.DrawRectangle(barX, Screen.VCenter-300, width, 40, Color.Gray);
-        GUI.DrawTextLeft(barX, Screen.VCenter-290, $"Misc: {(int)(100 * _swMisc.ElapsedMilliseconds / totalSWTime)}%");
+        Raylib.DrawRectangle(barX, Screen.CenterY-300, width, 40, Color.Gray);
+        GUI.DrawTextLeft(barX, Screen.CenterY-290, $"Misc: {(int)(100 * _swMisc.ElapsedMilliseconds / totalSWTime)}%");
         barX += width;
         width = (int)(totalWidth * _swFindNext.ElapsedMilliseconds / totalSWTime);
-        Raylib.DrawRectangle(barX, Screen.VCenter-300, width, 40, Color.Green);
-        GUI.DrawTextLeft(barX, Screen.VCenter-290, $"FindNext: {(int)(100 * _swFindNext.ElapsedMilliseconds / totalSWTime)}%");
+        Raylib.DrawRectangle(barX, Screen.CenterY-300, width, 40, Color.Green);
+        GUI.DrawTextLeft(barX, Screen.CenterY-290, $"FindNext: {(int)(100 * _swFindNext.ElapsedMilliseconds / totalSWTime)}%");
         barX += width;
         width = (int)(totalWidth * _swAddNodes.ElapsedMilliseconds / totalSWTime);
-        Raylib.DrawRectangle(barX, Screen.VCenter-300, width, 40, Color.SkyBlue);
-        GUI.DrawTextLeft(barX, Screen.VCenter-290, $"AddNodes: {(int)(100 * _swAddNodes.ElapsedMilliseconds / totalSWTime)}%");
+        Raylib.DrawRectangle(barX, Screen.CenterY-300, width, 40, Color.SkyBlue);
+        GUI.DrawTextLeft(barX, Screen.CenterY-290, $"AddNodes: {(int)(100 * _swAddNodes.ElapsedMilliseconds / totalSWTime)}%");
         barX += width;
         
         width = totalWidth - barX;
-        Raylib.DrawRectangle(barX, Screen.VCenter-300, width, 40, Color.Gray);
-        GUI.DrawTextLeft(barX, Screen.VCenter-290, $"Out of loop: {100 * width / totalWidth}%");
+        Raylib.DrawRectangle(barX, Screen.CenterY-300, width, 40, Color.Gray);
+        GUI.DrawTextLeft(barX, Screen.CenterY-290, $"Out of loop: {100 * width / totalWidth}%");
         #endif
 
         GUI.DrawTextLeft(350, -250, debugText);

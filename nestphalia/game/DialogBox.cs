@@ -40,22 +40,22 @@ public class DialogBox
     
     public void Draw()
     {
-        DrawRectangle(Screen.HCenter - 262, Screen.VCenter + 98,  524, 76, Color.Black);
-        DrawRectangle(Screen.HCenter - 260, Screen.VCenter + 100, 520, 72, Color.Brown);
+        DrawRectangle(Screen.CenterX - 262, Screen.CenterY + 98,  524, 76, Color.Black);
+        DrawRectangle(Screen.CenterX - 260, Screen.CenterY + 100, 520, 72, Color.Brown);
         
         _charsRevealed = (int)((Time.Unscaled - _timeStarted) / _timePerChar);
         DrawTextLeft(_mode == Mode.Left || _mode == Mode.Both ? -188 : -256, 104, _text.Substring(0, Math.Min(_charsRevealed, _text.Length)));
         
         if (_mode != Mode.None)
         {
-            int x = Screen.HCenter + (_mode == Mode.Left ? -256 : 192);
-            DrawTexture(_portraitPanel, x, Screen.VCenter + 104, Color.White);
-            DrawTexture(_portrait, x, Screen.VCenter + 104, Color.White);
+            int x = Screen.CenterX + (_mode == Mode.Left ? -256 : 192);
+            DrawTexture(_portraitPanel, x, Screen.CenterY + 104, Color.White);
+            DrawTexture(_portrait, x, Screen.CenterY + 104, Color.White);
             
             if (_mode == Mode.Both)
             {
-                DrawTexture(_portraitPanel, Screen.HCenter - 256, Screen.VCenter + 104, Color.White);
-                DrawTexture(_portraitTwo, Screen.HCenter - 256, Screen.VCenter + 104, Color.White);
+                DrawTexture(_portraitPanel, Screen.CenterX - 256, Screen.CenterY + 104, Color.White);
+                DrawTexture(_portraitTwo, Screen.CenterX - 256, Screen.CenterY + 104, Color.White);
             }
         }
     }

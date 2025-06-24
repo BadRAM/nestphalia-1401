@@ -240,10 +240,10 @@ public class Team
             if ((Beacons[2]?.IsReady() ?? false) && Input.Pressed(Input.Action.Use3)) _usingAbility = 2;
             if ((Beacons[3]?.IsReady() ?? false) && Input.Pressed(Input.Action.Use4)) _usingAbility = 3;
 
-            int posX = IsRightSide ? Screen.HCenter + 450  : Screen.HCenter - 450;
+            int posX = IsRightSide ? Screen.CenterX + 450  : Screen.CenterX - 450;
             for (int i = 0; i < BeaconCap; i++)
             {
-                if (Raylib.IsMouseButtonPressed(MouseButton.Left) && Raylib.CheckCollisionPointRec(GUI.GetScaledMousePosition(), new Rectangle( posX + i*68 - 150, Screen.Bottom - 68, 64, 64)))
+                if (Raylib.IsMouseButtonPressed(MouseButton.Left) && Raylib.CheckCollisionPointRec(GUI.GetScaledMousePosition(), new Rectangle( posX + i*68 - 150, Screen.BottomY - 68, 64, 64)))
                 {
                     _usingAbility = i;
                 }
@@ -282,11 +282,11 @@ public class Team
         }
         
         // ability slots
-        int posX = IsRightSide ? Screen.HCenter + 462  : Screen.HCenter - 462;
+        int posX = IsRightSide ? Screen.CenterX + 462  : Screen.CenterX - 462;
         for (int i = 0; i < BeaconCap; i++)
         {
             int x = posX + i * 68 - 134;
-            int y = Screen.Bottom - 68;
+            int y = Screen.BottomY - 68;
             Color c = Color.White;
             if (!Beacons[i]?.IsReady() ?? false) c = Color.Gray;
             if (i == _usingAbility) c = Color.DarkGray;
@@ -303,10 +303,10 @@ public class Team
         }
         
         // health bar
-        Raylib.DrawTextureRec(_healthBar, new Rectangle(0, 80, 300, 40), new Vector2(IsRightSide ? Screen.HCenter + 20  : Screen.HCenter - 320, Screen.Bottom - 44), Color.White);
+        Raylib.DrawTextureRec(_healthBar, new Rectangle(0, 80, 300, 40), new Vector2(IsRightSide ? Screen.CenterX + 20  : Screen.CenterX - 320, Screen.BottomY - 44), Color.White);
         float hpBarSize = (float)(300 * _health / _maxHealth);
-        Raylib.DrawTextureRec(_healthBar, new Rectangle( IsRightSide ? 300 - hpBarSize : 0, 40, hpBarSize, 40), new Vector2(IsRightSide ? (300 - hpBarSize) + Screen.HCenter + 20  : Screen.HCenter - 320, Screen.Bottom -44), Color.White);
-        GUI.DrawTextCentered(IsRightSide ? Screen.HCenter + 160 : Screen.HCenter - 160, Screen.Bottom - 24, $"{Name} - {_health:n0}/{_maxHealth:n0}", guiSpace: false);
+        Raylib.DrawTextureRec(_healthBar, new Rectangle( IsRightSide ? 300 - hpBarSize : 0, 40, hpBarSize, 40), new Vector2(IsRightSide ? (300 - hpBarSize) + Screen.CenterX + 20  : Screen.CenterX - 320, Screen.BottomY -44), Color.White);
+        GUI.DrawTextCentered(IsRightSide ? Screen.CenterX + 160 : Screen.CenterX - 160, Screen.BottomY - 24, $"{Name} - {_health:n0}/{_maxHealth:n0}", anchor: Screen.TopLeft);
     }
     
     public double GetTileWeight(int x, int y)

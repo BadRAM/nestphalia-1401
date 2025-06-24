@@ -6,6 +6,8 @@ namespace nestphalia;
 public static class GameConsole
 {
     public static List<string> LogHistory = new List<string>();
+    private static List<string> _commandHistory = new List<string>();
+    private static int _commandHistoryCursor = -1;
     private static bool _open;
     private static string _input;
 
@@ -23,7 +25,7 @@ public static class GameConsole
         } 
         else if (_open)
         {
-            if (GUI.GetScaledMousePosition().Y < Screen.Bottom/2)
+            if (GUI.GetScaledMousePosition().Y < Screen.BottomY/2)
             {
                 Input.Suppressed = true;
                 
@@ -40,10 +42,26 @@ public static class GameConsole
                     }
                     key = Raylib.GetCharPressed();  // Check next character in the queue
                 }
+                
+                if (Raylib.IsKeyPressed(KeyboardKey.Up) && _commandHistory.Count > 0)
+                {
+                    _commandHistoryCursor = Math.Min(_commandHistoryCursor + 1, _commandHistory.Count-1);
+                    _input = _commandHistory[_commandHistoryCursor];
+                }
+                if (Raylib.IsKeyPressed(KeyboardKey.Down) && _commandHistory.Count > 0)
+                {
+                    _commandHistoryCursor = Math.Max(_commandHistoryCursor - 1, 0);
+                    _input = _commandHistory[_commandHistoryCursor];
+                }
 
                 if (Raylib.IsMouseButtonPressed(MouseButton.Right))
                 {
                     _input += Raylib.GetClipboardText_();
+                }
+                
+                if (Raylib.IsMouseButtonPressed(MouseButton.Left))
+                {
+                    Raylib.SetClipboardText(string.Join("\n", LogHistory));
                 }
     
                 if ((Raylib.IsKeyPressed(KeyboardKey.Backspace) || Raylib.IsKeyPressedRepeat(KeyboardKey.Backspace)) && _input.Length > 0)
@@ -58,30 +76,36 @@ public static class GameConsole
             
             if (Raylib.IsKeyPressed(KeyboardKey.Enter) && _input.Length > 0)
             {
+                _commandHistory.Insert(0, _input);
                 WriteLine(_input);
                 string commandOutput = Command.Execute(_input);
-                if (commandOutput != "") WriteLine(commandOutput);
+                if ((commandOutput ?? "") != "") WriteLine(commandOutput);
                 _input = "";
             }
             
-            Raylib.DrawRectangle(0, 0, Screen.Right, Screen.Bottom/2, Raylib.ColorAlpha(Color.Black, 0.5f));
-            Raylib.DrawRectangle(0, Screen.Bottom/2, Screen.Right, 2, Color.DarkGray);
+            Raylib.DrawRectangle(0, 0, Screen.RightX, Screen.BottomY/2, Raylib.ColorAlpha(Color.Black, 0.5f));
+            Raylib.DrawRectangle(0, Screen.BottomY/2, Screen.RightX, 2, Color.DarkGray);
 
-            int y = Screen.Bottom / 2 - 14;
+            int y = Screen.BottomY / 2 - 14;
             
-            GUI.DrawTextLeft(4, y, "> " + _input, guiSpace:false);
+            GUI.DrawTextLeft(4, y, "> " + _input, anchor: Screen.TopLeft);
             int i = LogHistory.Count-1;
             while (y > -14 && i >= 0)
             {
                 y -= 14;
-                GUI.DrawTextLeft(4, y, LogHistory[i], guiSpace:false);
+                GUI.DrawTextLeft(4, y, LogHistory[i], anchor: Screen.TopLeft);
                 i--;
             }
         }
     }
     
-    public static void WriteLine(string message)
+    public static void WriteLine(string? message)
     {
+        if (message == null)
+        {
+            Console.WriteLine(message);
+            return;
+        }
         List<string> lines = new List<string>(message.Split("\n"));
         foreach (string line in lines) { LogHistory.Add(line); }
         Console.WriteLine(message);

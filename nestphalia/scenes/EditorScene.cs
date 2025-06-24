@@ -48,7 +48,7 @@ public class EditorScene : Scene
         Screen.RegenerateBackground();
         _bg = Resources.GetTextureByName("editor_bg");
         World.InitializeEditor(_fort);
-        World.Camera.Offset = new Vector2(Screen.HCenter, Screen.VCenter);
+        World.Camera.Offset = new Vector2(Screen.CenterX, Screen.CenterY);
         Resources.PlayMusicByName("so_lets_get_killed");
         
         UpdateFortStats();
@@ -120,7 +120,7 @@ public class EditorScene : Scene
         
         // lazy hack so resizing the window doesn't offset the viewport
         World.Camera.Zoom = GetWindowScale().X;
-        World.Camera.Offset = new Vector2(Screen.HCenter, Screen.VCenter) * GetWindowScale(); 
+        World.Camera.Offset = new Vector2(Screen.CenterX, Screen.CenterY) * GetWindowScale(); 
         
         // ===== DRAW =====
         
@@ -131,10 +131,10 @@ public class EditorScene : Scene
         World.DrawFloor();
         
         // Draw gui background texture
-        DrawTexture(_bg, Screen.HCenter - 604, Screen.VCenter - 304, Color.White);
+        DrawTexture(_bg, Screen.CenterX - 604, Screen.CenterY - 304, Color.White);
         
         // Draw brush preview ghost
-        if (CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(Screen.HCenter-240, Screen.VCenter-232, 480, 480)))
+        if (CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(Screen.CenterX-240, Screen.CenterY-232, 480, 480)))
         {
             BeginMode2D(World.Camera);
             Vector2 mousePos = World.GetTileCenter(World.GetMouseTilePos());
@@ -216,7 +216,7 @@ public class EditorScene : Scene
                 _toolActive = EditorTool.Brush;
             }
 
-            DrawTexture(s.Texture, Screen.HCenter + 312, Screen.VCenter + y * 40 - 246, Color.White);
+            DrawTexture(s.Texture, Screen.CenterX + 312, Screen.CenterY + y * 40 - 246, Color.White);
             y++;
         }
     }
