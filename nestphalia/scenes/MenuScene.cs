@@ -27,8 +27,11 @@ public class MenuScene : Scene
 
         if (!_settingsOpen)
         {
-            _panel = Draw9Slice(Resources.GetTextureByName("9slice"), _panel, Vector2.Zero, true, true);
-            Button300(30, 30, "Button on a window!", anchor: _panel.Position);
+            _panel = Draw9Slice(Resources.GetTextureByName("9slice"), _panel, Center, true, true);
+            if (Button300(-150, 30, "Button on a window!", anchor: Center + _panel.Top()))
+            {
+                Popup.Start(new AlertPopup("Heading!", "bodybodybodybodybodybody\nbodybodybodybodybodybody\nbodybodybodybodybodybody\nbodybodybodybodybodybody\nbodybodybodybodybodybody\n", "go away", () => {}));
+            }
             
             DrawTextCentered(0, -200, "NESTPHALIA 1401", 48);
             DrawTextLeft(-600, -300, "V2.0.0 - Conquest Update");
@@ -54,7 +57,5 @@ public class MenuScene : Scene
         {
             _settingsOpen = !Settings.DrawSettingsMenu();
         }
-        
-        EndDrawing();
     }
 }

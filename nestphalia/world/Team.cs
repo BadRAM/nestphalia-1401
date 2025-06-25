@@ -230,20 +230,20 @@ public class Team
         // use abilities
         if (IsPlayerControlled)
         {
-            if (_usingAbility != -1 && (Beacons[_usingAbility]?.IsReady() ?? false) && Raylib.IsMouseButtonPressed(MouseButton.Left))
+            if (_usingAbility != -1 && (Beacons[_usingAbility]?.IsReady() ?? false) && Input.Pressed(MouseButton.Left))
             {
                 Beacons[_usingAbility]?.Activate(Raylib.GetScreenToWorld2D(Raylib.GetMousePosition(), World.Camera));
                 _usingAbility = -1;
             }
-            if ((Beacons[0]?.IsReady() ?? false) && Input.Pressed(Input.Action.Use1)) _usingAbility = 0;
-            if ((Beacons[1]?.IsReady() ?? false) && Input.Pressed(Input.Action.Use2)) _usingAbility = 1;
-            if ((Beacons[2]?.IsReady() ?? false) && Input.Pressed(Input.Action.Use3)) _usingAbility = 2;
-            if ((Beacons[3]?.IsReady() ?? false) && Input.Pressed(Input.Action.Use4)) _usingAbility = 3;
+            if ((Beacons[0]?.IsReady() ?? false) && Input.Pressed(Input.InputAction.Use1)) _usingAbility = 0;
+            if ((Beacons[1]?.IsReady() ?? false) && Input.Pressed(Input.InputAction.Use2)) _usingAbility = 1;
+            if ((Beacons[2]?.IsReady() ?? false) && Input.Pressed(Input.InputAction.Use3)) _usingAbility = 2;
+            if ((Beacons[3]?.IsReady() ?? false) && Input.Pressed(Input.InputAction.Use4)) _usingAbility = 3;
 
             int posX = IsRightSide ? Screen.CenterX + 450  : Screen.CenterX - 450;
             for (int i = 0; i < BeaconCap; i++)
             {
-                if (Raylib.IsMouseButtonPressed(MouseButton.Left) && Raylib.CheckCollisionPointRec(GUI.GetScaledMousePosition(), new Rectangle( posX + i*68 - 150, Screen.BottomY - 68, 64, 64)))
+                if (Input.Pressed(MouseButton.Left) && Raylib.CheckCollisionPointRec(GUI.GetScaledMousePosition(), new Rectangle( posX + i*68 - 150, Screen.BottomY - 68, 64, 64)))
                 {
                     _usingAbility = i;
                 }
@@ -347,7 +347,6 @@ public class Team
     
     private void OnStructureChanged(object? sender, Int2D pos)
     {
-        // Console.WriteLine($"Structure changed at {pos}!");
         _weightMap[pos.X, pos.Y] = CalculateWeight(pos.X, pos.Y);
         _navSolidMap[pos.X, pos.Y] = World.GetTile(pos.X, pos.Y)?.NavSolid(this) ?? false;
     }

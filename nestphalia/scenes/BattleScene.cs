@@ -96,7 +96,7 @@ public class BattleScene : Scene
                 _dialogBox.Draw();
                 break;
             case SceneState.BattleActive:
-                if (Input.Held(Input.Action.FastForward))
+                if (Input.Held(Input.InputAction.FastForward))
                 {
                     DrawRectangle(0,0,Screen.RightX,Screen.BottomY,new Color(0,0,0,128));
                     DrawTextCentered(0, 0, $"{_skips+1}X SPEED", 48);
@@ -141,18 +141,15 @@ public class BattleScene : Scene
                 if (Settings.DrawSettingsMenu()) _state = SceneState.Paused;
                 break;
         }
-        
-        GameConsole.Draw();
-        EndDrawing();
     }
 
     private void HandleInputs()
     {
-        if (Input.Pressed(Input.Action.Pause) || Input.Pressed(Input.Action.Exit))
+        if (Input.Pressed(Input.InputAction.Pause) || Input.Pressed(Input.InputAction.Exit))
         {
             TogglePaused();
         }
-        if (_state == SceneState.Paused && Input.Pressed(Input.Action.FrameStep)) // Frame step
+        if (_state == SceneState.Paused && Input.Pressed(Input.InputAction.FrameStep)) // Frame step
         {
             Time.TimeScale = 1;
             Time.UpdateTime();
@@ -160,33 +157,33 @@ public class BattleScene : Scene
             Time.TimeScale = 0;
         }
         
-        if (Input.Pressed(Input.Action.FastForward))
+        if (Input.Pressed(Input.InputAction.FastForward))
         {
             SetMasterVolume(0.25f);
         }
-        if (Input.Released(Input.Action.FastForward))
+        if (Input.Released(Input.InputAction.FastForward))
         {
             SetMasterVolume(1f);
         }
 
-        if (Input.Held(Input.Action.CameraLeft))
+        if (Input.Held(Input.InputAction.CameraLeft))
         {
             World.Camera.Offset.X += 4;
         }
-        if (Input.Held(Input.Action.CameraRight))
+        if (Input.Held(Input.InputAction.CameraRight))
         {
             World.Camera.Offset.X -= 4;
         }
-        if (Input.Held(Input.Action.CameraUp))
+        if (Input.Held(Input.InputAction.CameraUp))
         {
             World.Camera.Offset.Y += 4;
         }
-        if (Input.Held(Input.Action.CameraDown))
+        if (Input.Held(Input.InputAction.CameraDown))
         {
             World.Camera.Offset.Y -= 4;
         }
 
-        if (Input.Pressed(Input.Action.PathDebug))
+        if (Input.Pressed(Input.InputAction.PathDebug))
         {
             _pathFinderDebug = !_pathFinderDebug;
         }
@@ -199,18 +196,18 @@ public class BattleScene : Scene
             _dialogQueue.RemoveAt(0);
             _state = SceneState.Dialogue;
         }
-        if (_state == SceneState.Dialogue && Input.Pressed(Input.Action.AdvanceDialogue))
+        if (_state == SceneState.Dialogue && Input.Pressed(Input.InputAction.AdvanceDialogue))
         {
             Time.TimeScale = 1;
             _state = SceneState.BattleActive;
         }
         
-        if (Input.Pressed(Input.Action.Debug))
+        if (Input.Pressed(Input.InputAction.Debug))
         {
             World.DrawDebugInfo = !World.DrawDebugInfo;
         }
         
-        if (IsMouseButtonDown(MouseButton.Right))
+        if (Input.Held(MouseButton.Right))
         {
             World.Camera.Offset += GetMouseDelta();
         }
@@ -247,7 +244,7 @@ public class BattleScene : Scene
         World.Update();
         CheckWinner();
         
-        if (_state == SceneState.BattleActive && Input.Held(Input.Action.FastForward))
+        if (_state == SceneState.BattleActive && Input.Held(Input.InputAction.FastForward))
         {
             _skips = 0;
             while (_state == SceneState.BattleActive && (GetTime() - startTime) + ((GetTime() - startTime) / (_skips + 1)) < 0.016)

@@ -67,12 +67,16 @@ public static class Command
         string script = @"
 class Command {
     foreign static kill(team, id)
-    foreign static dialog(boxMode, portrait1, portrait2, text)
+    foreign static dialog(text)
+    foreign static dialogR(portrait, text)
+    foreign static dialogL(portrait, text)
 }";
 
         var cm = _vm.Foreign("main", "Command");
         cm.Static("kill(_,_)", ctx => Kill(ctx.GetArgString(0), ctx.GetArgString(1)));
-        cm.Static("dialog(_,_,_,_)", ctx => Dialog(ctx.GetArgString(0), ctx.GetArgString(1), ctx.GetArgString(2), ctx.GetArgString(3)));
+        // cm.Static("dialog(_,_,_,_)", ctx => Dialog(ctx.GetArgString(0), ctx.GetArgString(1), ctx.GetArgString(2), ctx.GetArgString(3)));
+        // cm.Static("dialogR(_,_,_,_)", ctx => Dialog(ctx.GetArgString(0), ctx.GetArgString(1), ctx.GetArgString(2), ctx.GetArgString(3)));
+        // cm.Static("dialogL(_,_,_,_)", ctx => Dialog(ctx.GetArgString(0), ctx.GetArgString(1), ctx.GetArgString(2), ctx.GetArgString(3)));
         
         _vm.Interpret("main", script);
     }
@@ -102,35 +106,17 @@ class Command {
         }
     }
     
-    public static string Dialog(string boxMode, string portrait1, string portrait2, string text)
-    {
-        if (Program.CurrentScene is not BattleScene)
-        {
-            return "Can't show dialog in this scene!";
-        }
-        
-        if (!Enum.TryParse(boxMode, true, out DialogBox.Mode mode))
-        {
-            mode = DialogBox.Mode.None;
-        }
-        Texture2D? portraitOne = null;
-        if (mode != DialogBox.Mode.None)
-        {
-            portraitOne = Resources.GetTextureByName(portrait1);
-        }
-        Texture2D? portraitTwo = null;
-        if (mode == DialogBox.Mode.Both)
-        {
-            portraitTwo = Resources.GetTextureByName(portrait2);
-        }
-        DialogBox box = new DialogBox(text, mode, portraitOne, portraitTwo);
-        if (Program.CurrentScene is BattleScene bs)
-        {
-            bs.AddDialog(box);
-            return $"Dialog Queued Successfully";
-        }
-        return "Dialog failed, unsupported by scene";
-    }
+    // public static string Dialog(DialogBox.Mode mode, string portrait, string text)
+    // {
+    //     if (Program.CurrentScene is not BattleScene)
+    //     {
+    //         return "Can't show dialog in this scene!";
+    //     }
+    //     
+    //     Texture2D portraitTex = Resources.GetTextureByName(portrait);
+    //     
+    //     Popup.Start(new DialogBox(text, () => {}, mode));
+    // }
 
     
     public static void Kill(string team, string id)

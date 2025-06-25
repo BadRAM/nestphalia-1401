@@ -53,7 +53,7 @@ public class LevelEditorScene : Scene
     
     public override void Update()
     {
-        if (Input.Pressed(Input.Action.Exit))
+        if (Input.Pressed(Input.InputAction.Exit))
         {
             new MenuScene().Start();
         }
@@ -76,7 +76,7 @@ public class LevelEditorScene : Scene
             }
         }
         
-        if (Raylib.IsMouseButtonDown(MouseButton.Right))
+        if (Input.Held(MouseButton.Right))
         {
             World.Camera.Offset += Raylib.GetMouseDelta();
         }
@@ -173,13 +173,11 @@ public class LevelEditorScene : Scene
             }
             if (Button100(0, 260, "Erase", anchor: Screen.TopLeft)) _selectedStructure = null;
         }
-        
-        Raylib.EndDrawing();
     }
 
     private void FloorBrush()
     {
-        if (Raylib.IsMouseButtonDown(MouseButton.Left) && Raylib.GetMousePosition().X > 300)
+        if (Input.Held(MouseButton.Left) && Raylib.GetMousePosition().X > 300)
         {
             Int2D tilePos = World.GetMouseTilePos();
             if (tilePos.X >= 0 && tilePos.X < _level.WorldSize.X && tilePos.Y >= 0 && tilePos.Y < _level.WorldSize.Y) 
@@ -198,7 +196,7 @@ public class LevelEditorScene : Scene
 
     private void StructureBrush()
     {
-        if (Raylib.IsMouseButtonDown(MouseButton.Left) && Raylib.GetMousePosition().X > 300)
+        if (Input.Held(MouseButton.Left) && Raylib.GetMousePosition().X > 300)
         {
             Int2D tilePos = World.GetMouseTilePos();
             if (tilePos.X >= 0 && tilePos.X < _level.WorldSize.X && tilePos.Y >= 1 && tilePos.Y < _level.WorldSize.Y) 

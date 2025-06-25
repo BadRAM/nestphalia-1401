@@ -16,18 +16,19 @@ public static class GameConsole
         if (_open && Raylib.IsKeyPressed(KeyboardKey.Escape))
         {
             _open = false;
-            Input.Suppressed = false;
+            Input.SetSuppressed(Input.SuppressionSource.GameConsole, false);
         } 
         else if (Raylib.IsKeyPressed(KeyboardKey.Grave)) 
         {
             _open = !_open;
-            Input.Suppressed = _open;
+            Input.SetSuppressed(Input.SuppressionSource.GameConsole, _open);
         } 
         else if (_open)
         {
             if (GUI.GetScaledMousePosition().Y < Screen.BottomY/2)
             {
-                Input.Suppressed = true;
+                Input.SetSuppressed(Input.SuppressionSource.GameConsole, true);
+                Input.StartSuppressionOverride(Input.SuppressionSource.GameConsole);
                 
                 // Get char pressed (unicode character) on the queue
                 int key = Raylib.GetCharPressed();
@@ -43,35 +44,36 @@ public static class GameConsole
                     key = Raylib.GetCharPressed();  // Check next character in the queue
                 }
                 
-                if (Raylib.IsKeyPressed(KeyboardKey.Up) && _commandHistory.Count > 0)
+                if (Input.Pressed(KeyboardKey.Up) && _commandHistory.Count > 0)
                 {
                     _commandHistoryCursor = Math.Min(_commandHistoryCursor + 1, _commandHistory.Count-1);
                     _input = _commandHistory[_commandHistoryCursor];
                 }
-                if (Raylib.IsKeyPressed(KeyboardKey.Down) && _commandHistory.Count > 0)
+                if (Input.Pressed(KeyboardKey.Down) && _commandHistory.Count > 0)
                 {
                     _commandHistoryCursor = Math.Max(_commandHistoryCursor - 1, 0);
                     _input = _commandHistory[_commandHistoryCursor];
                 }
 
-                if (Raylib.IsMouseButtonPressed(MouseButton.Right))
+                if (Input.Pressed(MouseButton.Right))
                 {
                     _input += Raylib.GetClipboardText_();
                 }
                 
-                if (Raylib.IsMouseButtonPressed(MouseButton.Left))
+                if (Input.Pressed(MouseButton.Left))
                 {
                     Raylib.SetClipboardText(string.Join("\n", LogHistory));
                 }
     
-                if ((Raylib.IsKeyPressed(KeyboardKey.Backspace) || Raylib.IsKeyPressedRepeat(KeyboardKey.Backspace)) && _input.Length > 0)
+                if ((Input.Pressed(KeyboardKey.Backspace) || Input.Repeat(KeyboardKey.Backspace)) && _input.Length > 0)
                 {
                     _input = _input.Substring(0, _input.Length - 1);
                 }
+                Input.EndSuppressionOverride();
             }
             else
             {
-                Input.Suppressed = false;
+                Input.SetSuppressed(Input.SuppressionSource.GameConsole, false);
             }
             
             if (Raylib.IsKeyPressed(KeyboardKey.Enter) && _input.Length > 0)

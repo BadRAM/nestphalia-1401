@@ -38,7 +38,7 @@ public class CustomBattleMenu : Scene
     
     public override void Update()
     {
-        if (Input.Pressed(Input.Action.Exit))
+        if (Input.Pressed(Input.InputAction.Exit))
         {
             new MenuScene().Start();
         }
@@ -90,8 +90,6 @@ public class CustomBattleMenu : Scene
         {
             new BattleScene().Start(Assets.GetLevelByID("level_arena"), _leftFort, _rightFort, BattleOver, _leftIsPlayer, _rightIsPlayer, _deterministicMode);
         }
-        
-        Raylib.EndDrawing();
     }
 
     private void BattleOver(Team? winner)

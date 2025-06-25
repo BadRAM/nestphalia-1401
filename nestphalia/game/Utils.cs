@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.InteropServices;
+using Raylib_cs;
 
 namespace nestphalia;
 
@@ -42,6 +43,17 @@ public static class Utils
             }
         }
     }
+
+    public static Vector2 TopLeft(this Rectangle rect) { return rect.Position; }
+    public static Vector2 Top(this Rectangle rect) { return new Vector2(rect.X + rect.Width/2, rect.Y) ; }
+    public static Vector2 TopRight(this Rectangle rect) { return new Vector2(rect.X + rect.Width, rect.Y) ; }
+    public static Vector2 Left(this Rectangle rect) { return new Vector2(rect.X, rect.Y + rect.Height/2) ; }
+    public static Vector2 Center(this Rectangle rect) { return new Vector2(rect.X + rect.Width/2, rect.Y + rect.Height/2) ; }
+    public static Vector2 Right(this Rectangle rect) { return new Vector2(rect.X + rect.Width, rect.Y + rect.Height/2) ; }
+    public static Vector2 BottomLeft(this Rectangle rect) { return new Vector2(rect.X, rect.Y + rect.Height) ; }
+    public static Vector2 Bottom(this Rectangle rect) { return new Vector2(rect.X + rect.Width/2, rect.Y + rect.Height) ; }
+    public static Vector2 BottomRight(this Rectangle rect) { return new Vector2(rect.X + rect.Width, rect.Y + rect.Height) ; }
+
     
     public static float MoveTowards(this float start, float target, float maxDistanceDelta)
     {

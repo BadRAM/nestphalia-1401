@@ -220,7 +220,7 @@ public class PathFinder
             
             #if DEBUG
             _swAddNodes.Stop();
-            if (Input.Held(Input.Action.PathDebug))
+            if (Input.Held(Input.InputAction.PathDebug))
             {
                 Raylib.BeginDrawing();
                 Raylib.ClearBackground(new Color(16, 8, 4, 255));

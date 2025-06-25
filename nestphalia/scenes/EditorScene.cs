@@ -98,7 +98,7 @@ public class EditorScene : Scene
                 throw new ArgumentOutOfRangeException();
         }
         
-        if (IsMouseButtonPressed(MouseButton.Right))
+        if (Input.Pressed(MouseButton.Right))
         {
             Int2D tilePos = World.GetMouseTilePos();
             if (tilePos.X >= 1 && tilePos.X < 21 && tilePos.Y >= 1 && tilePos.Y < 21)
@@ -116,7 +116,7 @@ public class EditorScene : Scene
             }
         }
 
-        if (Input.Pressed(Input.Action.Exit)) _startPrevScene();
+        if (Input.Pressed(Input.InputAction.Exit)) _startPrevScene();
         
         // lazy hack so resizing the window doesn't offset the viewport
         World.Camera.Zoom = GetWindowScale().X;
@@ -198,7 +198,6 @@ public class EditorScene : Scene
             DrawTextLeft(-80,  -290, $"Cost: ${_price} bug dollars");
             DrawTextLeft( 160, -290, $"Stratagems: {_beaconCount}/{4}", color: _beaconCount > 4 ? Color.Red : Color.White);
         }
-        EndDrawing();
     }
 
     private void StructureList()
@@ -260,7 +259,7 @@ public class EditorScene : Scene
     
     private void EraseTool()
     {
-        if (IsMouseButtonDown(MouseButton.Left))
+        if (Input.Held(MouseButton.Left))
         {
             Int2D tilePos = World.GetMouseTilePos();
             
@@ -281,7 +280,7 @@ public class EditorScene : Scene
             _toolActive = EditorTool.Erase;
             return;
         }
-        if (IsMouseButtonDown(MouseButton.Left))
+        if (Input.Held(MouseButton.Left))
         {
             Int2D tilePos = World.GetMouseTilePos();
             

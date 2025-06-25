@@ -26,6 +26,11 @@ public static class GUI
         return GetMousePosition() / GetWindowScale();
     }
 
+    public static Vector2 GetScaledMouseDelta()
+    {
+        return GetMouseDelta() / GetWindowScale();
+    }
+
     public static Vector2 GetWindowScale()
     {
         if (Settings.Saved.WindowScale)
@@ -66,14 +71,14 @@ public static class GUI
         int tileSize = texture.Width / 3;
         
         // resize
-        if (resizable && IsMouseButtonDown(MouseButton.Left) && CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(GetMouseDelta() + rect.Position + rect.Size - Vector2.One * tileSize, tileSize, tileSize)))
+        if (resizable && Input.Held(MouseButton.Left) && CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(GetScaledMouseDelta() + rect.Position + rect.Size - Vector2.One * tileSize, tileSize, tileSize)))
         {
-            rect.Size = Vector2.Clamp(rect.Size + GetMouseDelta(), Vector2.Zero, Vector2.PositiveInfinity);
+            rect.Size = Vector2.Clamp(rect.Size + GetScaledMouseDelta(), Vector2.Zero, Vector2.PositiveInfinity);
         }
         // move
-        else if (draggable && IsMouseButtonDown(MouseButton.Left) && CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(rect.Position + GetMouseDelta(), rect.Width, tileSize)))
+        else if (draggable && Input.Held(MouseButton.Left) && CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(rect.Position + GetScaledMouseDelta(), rect.Width, tileSize)))
         {
-            rect.Position = Vector2.Clamp(rect.Position + GetMouseDelta(), Vector2.Zero, Screen.BottomRight - rect.Size);
+            rect.Position = Vector2.Clamp(rect.Position + GetScaledMouseDelta(), Vector2.Zero, Screen.BottomRight - rect.Size);
         }
         
         // Draw background
@@ -84,8 +89,8 @@ public static class GUI
         for (int y = 0; y <= centerHeight; y++)
         {
             texRect = new Rectangle(tileSize, tileSize, tileSize, tileSize);
-            if (x == centerWidth) texRect.Width = (int)rect.Width % tileSize;
-            if (y == centerHeight) texRect.Height = (int)rect.Height % tileSize;
+            if (x == centerWidth) texRect.Width = (int)(rect.Width % tileSize)+1;
+            if (y == centerHeight) texRect.Height = (int)(rect.Height % tileSize)+1;
             DrawTextureRec(texture, texRect, new Vector2(rect.X + (x+1) * tileSize, rect.Y + (y+1) * tileSize), Color.White);
         }
 
@@ -93,7 +98,7 @@ public static class GUI
         for (int x = 0; x <= centerWidth; x++)
         {
             texRect = new Rectangle(tileSize, 0, tileSize, tileSize);
-            if (x == centerWidth) texRect.Width = (int)rect.Width % tileSize;
+            if (x == centerWidth) texRect.Width = (int)(rect.Width % tileSize)+1;
             DrawTextureRec(texture, texRect, new Vector2(rect.X + (x+1) * tileSize, rect.Y), Color.White);
         }
         
@@ -101,7 +106,7 @@ public static class GUI
         for (int x = 0; x <= centerWidth; x++)
         {
             texRect = new Rectangle(tileSize, tileSize*2, tileSize, tileSize);
-            if (x == centerWidth) texRect.Width = (int)rect.Width % tileSize;
+            if (x == centerWidth) texRect.Width = (int)(rect.Width % tileSize)+1;
             DrawTextureRec(texture, texRect, new Vector2(rect.X + (x+1) * tileSize, rect.Y + rect.Height - tileSize), Color.White);
         }
         
@@ -109,7 +114,7 @@ public static class GUI
         for (int y = 0; y <= centerHeight; y++)
         {
             texRect = new Rectangle(0, tileSize, tileSize, tileSize);
-            if (y == centerHeight) texRect.Height = (int)rect.Height % tileSize;
+            if (y == centerHeight) texRect.Height = (int)(rect.Height % tileSize)+1;
             DrawTextureRec(texture, texRect, new Vector2(rect.X, rect.Y + (y+1) * tileSize), Color.White);
         }
         
@@ -117,7 +122,7 @@ public static class GUI
         for (int y = 0; y <= centerHeight; y++)
         {
             texRect = new Rectangle(tileSize*2, tileSize, tileSize, tileSize);
-            if (y == centerHeight) texRect.Height = (int)rect.Height % tileSize;
+            if (y == centerHeight) texRect.Height = (int)(rect.Height % tileSize)+1;
             DrawTextureRec(texture, texRect, new Vector2(rect.X + rect.Width - tileSize, rect.Y + (y+1) * tileSize), Color.White);
         }
 
@@ -150,8 +155,8 @@ public static class GUI
         x += (int)anchor.Value.X;
         y += (int)anchor.Value.Y;
         
-        bool hover = CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(x, y, 300, 40));
-        bool press = !enabled || (hover && (IsMouseButtonDown(MouseButton.Left) || IsMouseButtonReleased(MouseButton.Left)));
+        bool hover = !Input.IsSuppressed() && CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(x, y, 300, 40));
+        bool press = !enabled || (hover && (Input.Held(MouseButton.Left) || Input.Released(MouseButton.Left)));
         
         Rectangle subSprite = new Rectangle(0, !press ? !hover ? 0 : 40 : 80, 300, 40);
         DrawTextureRec(_buttonWideTexture, subSprite, new Vector2(x,y), Color.White);
@@ -160,7 +165,7 @@ public static class GUI
         if (enabled && hover)
         {
             _cursorLook = MouseCursor.PointingHand;
-            if (IsMouseButtonReleased(MouseButton.Left))
+            if (Input.Released(MouseButton.Left))
             {
                 _buttonClickSFX.Play();
                 return true;
@@ -177,8 +182,8 @@ public static class GUI
         x += (int)anchor.Value.X;
         y += (int)anchor.Value.Y;
         
-        bool hover = CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(x, y, 100, 40));
-        bool press = !enabled || (hover && (IsMouseButtonDown(MouseButton.Left) || IsMouseButtonReleased(MouseButton.Left)));
+        bool hover = !Input.IsSuppressed() && CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(x, y, 100, 40));
+        bool press = !enabled || (hover && (Input.Held(MouseButton.Left) || Input.Released(MouseButton.Left)));
         
         Rectangle subSprite = new Rectangle(0, !press ? !hover ? 0 : 40 : 80, 100, 40);
         DrawTextureRec(_buttonNarrowTexture, subSprite, new Vector2(x,y), Color.White);
@@ -187,7 +192,7 @@ public static class GUI
         if (enabled && hover)
         {
             _cursorLook = MouseCursor.PointingHand;
-            if (IsMouseButtonReleased(MouseButton.Left))
+            if (Input.Released(MouseButton.Left))
             {
                 _buttonClickSFX.Play();
                 return true;
@@ -202,7 +207,7 @@ public static class GUI
         x += (int)anchor.Value.X;
         y += (int)anchor.Value.Y;
         
-        bool hover = CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(x, y, image.Width, image.Height));
+        bool hover = !Input.IsSuppressed() && CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(x, y, image.Width, image.Height));
 
         if (selected) DrawRectangle(x-2, y-2, image.Width + 4, image.Height + 4, Color.White);
         DrawTexture(image, x, y, Color.White);
@@ -210,7 +215,7 @@ public static class GUI
         if (hover)
         {
             _cursorLook = MouseCursor.PointingHand;
-            if (IsMouseButtonReleased(MouseButton.Left))
+            if (Input.Released(MouseButton.Left))
             {
                 _buttonClickSFX.Play();
                 return true;
@@ -226,7 +231,7 @@ public static class GUI
         x += (int)anchor.Value.X;
         y += (int)anchor.Value.Y;
         
-        bool hover = CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(x, y, 24, 24));
+        bool hover = !Input.IsSuppressed() && CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(x, y, 24, 24));
 
         if (selected) DrawRectangle(x-2, y-2, 28, 28, Color.White);
         DrawTexture(image, x, y+24 - image.Height, Color.White);
@@ -234,7 +239,7 @@ public static class GUI
         if (hover)
         {
             _cursorLook = MouseCursor.PointingHand;
-            if (IsMouseButtonReleased(MouseButton.Left))
+            if (Input.Released(MouseButton.Left))
             {
                 _buttonClickSFX.Play();
                 return true;
@@ -250,7 +255,7 @@ public static class GUI
         x += (int)anchor.Value.X;
         y += (int)anchor.Value.Y;
         
-        bool hover = CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(x, y, 300, 40));
+        bool hover = !Input.IsSuppressed() && CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(x, y, 300, 40));
         
         Rectangle subSprite = new Rectangle(0, !hover ? 0 : 40, 300, 40);
         DrawTextureRec(_buttonWideTexture, subSprite, new Vector2(x,y), Color.White);
@@ -275,7 +280,7 @@ public static class GUI
                 key = GetCharPressed();  // Check next character in the queue
             }
     
-            if ((IsKeyPressed(KeyboardKey.Backspace) || IsKeyPressedRepeat(KeyboardKey.Backspace)) && text.Length > 0)
+            if ((Input.Pressed(KeyboardKey.Backspace) || Input.Repeat(KeyboardKey.Backspace)) && text.Length > 0)
             {
                 text = text.Substring(0, text.Length - 1);
             }
@@ -289,7 +294,12 @@ public static class GUI
         x += (int)anchor.Value.X;
         y += (int)anchor.Value.Y;
         
-        bool hover = CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(x, y, 300, 40));
+        bool hover = !Input.IsSuppressed() && CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(x, y, 300, 40));
+        bool press = (hover && (Input.Held(MouseButton.Left) || Input.Held(MouseButton.Right)));
+        
+        Rectangle subSprite = new Rectangle(0, !press ? !hover ? 0 : 40 : 80, 300, 40);
+        DrawTextureRec(_buttonWideTexture, subSprite, new Vector2(x,y), Color.White);
+        DrawTextCentered(x+150, y+20, label, anchor: Vector2.Zero);
 
         if (hover)
         {
@@ -298,20 +308,16 @@ public static class GUI
             DrawRectangle(Screen.CenterX, Screen.CenterY - 300, 600, 600, ColorAlpha(Color.Black, 0.5f));
             DrawTextLeft(2, -298, text);
 
-            if (IsMouseButtonPressed(MouseButton.Left))
+            if (Input.Released(MouseButton.Left))
             {
                 text = GetClipboardText_();
             }
 
-            if (IsMouseButtonPressed(MouseButton.Right))
+            if (Input.Released(MouseButton.Right))
             {
                 SetClipboardText(text);
             }
         }
-        
-        Rectangle subSprite = new Rectangle(0, !hover ? 0 : 40, 300, 40);
-        DrawTextureRec(_buttonWideTexture, subSprite, new Vector2(x,y), Color.White);
-        DrawTextCentered(x+150, y+20, label, anchor: Vector2.Zero);
         
         return text;
     }

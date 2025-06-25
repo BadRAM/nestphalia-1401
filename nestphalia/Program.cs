@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Raylib_cs;
 using static Raylib_cs.Raylib;
 namespace nestphalia;
 
@@ -39,11 +40,17 @@ static class Program
 	        {
 		        Screen.UpdateBounds();
 	        }
-			
-	        GUI.UpdateCursor();
 	        
 			CurrentScene.Update();
+			if (WindowShouldClose()) break;
 			
+			Popup.Update();
+			GameConsole.Draw();
+			GUI.UpdateCursor();
+			
+			EndDrawing();
+
+			// Ugly hack to fix loud sound at start of first song.
 	        if (Time.Scaled <= 1)
 	        {
 		        SetMusicVolume(Resources.MusicPlaying, MathF.Min((float)Time.Scaled, 0.3f));

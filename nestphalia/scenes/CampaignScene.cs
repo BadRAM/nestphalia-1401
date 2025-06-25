@@ -96,7 +96,7 @@ public class CampaignScene : Scene
             _data.Level++;
         }
         
-        if (Input.Pressed(Input.Action.Exit))
+        if (Input.Pressed(Input.InputAction.Exit))
         {
             new MenuScene().Start();
         }
@@ -164,8 +164,6 @@ public class CampaignScene : Scene
         {
             new MenuScene().Start();
         }
-        
-        Raylib.EndDrawing();
     }
 
     private void BattleOver(Team? winner)
