@@ -1,13 +1,16 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Raylib_cs;
 using static nestphalia.GUI;
 
 namespace nestphalia;
 
 public class SavedSettings
 {
-    [JsonInclude] public bool SFXMute;
-    [JsonInclude] public bool MusicMute;
+    // [JsonInclude] public bool SFXMute;
+    [JsonInclude] public double SFXVolume = 1;
+    // [JsonInclude] public bool MusicMute;
+    [JsonInclude] public double MusicVolume = 1;
     [JsonInclude] public bool WindowScale;
     [JsonInclude] public bool AccessibleFont;
 
@@ -47,18 +50,21 @@ public static class Settings
     // returns true if the 'close' button has been pressed
     public static bool DrawSettingsMenu()
     {
-        if (Button300(-150, -80, Saved.MusicMute ? "Unmute Music" : "Mute Music")) 
+        double vol = Slider(-150, -100, "Music Volume", Saved.MusicVolume);
+        if (Math.Abs(vol - Saved.MusicVolume) > 0.0001) // If volume was changed
         {
-            Saved.MusicMute = !Saved.MusicMute;
-            Save();
-            // Resources.PlayMusicByName("unreal_technology_demo_95_-_unreals");
-            Resources.RestartMusic();
-        }
-        if (Button300(-150, -40, Saved.SFXMute ? "Unmute SFX" : "Mute SFX"))
-        {
-            Saved.SFXMute = !Saved.SFXMute;
+            Saved.MusicVolume = vol;
+            Resources.MusicVolumeChanged();
             Save();
         }
+        
+        vol = Slider(-150, -50, "SFX Volume", Saved.SFXVolume);
+        if (Math.Abs(vol - Saved.SFXVolume) > 0.0001) // If volume was changed
+        {
+            Saved.SFXVolume = vol;
+            Save();
+        }
+        
         if (Button300(-150, 0, "Accessible Font"))
         {
             Saved.AccessibleFont = !Saved.AccessibleFont;

@@ -8,6 +8,8 @@ public static class GUI
 {
     private static Texture2D _buttonWideTexture;
     private static Texture2D _buttonNarrowTexture;
+    private static Texture2D _sliderBarTexture;
+    private static Texture2D _sliderPinTexture;
     private static SoundResource _buttonClickSFX;
     private static MouseCursor _cursorLook;
     public static Font Font;
@@ -17,6 +19,8 @@ public static class GUI
     {
         _buttonWideTexture = Resources.GetTextureByName("button_wide");
         _buttonNarrowTexture = Resources.GetTextureByName("button_narrow");
+        _sliderBarTexture = Resources.GetTextureByName("slider_bar");
+        _sliderPinTexture = Resources.GetTextureByName("slider_pin");
         _buttonClickSFX = Resources.GetSoundByName("shovel");
     }
 
@@ -247,6 +251,34 @@ public static class GUI
         }
         
         return false;
+    }
+
+    public static double Slider(int x, int y, string label, double value, Vector2? anchor = null)
+    {
+        anchor ??= Screen.Center;
+        x += (int)anchor.Value.X;
+        y += (int)anchor.Value.Y;
+        
+        bool hover = !Input.IsSuppressed() && CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(x, y, 300, 40));
+        bool press = (hover && (Input.Held(MouseButton.Left) || Input.Released(MouseButton.Left)));
+        
+        // if clicking on bar, move pin to mouse
+        if (hover && press)
+        {
+            // value = Math.Clamp((GetScaledMousePosition().X - x + 20) / 260, 0, 1) * (max - min) + min ;
+            value = Math.Clamp((GetScaledMousePosition().X - x - 10) / 280, 0, 1);
+        }
+        
+        // Draw bar
+        DrawTexture(_sliderBarTexture, x, y, Color.White);
+        // Draw title
+        DrawTextLeft(x + 2, y + 2, label, anchor: Vector2.Zero);
+        // Draw scale labels
+        // Draw pin
+        // DrawTexture(_sliderPinTexture, (int)(x + (value - min) / max * 260), y, Color.White);
+        DrawTexture(_sliderPinTexture, (int)(x - 10 + value * 280), y, Color.White);
+
+        return value;
     }
 
     public static string TextEntry(int x, int y, string text, Vector2? anchor = null)

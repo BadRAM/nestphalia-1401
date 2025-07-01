@@ -39,10 +39,10 @@ public class SoundResource
     
     public void Play(float pan = 0.5f, float pitch = 1f, float volume = 0.75f)
     {
-        if (Settings.Saved.SFXMute || IsSoundPlaying(_soundBuffer[_bufferIndex])) return;
+        if (Settings.Saved.SFXVolume == 0 || IsSoundPlaying(_soundBuffer[_bufferIndex])) return;
         SetSoundPan(_soundBuffer[_bufferIndex], pan);
         SetSoundPitch(_soundBuffer[_bufferIndex], pitch);
-        SetSoundVolume(_soundBuffer[_bufferIndex], volume);
+        SetSoundVolume(_soundBuffer[_bufferIndex], volume * (float)Settings.Saved.SFXVolume);
         PlaySound(_soundBuffer[_bufferIndex]);
         _bufferIndex++;
         _bufferIndex %= _soundBuffer.Length;
@@ -157,16 +157,17 @@ public static class Resources
     public static void PlayMusicByName(string name)
     {
         StopMusicStream(MusicPlaying);
-        if (Settings.Saved.MusicMute) return;
         
         // MusicResource? s = _music.FirstOrDefault(x => x.Name == name);
         MusicResource? s = null;
         if (_music.ContainsKey(name)) s = _music[name];
+
+        // if (Settings.Saved.MusicVolume == 0) return;
         
         if (s != null)
         {
             MusicPlaying = s.Music;
-            SetMusicVolume(MusicPlaying, 0.3f);
+            SetMusicVolume(MusicPlaying, (float)Settings.Saved.MusicVolume * 0.3f);
             PlayMusicStream(MusicPlaying);
         }
         else
@@ -179,17 +180,17 @@ public static class Resources
         }
     }
 
-    // public static void SetTeamColor(Color color)
-    // {
-    //     SetShaderValue(TeamColorShader, _teamColorLoc, color, ShaderUniformDataType.Vec4);
-    // }
-    
-    public static void RestartMusic()
+    public static void MusicVolumeChanged()
     {
-        StopMusicStream(MusicPlaying);
-        if (Settings.Saved.MusicMute) return;
-        PlayMusicStream(MusicPlaying);
+        SetMusicVolume(MusicPlaying, (float)Settings.Saved.MusicVolume * 0.3f);
     }
+    
+    // public static void RestartMusic()
+    // {
+    //     StopMusicStream(MusicPlaying);
+    //     if (Settings.Saved.MusicVolume == 0) return;
+    //     PlayMusicStream(MusicPlaying);
+    // }
 
     public static void Unload()
     {
