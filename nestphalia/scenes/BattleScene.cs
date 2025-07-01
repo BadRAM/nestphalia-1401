@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Numerics;
 using Raylib_cs;
 using static nestphalia.GUI;
@@ -24,21 +23,11 @@ public class BattleScene : Scene
     private double _cameraShakeIntensity = 6;
     private double _cameraShakeRemaining = 0;
     
-    private DialogBox _dialogBox;
-    private List<DialogBox> _dialogQueue = new List<DialogBox>()
-    {
-        // new DialogBox("I Won't let you ruin my perfect perfect plan!         \nSacrifices MUST be made!!!", DialogBox.Mode.Left, Resources.GetTextureByName("kray")),
-        // new DialogBox("What about that big opening in the wall?", DialogBox.Mode.Right, Resources.GetTextureByName("knux")),
-        // new DialogBox("How could my perfect perfect plan be defeated so easily!", DialogBox.Mode.Both, Resources.GetTextureByName("knux"), Resources.GetTextureByName("kray")),
-        // new DialogBox("Kray gave up...")
-    };
-    
     private string _log;
     
     private enum SceneState
     {
         StartPending,
-        Dialogue,
         BattleActive,
         BattleFinished,
         Paused,
@@ -72,7 +61,7 @@ public class BattleScene : Scene
         HandleInputs();
 
         // ----- WORLD UPDATE PHASE -----
-        if (_state == SceneState.BattleActive || _state == SceneState.BattleFinished)
+        if (!Popup.PopupActive() && (_state == SceneState.BattleActive || _state == SceneState.BattleFinished))
         {
             UpdateWorld();
             DoCameraShake();
@@ -91,9 +80,6 @@ public class BattleScene : Scene
         switch (_state)
         {
             case SceneState.StartPending:
-                break;
-            case SceneState.Dialogue:
-                _dialogBox.Draw();
                 break;
             case SceneState.BattleActive:
                 if (Input.Held(Input.InputAction.FastForward))
@@ -186,20 +172,6 @@ public class BattleScene : Scene
         if (Input.Pressed(Input.InputAction.PathDebug))
         {
             _pathFinderDebug = !_pathFinderDebug;
-        }
-
-        if (Input.Pressed(KeyboardKey.T) && _dialogQueue.Count > 0)
-        {
-            Time.TimeScale = 0;
-            _dialogBox = _dialogQueue[0];
-            _dialogBox.Start();
-            _dialogQueue.RemoveAt(0);
-            _state = SceneState.Dialogue;
-        }
-        if (_state == SceneState.Dialogue && Input.Pressed(Input.InputAction.AdvanceDialogue))
-        {
-            Time.TimeScale = 1;
-            _state = SceneState.BattleActive;
         }
         
         if (Input.Pressed(Input.InputAction.Debug))
@@ -357,20 +329,6 @@ public class BattleScene : Scene
         {
             World.Camera.Offset -= _cameraShakeDisplacement;
             _cameraShakeDisplacement = Vector2.Zero;
-        }
-    }
-
-    public void AddDialog(DialogBox dialogBox)
-    {
-        _dialogQueue.Add(dialogBox);
-
-        if (_state != SceneState.Dialogue)
-        {
-            Time.TimeScale = 0;
-            _dialogBox = _dialogQueue[0];
-            _dialogBox.Start();
-            _dialogQueue.RemoveAt(0);
-            _state = SceneState.Dialogue;
         }
     }
 }

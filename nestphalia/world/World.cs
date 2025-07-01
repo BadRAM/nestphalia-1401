@@ -183,6 +183,9 @@ public static class World
         
         Determinator.Start(deterministic);
 
+        string result = WrenCommand.Execute(level.Script);
+        GameConsole.WriteLine($"World.InitializeBattle executed script:{level.Script}\nResult:\n{result}");
+        
         _battleStarted = true;
     }
 

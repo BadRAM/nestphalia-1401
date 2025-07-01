@@ -4,91 +4,42 @@ using WrenSharp;
 
 namespace nestphalia;
 
-public class WrenBufferOutput : IWrenWriteOutput, IWrenErrorOutput
-{
-    private string buffer;
-    
-    public void OutputWrite(WrenVM vm, string text)
-    {
-        buffer += text;
-    }
-
-    public void OutputError(WrenVM vm, WrenErrorType errorType, string moduleName, int lineNumber, string message)
-    {
-        switch (errorType)
-        {
-            case WrenErrorType.Compile:
-                buffer += ($"Wren compile error in {moduleName}:{lineNumber} : {message}") + "\n";
-                break;
-
-            case WrenErrorType.StackTrace:
-                buffer += ($"at {message} in {moduleName}:{lineNumber}") + "\n";
-                break;
-
-            case WrenErrorType.Runtime:
-                buffer += (string.IsNullOrEmpty(moduleName)
-                    ? $"Wren error: {message}"
-                    : $"Wren error in {moduleName}: {message}") + "\n";
-                break;
-        }
-    }
-
-    public string GetBuffer()
-    {
-        string ret = buffer;
-        buffer = "";
-        return ret;
-    }
-}
-
 public static class Command
 {
-    // private static Dictionary<string, Func<string, string>> _commands;
-    private static WrenSharpVM _vm;
-    private static WrenBufferOutput _output = new WrenBufferOutput();
+    private static Dictionary<string, Func<string, string>> _commands;
 
     static Command()
     {
-        // _commands = new Dictionary<string, Func<string, string>>();
-        // foreach (MethodInfo methodInfo in typeof(Command).GetMethods())
-        // {
-        //     IsCommand? attr = methodInfo.GetCustomAttribute<IsCommand>();
-        //     if (attr == null) continue;
-        //     _commands.Add(attr.Name, (Func<string, string>)methodInfo.CreateDelegate(typeof(Func<string, string>)));
-        // }
-
-        _vm = new WrenSharpVM(new WrenVMConfiguration()
+        _commands = new Dictionary<string, Func<string, string>>();
+        foreach (MethodInfo methodInfo in typeof(Command).GetMethods())
         {
-            LogErrors = true,
-            ErrorOutput = _output,
-            WriteOutput = _output,
-        });
-
-        string script = @"
-class Command {
-    foreign static kill(team, id)
-    foreign static dialog(text)
-    foreign static dialogR(portrait, text)
-    foreign static dialogL(portrait, text)
-}";
-
-        var cm = _vm.Foreign("main", "Command");
-        cm.Static("kill(_,_)", ctx => Kill(ctx.GetArgString(0), ctx.GetArgString(1)));
-        // cm.Static("dialog(_,_,_,_)", ctx => Dialog(ctx.GetArgString(0), ctx.GetArgString(1), ctx.GetArgString(2), ctx.GetArgString(3)));
-        // cm.Static("dialogR(_,_,_,_)", ctx => Dialog(ctx.GetArgString(0), ctx.GetArgString(1), ctx.GetArgString(2), ctx.GetArgString(3)));
-        // cm.Static("dialogL(_,_,_,_)", ctx => Dialog(ctx.GetArgString(0), ctx.GetArgString(1), ctx.GetArgString(2), ctx.GetArgString(3)));
-        
-        _vm.Interpret("main", script);
+            IsCommand? attr = methodInfo.GetCustomAttribute<IsCommand>();
+            if (attr == null) continue;
+            _commands.Add(attr.Name, (Func<string, string>)methodInfo.CreateDelegate(typeof(Func<string, string>)));
+        }
     }
     
     public static string Execute(string input)
     {
-        _vm.Interpret(
-            module: "main",
-            source: input, 
-            throwOnFailure: false);
-
-        return _output.GetBuffer();
+        List<string> words = new List<string>(input.Split(" "));
+        if (words.Count == 0) return "";
+        string command = words[0].ToUpper();
+        words.RemoveAt(0);
+        if (!_commands.ContainsKey(command)) return $"Command not recognized";
+        
+        try
+        {
+            return _commands[command].Invoke(string.Join(" ", words));
+        }
+        catch (Exception e)
+        {
+            #if DEBUG
+            GameConsole.WriteLine(e.ToString());
+            #else
+            GameConsole.WriteLine(e.Message);
+            #endif
+            return "";
+        }
     }
     
     [AttributeUsage(AttributeTargets.Method)]
@@ -105,70 +56,91 @@ class Command {
             Help = help;
         }
     }
+
+    [IsCommand("HELP", "List commands, or display help text for a command",
+        "Usage: HELP [command]\n But you already knew that, didn't you? ;)")]
+    public static string Help(string args)
+    {
+        string command = args.Split(" ")[0].ToUpper();
+        if (_commands.ContainsKey(command))
+        {
+            IsCommand attr = _commands[command].Method.GetCustomAttribute<IsCommand>();
+            GameConsole.WriteLine($"{attr.Name} - {attr.Description}\n{attr.Help}");
+            return "";
+        }
+        else
+        {
+            if (command != "") GameConsole.WriteLine($"Couldn't find command: {command}");
+            GameConsole.WriteLine($"{_commands.Count} Commands Available:");
+            foreach (MethodInfo methodInfo in typeof(Command).GetMethods())
+            {
+                IsCommand? attr = methodInfo.GetCustomAttribute<IsCommand>();
+                if (attr == null) continue;
+                GameConsole.WriteLine($"{attr.Name} - {attr.Description}");
+            }
+            return "";
+        }
+    }
     
-    // public static string Dialog(DialogBox.Mode mode, string portrait, string text)
+    // [IsCommand("DIALOG", "Display a dialog box", 
+    //     "Usage: DIALOG [mode] [texture1] [texture2] Dialog Text...\n" +
+    //     " Valid [mode]s: NONE, LEFT, RIGHT, BOTH")]
+    // public static string Dialog(string args)
     // {
     //     if (Program.CurrentScene is not BattleScene)
     //     {
     //         return "Can't show dialog in this scene!";
     //     }
     //     
-    //     Texture2D portraitTex = Resources.GetTextureByName(portrait);
-    //     
-    //     Popup.Start(new DialogBox(text, () => {}, mode));
+    //     List<string> words = new List<string>(args.Split(" "));
+    //     if (Enum.TryParse(words[0], true, out DialogBox.Mode mode))
+    //     {
+    //         words.RemoveAt(0);
+    //     }
+    //     else
+    //     {
+    //         mode = DialogBox.Mode.None;
+    //     }
+    //     Texture2D? portraitOne = null;
+    //     if (mode != DialogBox.Mode.None)
+    //     {
+    //         portraitOne = Resources.GetTextureByName(words[0]);
+    //         words.RemoveAt(0);
+    //     }
+    //     Texture2D? portraitTwo = null;
+    //     DialogBox box = new DialogBox(string.Join(" ", words), mode, portraitOne, portraitTwo);
+    //     if (Program.CurrentScene is BattleScene bs)
+    //     {
+    //         bs.AddDialog(box);
+    //         return $"Dialog Queued Successfully";
+    //     }
+    //     return "Dialog failed, unsupported by scene";
     // }
-
     
-    public static void Kill(string team, string id)
+    [IsCommand("KILL", "Kill minions", 
+        "Usage: KILL [minionID] [team]\n" +
+        " [minionID] if not included, kills all minions")]
+    public static string Kill(string args)
     {
         if (Program.CurrentScene is not BattleScene)
         {
-            GameConsole.WriteLine("Can't do that in this scene!");
-            return;
+            return "Can't do that in this scene!";
         }
-
-        Team? t = null;
-        if (team.ToLower() == "left") t = World.LeftTeam;
-        if (team.ToLower() == "right") t = World.RightTeam;
+        
+        string id = args.Split(" ")[0].ToLower();
         int count = 0;
         for (int index = 0; index < World.Minions.Count; index++)
         {
             Minion minion = World.Minions[index];
-            if ((id == "" || id == minion.Template.ID.ToLower()) && (t == null || t == minion.Team))
+            if (id == "" || id == minion.Template.ID.ToLower())
             {
                 minion.Health = 0;
                 minion.Die();
                 count++;
             }
         }
-        
-        GameConsole.WriteLine($"Killed {count} Minions");
+        return $"Killed {count} Minions";
     }
-    
-    // [IsCommand("KILL", "Kill minions", 
-    //     "Usage: KILL [minionID] [team]\n" +
-    //     " [minionID] if not included, kills all minions")]
-    // public static string Kill(string args)
-    // {
-    //     if (Program.CurrentScene is not BattleScene)
-    //     {
-    //         return "Can't do that in this scene!";
-    //     }
-    //     
-    //     string id = args.Split(" ")[0].ToLower();
-    //     int count = 0;
-    //     for (int index = 0; index < World.Minions.Count; index++)
-    //     {
-    //         Minion minion = World.Minions[index];
-    //         if (id == "" || id == minion.Template.ID.ToLower())
-    //         {
-    //             minion.Health = 0;
-    //             minion.Die();
-    //             count++;
-    //         }
-    //     }
-    //     return $"Killed {count} Minions";
-    // }
 
     [IsCommand("CENSUS", "List Minion populations", 
         "Usage: CENSUS [side]\n" +

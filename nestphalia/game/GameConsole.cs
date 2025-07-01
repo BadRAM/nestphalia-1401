@@ -68,6 +68,10 @@ public static class GameConsole
                 if ((Input.Pressed(KeyboardKey.Backspace) || Input.Repeat(KeyboardKey.Backspace)) && _input.Length > 0)
                 {
                     _input = _input.Substring(0, _input.Length - 1);
+                    if (Input.Held(KeyboardKey.LeftControl) || Input.Held(KeyboardKey.RightControl))
+                    {
+                        _input = "";
+                    }
                 }
                 Input.EndSuppressionOverride();
             }
@@ -80,7 +84,7 @@ public static class GameConsole
             {
                 _commandHistory.Insert(0, _input);
                 WriteLine(_input);
-                string commandOutput = Command.Execute(_input);
+                string commandOutput = WrenCommand.Execute(_input);
                 if ((commandOutput ?? "") != "") WriteLine(commandOutput);
                 _input = "";
             }

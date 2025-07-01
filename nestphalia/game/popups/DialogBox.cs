@@ -8,7 +8,7 @@ public class DialogBox : Popup
 {
     private string _text;
     private int _charsRevealed;
-    private double _timeStarted;
+    private double _lastCharRevealTime;
     private double _timePerChar = 0.1;
     private Texture2D _portrait;
     private Texture2D _portraitPanel;
@@ -29,22 +29,24 @@ public class DialogBox : Popup
         _portrait = portrait ?? Resources.MissingTexture;
         _portraitPanel = Resources.GetTextureByName("ability_slot");
         _background = Resources.GetTextureByName("9slice");
-        _timeStarted = Time.Unscaled;
+        _lastCharRevealTime = Time.Unscaled;
         _text = text;
     }
     
     public void Start()
     {
-        _timeStarted = Time.Unscaled;
+        _lastCharRevealTime = Time.Unscaled;
     }
     
     public override void Draw()
     {
         Draw9Slice(_background, _rect);
-        // DrawRectangle(Screen.CenterX - 262, Screen.CenterY + 98,  524, 76, Color.Black);
-        // DrawRectangle(Screen.CenterX - 260, Screen.CenterY + 100, 520, 72, Color.Brown);
-        
-        _charsRevealed = (int)((Time.Unscaled - _timeStarted) / _timePerChar);
+
+        if (Time.Unscaled - _lastCharRevealTime > _timePerChar)
+        {
+            _charsRevealed++;
+            _lastCharRevealTime = Time.Unscaled;
+        }
         DrawTextLeft(_mode == Mode.Left ? -188 : -256, 104, _text.Substring(0, Math.Min(_charsRevealed, _text.Length)));
         
         if (_mode != Mode.None)
@@ -52,6 +54,18 @@ public class DialogBox : Popup
             int x = Screen.CenterX + (_mode == Mode.Left ? -256 : 192);
             DrawTexture(_portraitPanel, x, Screen.CenterY + 104, Color.White);
             DrawTexture(_portrait, x, Screen.CenterY + 104, Color.White);
+        }
+
+        if (Input.Pressed(Input.InputAction.AdvanceDialogue))
+        {
+            if (_charsRevealed < _text.Length)
+            {
+                _charsRevealed = _text.Length;
+            }
+            else
+            {
+                Close();
+            }
         }
     }
 }

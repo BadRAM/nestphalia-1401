@@ -26,6 +26,7 @@ public abstract class Popup(Action closeAction)
     {
         if (_activePopup != null) throw new Exception("Tried to create a popup when one already exists");
         _activePopup = popup;
+        Time.TimeScale = 0;
         Input.SetSuppressed(Input.SuppressionSource.Popup, true);
     }
     
@@ -35,6 +36,7 @@ public abstract class Popup(Action closeAction)
     protected void Close()
     {
         _activePopup = null;
+        Time.TimeScale = 1;
         Input.SetSuppressed(Input.SuppressionSource.Popup, false);
         _closeAction.Invoke();
     }
