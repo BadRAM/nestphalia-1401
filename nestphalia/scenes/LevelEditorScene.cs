@@ -21,6 +21,7 @@ public class LevelEditorScene : Scene
     private LevelEditorTool _toolActive;
     private List<FloorTileTemplate> _selectedFloors = new List<FloorTileTemplate>();
     private StructureTemplate? _selectedStructure = null;
+    private List<string> _loadableLevels = new List<string>();
     // private int _brushRadius = 2;
 
     private enum LevelEditorTool
@@ -116,16 +117,12 @@ public class LevelEditorScene : Scene
         {
             _toolActive = LevelEditorTool.StructureBrush;
             _selectedStructure = null;
-            foreach (StructureTemplate t in _structures)
-            {
-                GameConsole.WriteLine(t.ID);
-            }
         }
 
         _idBuffer = TextEntry(0, 300, _idBuffer, anchor: Screen.TopLeft);
         if (Button100(0, 340, "Save", anchor: Screen.TopLeft)) Save();
         if (Button100(100, 340, "Folder", anchor: Screen.TopLeft)) Utils.OpenFolder(@"\resources\levels");
-        if (Button100(200, 340, "Load", anchor: Screen.TopLeft)) Load();
+        if (Button100(200, 340, "Load", anchor: Screen.TopLeft)) ShowLoadPopup();
         BigTextCopyPad(0, 380, "Full Level Data", JObject.FromObject(_level).ToString(), anchor: Screen.TopLeft);
         
         _levelBuffer = BigTextCopyPad(0, 460, "Level Metadata", _levelBuffer, anchor: Screen.TopLeft);
@@ -225,17 +222,17 @@ public class LevelEditorScene : Scene
             _level.Structures[x, y] = World.GetTile(x, y)?.Template.ID ?? "";
         }
         
-        File.WriteAllText(Path(), JsonConvert.SerializeObject(_level, Formatting.Indented));
+        File.WriteAllText(SelectedSavePath(), JsonConvert.SerializeObject(_level, Formatting.Indented));
         
         Load();
     }
     
     private void Load()
     {
-        if (File.Exists(Path()))
+        if (File.Exists(SelectedSavePath()))
         {
-            _level.LoadValues(File.ReadAllText(Path()));
-            GameConsole.WriteLine($"loaded {Path()}");
+            _level.LoadValues(File.ReadAllText(SelectedSavePath()));
+            GameConsole.WriteLine($"loaded {SelectedSavePath()}");
         }
         
         for (int x = 0; x < _level.WorldSize.X; x++)
@@ -257,7 +254,25 @@ public class LevelEditorScene : Scene
         _levelBuffer = j.ToString();
     }
 
-    private string Path()
+    private void ShowLoadPopup()
+    {
+        _loadableLevels = Directory.GetFiles(Directory.GetCurrentDirectory() + "/resources/levels/").ToList();
+        for (int i = 0; i < _loadableLevels.Count; i++)
+        {
+            _loadableLevels[i] = Path.GetFileNameWithoutExtension(_loadableLevels[i]);
+        }
+        _loadableLevels.Sort();
+        
+        Popup.Start(new PickerPopup("Select level to load", _loadableLevels.ToArray(), LoadFromList));
+    }
+
+    private void LoadFromList(int index)
+    {
+        _idBuffer = _loadableLevels[index];
+        Load();
+    }
+
+    private string SelectedSavePath()
     {
         return Directory.GetCurrentDirectory() + "/resources/levels/" + _idBuffer + ".json";
     }

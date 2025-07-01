@@ -33,7 +33,7 @@ public abstract class Popup(Action closeAction)
     // This is supplied by implementations of Popup to be called when they are active.
     public abstract void Draw();
 
-    protected void Close()
+    protected virtual void Close()
     {
         _activePopup = null;
         Time.TimeScale = 1;

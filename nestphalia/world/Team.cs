@@ -8,6 +8,8 @@ namespace nestphalia;
 // TODO: Cache target list here
 public class Team
 {
+    private const int FriendlyStructureWeightPenalty = 1000000;
+    
     public string Name;
     private double[,] _fearMap = new double[World.BoardWidth, World.BoardHeight];
     private double[,] _hateMap = new double[World.BoardWidth, World.BoardHeight];
@@ -331,14 +333,14 @@ public class Team
             }
             else if (structure is HazardSign && structure.Team == this)
             {
-                weight += 1000000;
+                weight += FriendlyStructureWeightPenalty;
             }
             else
             {
                 if (structure.NavSolid(this))
                 {
                     weight += structure.Health;
-                    if (structure.Team == this) weight += 1000000; //return null;
+                    if (structure.Team == this) weight += FriendlyStructureWeightPenalty; //return null;
                 }
             }
         }
@@ -349,5 +351,14 @@ public class Team
     {
         _weightMap[pos.X, pos.Y] = CalculateWeight(pos.X, pos.Y);
         _navSolidMap[pos.X, pos.Y] = World.GetTile(pos.X, pos.Y)?.NavSolid(this) ?? false;
+    }
+
+    public void ClearFear()
+    {
+        for (int x = 0; x < World.BoardWidth; x++)
+        for (int y = 0; y < World.BoardHeight; y++)
+        {
+            _fearMap[x, y] = 0;
+        }
     }
 }

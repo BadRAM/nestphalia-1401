@@ -48,8 +48,21 @@ public class MenuScene : Scene
             if (Settings.RestartNeeded) DrawTextLeft(155, 92, "Restart to apply changes");
             
             if (Button300(200, -40, "Level Editor")) new LevelEditorScene().Start();
-            if (Button300(200, -40, "Level Editor")) new LevelEditorScene().Start();
 
+
+            if (Button300(200, 40, "Test Picker"))
+            {
+                // Popup.Start( new PickerPopup("Test Picker", new List<string>({ "option 0", "option 1", "option 2" }), delegate(int i) {TestPopup(i);} ))
+                string[] s = new[]
+                {
+                    "option 0", "option 1", "option 2", "etc...", "etc...", "etc...", "etc...", "etc...", "etc...",
+                    "etc...", "etc...", "etc...", "etc...", "etc...", "etc...", "etc...", "etc...", "etc...", "etc...",
+                    "etc...", "etc...", "etc...", "etc...", "etc...", "etc...", "etc...", "etc...", "etc...", "etc...",
+                    "etc...", "etc...", "etc...", "etc...", "etc...", "etc...", "etc...", "etc...", "etc...", "etc...",
+                    "etc..."
+                };
+                Popup.Start(new PickerPopup("Test Picker", s, TestPopup));
+            }
         
             DrawTextLeft(-590, 260, "By BadRAM and rosettedotnet\nWith music from the mod archive");
         }
@@ -57,5 +70,10 @@ public class MenuScene : Scene
         {
             _settingsOpen = !Settings.DrawSettingsMenu();
         }
+    }
+
+    public void TestPopup(int select)
+    {
+        GameConsole.WriteLine($"Practice Picker Picked {select} Pixels");
     }
 }

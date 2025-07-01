@@ -38,6 +38,7 @@ Programming todo:
 - 2-3 more bugs & towers
   - Ranged attack bug
   - ~~Another flyer. Ladybug? Flies until attacked.~~
+  - Roaches - Gets within a radius of target then flies close to it.
   - Snail rework
   - Beetle rework. Attacks can damage the ball?
   - Centipede that gets longer and shorter
@@ -49,6 +50,7 @@ Programming todo:
   - Direct damage minions in radius stratagem
   - Freeze minions in radius stratagem
   - Build new wall/tower stratagem (Can it build in the neutral zone, or even the enemy fort?)
+  - Create/remove fear stratagem
 - Crush damage
 - Minion Status Effect System
 - Make Frenzy Beacon work again
@@ -80,31 +82,21 @@ Programming todo:
   - ~~Spidermom + spiderling~~
   - ~~Bees~~
   - ~~Frog~~
-- ~~States can draw special decorators~~
-- ~~Minion render layers~~
-- ~~Minion state machine~~
-- ~~minion facing flicker~~
-- ~~Fix determinism~~
 - Team colored structures, Stratagem banners in particular
 - Animated structures
   - Stratagems raise their flag as they charge, or is it when they activate?
 - ~~Settings menu scene~~
-  - Music and SFX volume sliders
-- ~~Fix High DPI mode~~
-- Add button to relaunch game when High DPI mode toggle selected
-- Assets from json
+  - ~~Music and SFX volume sliders~~
+  - Add button to relaunch game when High DPI mode toggle selected
 - More Sounds
   - Bespoke music from music peoples
   - Button hover and new button click
   - Bug Death
   - Bug take damage
   - Tower Shoot
-- Custom Cursor
-- Fix path preview
-- Screen edge scroll (off by default)
+- File Select popup
 - Migrate old JSON functions to newtonsoft
 - Stateful GUI
-- Universal Popup queue system, either an explicit queue or a yield/callback system.
 
 
 ----- Premature Optimizations -----
@@ -117,6 +109,8 @@ Programming todo:
     - ~~State machine~~
     - ~~Extract physics~~
     - Move flying behavior into base minion
+  - Projectile
+    - Convert into general purpose gameEntity
   - World
     - make it not static, with a singleton-like static reference
     - keep it static, but move all it's state into a 'WorldState' object that isn't static.
@@ -180,9 +174,7 @@ Programming todo:
 - Many more bugs and towers than current
 - Better fear evaluation, make bugs more scared of staying in scary places than passing through them.
 - Minion vs Minion melee
-- Post battle screen
 - Multiple team colors via shader & rgb swizzling, or channel splitting assets at load time, or something.
-- Limit total spiderlings a spider can spawn
 
 
 Design todo:

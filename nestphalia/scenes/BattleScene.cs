@@ -276,6 +276,9 @@ public class BattleScene : Scene
                 }
             }
 
+            World.LeftTeam.ClearFear();
+            World.RightTeam.ClearFear();
+
             List<NavPath> paths = new List<NavPath>();
             foreach (Minion minion in World.Minions)
             {
