@@ -37,11 +37,11 @@ public static class GUI
 
     public static Vector2 GetWindowScale()
     {
-        if (Settings.Saved.WindowScale)
-        {
-            return GetWindowScaleDPI();
-        }
-        return Vector2.One;
+        // if (Settings.Saved.WindowScale)
+        // {
+        //     return GetWindowScaleDPI();
+        // }
+        return (float)Settings.Saved.WindowScale * Vector2.One;
     }
 
     public static void DrawTextCentered(int x, int y, string text, float size = FontSize, Color? color = null, Vector2? anchor = null)

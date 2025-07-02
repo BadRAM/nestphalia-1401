@@ -68,7 +68,7 @@ public class BattleScene : Scene
         }
         
         // ----- DRAW PHASE -----
-        BeginDrawing();
+        Screen.BeginDrawing();
         ClearBackground(new Color(16, 8, 4, 255));
         
         World.DrawFloor();

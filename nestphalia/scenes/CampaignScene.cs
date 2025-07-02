@@ -101,7 +101,7 @@ public class CampaignScene : Scene
             new MenuScene().Start();
         }
         
-        Raylib.BeginDrawing();
+        Screen.BeginDrawing();
         Raylib.ClearBackground(Color.Black);
         Screen.DrawBackground(Color.DarkBrown);
         

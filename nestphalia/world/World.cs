@@ -433,7 +433,7 @@ public static class World
 
     public static void DrawFloor()
     {
-        Raylib.BeginMode2D(Camera);
+        Screen.SetCamera(Camera);
         
         for (int x = 0; x < BoardWidth; ++x)
         for (int y = 0; y < BoardHeight; ++y)
@@ -441,13 +441,13 @@ public static class World
             _floor[x,y].Draw(x*24, y*24);
         }
         
-        Raylib.EndMode2D();
+        Screen.SetCamera();
     }
 
     public static void Draw()
     {
         _swDraw.Restart();
-        Raylib.BeginMode2D(Camera);
+        Screen.SetCamera(Camera);
 
         Sprites = Sprites.OrderBy(o => o.GetDrawOrder()).ToList();
 
@@ -456,7 +456,7 @@ public static class World
             s.Draw();
         }
         
-        Raylib.EndMode2D();
+        Screen.SetCamera();
 
         if (_battleStarted)
         {

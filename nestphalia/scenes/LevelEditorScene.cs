@@ -94,17 +94,17 @@ public class LevelEditorScene : Scene
         
         // ===== DRAW =====
         
-        Raylib.BeginDrawing();
+        Screen.BeginDrawing();
         Raylib.ClearBackground(Color.DarkGray);
         
         World.DrawFloor();
         World.Draw();
         
         // Draw outline of player's fort position
-        Raylib.BeginMode2D(World.Camera);
+        Screen.SetCamera(World.Camera);
         Rectangle playerRect = new Rectangle(World.GetTileCenter(_level.PlayerOffset) + Vector2.One * -12, Vector2.One * 24 * 20);
         Raylib.DrawRectangleLinesEx(playerRect, 2, Raylib.ColorAlpha(Color.Blue, 0.8f));
-        Raylib.EndMode2D();
+        Screen.SetCamera();
 
         Raylib.DrawRectangle(0, Screen.TopY, 300, Screen.BottomY, Raylib.ColorAlpha(Color.Black, 0.5f));
         

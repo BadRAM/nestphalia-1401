@@ -1,7 +1,4 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Raylib_cs;
-using static Raylib_cs.Raylib;
+﻿using Raylib_cs;
 namespace nestphalia;
 
 static class Program
@@ -23,7 +20,7 @@ static class Program
 	    // Startup sequence
 	    Settings.Load();
 	    Screen.Initialize();
-	    InitAudioDevice();
+	    Raylib.InitAudioDevice();
 	    Resources.Load();
 	    Screen.Load();
 	    Assets.Load();
@@ -32,43 +29,37 @@ static class Program
         // Start the first scene. TODO: loading screen, then intro cutscene, rather than menu
         new MenuScene().Start();
         
-        while (!WindowShouldClose())
+        while (!Raylib.WindowShouldClose())
         {
 	        Time.UpdateTime();
 			
-	        if (IsWindowResized())
+	        if (Raylib.IsWindowResized())
 	        {
 		        Screen.UpdateBounds();
 	        }
 	        
 			CurrentScene.Update();
-			if (WindowShouldClose()) break;
+			if (Raylib.WindowShouldClose()) break;
 			
 			Popup.Update();
 			GameConsole.Draw();
 			GUI.UpdateCursor();
 			
-			EndDrawing();
+			Screen.EndDrawing();
 
 			// Ugly hack to fix loud sound at start of first song.
 	        if (Time.Scaled <= 1)
 	        {
-		        SetMusicVolume(Resources.MusicPlaying, MathF.Min((float)Time.Scaled, 0.3f));
+		        Raylib.SetMusicVolume(Resources.MusicPlaying, MathF.Min((float)Time.Scaled, 0.3f));
 	        }
-	        UpdateMusicStream(Resources.MusicPlaying);
+	        Raylib.UpdateMusicStream(Resources.MusicPlaying);
         }
 		
         GameConsole.WriteLine("Quitting time!");
-		
-        if (Settings.RestartNeeded)
-        {
-	        Settings.Saved.WindowScale = !Settings.Saved.WindowScale;
-	        Settings.Save();
-        }
         
 	    Resources.Unload();
         
-	    CloseAudioDevice();
+	    Raylib.CloseAudioDevice();
         //CloseWindow();
     }
 }

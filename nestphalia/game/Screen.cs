@@ -6,8 +6,8 @@ namespace nestphalia;
 
 public static class Screen
 {
-    public static int MinWidth = 1200;
-    public static int MinHeight = 600;
+    public static int MinWidth = 960;
+    public static int MinHeight = 720;
     
     public static int CenterX;
     public static int CenterY;
@@ -34,16 +34,21 @@ public static class Screen
     private static int _graffitiPosY;
     private static int _graffitiPicked;
 
+    private static Camera2D _activeCamera;
+    private static Camera2D _screenCamera = new Camera2D();
+
     public static void Initialize()
     {
         ConfigFlags flags = ConfigFlags.ResizableWindow;
-        if (Settings.Saved.WindowScale) flags |= ConfigFlags.HighDpiWindow;
+        // if (Settings.Saved.WindowScale) flags |= ConfigFlags.HighDpiWindow;
 
         SetConfigFlags(flags);
-        Vector2 scaleDpi = Settings.Saved.WindowScale ? GetWindowScaleDPI() : Vector2.One;
-        InitWindow(1200, 600, "Nestphalia 1401");
+        Vector2 scaleDpi = (float)Settings.Saved.WindowScale * Vector2.One;
+        
+        InitWindow(MinWidth, MinHeight, "Nestphalia 1401");
         SetTargetFPS(60);
         SetExitKey(KeyboardKey.Null);
+        BeginMode2D(_screenCamera);
         SetMouseScale(1, 1);
         UpdateBounds();
     }
@@ -103,23 +108,37 @@ public static class Screen
         }
     }
     
-    public static void UpdateBounds()
+    public static void UpdateBounds(Vector2? windowSize = null)
     {
         GameConsole.WriteLine($"WindowScale = {GUI.GetWindowScale()}");
 
         Vector2 scale = GUI.GetWindowScale();
         GameConsole.WriteLine($"Scale is X:{scale.X},Y:{scale.Y}");
+        SetWindowMinSize((int)(scale.X * MinWidth), (int)(scale.Y * MinHeight));
+        _screenCamera.Zoom = (float)Settings.Saved.WindowScale;
+
+        // if ((IsWindowMaximized() || IsWindowFullscreen()) &&
+        //     ((scale.X * MinWidth) > GetMonitorWidth(GetCurrentMonitor())) || 
+        //     ((scale.Y * MinHeight) > GetMonitorHeight(GetCurrentMonitor())))
+        // {
+        //     RestoreWindow();
+        // }
+        
+        if (windowSize != null && !IsWindowMaximized() && !IsWindowFullscreen())
+        {
+            SetWindowSize((int)windowSize.Value.X, (int)windowSize.Value.Y);
+        }
         
         RightX = (int)(GetScreenWidth() / scale.X);
         BottomY = (int)(GetScreenHeight() / scale.Y);
 
-        if (RightX < MinWidth || BottomY < MinHeight)
-        {
-            GameConsole.WriteLine("Window undersized, resizing...");
-            SetWindowSize(Math.Max(RightX, MinWidth), Math.Max(BottomY, MinHeight));
-            RightX = GetScreenWidth();
-            BottomY = GetScreenHeight();
-        }
+        // if (RightX < MinWidth || BottomY < MinHeight)
+        // {
+        //     GameConsole.WriteLine("Window undersized, resizing...");
+        //     SetWindowSize(Math.Max(RightX, MinWidth), Math.Max(BottomY, MinHeight));
+        //     RightX = GetScreenWidth();
+        //     BottomY = GetScreenHeight();
+        // }
         
         CenterX = RightX / 2;
         CenterY = BottomY / 2;
@@ -135,19 +154,36 @@ public static class Screen
         BottomRight = new Vector2(RightX, BottomY);
 
         RegenerateBackground();
-
-        Vector2 scaleDpi = Settings.Saved.WindowScale ? GetWindowScaleDPI() : Vector2.One;
-        SetWindowMinSize((int)(scaleDpi.X * 1200), (int)(scaleDpi.Y * 600));
     }
 
     public static void DrawBackground(Color tint)
     {
+        SetCamera();
+        
         for (int x = 0; x <= RightX/24; x++)
         for (int y = 0; y <= BottomY/24; y++)
         {
             DrawTexture(_backgroundNoise[x][y] ? _tile1 : _tile2, x * 24, y * 24 - 12, tint);
         }
-        DrawRectangle(CenterX - 600, CenterY - 300, 1200, 600, new Color(10, 10, 10, 64));
+        DrawRectangle(CenterX - MinWidth/2, CenterY - MinHeight/2, MinWidth, MinHeight, new Color(10, 10, 10, 64));
         DrawTexture(_graffiti[_graffitiPicked], _graffitiPosX, _graffitiPosY, Color.White);
+    }
+
+    public static void SetCamera(Camera2D? camera = null)
+    {
+        EndMode2D();
+        _activeCamera = camera ?? _screenCamera;
+        BeginMode2D(_activeCamera);
+    }
+
+    public static void BeginDrawing()
+    {
+        Raylib.BeginDrawing();
+        SetCamera();
+    }
+
+    public static void EndDrawing()
+    {
+        Raylib.EndDrawing();
     }
 }

@@ -43,7 +43,7 @@ public class CustomBattleMenu : Scene
             new MenuScene().Start();
         }
         
-        Raylib.BeginDrawing();
+        Screen.BeginDrawing();
         Raylib.ClearBackground(Color.Gray);
         Screen.DrawBackground(Color.DarkGray);
         

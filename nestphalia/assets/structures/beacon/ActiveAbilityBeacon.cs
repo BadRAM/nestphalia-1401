@@ -49,10 +49,9 @@ public abstract class ActiveAbilityBeacon : Structure
 
         if (Time.Scaled - TimeLastUsed < 10)
         {
-            Raylib.BeginMode2D(World.Camera);
-            
+            Screen.SetCamera(World.Camera);
             Raylib.DrawTexture(Template.Texture, (int)(TargetPosition.X - (Template.Texture.Width-20)), (int)(TargetPosition.Y - (Template.Texture.Height-8)), Color.White);
-            Raylib.EndMode2D();
+            Screen.SetCamera();
         }
     }
 

@@ -268,7 +268,7 @@ public class Team
         // fear/hate debug
         if (Input.Held(KeyboardKey.H))
         {
-            Raylib.BeginMode2D(World.Camera);
+            Screen.SetCamera(World.Camera);
             for (int x = 0; x < World.BoardWidth; x++)
             for (int y = 0; y < World.BoardHeight; y++)
             {
@@ -280,7 +280,7 @@ public class Team
                 }
                 Raylib.DrawCircleV(World.GetTileCenter(x,y), MathF.Min((float)(_weightMap[x,y]/10), 10), new Color(255,  64, 255, 128));
             }
-            Raylib.EndMode2D();
+            Screen.SetCamera();
         }
         
         // ability slots

@@ -222,7 +222,7 @@ public class PathFinder
             _swAddNodes.Stop();
             if (Input.Held(Input.InputAction.PathDebug))
             {
-                Raylib.BeginDrawing();
+                Screen.BeginDrawing();
                 Raylib.ClearBackground(new Color(16, 8, 4, 255));
                 World.DrawFloor();
                 World.Draw();
@@ -330,7 +330,7 @@ public class PathFinder
     
     public void DrawDebug()
     {
-        Raylib.BeginMode2D(World.Camera);
+        Screen.SetCamera(World.Camera);
 
         for (int x = 0; x < World.BoardWidth; x++)
         for (int y = 0; y < World.BoardHeight; y++)
@@ -356,7 +356,7 @@ public class PathFinder
                 Raylib.DrawCircleV(World.GetTileCenter(x,y), r, Color.Green);
             }
         }
-        Raylib.EndMode2D();
+        Screen.SetCamera();
         
         // ReSharper disable once InconsistentNaming
         long totalSWTime = _swTotalTime.ElapsedMilliseconds;

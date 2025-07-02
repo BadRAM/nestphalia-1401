@@ -1,3 +1,4 @@
+using System.Numerics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Raylib_cs;
@@ -11,7 +12,7 @@ public class SavedSettings
     [JsonInclude] public double SFXVolume = 1;
     // [JsonInclude] public bool MusicMute;
     [JsonInclude] public double MusicVolume = 1;
-    [JsonInclude] public bool WindowScale;
+    [JsonInclude] public double WindowScale = 1;
     [JsonInclude] public bool AccessibleFont;
 
     // Default settings constructor
@@ -72,12 +73,38 @@ public static class Settings
             Save();
         }
 
-        if (Button300(-150, 40, "High DPI mode"))
-        {
-            RestartNeeded = !RestartNeeded;
-        }
-        if (RestartNeeded) DrawTextLeft(155, 52, "Restart to apply changes");
+        // if (Button300(-150, 40, "High DPI mode"))
+        // {
+        //     RestartNeeded = !RestartNeeded;
+        // }
+        // if (RestartNeeded) DrawTextLeft(155, 52, "Restart to apply changes");
 
-        return Button300(-150, 80, "Save & Exit");
+        bool resizing = false;
+        if (Button100(-150, 40, "-") || Input.Pressed(KeyboardKey.Minus))
+        {
+            Vector2 res = new Vector2(Raylib.GetScreenWidth(), Raylib.GetScreenHeight()) / (float)Saved.WindowScale;
+            Saved.WindowScale -= 0.25;
+            Saved.WindowScale = Math.Max(Saved.WindowScale, 0.25);
+            res *= (float)Saved.WindowScale;
+            // Raylib.SetWindowMinSize(1, 1);
+            // Raylib.SetWindowSize((int)res.X, (int)res.Y);
+            Save();
+            Screen.UpdateBounds(res);
+            resizing = true;
+        }
+        Button100(-50, 40, Saved.WindowScale.ToString("N2"));
+        if (Button100(50, 40, "+") || Input.Pressed(KeyboardKey.Equal))
+        {
+            Vector2 res = new Vector2(Raylib.GetScreenWidth(), Raylib.GetScreenHeight()) / (float)Saved.WindowScale;
+            Saved.WindowScale += 0.25;
+            res *= (float)Saved.WindowScale;
+            // Raylib.SetWindowMinSize(1, 1);
+            // Raylib.SetWindowSize((int)res.X, (int)res.Y);
+            Save();
+            Screen.UpdateBounds(res);
+            resizing = true;
+        }
+        
+        return Button300(-150, 160, "Save & Return", enabled: !resizing);
     }
 }

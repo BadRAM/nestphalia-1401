@@ -21,7 +21,7 @@ public class MenuScene : Scene
     
     public override void Update()
     {
-        BeginDrawing();
+        Screen.BeginDrawing();
         ClearBackground(Color.Gray);
         DrawBackground(Color.LightGray);
 
@@ -41,7 +41,7 @@ public class MenuScene : Scene
             if (Button300(-150,   0, "Settings")) _settingsOpen = !_settingsOpen;
             if (Button300(-150,  80, "Quit")) 
             {
-                EndDrawing();
+                Screen.EndDrawing();
                 CloseWindow();
                 return;
             }

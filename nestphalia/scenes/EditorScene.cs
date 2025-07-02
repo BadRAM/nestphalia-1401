@@ -124,7 +124,7 @@ public class EditorScene : Scene
         
         // ===== DRAW =====
         
-        BeginDrawing();
+        Screen.BeginDrawing();
         ClearBackground(Color.Black);
         Screen.DrawBackground(Color.Gray);
         
@@ -136,7 +136,7 @@ public class EditorScene : Scene
         // Draw brush preview ghost
         if (CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(Screen.CenterX-240, Screen.CenterY-232, 480, 480)))
         {
-            BeginMode2D(World.Camera);
+            Screen.SetCamera(World.Camera);
             Vector2 mousePos = World.GetTileCenter(World.GetMouseTilePos());
             if (_brush is TowerTemplate t)
             {
@@ -147,7 +147,7 @@ public class EditorScene : Scene
             {
                 DrawTexture(_brush.Texture, (int)mousePos.X-12, (int)mousePos.Y-(_brush.Texture.Height - 12), new Color(128, 128, 255, 128));
             }
-            EndMode2D();
+            Screen.SetCamera();
         }
         
         World.Draw();
@@ -189,7 +189,14 @@ public class EditorScene : Scene
         {
             int nestCap = _data.GetNestCap();
             DrawTextLeft(-260, -290, $"Nests: {_nestCount}/{nestCap}", color: _nestCount > nestCap ? Color.Red : Color.White);
-            DrawTextLeft(-80,  -290, $"Cost: ${_price}/{_data.Money} bug dollars", color: _price > _data.Money ? Color.Red : Color.White);
+            if (_sandboxMode)
+            {
+                DrawTextLeft(-80,  -290, $"Cost: ${_price} bug dollars");
+            }
+            else
+            {
+                DrawTextLeft(-80,  -290, $"Cost: ${_price}/{_data.Money} bug dollars", color: _price > _data.Money ? Color.Red : Color.White);
+            }
             DrawTextLeft( 160, -290, $"Stratagems: {_beaconCount}/{4}", color: _beaconCount > 4 ? Color.Red : Color.White);
         }
         else
@@ -241,7 +248,7 @@ public class EditorScene : Scene
         NavPath navPath = new NavPath("editor", new Int2D(28, 11), World.GetMouseTilePos(), World.RightTeam);
         pathFinder.FindPath(navPath);
         
-        BeginMode2D(World.Camera);
+        Screen.SetCamera(World.Camera);
         
         Vector2 path = World.GetTileCenter(navPath.Start);
         foreach (Int2D i in navPath.Points)
@@ -254,7 +261,7 @@ public class EditorScene : Scene
             path = v;
         }
         
-        EndMode2D();
+        Screen.SetCamera();
     }
     
     private void EraseTool()
