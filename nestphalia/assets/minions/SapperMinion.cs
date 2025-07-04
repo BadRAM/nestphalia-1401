@@ -13,10 +13,10 @@ public class SapperMinionTemplate : MinionTemplate
     
     public SapperMinionTemplate(JObject jObject) : base(jObject)
     {
-        BombTexture = Resources.GetTextureByName(jObject.Value<string?>("bombTexture") ?? "");
+        BombTexture = Resources.GetTextureByName(jObject.Value<string?>("BombTexture") ?? "");
         AttackDuration = 0;
 
-        string j = $@"{{""id"": ""{ID}_bomb"", ""texture"": ""{jObject.Value<string?>("bombTexture") ?? ""}"", ""arcDuration"": 0.4, ""arcHeight"": 4, ""damage"": {Damage}}}";
+        string j = $@"{{""ID"": ""{ID}_bomb"", ""Texture"": ""{jObject.Value<string?>("BombTexture") ?? ""}"", ""ArcDuration"": 0.4, ""ArcHeight"": 4, ""Damage"": {Damage}}}";
         Projectile = new MortarShellTemplate(JObject.Parse(j));
     }
 

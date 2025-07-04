@@ -13,11 +13,11 @@ public class MinefieldTemplate : StructureTemplate
     
     public MinefieldTemplate(JObject jObject) : base(jObject)
     {
-        MaxCharges = jObject.Value<int?>("maxCharges") ?? throw new ArgumentNullException();
-        Bomb = Assets.LoadJsonAsset<ProjectileTemplate>(jObject.Value<JObject?>("bomb"));
-        Range = jObject.Value<double?>("range") ?? throw new ArgumentNullException();
-        Cooldown = jObject.Value<double?>("cooldown") ?? throw new ArgumentNullException();
-        Class = jObject.Value<StructureClass?>("class") ?? StructureClass.Tower;
+        MaxCharges = jObject.Value<int?>("MaxCharges") ?? throw new ArgumentNullException();
+        Bomb = Assets.LoadJsonAsset<ProjectileTemplate>(jObject.Value<JObject?>("Bomb"));
+        Range = jObject.Value<double?>("Range") ?? throw new ArgumentNullException();
+        Cooldown = jObject.Value<double?>("Cooldown") ?? throw new ArgumentNullException();
+        Class = jObject.Value<StructureClass?>("Class") ?? StructureClass.Tower;
     }
 
     public override Minefield Instantiate(Team team, int x, int y)

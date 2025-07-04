@@ -12,9 +12,9 @@ public class MortarShellTemplate : ProjectileTemplate
         
     public MortarShellTemplate(JObject jObject) : base(jObject)
     {
-        ArcDuration = jObject.Value<double?>("arcDuration") ?? throw new ArgumentNullException();
-        ArcHeight = jObject.Value<double?>("arcHeight") ?? throw new ArgumentNullException();
-        BlastRadius = jObject.Value<float?>("blastRadius") ?? 0;
+        ArcDuration = jObject.Value<double?>("ArcDuration") ?? throw new ArgumentNullException();
+        ArcHeight = jObject.Value<double?>("ArcHeight") ?? throw new ArgumentNullException();
+        BlastRadius = jObject.Value<float?>("BlastRadius") ?? 0;
     }
 
     public override void Instantiate(object target, object source, Vector3 position)

@@ -22,9 +22,9 @@ public class ProjectileTemplate : JsonAsset
     
     public ProjectileTemplate(JObject jObject) : base(jObject)
     {
-        Damage = jObject.Value<double?>("damage") ?? 0;
-        Speed = jObject.Value<double?>("speed") ?? 0;
-        Texture = Resources.GetTextureByName(jObject.Value<string?>("texture") ?? "");
+        Damage = jObject.Value<double?>("Damage") ?? 0;
+        Speed = jObject.Value<double?>("Speed") ?? 0;
+        Texture = Resources.GetTextureByName(jObject.Value<string?>("Texture") ?? "");
     }
 
     public virtual void Instantiate(object target, object source, Vector3 position)

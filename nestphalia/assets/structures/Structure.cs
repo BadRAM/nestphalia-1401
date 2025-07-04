@@ -25,14 +25,14 @@ public class StructureTemplate : JsonAsset
     
     public StructureTemplate(JObject jObject) : base(jObject)
     {
-        Name = jObject.Value<string?>("name") ?? throw new ArgumentNullException();
-        Description = jObject.Value<string?>("description") ?? "";
-        Texture = Resources.GetTextureByName(jObject.Value<string?>("texture") ?? "");
-        MaxHealth = jObject.Value<double?>("maxHealth") ?? 0;
-        Price = jObject.Value<double?>("price") ?? 0;
-        LevelRequirement = jObject.Value<int?>("levelRequirement") ?? 0;
-        BaseHate = jObject.Value<double?>("baseHate") ?? 0;
-        Class = jObject.Value<StructureClass?>("class") ?? StructureClass.Utility;
+        Name = jObject.Value<string?>("Name") ?? throw new ArgumentNullException();
+        Description = jObject.Value<string?>("Description") ?? "";
+        Texture = Resources.GetTextureByName(jObject.Value<string?>("Texture") ?? "");
+        MaxHealth = jObject.Value<double?>("MaxHealth") ?? 0;
+        Price = jObject.Value<double?>("Price") ?? 0;
+        LevelRequirement = jObject.Value<int?>("LevelRequirement") ?? 0;
+        BaseHate = jObject.Value<double?>("BaseHate") ?? 0;
+        Class = jObject.Value<StructureClass?>("Class") ?? StructureClass.Utility;
     }
     
     public virtual Structure Instantiate(Team team, int x, int y)

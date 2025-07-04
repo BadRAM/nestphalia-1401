@@ -11,6 +11,6 @@ public abstract class JsonAsset
     
     public JsonAsset(JObject jObject)
     {
-        ID = jObject.Value<string?>("id") ?? throw new Exception("Tried to load a jsonAsset with no ID!");
+        ID = jObject.Value<string?>("ID") ?? throw new Exception("Tried to load a jsonAsset with no ID!");
     }
 }

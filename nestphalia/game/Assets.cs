@@ -44,19 +44,19 @@ public static class Assets
     
     public static T? LoadJsonAsset<T>(JObject jObject) where T : JsonAsset
     {
-        if (!jObject.ContainsKey("type"))
+        if (!jObject.ContainsKey("Type"))
         {
             throw new Exception($"Tried to load JsonAsset from JObject with no type. \n{jObject}");
             return null;
         }
         
-        if (!JsonAssetTypes.ContainsKey(jObject.Value<string>("type")))
+        if (!JsonAssetTypes.ContainsKey(jObject.Value<string>("Type")))
         {
             throw new Exception($"Tried to load JsonAsset from JObject with invalid type. \n{jObject}");
             return null;
         }
         
-        return JsonAssetTypes[jObject.Value<string>("type")].Invoke([jObject]) as T;
+        return JsonAssetTypes[jObject.Value<string>("Type")].Invoke([jObject]) as T;
     }
     
     public static void Load()
@@ -75,7 +75,8 @@ public static class Assets
             if (Path.GetExtension(path).ToLower() == ".json")
             {
                 JObject content = JObject.Parse(File.ReadAllText(path));
-                foreach (JObject structure in content.Value<JArray>("structures"))
+                GameConsole.WriteLine(CapitalizeAllKeys(content));
+                foreach (JObject structure in content.Value<JArray>("Structures"))
                 {
                     StructureTemplate t = LoadJsonAsset<StructureTemplate>(structure);
                     _structures.Add(t.ID, t);
@@ -91,6 +92,26 @@ public static class Assets
                 _levels.Add(level.ID, level);
             }
         }
+    }
+
+    private static string CapitalizeAllKeys(JObject jObject)
+    {
+        string str = jObject.ToString();
+        List<string> lines = new List<string>(str.Split("\n"));
+        for (int i = 0; i < lines.Count; i++)
+        {
+            for (int j = 0; j < lines[i].Length; j++)
+            {
+                int firstLetterIndex = lines[i].IndexOfAny("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray());
+                if (firstLetterIndex != -1)
+                {
+                    lines[i] = lines[i].Substring(0, firstLetterIndex) + 
+                               lines[i].Substring(firstLetterIndex, 1).ToUpper() +
+                               lines[i].Substring(firstLetterIndex + 1);
+                }
+            }
+        }
+        return string.Join("\n", lines);
     }
 
     public static StructureTemplate? GetStructureByID(string? id)

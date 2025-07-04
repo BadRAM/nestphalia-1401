@@ -4,11 +4,6 @@ using Raylib_cs;
 
 namespace nestphalia;
 
-public class GameWorld
-{
-    public static GameWorld Shared = new GameWorld();
-}
-
 public static class World
 {
     public static int BoardWidth = 48;

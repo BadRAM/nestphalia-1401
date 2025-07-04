@@ -11,9 +11,9 @@ public class BroodMinionTemplate : MinionTemplate
     
     public BroodMinionTemplate(JObject jObject) : base(jObject)
     {
-        SpawnInterval = jObject.Value<double?>("spawnInterval") ?? 0;
-        SpawnsOnDeath = jObject.Value<int?>("spawnsOnDeath") ?? 0;
-        SpawnedMinion = Assets.LoadJsonAsset<MinionTemplate>(jObject.Value<JObject?>("spawnedMinion")) ?? throw new ArgumentNullException();
+        SpawnInterval = jObject.Value<double?>("SpawnInterval") ?? 0;
+        SpawnsOnDeath = jObject.Value<int?>("SpawnsOnDeath") ?? 0;
+        SpawnedMinion = Assets.LoadJsonAsset<MinionTemplate>(jObject.Value<JObject?>("SpawnedMinion")) ?? throw new ArgumentNullException();
     }
     
     public override void Instantiate(Team team, Vector3 position, NavPath? navPath)

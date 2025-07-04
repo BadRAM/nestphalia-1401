@@ -8,9 +8,7 @@ namespace nestphalia;
 
 public class SavedSettings
 {
-    // [JsonInclude] public bool SFXMute;
     [JsonInclude] public double SFXVolume = 1;
-    // [JsonInclude] public bool MusicMute;
     [JsonInclude] public double MusicVolume = 1;
     [JsonInclude] public double WindowScale = 1;
     [JsonInclude] public bool AccessibleFont;
@@ -47,7 +45,6 @@ public static class Settings
         }
     }
     
-    
     // returns true if the 'close' button has been pressed
     public static bool DrawSettingsMenu()
     {
@@ -72,13 +69,7 @@ public static class Settings
             Resources.SetFontAccessibility(Saved.AccessibleFont);
             Save();
         }
-
-        // if (Button300(-150, 40, "High DPI mode"))
-        // {
-        //     RestartNeeded = !RestartNeeded;
-        // }
-        // if (RestartNeeded) DrawTextLeft(155, 52, "Restart to apply changes");
-
+        
         bool resizing = false;
         if (Button100(-150, 40, "-") || Input.Pressed(KeyboardKey.Minus))
         {
@@ -86,8 +77,6 @@ public static class Settings
             Saved.WindowScale -= 0.25;
             Saved.WindowScale = Math.Max(Saved.WindowScale, 0.25);
             res *= (float)Saved.WindowScale;
-            // Raylib.SetWindowMinSize(1, 1);
-            // Raylib.SetWindowSize((int)res.X, (int)res.Y);
             Save();
             Screen.UpdateBounds(res);
             resizing = true;
@@ -98,8 +87,6 @@ public static class Settings
             Vector2 res = new Vector2(Raylib.GetScreenWidth(), Raylib.GetScreenHeight()) / (float)Saved.WindowScale;
             Saved.WindowScale += 0.25;
             res *= (float)Saved.WindowScale;
-            // Raylib.SetWindowMinSize(1, 1);
-            // Raylib.SetWindowSize((int)res.X, (int)res.Y);
             Save();
             Screen.UpdateBounds(res);
             resizing = true;

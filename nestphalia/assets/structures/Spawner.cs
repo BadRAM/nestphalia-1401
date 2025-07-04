@@ -11,11 +11,11 @@ public class SpawnerTemplate : StructureTemplate
     
     public SpawnerTemplate(JObject jObject) : base(jObject)
     {
-        Minion = Assets.LoadJsonAsset<MinionTemplate>(jObject.Value<JObject?>("minion"));
-        WaveSize = jObject.Value<int?>("waveSize") ?? throw new ArgumentNullException();
-        WaveGrowth = jObject.Value<int?>("waveGrowth") ?? throw new ArgumentNullException();
-        TimeBetweenSpawns = jObject.Value<double?>("timeBetweenSpawns") ?? throw new ArgumentNullException();
-        Class = jObject.Value<StructureClass?>("class") ?? StructureClass.Nest;
+        Minion = Assets.LoadJsonAsset<MinionTemplate>(jObject.Value<JObject?>("Minion"));
+        WaveSize = jObject.Value<int?>("WaveSize") ?? throw new ArgumentNullException();
+        WaveGrowth = jObject.Value<int?>("WaveGrowth") ?? throw new ArgumentNullException();
+        TimeBetweenSpawns = jObject.Value<double?>("TimeBetweenSpawns") ?? throw new ArgumentNullException();
+        Class = jObject.Value<StructureClass?>("Class") ?? StructureClass.Nest;
     }
     
     public override Spawner Instantiate(Team team, int x, int y)

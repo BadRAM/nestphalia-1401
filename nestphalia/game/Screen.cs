@@ -116,13 +116,6 @@ public static class Screen
         GameConsole.WriteLine($"Scale is X:{scale.X},Y:{scale.Y}");
         SetWindowMinSize((int)(scale.X * MinWidth), (int)(scale.Y * MinHeight));
         _screenCamera.Zoom = (float)Settings.Saved.WindowScale;
-
-        // if ((IsWindowMaximized() || IsWindowFullscreen()) &&
-        //     ((scale.X * MinWidth) > GetMonitorWidth(GetCurrentMonitor())) || 
-        //     ((scale.Y * MinHeight) > GetMonitorHeight(GetCurrentMonitor())))
-        // {
-        //     RestoreWindow();
-        // }
         
         if (windowSize != null && !IsWindowMaximized() && !IsWindowFullscreen())
         {
@@ -131,14 +124,6 @@ public static class Screen
         
         RightX = (int)(GetScreenWidth() / scale.X);
         BottomY = (int)(GetScreenHeight() / scale.Y);
-
-        // if (RightX < MinWidth || BottomY < MinHeight)
-        // {
-        //     GameConsole.WriteLine("Window undersized, resizing...");
-        //     SetWindowSize(Math.Max(RightX, MinWidth), Math.Max(BottomY, MinHeight));
-        //     RightX = GetScreenWidth();
-        //     BottomY = GetScreenHeight();
-        // }
         
         CenterX = RightX / 2;
         CenterY = BottomY / 2;

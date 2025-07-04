@@ -9,7 +9,7 @@ public class FlyUntilHitMinionTemplate : FlyingMinionTemplate
     
     public FlyUntilHitMinionTemplate(JObject jObject) : base(jObject)
     {
-        LandSpeed = jObject.Value<double?>("landSpeed") ?? throw new ArgumentNullException();
+        LandSpeed = jObject.Value<double?>("LandSpeed") ?? throw new ArgumentNullException();
     }
     
     public override void Instantiate(Team team, Vector3 position, NavPath? navPath)

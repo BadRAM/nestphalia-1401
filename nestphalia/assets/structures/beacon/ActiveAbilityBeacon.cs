@@ -12,10 +12,10 @@ public abstract class ActiveAbilityBeaconTemplate : StructureTemplate
     
     public ActiveAbilityBeaconTemplate(JObject jObject) : base(jObject)
     {
-        Cooldown = jObject.Value<double?>("cooldown") ?? throw new ArgumentNullException();;
+        Cooldown = jObject.Value<double?>("Cooldown") ?? throw new ArgumentNullException();;
         // CooldownReduction = cooldownReduction;
-        AbilityIcon = Resources.GetTextureByName(jObject.Value<string?>("abilityIcon") ?? "");
-        Class = jObject.Value<StructureClass?>("class") ?? StructureClass.Tower;
+        AbilityIcon = Resources.GetTextureByName(jObject.Value<string?>("AbilityIcon") ?? "");
+        Class = jObject.Value<StructureClass?>("Class") ?? StructureClass.Tower;
     }
 }
 

@@ -4,7 +4,7 @@ namespace nestphalia;
 
 public class Rubble : Structure
 {
-    private const string jsonTemplate = @"{""id"": ""rubble"", ""name"": ""rubble"", ""texture"": ""rubble""}";
+    private const string jsonTemplate = @"{""ID"": ""rubble"", ""Name"": ""rubble"", ""Texture"": ""rubble""}";
     public static readonly StructureTemplate RubbleTemplate = new StructureTemplate(JObject.Parse(jsonTemplate));
     public StructureTemplate DestroyedStructure;
     

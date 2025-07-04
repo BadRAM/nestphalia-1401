@@ -27,15 +27,15 @@ public class TowerTemplate : StructureTemplate
 
     public TowerTemplate(JObject jObject) : base(jObject)
     {
-        Name = jObject.Value<string?>("name") ?? throw new ArgumentNullException();
-        Range = jObject.Value<double?>("range") ?? throw new ArgumentNullException();
-        Projectile = Assets.LoadJsonAsset<ProjectileTemplate>(jObject.Value<JObject?>("projectile"));
-        ProjectileOriginZ = jObject.Value<int?>("projectileOriginZ") ?? 8;
-        RateOfFire = jObject.Value<double?>("rateOfFire") ?? throw new ArgumentNullException();
-        TargetMode = (TargetSelector)(jObject.Value<int?>("targetMode") ?? throw new ArgumentNullException());
-        CanHitGround = jObject.Value<bool?>("canHitGround") ?? true;
-        CanHitFlying = jObject.Value<bool?>("canHitFlying") ?? true;
-        Class = jObject.Value<StructureClass?>("class") ?? StructureClass.Tower;
+        Name = jObject.Value<string?>("Name") ?? throw new ArgumentNullException();
+        Range = jObject.Value<double?>("Range") ?? throw new ArgumentNullException();
+        Projectile = Assets.LoadJsonAsset<ProjectileTemplate>(jObject.Value<JObject?>("Projectile"));
+        ProjectileOriginZ = jObject.Value<int?>("ProjectileOriginZ") ?? 8;
+        RateOfFire = jObject.Value<double?>("RateOfFire") ?? throw new ArgumentNullException();
+        TargetMode = (TargetSelector)(jObject.Value<int?>("TargetMode") ?? throw new ArgumentNullException());
+        CanHitGround = jObject.Value<bool?>("CanHitGround") ?? true;
+        CanHitFlying = jObject.Value<bool?>("CanHitFlying") ?? true;
+        Class = jObject.Value<StructureClass?>("Class") ?? StructureClass.Tower;
     }
     
     public override Tower Instantiate(Team team, int x, int y)

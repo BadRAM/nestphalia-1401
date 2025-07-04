@@ -11,10 +11,10 @@ public class DoorTemplate : StructureTemplate
     
     public DoorTemplate(JObject jObject) : base(jObject)
     {
-        Texture = Resources.GetTextureByName(jObject.Value<string?>("texture") ?? "");
+        Texture = Resources.GetTextureByName(jObject.Value<string?>("Texture") ?? "");
 
-        OpenTexture = Resources.GetTextureByName(jObject.Value<string?>("openTexture") ?? "");
-        Range = jObject.Value<double?>("range") ?? 32;
+        OpenTexture = Resources.GetTextureByName(jObject.Value<string?>("OpenTexture") ?? "");
+        Range = jObject.Value<double?>("Range") ?? 32;
     }
     
     public override Door Instantiate(Team team, int x, int y)

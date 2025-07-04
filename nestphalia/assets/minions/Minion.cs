@@ -21,19 +21,19 @@ public class MinionTemplate : JsonAsset
 
     public MinionTemplate(JObject jObject) : base(jObject)
     {
-        Name = jObject.Value<string?>("name") ?? throw new ArgumentNullException();
-        Description = jObject.Value<string?>("description") ?? "";
-        Texture = Resources.GetTextureByName(jObject.Value<string?>("texture") ?? "");
+        Name = jObject.Value<string?>("Name") ?? throw new ArgumentNullException();
+        Description = jObject.Value<string?>("Description") ?? "";
+        Texture = Resources.GetTextureByName(jObject.Value<string?>("Texture") ?? "");
         ShadowTexture = Resources.GetTextureByName("shadow");
-        MaxHealth = jObject.Value<double?>("maxHealth") ?? throw new ArgumentNullException();
-        Armor = jObject.Value<double?>("armor") ?? 0;
-        Damage = jObject.Value<double?>("damage") ?? 0;
-        AttackDuration = jObject.Value<double?>("attackDuration") ?? 1;
-        Speed = jObject.Value<double?>("speed") ?? 0;
-        PhysicsRadius = jObject.Value<int?>("physicsRadius") ?? throw new ArgumentNullException();
-        WalkAnimDelay = jObject.Value<int?>("walkAnimDelay") ?? 2;
+        MaxHealth = jObject.Value<double?>("MaxHealth") ?? throw new ArgumentNullException();
+        Armor = jObject.Value<double?>("Armor") ?? 0;
+        Damage = jObject.Value<double?>("Damage") ?? 0;
+        AttackDuration = jObject.Value<double?>("AttackDuration") ?? 1;
+        Speed = jObject.Value<double?>("Speed") ?? 0;
+        PhysicsRadius = jObject.Value<int?>("PhysicsRadius") ?? throw new ArgumentNullException();
+        WalkAnimDelay = jObject.Value<int?>("WalkAnimDelay") ?? 2;
 
-        string j = $@"{{""id"": ""{ID}_attack"", ""texture"": ""minion_bullet"", ""damage"": {Damage}, ""speed"": 400}}";
+        string j = $@"{{""ID"": ""{ID}_attack"", ""Texture"": ""minion_bullet"", ""Damage"": {Damage}, ""Speed"": 400}}";
         Projectile = new ProjectileTemplate(JObject.Parse(j));
     }
 
