@@ -1,3 +1,4 @@
+using System.Numerics;
 using Raylib_cs;
 
 namespace nestphalia;
@@ -5,6 +6,7 @@ namespace nestphalia;
 public static class Input
 {
     private static bool _suppressed;
+    private static Vector2 _clickStartPos;
     
     public static Dictionary<InputAction, KeyboardKey> Bindings = new Dictionary<InputAction, KeyboardKey>()
     {
@@ -75,8 +77,6 @@ public static class Input
             _inputLockers.Add(suppressionSource, false);
         }
     }
-    
-
     
     public static bool IsSuppressed()
     {
@@ -175,5 +175,25 @@ public static class Input
     {
         if (_suppressed) return false;
         return Raylib.IsKeyPressedRepeat(key);
+    }
+
+    public static void Poll()
+    {
+        // This could support all mouse buttons with a for loop
+        if (Raylib.IsMouseButtonPressed(MouseButton.Left))
+        {
+            _clickStartPos = Raylib.GetMousePosition();
+            // GameConsole.WriteLine($"_clickStartPos set to {_clickStartPos}");
+        }
+    }
+
+    public static Vector2 GetClickPos()
+    {
+        return _clickStartPos;
+    }
+
+    public static Vector2 GetScaledClickPos()
+    {
+        return _clickStartPos / GUI.GetWindowScale();
     }
 }

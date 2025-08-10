@@ -12,7 +12,7 @@ public class Level
     public string Description = "";
     public Color EnemyColor = Color.Red;
     public Int2D Location;
-    public string[] LeadsTo = [];
+    public string[] Prerequisites = [];
     public int MoneyReward;
     public string[] UnlockReward = [];
     public Int2D PlayerOffset = new Int2D(1,1); // The player fort is offset by this amount.
@@ -45,7 +45,7 @@ public class Level
         Description = j.Value<string>("Description") ?? Description;
         EnemyColor = j.Value<JObject>("EnemyColor")?.ToObject<Color?>() ?? EnemyColor;
         Location = j.Value<JObject>("Location")?.ToObject<Int2D?>() ?? Location;
-        LeadsTo = j.Value<JArray>("LeadsTo")?.ToObject<string[]>() ?? LeadsTo;
+        Prerequisites = j.Value<JArray>("Prerequisites")?.ToObject<string[]>() ?? Prerequisites;
         MoneyReward = j.Value<int?>("MoneyReward") ?? MoneyReward;
         UnlockReward = j.Value<JArray>("UnlockReward")?.ToObject<string[]>() ?? UnlockReward;
         PlayerOffset = j.Value<JObject?>("PlayerOffset")?.ToObject<Int2D?>() ?? PlayerOffset;

@@ -20,18 +20,26 @@ static class Program
 	    // Startup sequence
 	    Settings.Load();
 	    Screen.Initialize();
+	    Resources.PreLoad();
 	    Raylib.InitAudioDevice();
+	    
+	    Screen.BeginDrawing();
+	    GUI.DrawTextCentered(0,0,"Loading...", 48, anchor:Screen.Center);
+	    Screen.EndDrawing();
+	    
 	    Resources.Load();
 	    Screen.Load();
 	    Assets.Load();
         GUI.Initialize();
         
         // Start the first scene. TODO: loading screen, then intro cutscene, rather than menu
+        
         new MenuScene().Start();
         
         while (!Raylib.WindowShouldClose())
         {
 	        Time.UpdateTime();
+	        Input.Poll();
 			
 	        if (Raylib.IsWindowResized())
 	        {
@@ -41,18 +49,13 @@ static class Program
 			CurrentScene.Update();
 			if (Raylib.WindowShouldClose()) break;
 			
-			Popup.Update();
+			PopupManager.Update();
 			GameConsole.Draw();
 			GUI.UpdateCursor();
 			
 			Screen.EndDrawing();
-
-			// Ugly hack to fix loud sound at start of first song.
-	        if (Time.Scaled <= 1)
-	        {
-		        Raylib.SetMusicVolume(Resources.MusicPlaying, MathF.Min((float)Time.Scaled, 0.3f));
-	        }
-	        Raylib.UpdateMusicStream(Resources.MusicPlaying);
+			
+			Raylib.UpdateMusicStream(Resources.MusicPlaying);
         }
 		
         GameConsole.WriteLine("Quitting time!");

@@ -1,4 +1,3 @@
-using System.Drawing;
 using System.Text.Json.Serialization;
 
 namespace nestphalia;
@@ -79,15 +78,15 @@ public class Fort
             totalCost += t.Price;
             if (t is SpawnerTemplate) nestCount++;
             if (t is ActiveAbilityBeaconTemplate) stratagemCount++;
-            if (t.LevelRequirement > campaign.Level) illegalBuilding = true;
+            if (!campaign.UnlockedStructures.Contains(t.ID)) illegalBuilding = true;
         }
 
         string reason = "";
-        if (nestCount <= 0) reason = "Fort has no nests!";
+        if (illegalBuilding) reason = "Fort contains locked structures!";
+        else if (nestCount <= 0) reason = "Fort has no nests!";
         else if (nestCount > campaign.GetNestCap()) reason = "Fort has too many nests!";
         else if (stratagemCount > 4) reason = "Fort has too many stratagems!";
-        else if (totalCost > campaign.Money) reason = "Fort is to expensive!";
-        else if (illegalBuilding) reason = "Fort contains locked structures!";
+        else if (totalCost > campaign.Money) reason = "Fort is too expensive!";
 
         return reason;
     }

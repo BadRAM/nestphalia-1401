@@ -43,8 +43,8 @@ public class PickerPopup : Popup
         // Draw page buttons if relevant
         if (_items.Count > pageSize)
         {
-            if (GUI.Button100(-150, -44, "<", _page > 1, Screen.Center + _rect.Bottom())) _page--;
-                GUI.Button100(-50,  -44, _page.ToString(), false, Screen.Center + _rect.Bottom());
+            if (GUI.Button100(-150, -44, "<", _page > 0, Screen.Center + _rect.Bottom())) _page--;
+                GUI.Button100(-50,  -44, $"{_page+1}/{_items.Count / pageSize + 1}", false, Screen.Center + _rect.Bottom());
             if (GUI.Button100( 50,  -44, ">", _page < _items.Count / pageSize, anchor: Screen.Center + _rect.Bottom())) _page++;
         }
     }

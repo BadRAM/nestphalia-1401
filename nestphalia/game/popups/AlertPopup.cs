@@ -3,6 +3,8 @@ using Raylib_cs;
 
 namespace nestphalia;
 
+// The simplest possible popup, displays text, does something on close.
+// DO NOT ADD FEATURES. If a more advanced popup is necessary, create it separately.
 public class AlertPopup : Popup
 {
     public string TitleText;

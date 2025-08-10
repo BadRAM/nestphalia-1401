@@ -40,17 +40,18 @@ Programming todo:
   - ~~Another flyer. Ladybug? Flies until attacked.~~
   - Roaches - Gets within a radius of target then flies close to it.
   - Snail rework
-  - Beetle rework. Attacks can damage the ball?
+  - Sapper rework. Attacks can damage the ball?
   - Centipede that gets longer and shorter
   - Tower with a big sawblade on an arm that slowly orbits
   - Springboard trap that launches a bug towards the other fort based on it's weight
   - Glue paper rework - Maybe it just works forever, but only affects bugs standing on it?
   - Multitarget tower, attacks 3 units simultaneously, but can't focus all attacks on one target
   - Penetrating tower, like spike roller from bloons
-  - Direct damage minions in radius stratagem
+  - Direct damage minions in radius stratagem. Molotov?
   - Freeze minions in radius stratagem
   - Build new wall/tower stratagem (Can it build in the neutral zone, or even the enemy fort?)
   - Create/remove fear stratagem
+- Standard bearer
 - Crush damage
 - Minion Status Effect System
 - Make Frenzy Beacon work again
@@ -97,6 +98,7 @@ Programming todo:
 - File Select popup
 - Migrate old JSON functions to newtonsoft
 - Stateful GUI
+- Repeatable LARP gauntlet challenge
 
 
 ----- Premature Optimizations -----
@@ -115,6 +117,7 @@ Programming todo:
     - make it not static, with a singleton-like static reference
     - keep it static, but move all it's state into a 'WorldState' object that isn't static.
     - move all world function into a 'worldInstance' class, and leave World as a wrapper to it
+    - add an integer frame counting 'battle clock' to handle wave timing
   - BattleScene
     - Camera shake stores just the last offset.
   - Team
@@ -175,6 +178,7 @@ Programming todo:
 - Better fear evaluation, make bugs more scared of staying in scary places than passing through them.
 - Minion vs Minion melee
 - Multiple team colors via shader & rgb swizzling, or channel splitting assets at load time, or something.
+- Special power to rotate entire fort
 
 
 Design todo:

@@ -25,6 +25,8 @@ public static class Screen
     public static Vector2 Bottom;
     public static Vector2 BottomRight;
 
+    public static bool DebugMode;
+
     //public static Image WhiteNoise = Raylib.GenImageWhiteNoise(1024, 1024, 0.5f);
     private static List<List<bool>> _backgroundNoise = new List<List<bool>>();
     private static Texture2D _tile1;
@@ -36,7 +38,7 @@ public static class Screen
 
     private static Camera2D _activeCamera;
     private static Camera2D _screenCamera = new Camera2D();
-
+    
     public static void Initialize()
     {
         ConfigFlags flags = ConfigFlags.ResizableWindow;
@@ -165,10 +167,16 @@ public static class Screen
     {
         Raylib.BeginDrawing();
         SetCamera();
+        if (Input.Pressed(Input.InputAction.Debug)) DebugMode = !DebugMode;
     }
 
     public static void EndDrawing()
     {
+        if (DebugMode && Input.Held(KeyboardKey.LeftShift))
+        {
+            Vector2 mPos = GUI.GetScaledMousePosition() - Center;
+            GUI.DrawTextLeft((int)mPos.X + 10, (int)mPos.Y, $"mPos: {mPos}\nAbs: {GUI.GetScaledMousePosition()}\nUnscaled: {GetMousePosition()}");
+        }
         Raylib.EndDrawing();
     }
 }

@@ -1,0 +1,36 @@
+namespace nestphalia;
+
+public static class PopupManager
+{
+    private static Popup? _activePopup;
+    
+    // This is called by scenes to update whatever popup is currently active
+    public static void Update()
+    {
+        if (_activePopup != null)
+        {
+            Input.StartSuppressionOverride(Input.SuppressionSource.Popup);
+            _activePopup.Draw();
+            Input.EndSuppressionOverride();
+        }
+    }
+    
+    public static bool PopupActive()
+    {
+        return _activePopup != null;
+    }
+    
+    public static void Start(Popup popup)
+    {
+        if (_activePopup != null) throw new Exception("Tried to create a popup when one already exists");
+        _activePopup = popup;
+        Time.TimeScale = 0;
+        Input.SetSuppressed(Input.SuppressionSource.Popup, true);
+    }
+
+    // Warning: Calling this from outside a popup will close the current popup without running it's close behavior
+    public static void Clear()
+    {
+        _activePopup = null;
+    }
+}

@@ -61,7 +61,7 @@ public class BattleScene : Scene
         HandleInputs();
 
         // ----- WORLD UPDATE PHASE -----
-        if (!Popup.PopupActive() && (_state == SceneState.BattleActive || _state == SceneState.BattleFinished))
+        if (!PopupManager.PopupActive() && (_state == SceneState.BattleActive || _state == SceneState.BattleFinished))
         {
             UpdateWorld();
             DoCameraShake();
@@ -92,7 +92,7 @@ public class BattleScene : Scene
                 DrawRectangle(Screen.CenterX-250,Screen.CenterY-150, 500, 300,new Color(0,0,0,128));
                 DrawTextCentered(0, -48, "BATTLE OVER!", 48);
                 DrawTextCentered(0, 0, $"{_winner.Name} is victorious!", 48);
-                if (World.DrawDebugInfo) DrawTextCentered(0, 100, $"{_log}");
+                if (Screen.DebugMode) DrawTextCentered(0, 100, $"{_log}");
                 if (Button100(-50, 30, "Return"))
                 {
                     SetMasterVolume(1f); // if F is still held, restore full volume.
@@ -100,7 +100,7 @@ public class BattleScene : Scene
                 }
                 break;
             case SceneState.Paused:
-                if (World.DrawDebugInfo || _pathFinderDebug)
+                if (Screen.DebugMode || _pathFinderDebug)
                 {
                     DrawTextCentered(0, -Screen.BottomY/2, "PAUSED", 48);
                 }
@@ -172,11 +172,6 @@ public class BattleScene : Scene
         if (Input.Pressed(Input.InputAction.PathDebug))
         {
             _pathFinderDebug = !_pathFinderDebug;
-        }
-        
-        if (Input.Pressed(Input.InputAction.Debug))
-        {
-            World.DrawDebugInfo = !World.DrawDebugInfo;
         }
         
         if (Input.Held(MouseButton.Right))

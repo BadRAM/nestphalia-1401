@@ -128,3 +128,16 @@ Event Triggers
 - at the start of the battle
 - just before the battle end screen is shown
 - when a special minion passes a HP threshold
+
+
+Obliterate Everything 2 Unlock Order
+====================================
+
+- Wall
+- Autogun
+- Carrier
+- Shield
+- Double Cannon
+- Repair Turret
+- Fleet carrier!
+- Freeze Drone!

@@ -15,6 +15,14 @@ public static class GUI
     public static Font Font;
     const int FontSize = 16;
     
+    public enum ButtonState
+    {
+        Disabled,
+        Enabled,
+        Hovered,
+        Pressed
+    }
+    
     public static void Initialize()
     {
         _buttonWideTexture = Resources.GetTextureByName("button_wide");
@@ -37,10 +45,6 @@ public static class GUI
 
     public static Vector2 GetWindowScale()
     {
-        // if (Settings.Saved.WindowScale)
-        // {
-        //     return GetWindowScaleDPI();
-        // }
         return (float)Settings.Saved.WindowScale * Vector2.One;
     }
 
@@ -151,82 +155,121 @@ public static class GUI
         
         return rect;
     }
+
+    public static bool Button(Rectangle rect, string text, Texture2D? texture = null, bool enabled = true, Vector2? anchor = null)
+    {
+        anchor ??= Screen.Center;
+        rect.X += (int)anchor.Value.X;
+        rect.Y += (int)anchor.Value.Y;
+
+        ButtonState state;
+        if (!enabled)
+        {
+            state = ButtonState.Disabled;
+        }
+        else if (Input.IsSuppressed()) // Ignore everything if input is suppressed
+        {
+            state = ButtonState.Enabled;
+        }
+        else if (Input.Held(MouseButton.Left) || Input.Released(MouseButton.Left)) // If click is held, button must be clicked or unhoverable
+        {
+            if (CheckCollisionPointRec(Input.GetScaledClickPos(), rect) && CheckCollisionPointRec(GetScaledMousePosition(), rect))
+                state = ButtonState.Pressed;
+            else
+                state = ButtonState.Enabled;
+        }
+        else // Check if we need to show hover
+        {
+            if (CheckCollisionPointRec(GetScaledMousePosition(), rect))
+                state = ButtonState.Hovered;
+            else
+                state = ButtonState.Enabled;
+        }
+        
+        if (texture != null)
+        {
+            Rectangle subSprite = new Rectangle(0, 0, rect.Size);
+            switch (state)
+            {
+                case ButtonState.Disabled:
+                    subSprite.Y = texture.Value.Height/3 * 2;
+                    break;
+                case ButtonState.Enabled:
+                    subSprite.Y = 0;
+                    break;
+                case ButtonState.Hovered:
+                    subSprite.Y = texture.Value.Height/3 * 1;
+                    break;
+                case ButtonState.Pressed:
+                    subSprite.Y = texture.Value.Height/3 * 2;
+                    break; 
+            }
+            DrawTextureRec(texture.Value, subSprite, rect.Position, Color.White);
+        }
+        else
+        {
+            Color color = Color.White;
+            switch (state)
+            {
+                case ButtonState.Disabled:
+                    color = Color.DarkBrown;
+                    break;
+                case ButtonState.Enabled:
+                    color = Color.Brown;
+                    break;
+                case ButtonState.Hovered:
+                    color = Color.Orange;
+                    break;
+                case ButtonState.Pressed:
+                    color = Color.DarkBrown;
+                    break; 
+            }
+            DrawRectangleRec(rect, color);
+            DrawRectangleLinesEx(rect, 2, Color.Black);
+        }
+
+        DrawTextCentered((int)(rect.X + rect.Width / 2), (int)(rect.Y + rect.Height/2), text, anchor: Vector2.Zero);
+
+        if (state == ButtonState.Hovered)
+        {
+            _cursorLook = MouseCursor.PointingHand;
+        }
+        
+        if (state == ButtonState.Pressed)
+        {
+            _cursorLook = MouseCursor.PointingHand;
+            if (Input.Released(MouseButton.Left))
+            {
+                _buttonClickSFX.Play();
+                return true;
+            }
+        }
+        
+        return false;
+    }
     
-    // 300 pixel wide button
+    // 180x36 pixel button
+    public static bool Button180(int x, int y, string text, bool enabled = true, Vector2? anchor = null)
+    {
+        return Button(new Rectangle(x, y, 180, 36), text, enabled:enabled, anchor:anchor);
+    }
+    
+    // 270x36 pixel button
+    public static bool Button270(int x, int y, string text, bool enabled = true, Vector2? anchor = null)
+    {
+        return Button(new Rectangle(x, y, 270, 36), text, enabled:enabled, anchor:anchor);
+    }
+    
+    // 300x40 pixel button
     public static bool Button300(int x, int y, string text, bool enabled = true, Vector2? anchor = null)
     {
-        anchor ??= Screen.Center;
-        x += (int)anchor.Value.X;
-        y += (int)anchor.Value.Y;
-        
-        bool hover = !Input.IsSuppressed() && CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(x, y, 300, 40));
-        bool press = !enabled || (hover && (Input.Held(MouseButton.Left) || Input.Released(MouseButton.Left)));
-        
-        Rectangle subSprite = new Rectangle(0, !press ? !hover ? 0 : 40 : 80, 300, 40);
-        DrawTextureRec(_buttonWideTexture, subSprite, new Vector2(x,y), Color.White);
-        DrawTextCentered(x+150, y+20, text, anchor: Vector2.Zero);
-
-        if (enabled && hover)
-        {
-            _cursorLook = MouseCursor.PointingHand;
-            if (Input.Released(MouseButton.Left))
-            {
-                _buttonClickSFX.Play();
-                return true;
-            }
-        }
-        
-        return false;
+        return Button(new Rectangle(x, y, 300, 40), text, _buttonWideTexture, enabled, anchor);
     }
     
-    // 100 pixel wide button
+    // 100x40 pixel button
     public static bool Button100(int x, int y, string text, bool enabled = true, Vector2? anchor = null)
     {
-        anchor ??= Screen.Center;
-        x += (int)anchor.Value.X;
-        y += (int)anchor.Value.Y;
-        
-        bool hover = !Input.IsSuppressed() && CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(x, y, 100, 40));
-        bool press = !enabled || (hover && (Input.Held(MouseButton.Left) || Input.Released(MouseButton.Left)));
-        
-        Rectangle subSprite = new Rectangle(0, !press ? !hover ? 0 : 40 : 80, 100, 40);
-        DrawTextureRec(_buttonNarrowTexture, subSprite, new Vector2(x,y), Color.White);
-        DrawTextCentered(x+50, y+20, text, anchor: Vector2.Zero);
-        
-        if (enabled && hover)
-        {
-            _cursorLook = MouseCursor.PointingHand;
-            if (Input.Released(MouseButton.Left))
-            {
-                _buttonClickSFX.Play();
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    public static bool ButtonImage(int x, int y, Texture2D image, bool selected = false, Vector2? anchor = null)
-    {
-        anchor ??= Screen.Center;
-        x += (int)anchor.Value.X;
-        y += (int)anchor.Value.Y;
-        
-        bool hover = !Input.IsSuppressed() && CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(x, y, image.Width, image.Height));
-
-        if (selected) DrawRectangle(x-2, y-2, image.Width + 4, image.Height + 4, Color.White);
-        DrawTexture(image, x, y, Color.White);
-
-        if (hover)
-        {
-            _cursorLook = MouseCursor.PointingHand;
-            if (Input.Released(MouseButton.Left))
-            {
-                _buttonClickSFX.Play();
-                return true;
-            }
-        }
-        
-        return false;
+        return Button(new Rectangle(x, y, 100, 40), text, _buttonNarrowTexture, enabled, anchor);
     }
     
     public static bool TileButton(int x, int y, Texture2D image, bool selected = false, Vector2? anchor = null)

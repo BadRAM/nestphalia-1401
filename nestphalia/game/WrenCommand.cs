@@ -74,7 +74,7 @@ class Command {
             }
         };
         
-        Popup.Start(new DialogBox(text, resume, mode));
+        PopupManager.Start(new DialogBox(text, resume, mode));
     }
 
     

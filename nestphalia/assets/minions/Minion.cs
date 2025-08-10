@@ -291,7 +291,7 @@ public partial class Minion : ISprite
     {
         if (Raylib.CheckCollisionPointCircle(Raylib.GetScreenToWorld2D(Raylib.GetMousePosition(), World.Camera), Position.XYZ2D(), 2*Template.PhysicsRadius))
         {
-            if (World.DrawDebugInfo) Raylib.DrawCircleV(NextPos, 2, Color.Green);
+            if (Screen.DebugMode) Raylib.DrawCircleV(NextPos, 2, Color.Green);
 
             if (Position.Z > 0)
             {
@@ -314,7 +314,7 @@ public partial class Minion : ISprite
             
             Raylib.DrawCircleV(World.GetTileCenter(NavPath.Destination), 3, Color.Red);
             
-            if (World.DrawDebugInfo) GUI.DrawTextLeft((int)Position.X, (int)Position.Y, State.ToString(), anchor: Screen.TopLeft);
+            if (Screen.DebugMode) GUI.DrawTextLeft((int)Position.X, (int)Position.Y, State.ToString(), anchor: Screen.TopLeft);
         }
     }
     #endregion

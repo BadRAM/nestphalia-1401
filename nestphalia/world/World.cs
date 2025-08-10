@@ -29,7 +29,6 @@ public static class World
     private static SoundResource _waveStartSoundEffect;
     private static bool _battleOver;
     
-    public static bool DrawDebugInfo;
     private static Stopwatch _swFrame = new Stopwatch();
     private static Stopwatch _swDraw = new Stopwatch();
     private static Stopwatch _swUpdate = new Stopwatch();
@@ -78,7 +77,6 @@ public static class World
         PreWave = false;
         _waveStartSoundEffect = Resources.GetSoundByName("start");
         _battleOver = false;
-        DrawDebugInfo = false;
         
         LeftTeam = new Team("Player", false, Color.Blue);
         RightTeam = new Team("Enemy", true, Color.Red);
@@ -460,7 +458,7 @@ public static class World
         }
         _swDraw.Stop();
         
-        if (DrawDebugInfo) DrawDebug();
+        if (Screen.DebugMode) DrawDebug();
         _swFrame.Restart();
     }
 

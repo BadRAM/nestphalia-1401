@@ -60,14 +60,34 @@ public class EditorScene : Scene
         
         if (!_sandboxMode)
         {
-            foreach (string s in _data.UnlockedStructures)
+            foreach (string structure in _data.UnlockedStructures)
             {
-                _buildableStructures.Add(Assets.GetStructureByID(s));
+                StructureTemplate s = Assets.GetStructureByID(structure);
+                if (s == null)
+                {
+                    GameConsole.WriteLine("Editor couldn't find structure: " + structure);
+                }
+                else
+                {
+                    _buildableStructures.Add(s);
+                }
             }
-            
-            _newUtil = _data.NewUtil;
-            _newTower = _data.NewTower;
-            _newNest = _data.NewNest;
+
+            foreach (string unlock in _data.NewUnlocks)
+            {
+                switch (Assets.GetStructureByID(unlock)?.Class)
+                {
+                    case StructureTemplate.StructureClass.Utility:
+                        _newUtil = true;
+                        break;
+                    case StructureTemplate.StructureClass.Tower:
+                        _newTower = true;
+                        break;
+                    case StructureTemplate.StructureClass.Nest:
+                        _newNest = true;
+                        break;
+                }
+            }
         }
         else
         {
@@ -213,9 +233,8 @@ public class EditorScene : Scene
         for (int i = 0; i < _buildableStructures.Count; i++)
         {
             StructureTemplate s = _buildableStructures[i];
-            if ((!_sandboxMode && s.LevelRequirement > _data.Level) || s.Class != _structureClassSelected) continue;
-            string label = ((!_sandboxMode && s.LevelRequirement == _data.Level) ? "NEW! " : "") + s.Name +
-                           " - $" + s.Price;
+            if (s.Class != _structureClassSelected) continue;
+            string label = s.Name + " - $" + s.Price;
             if (Button300(292, y * 40 - 250, label, _brush != s))
             {
                 _brush = s;
@@ -342,7 +361,7 @@ public class EditorScene : Scene
         _fortStats = $"{_fort.Name}\n" +
                      $"{turretCount} Towers\n" +
                      $"{utilityCount} Utility\n" +
-                     nestCount + (_sandboxMode ? "" : "/"+(_data.Level*2+10)) + " Nests\n" +
+                     nestCount + (_sandboxMode ? "" : "/"+(_data.BeatenLevels.Count*2+10)) + " Nests\n" +
                      beaconCount + (_sandboxMode ? "" : "/4") + " Stratagems\n" +
                      $"{structureCount} Total\n" +
                      $"{totalCost} Cost";

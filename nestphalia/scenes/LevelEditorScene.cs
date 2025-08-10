@@ -169,6 +169,10 @@ public class LevelEditorScene : Scene
                 }
             }
             if (Button100(0, 260, "Erase", anchor: Screen.TopLeft)) _selectedStructure = null;
+            if (_selectedStructure != null)
+            {
+                DrawTextLeft(4, 240, _selectedStructure.ID);
+            }
         }
     }
 
@@ -263,7 +267,7 @@ public class LevelEditorScene : Scene
         }
         _loadableLevels.Sort();
         
-        Popup.Start(new PickerPopup("Select level to load", _loadableLevels.ToArray(), LoadFromList));
+        PopupManager.Start(new PickerPopup("Select level to load", _loadableLevels.ToArray(), LoadFromList));
     }
 
     private void LoadFromList(int index)

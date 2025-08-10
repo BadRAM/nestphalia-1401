@@ -1,7 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Raylib_cs;
-using static Raylib_cs.Raylib;
 
 namespace nestphalia;
 
@@ -29,21 +28,21 @@ public class SoundResource
     {
         Name = name;
         _sound = sound;
-        SetSoundVolume(_sound, 0.75f);
+        Raylib.SetSoundVolume(_sound, 0.75f);
         _soundBuffer = new Sound[bufferSize];
         for (int i = 0; i < bufferSize; i++)
         {
-            _soundBuffer[i] = LoadSoundAlias(sound);
+            _soundBuffer[i] = Raylib.LoadSoundAlias(sound);
         }
     }
     
     public void Play(float pan = 0.5f, float pitch = 1f, float volume = 0.75f)
     {
-        if (Settings.Saved.SFXVolume == 0 || IsSoundPlaying(_soundBuffer[_bufferIndex])) return;
-        SetSoundPan(_soundBuffer[_bufferIndex], pan);
-        SetSoundPitch(_soundBuffer[_bufferIndex], pitch);
-        SetSoundVolume(_soundBuffer[_bufferIndex], volume * (float)Settings.Saved.SFXVolume);
-        PlaySound(_soundBuffer[_bufferIndex]);
+        if (Settings.Saved.SFXVolume == 0 || Raylib.IsSoundPlaying(_soundBuffer[_bufferIndex])) return;
+        Raylib.SetSoundPan(_soundBuffer[_bufferIndex], pan);
+        Raylib.SetSoundPitch(_soundBuffer[_bufferIndex], pitch);
+        Raylib.SetSoundVolume(_soundBuffer[_bufferIndex], volume * (float)Settings.Saved.SFXVolume);
+        Raylib.PlaySound(_soundBuffer[_bufferIndex]);
         _bufferIndex++;
         _bufferIndex %= _soundBuffer.Length;
     }
@@ -77,65 +76,46 @@ public static class Resources
     private static Dictionary<String, SpriteResource> _sprites = new Dictionary<String, SpriteResource>();
     private static Dictionary<String, SoundResource> _sounds = new Dictionary<String, SoundResource>();
     private static Dictionary<String, MusicResource> _music = new Dictionary<String, MusicResource>();
-    public static List<Fort> CampaignLevels = new List<Fort>();
     public static Font Font;
     private static Font _accessibleFont;
     private static Font _defaultFont;
     public static Music MusicPlaying;
-    
-    // public static Shader TeamColorShader;
-    // private static int _teamColorLoc;
+
+    public static void PreLoad()
+    {
+        MissingTexture = Raylib.LoadTexture("resources/sprites/missingtex.png");
+        
+        _accessibleFont = Raylib.LoadFont("resources/pixelplay16.png");
+        _defaultFont = Raylib.LoadFont("resources/alagard.png");
+        Font = Settings.Saved.AccessibleFont ? _accessibleFont : _defaultFont;
+    }
     
     public static void Load()
     {
-        MissingTexture = LoadTexture("resources/sprites/missingtex.png");
-        
-        _accessibleFont = LoadFont("resources/pixelplay16.png");
-        _defaultFont = LoadFont("resources/alagard.png");
-        Font = Settings.Saved.AccessibleFont ? _accessibleFont : _defaultFont;
-        
-        // TeamColorShader = LoadShader("", "resources/TeamColor.glsl");
-        // _teamColorLoc = GetShaderLocation(TeamColorShader, "teamColor1");
+        foreach (string path in Directory.GetFiles(Directory.GetCurrentDirectory() + "/resources/music"))
+        {
+            MusicResource r = new MusicResource(Path.GetFileNameWithoutExtension(path), Raylib.LoadMusicStream("resources/music/" + Path.GetFileName(path)));
+            _music.Add(r.Name, r);
+        }
+
+        MusicPlaying = _music["unreal_technology_demo_95_-_unreals"].Music;
+        Raylib.PlayMusicStream(MusicPlaying);
+        Raylib.SetMusicVolume(MusicPlaying, 0f); // Purge the random garbage from the music stream
+        Raylib.UpdateMusicStream(MusicPlaying);
         
         foreach (string path in Directory.GetFiles(Directory.GetCurrentDirectory() + "/resources/sprites"))
         {
-            SpriteResource r = new SpriteResource(Path.GetFileNameWithoutExtension(path), LoadTexture("resources/sprites/" + Path.GetFileName(path)));
+            SpriteResource r = new SpriteResource(Path.GetFileNameWithoutExtension(path), Raylib.LoadTexture("resources/sprites/" + Path.GetFileName(path)));
             _sprites.Add(r.Name, r);
         }
         
         foreach (string path in Directory.GetFiles(Directory.GetCurrentDirectory() + "/resources/sfx"))
         {
-            SoundResource r = new SoundResource(Path.GetFileNameWithoutExtension(path), LoadSound("resources/sfx/" + Path.GetFileName(path)), 16);
+            SoundResource r = new SoundResource(Path.GetFileNameWithoutExtension(path), Raylib.LoadSound("resources/sfx/" + Path.GetFileName(path)), 16);
             _sounds.Add(r.Name, r);
         }
-        
-        foreach (string path in Directory.GetFiles(Directory.GetCurrentDirectory() + "/resources/music"))
-        {
-            MusicResource r = new MusicResource(Path.GetFileNameWithoutExtension(path), LoadMusicStream("resources/music/" + Path.GetFileName(path)));
-            _music.Add(r.Name, r);
-        }
-
-        //MusicPlaying = _music["unreal_technology_demo_95_-_unreals"].Music;
-        //PlayMusicStream(MusicPlaying);
 
         //Sounds.Add(new SoundResource("explosion", LoadSound("resources/sfx/explosion.wav"), 8));
-        
-        CampaignLevels.Add(LoadFort("/resources/level1.fort"));
-        CampaignLevels.Add(LoadFort("/resources/level2.fort"));
-        CampaignLevels.Add(LoadFort("/resources/level3.fort"));
-        CampaignLevels.Add(LoadFort("/resources/level4.fort"));
-        CampaignLevels.Add(LoadFort("/resources/level5.fort"));
-        CampaignLevels.Add(LoadFort("/resources/level6.fort"));
-        CampaignLevels.Add(LoadFort("/resources/level7.fort"));
-        CampaignLevels.Add(LoadFort("/resources/level8.fort"));
-        CampaignLevels.Add(LoadFort("/resources/level9.fort"));
-        CampaignLevels.Add(LoadFort("/resources/level10.fort"));
-        CampaignLevels.Add(LoadFort("/resources/level11.fort"));
-        CampaignLevels.Add(LoadFort("/resources/level12.fort"));
-        CampaignLevels.Add(LoadFort("/resources/level13.fort"));
-        CampaignLevels.Add(LoadFort("/resources/level14.fort"));
-        CampaignLevels.Add(LoadFort("/resources/level15.fort"));
-        // CampaignLevels.Add(LoadFort("/resources/level16.fort"));
     }
     
     public static Texture2D GetTextureByName(string name)
@@ -156,7 +136,7 @@ public static class Resources
 
     public static void PlayMusicByName(string name)
     {
-        StopMusicStream(MusicPlaying);
+        Raylib.StopMusicStream(MusicPlaying);
         
         // MusicResource? s = _music.FirstOrDefault(x => x.Name == name);
         MusicResource? s = null;
@@ -167,8 +147,13 @@ public static class Resources
         if (s != null)
         {
             MusicPlaying = s.Music;
-            SetMusicVolume(MusicPlaying, (float)Settings.Saved.MusicVolume * 0.3f);
-            PlayMusicStream(MusicPlaying);
+            Raylib.SetMusicVolume(MusicPlaying, (float)Settings.Saved.MusicVolume * 0.3f);
+            Raylib.PlayMusicStream(MusicPlaying);
+
+            while (!Raylib.IsMusicValid(MusicPlaying))
+            {
+                GameConsole.WriteLine("Music isn't valid yet!");
+            }
         }
         else
         {
@@ -182,21 +167,14 @@ public static class Resources
 
     public static void MusicVolumeChanged()
     {
-        SetMusicVolume(MusicPlaying, (float)Settings.Saved.MusicVolume * 0.3f);
+        Raylib.SetMusicVolume(MusicPlaying, (float)Settings.Saved.MusicVolume * 0.3f);
     }
-    
-    // public static void RestartMusic()
-    // {
-    //     StopMusicStream(MusicPlaying);
-    //     if (Settings.Saved.MusicVolume == 0) return;
-    //     PlayMusicStream(MusicPlaying);
-    // }
 
     public static void Unload()
     {
         foreach (KeyValuePair<string, SpriteResource> spriteResource in _sprites.ToArray())
         {
-            UnloadTexture(spriteResource.Value.Tex);
+            Raylib.UnloadTexture(spriteResource.Value.Tex);
         }
         _sprites.Clear();
     }
@@ -219,10 +197,16 @@ public static class Resources
         File.WriteAllText(Directory.GetCurrentDirectory() + fort.Path + "/" + fort.Name + ".fort", jsonString);
     }
 
-    // Takes relative path
     public static Fort? LoadFort(string filepath)
     {
-        filepath = Directory.GetCurrentDirectory() + filepath;
+        // Horrible hack to enable laziness
+        bool relativePath = false;
+        if (filepath.Substring(0,2) != "C:")
+        {
+            filepath = Directory.GetCurrentDirectory() + filepath;
+            relativePath = true;
+        }
+        
         if (!Path.Exists(filepath))
         {
             GameConsole.WriteLine($"Failed to find fort at {filepath}");
@@ -233,7 +217,7 @@ public static class Resources
         fort.UpdateCost();
         fort.Path = Path.GetDirectoryName(filepath)!;
         fort.Path = fort.Path.Substring(Directory.GetCurrentDirectory().Length);
-        GameConsole.WriteLine($"Loaded {fort.Name}, path: {fort.Path}");
+        GameConsole.WriteLine($"Loaded {fort.Name}, path: {fort.Path}, supplied path {(relativePath ? "was" : "wasn't")} relative");
         return fort;
     }
 
