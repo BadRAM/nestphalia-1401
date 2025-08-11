@@ -8,16 +8,39 @@
         <Nullable>enable</Nullable>
         <LangVersion>12</LangVersion>
         <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
-        <PublishTrimmed>true</PublishTrimmed>
         <PathMap>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)'))=./</PathMap>
     </PropertyGroup>
+
+    <Target Name="ShowRID" BeforeTargets="BeforeBuild">
+        <Message Text="nestphalia properties:" Importance="High" />
+        <Message Text="SelfContained = '$(SelfContained)'" Importance="High" />
+        <Message Text="RuntimeIdentifier = '$(RuntimeIdentifier)'" Importance="High" />
+        <Message Text="RuntimeIdentifiers = '$(RuntimeIdentifiers)'" Importance="High" />
+        <Message Text="OS = '$(OS)'" Importance="High" />
+    </Target>
     
     <PropertyGroup Condition="'$(Configuration)'=='Release'">
         <DebugSymbols>False</DebugSymbols>
         <DebugType>None</DebugType>
     </PropertyGroup>
 
+<!--    <PropertyGroup Condition="'$(RuntimeIdentifier)' == 'linux-x64'">-->
+<!--        <LibraryFilename>libwren.so</LibraryFilename>-->
+<!--    </PropertyGroup>-->
+
+<!--    <PropertyGroup Condition="'$(RuntimeIdentifier)' == 'win-x64'">-->
+<!--        <LibraryFilename>wren.dll</LibraryFilename>-->
+<!--    </PropertyGroup>-->
+
     <ItemGroup>
+        <None Update="libwren.so" Condition="'$(RuntimeIdentifier)' == 'linux-x64'">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        </None>
+        <None Update="wren.dll" Condition="'$(RuntimeIdentifier)' == 'win-x64'">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        </None>
         <None Update="resources/**/*">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
@@ -42,7 +65,7 @@
     </ItemGroup>
     
     <ItemGroup>
-      <ProjectReference Include="..\WrenSharp\WrenSharp\WrenSharp.csproj" />
+        <ProjectReference Include="..\WrenSharp\WrenSharp\WrenSharp.csproj" />
     </ItemGroup>
     
     <ItemGroup>

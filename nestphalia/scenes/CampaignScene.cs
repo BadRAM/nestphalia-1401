@@ -85,7 +85,7 @@ public class CampaignScene : Scene
 
         if (_fort != null)
         {
-            _fort = Resources.LoadFort(_fort.Path);
+            _fort = Resources.LoadFort(_fort.Path  + "/" + _fort.Name  + ".fort");
         }
     }
     

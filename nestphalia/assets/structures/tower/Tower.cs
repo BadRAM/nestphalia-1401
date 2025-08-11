@@ -118,7 +118,7 @@ public class Tower : Structure
 
     public override void Destroy()
     {
-        Team e = World.GetOtherTeam(Team);
+        Team e = World.GetEnemyTeam(Team);
 
         Queue<Int2D> protectedArea = new Queue<Int2D>();
         for (int x = 0; x < World.BoardWidth; x++)

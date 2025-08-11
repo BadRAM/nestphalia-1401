@@ -34,7 +34,7 @@ public class MenuScene : Scene
             }
             
             DrawTextCentered(0, -200, "NESTPHALIA 1401", 48);
-            DrawTextLeft(-470, -350, "V2.0.0 - Conquest Update");
+            DrawTextLeft(-470, -350, "V2.0.a2 - Quest Update");
         
             if (Button300(-150, -80, "Start")) new CampaignScene().Start();
             if (Button300(-150, -40, "Custom Battle")) new CustomBattleMenu().Start();

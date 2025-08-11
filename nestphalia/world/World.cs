@@ -593,7 +593,23 @@ public static class World
         return _board[x,y];
     }
 
-    public static Team GetOtherTeam(Team team)
+    public static Team? GetTeam(string teamName)
+    {
+        teamName = teamName.ToLower();
+        switch (teamName)
+        {
+            case "left":
+            case "player":
+                return LeftTeam;
+            case "right":
+            case "enemy":
+                return RightTeam;
+        }
+
+        return null;
+    }
+
+    public static Team GetEnemyTeam(Team team)
     {
         return team == LeftTeam ? RightTeam : LeftTeam;
     }

@@ -301,9 +301,11 @@ public static class GUI
         anchor ??= Screen.Center;
         x += (int)anchor.Value.X;
         y += (int)anchor.Value.Y;
+
+        Rectangle rect = new Rectangle(x, y, 300, 40);
         
-        bool hover = !Input.IsSuppressed() && CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(x, y, 300, 40));
-        bool press = (hover && (Input.Held(MouseButton.Left) || Input.Released(MouseButton.Left)));
+        bool hover = !Input.IsSuppressed() && CheckCollisionPointRec(GetScaledMousePosition(), rect);
+        bool press = (hover && (Input.Held(MouseButton.Left) || Input.Released(MouseButton.Left)) && CheckCollisionPointRec(Input.GetScaledClickPos(), rect));
         
         // if clicking on bar, move pin to mouse
         if (hover && press)

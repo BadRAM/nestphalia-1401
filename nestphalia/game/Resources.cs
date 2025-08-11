@@ -122,27 +122,20 @@ public static class Resources
     {
         if (!_sprites.ContainsKey(name)) return MissingTexture;
         return _sprites[name].Tex;
-        // SpriteResource? s = _sprites.FirstOrDefault(x => x.Name == name);
-        // return s?.Tex ?? MissingTexture;
     }
     
     public static SoundResource GetSoundByName(string name)
     {
         if (!_sounds.ContainsKey(name)) return _sounds["shovel"];
         return _sounds[name];
-        // SoundResource? s = _sounds.FirstOrDefault(x => x.Name == name);
-        // return s ?? _sounds[0];
     }
 
     public static void PlayMusicByName(string name)
     {
         Raylib.StopMusicStream(MusicPlaying);
         
-        // MusicResource? s = _music.FirstOrDefault(x => x.Name == name);
         MusicResource? s = null;
         if (_music.ContainsKey(name)) s = _music[name];
-
-        // if (Settings.Saved.MusicVolume == 0) return;
         
         if (s != null)
         {
@@ -201,7 +194,7 @@ public static class Resources
     {
         // Horrible hack to enable laziness
         bool relativePath = false;
-        if (filepath.Substring(0,2) != "C:")
+        if (!Path.Exists(filepath))
         {
             filepath = Directory.GetCurrentDirectory() + filepath;
             relativePath = true;
