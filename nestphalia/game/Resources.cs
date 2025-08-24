@@ -1,5 +1,3 @@
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using Raylib_cs;
 
 namespace nestphalia;
@@ -175,60 +173,5 @@ public static class Resources
     public static void SetFontAccessibility(bool accessible)
     {
         Font = accessible ? _accessibleFont : _defaultFont;
-    }
-
-    public static void SaveFort(Fort fort)
-    {
-        for (int x = 0; x < 20; x++)
-        for (int y = 0; y < 20; y++)
-        {
-            fort.Board[x+y*20] = World.GetTile(x+1,y+1)?.Template.ID ?? "";
-        }
-        fort.Comment = fort.FortSummary();
-
-        string jsonString = JsonSerializer.Serialize(fort, SourceGenerationContext.Default.Fort);
-        File.WriteAllText(Directory.GetCurrentDirectory() + fort.Path + "/" + fort.Name + ".fort", jsonString);
-    }
-
-    public static Fort? LoadFort(string filepath)
-    {
-        // Horrible hack to enable laziness
-        bool relativePath = false;
-        if (!Path.Exists(filepath))
-        {
-            filepath = Directory.GetCurrentDirectory() + filepath;
-            relativePath = true;
-        }
-        
-        if (!Path.Exists(filepath))
-        {
-            GameConsole.WriteLine($"Failed to find fort at {filepath}");
-            return null;
-        }
-        string jsonString = File.ReadAllText(filepath);
-        Fort fort = JsonSerializer.Deserialize<Fort>(jsonString, SourceGenerationContext.Default.Fort)!;
-        fort.UpdateCost();
-        fort.Path = Path.GetDirectoryName(filepath)!;
-        fort.Path = fort.Path.Substring(Directory.GetCurrentDirectory().Length);
-        GameConsole.WriteLine($"Loaded {fort.Name}, path: {fort.Path}, supplied path {(relativePath ? "was" : "wasn't")} relative");
-        return fort;
-    }
-
-    public static string GetUnusedFortName(string path)
-    {
-        path = Directory.GetCurrentDirectory() + path;
-        int number = 1;
-        while (true)
-        {
-            if (!File.Exists(path + $"fort{number}.fort"))
-            {
-                return $"fort{number}";
-            }
-            if (number >= 1000)
-            {
-                return "TooManyForts";
-            }
-            number++;
-        }
     }
 }

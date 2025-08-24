@@ -7,9 +7,9 @@ namespace nestphalia;
 
 public class EditorScene : Scene
 {
-    private Action _startPrevScene;
+    private Action<Fort> _exitAction;
     private CampaignSaveData? _data;
-    private List<StructureTemplate> _buildableStructures = new List<StructureTemplate>();
+    private List<StructureTemplate> _buildableStructures;
     private StructureTemplate? _brush;
     private EditorTool _toolActive;
     private Fort _fort;
@@ -23,8 +23,12 @@ public class EditorScene : Scene
     private double _price;
     private int _nestCount;
     private int _beaconCount;
+    private Texture2D _panelTex;
     private Texture2D _bg;
-
+    private StructureTemplate? _toolTipStructure;
+    private bool _unsaved;
+    private Int2D _mouseTilePos = Int2D.Zero;
+    
     private PathFinder pathFinder = new PathFinder();
 
     private enum EditorTool
@@ -34,18 +38,19 @@ public class EditorScene : Scene
         PathTester
     }
     
-    public void Start(Action exitAction, Fort fortToLoad, CampaignSaveData? data = null)
+    public void Start(Action<Fort> exitAction, Fort fortToLoad, CampaignSaveData? data = null)
     {
-        _startPrevScene = exitAction; // exitAction is usually the start function of the scene that invoked the editor
+        _exitAction = exitAction; // exitAction is usually the start function of the scene that invoked the editor
         _fort = fortToLoad;
         _brush = null;
         _toolActive = EditorTool.Erase;
         _data = data;
         _sandboxMode = data == null;
-        //Console.WriteLine($"checking if {Directory.GetCurrentDirectory() +  $"/forts/{_fort.Name}.fort"} exists. Answer: {_fortAlreadySaved.ToString()}");
-
+        _unsaved = false;
+        
         Program.CurrentScene = this;
         Screen.RegenerateBackground();
+        _panelTex = Resources.GetTextureByName("9slice");
         _bg = Resources.GetTextureByName("editor_bg");
         World.InitializeEditor(_fort);
         World.Camera.Offset = new Vector2(Screen.CenterX, Screen.CenterY);
@@ -58,6 +63,7 @@ public class EditorScene : Scene
         _newTower = false;
         _newNest = false;
         
+        _buildableStructures = new List<StructureTemplate>();
         if (!_sandboxMode)
         {
             foreach (string structure in _data.UnlockedStructures)
@@ -101,6 +107,7 @@ public class EditorScene : Scene
     public override void Update()
     {
         // ===== INPUT + UPDATE =====
+        _mouseTilePos = World.GetMouseTilePos();
         
         switch (_toolActive)
         {
@@ -120,10 +127,9 @@ public class EditorScene : Scene
         
         if (Input.Pressed(MouseButton.Right))
         {
-            Int2D tilePos = World.GetMouseTilePos();
-            if (tilePos.X >= 1 && tilePos.X < 21 && tilePos.Y >= 1 && tilePos.Y < 21)
+            if (MouseIsInBounds())
             {
-                _brush = World.GetTile(tilePos)?.Template;
+                _brush = World.GetTile(_mouseTilePos)?.Template;
                 if (_brush == null)
                 {
                     _toolActive = EditorTool.Erase;
@@ -135,26 +141,25 @@ public class EditorScene : Scene
                 }
             }
         }
-
-        if (Input.Pressed(Input.InputAction.Exit)) _startPrevScene();
         
         // lazy hack so resizing the window doesn't offset the viewport
         World.Camera.Zoom = GetWindowScale().X;
-        World.Camera.Offset = new Vector2(Screen.CenterX, Screen.CenterY) * GetWindowScale(); 
+        World.Camera.Offset = new Vector2(Screen.CenterX + 192, Screen.CenterY - 64) * GetWindowScale(); 
         
         // ===== DRAW =====
         
         Screen.BeginDrawing();
         ClearBackground(Color.Black);
+        _toolTipStructure = null;
         Screen.DrawBackground(Color.Gray);
         
         World.DrawFloor();
         
         // Draw gui background texture
-        DrawTexture(_bg, Screen.CenterX - 604, Screen.CenterY - 304, Color.White);
+        DrawTexture(_bg, Screen.CenterX - 484, Screen.CenterY - 364, Color.White);
         
         // Draw brush preview ghost
-        if (CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(Screen.CenterX-240, Screen.CenterY-232, 480, 480)))
+        if (MouseIsInBounds())
         {
             Screen.SetCamera(World.Camera);
             Vector2 mousePos = World.GetTileCenter(World.GetMouseTilePos());
@@ -172,29 +177,32 @@ public class EditorScene : Scene
         
         World.Draw();
         
-        _fort.Name = TextEntry(-592, 172, _fort.Name);
-        if (Button300(-592, 212, "Save Changes")) Resources.SaveFort(_fort);
-        if (Button300(-592, 252, "Exit")) _startPrevScene();
+        _fort.Name = TextEntry(290, 194, _fort.Name);
+        if (Button90(290, 238, "Save", enabled:_unsaved)) Save();
+        if (Button90(380, 238, "Save As")) SaveAs();
+        if (Button180(290, 276, "Load")) Load();
+        if (Button180(290, 314, "Exit") || Input.Pressed(Input.InputAction.Exit)) Exit();
         
         // Bottom center buttons
-        if (Button100(150, 258, "Sell", _toolActive != EditorTool.Erase))
+        if (Button90(-64, -358, "Sell", _toolActive != EditorTool.Erase))
         {
             _brush = null;
             _toolActive = EditorTool.Erase;
         }
-        if (Button100(50, 258, "Path Preview", _toolActive != EditorTool.PathTester))
+        if (Button90(28, -358, "Path Test", _toolActive != EditorTool.PathTester))
         {
             _brush = null;
             _toolActive = EditorTool.PathTester;
         }
-        if (_sellAllConfirm && Button100(-250, 258, "Cancel"))   _sellAllConfirm = false;
-        else if (!_sellAllConfirm&& Button100(-250, 258, "Sell All")) _sellAllConfirm = true;
-        if (_sellAllConfirm && Button100(-150, 258, "Confirm"))  SellAll();
+        if (_sellAllConfirm && Button90(120, -358, "Cancel"))   _sellAllConfirm = false;
+        else if (!_sellAllConfirm&& Button90(120, -358, "Sell All")) _sellAllConfirm = true;
+        if (_sellAllConfirm && Button90(212, -358, "Confirm"))  SellAll();
         
         // Structure Category buttons
-        if (Button100(292, -292, (_newUtil ? "NEW! " : "") + "Utility", _structureClassSelected != StructureTemplate.StructureClass.Utility)) _structureClassSelected = StructureTemplate.StructureClass.Utility;
-        if (Button100(392, -292, (_newTower ? "NEW! " : "") + "Tower", _structureClassSelected != StructureTemplate.StructureClass.Tower)) _structureClassSelected = StructureTemplate.StructureClass.Tower;
-        if (Button100(492, -292, (_newNest ? "NEW! " : "") + "Nest", _structureClassSelected != StructureTemplate.StructureClass.Nest)) _structureClassSelected = StructureTemplate.StructureClass.Nest;
+        if (Button90(-470, -350, (_newUtil ? "NEW! " : "") + "Basic", _structureClassSelected != StructureTemplate.StructureClass.Utility)) _structureClassSelected = StructureTemplate.StructureClass.Utility;
+        if (Button90(-380, -350, (_newUtil ? "NEW! " : "") + "Utility", _structureClassSelected != StructureTemplate.StructureClass.Utility)) _structureClassSelected = StructureTemplate.StructureClass.Utility;
+        if (Button90(-290, -350, (_newTower ? "NEW! " : "") + "Defense", _structureClassSelected != StructureTemplate.StructureClass.Tower)) _structureClassSelected = StructureTemplate.StructureClass.Tower;
+        if (Button90(-200, -350, (_newNest ? "NEW! " : "") + "Nest", _structureClassSelected != StructureTemplate.StructureClass.Nest)) _structureClassSelected = StructureTemplate.StructureClass.Nest;
         
         StructureList();
         
@@ -205,25 +213,81 @@ public class EditorScene : Scene
             PathTestTool();
         }
         
-        if (!_sandboxMode)
+        DrawToolTip();
+        
+        // if (!_sandboxMode)
+        // {
+        //     int nestCap = _data.GetNestCap();
+        //     DrawTextLeft(-260, -290, $"Nests: {_nestCount}/{nestCap}", color: _nestCount > nestCap ? Color.Red : Color.White);
+        //     if (_sandboxMode)
+        //     {
+        //         DrawTextLeft(-80,  -290, $"Cost: ${_price} bug dollars");
+        //     }
+        //     else
+        //     {
+        //         DrawTextLeft(-80,  -290, $"Cost: ${_price}/{_data.Money} bug dollars", color: _price > _data.Money ? Color.Red : Color.White);
+        //     }
+        //     DrawTextLeft( 160, -290, $"Stratagems: {_beaconCount}/{4}", color: _beaconCount > 4 ? Color.Red : Color.White);
+        // }
+        // else
+        // {
+        //     DrawTextLeft(-260, -290, $"Nests: {_nestCount}");
+        //     DrawTextLeft(-80,  -290, $"Cost: ${_price} bug dollars");
+        //     DrawTextLeft( 160, -290, $"Stratagems: {_beaconCount}/{4}", color: _beaconCount > 4 ? Color.Red : Color.White);
+        // }
+    }
+
+    private void Save()
+    {
+        if (_fort.Path == "")
         {
-            int nestCap = _data.GetNestCap();
-            DrawTextLeft(-260, -290, $"Nests: {_nestCount}/{nestCap}", color: _nestCount > nestCap ? Color.Red : Color.White);
-            if (_sandboxMode)
+            SaveAs();
+        }
+        _fort.SaveBoard();
+        _fort.SaveToDisc();
+        _unsaved = false;
+    }
+    
+    private void SaveAs()
+    {
+        PopupManager.Start(new AlertPopup("Error!", "\"Save As\" has not yet been implemented.\nFort folder will be opened.", "OK",
+        () =>
+        {
+            Utils.OpenFolder(Path.GetDirectoryName(_fort.Path));
+        }));
+        GameConsole.WriteLine("Todo: Implement \"save as\" function");
+    }
+    
+    private void Load()
+    {
+        PopupManager.Start(new FortPickerPopup(Path.GetDirectoryName(_fort.Path), 
+        fort => 
+        {
+            Start(_exitAction, fort, _data);
+        },
+        path =>
+        {
+            Fort f = new Fort(path);
+            Start(_exitAction, f, _data);
+        }));
+    }
+    
+    private void Exit()
+    {
+        if (_unsaved)
+        {
+            PopupManager.Start(new YesNoPopup("Alert", "You have unsaved changes!", "Save", "Discard", yes =>
             {
-                DrawTextLeft(-80,  -290, $"Cost: ${_price} bug dollars");
-            }
-            else
-            {
-                DrawTextLeft(-80,  -290, $"Cost: ${_price}/{_data.Money} bug dollars", color: _price > _data.Money ? Color.Red : Color.White);
-            }
-            DrawTextLeft( 160, -290, $"Stratagems: {_beaconCount}/{4}", color: _beaconCount > 4 ? Color.Red : Color.White);
+                if (yes)
+                {
+                    Save();
+                }
+                _exitAction.Invoke(_fort);
+            }));
         }
         else
         {
-            DrawTextLeft(-260, -290, $"Nests: {_nestCount}");
-            DrawTextLeft(-80,  -290, $"Cost: ${_price} bug dollars");
-            DrawTextLeft( 160, -290, $"Stratagems: {_beaconCount}/{4}", color: _beaconCount > 4 ? Color.Red : Color.White);
+            _exitAction.Invoke(_fort);
         }
     }
 
@@ -235,31 +299,43 @@ public class EditorScene : Scene
             StructureTemplate s = _buildableStructures[i];
             if (s.Class != _structureClassSelected) continue;
             string label = s.Name + " - $" + s.Price;
-            if (Button300(292, y * 40 - 250, label, _brush != s))
+            if (Button360(-470, y * 38 - 310, label, _brush != s))
             {
                 _brush = s;
                 _toolActive = EditorTool.Brush;
             }
 
-            DrawTexture(s.Texture, Screen.CenterX + 312, Screen.CenterY + y * 40 - 246, Color.White);
+            if (CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(Screen.CenterX - 470, Screen.CenterY + y * 38 - 310, 360, 36)))
+            {
+                _toolTipStructure = s;
+            }
+
+            DrawTexture(s.Texture, Screen.CenterX - 450, Screen.CenterY + y * 38 - 278 - s.Texture.Height, Color.White);
+            if (s is SpawnerTemplate spawner)
+            {
+                spawner.Minion.DrawPreview(Screen.CenterX - 410, Screen.CenterY + y * 38 - 292, Color.Red);
+            }
             y++;
         }
     }
 
     private void DrawInfoPanel()
     {
-        string info;
-        switch (_toolActive)
-        {
-            case EditorTool.Brush:
-                info = _brush?.GetStats() ?? "";
-                break;
-            default:
-                info = _fortStats;
-                break;
-        }
+        DrawTextLeft(-94, 204, _fortStats);
+    }
 
-        DrawTextLeft(-590, -290, info);
+    private void DrawToolTip()
+    {
+        if (_toolTipStructure == null) return;
+
+        string tip = WrapText(_toolTipStructure.GetStats(), 270);
+
+        Rectangle rect = new Rectangle(GetScaledMousePosition() + Vector2.One * 12, MeasureText(tip) + Vector2.One * 4);
+
+        rect.Position = Vector2.Clamp(rect.Position, Vector2.Zero, Screen.BottomRight - rect.Size);
+        
+        Draw9Slice(_panelTex, rect, anchor:Screen.TopLeft);
+        DrawTextLeft(rect.Position + Vector2.One * 2, tip, anchor:Screen.TopLeft);
     }
 
     private void PathTestTool()
@@ -294,6 +370,7 @@ public class EditorScene : Scene
             {
                 World.SetTile(null, World.LeftTeam, tilePos);
                 UpdateFortStats();
+                _unsaved = true;
             }
         }
     }
@@ -315,6 +392,7 @@ public class EditorScene : Scene
             {
                 World.SetTile(_brush, World.LeftTeam, tilePos);
                 UpdateFortStats();
+                _unsaved = true;
             }
         }
     }
@@ -331,6 +409,7 @@ public class EditorScene : Scene
         }
         
         _sellAllConfirm = false;
+        _unsaved = true;
     }
     
     private void UpdateFortStats()
@@ -365,5 +444,10 @@ public class EditorScene : Scene
                      beaconCount + (_sandboxMode ? "" : "/4") + " Stratagems\n" +
                      $"{structureCount} Total\n" +
                      $"{totalCost} Cost";
+    }
+
+    private bool MouseIsInBounds()
+    {
+        return _mouseTilePos.X >= 1 && _mouseTilePos.X < 21 && _mouseTilePos.Y >= 1 && _mouseTilePos.Y < 21;
     }
 }

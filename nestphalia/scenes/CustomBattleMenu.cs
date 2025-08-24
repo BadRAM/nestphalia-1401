@@ -13,24 +13,20 @@ public class CustomBattleMenu : Scene
     private bool _loadingLeftSide = true;
     private string _outcomeMessage = "";
     private string _activeDirectory = "";
-    private int _fortListPage = 1;
-    private string[] _directories = [];
-    private string[] _fortFiles = [];
 
-    public void Start()
+    public void Start(Fort? leftFort = null, Fort? rightFort = null)
     {
         World.InitializePreview();
 
-        if (_leftFort  != null) _leftFort  = Resources.LoadFort(_leftFort.Path  + "/" + _leftFort.Name  + ".fort") ?? _leftFort;
-        if (_rightFort != null) _rightFort = Resources.LoadFort(_rightFort.Path + "/" + _rightFort.Name + ".fort") ?? _rightFort;
+        if (leftFort != null) _leftFort = leftFort;
+        if (rightFort != null) _rightFort = rightFort;
+        // if (_leftFort  != null) _leftFort  = Resources.LoadFort(_leftFort.Path  + "/" + _leftFort.Name  + ".fort") ?? _leftFort;
+        // if (_rightFort != null) _rightFort = Resources.LoadFort(_rightFort.Path + "/" + _rightFort.Name + ".fort") ?? _rightFort;
         _leftFort?.LoadToBoard(new Int2D(1,1),false);
         _rightFort?.LoadToBoard(new Int2D(26, 1), true);
         _loadingLeftSide = true;
         _outcomeMessage = "";
         _activeDirectory = "";
-        _fortListPage = 1;
-        _directories = Directory.GetDirectories(Directory.GetCurrentDirectory() + "/forts/" + _activeDirectory);
-        _fortFiles = Directory.GetFiles(Directory.GetCurrentDirectory() + "/forts/" + _activeDirectory);
         Program.CurrentScene = this;
         Screen.RegenerateBackground();
         Resources.PlayMusicByName("scene03");
@@ -51,19 +47,43 @@ public class CustomBattleMenu : Scene
         World.Camera.Zoom = 0.5f * GUI.GetWindowScale().X;
         World.DrawFloor();
         World.Draw();
-
+        
         if (GUI.Button300(300, -300, _loadingLeftSide ? "Selecting Left Fort" : "Selecting Right Fort"))
         {
             _loadingLeftSide = !_loadingLeftSide;
         }
         
-        if (_leftFort != null  && GUI.Button300(300, -260, $"Edit {_leftFort.Name}" )) new EditorScene().Start(Start, _leftFort);
-        if (_rightFort != null && GUI.Button300(300, -220, $"Edit {_rightFort.Name}")) new EditorScene().Start(Start, _rightFort);
+        if (GUI.Button100(100, -260, $"Pick Left" ))
+        {
+            PopupManager.Start(new FortPickerPopup(Directory.GetCurrentDirectory() + "/forts/", 
+            fort =>
+            {
+                _leftFort = fort;
+                _leftFort.LoadToBoard(new Int2D(1, 1), false);
+            },
+            path =>
+            {
+                new EditorScene().Start(fort => {Start(leftFort:fort);}, new Fort(path));
+            }));
+        }
+        if (GUI.Button100(100, -220, $"Pick Right"))
+        {
+            PopupManager.Start(new FortPickerPopup(Directory.GetCurrentDirectory() + "/forts/", 
+            fort =>
+            {
+                _rightFort = fort;
+                _rightFort.LoadToBoard(new Int2D(26, 1), true);
+            },
+            path =>
+            {
+                new EditorScene().Start(fort => {Start(rightFort:fort);}, new Fort(path));
+            }));
+        }
+        if (_leftFort != null  && GUI.Button300(300, -260, $"Edit {_leftFort.Name}" )) new EditorScene().Start(f => {Start(leftFort:f);}, _leftFort);
+        if (_rightFort != null && GUI.Button300(300, -220, $"Edit {_rightFort.Name}")) new EditorScene().Start(f => {Start(rightFort:f);}, _rightFort);
         
         if (_leftFort != null  && GUI.Button100(200, -260, _leftIsPlayer  ? "PLAYER" : "CPU" )) _leftIsPlayer =  !_leftIsPlayer;
         if (_rightFort != null && GUI.Button100(200, -220, _rightIsPlayer ? "PLAYER" : "CPU" )) _rightIsPlayer = !_rightIsPlayer;
-        
-        ListForts();
         
         string vs = (_leftFort  != null ? _leftFort.Name  : "???") + " VS " +
                     (_rightFort != null ? _rightFort.Name : "???");
@@ -102,72 +122,6 @@ public class CustomBattleMenu : Scene
         else
         {
             _outcomeMessage = winner.Name + " won the battle!";
-        }
-    }
-
-    private void ListForts()
-    {
-        if (GUI.Button100(-600, 260, "<", _fortListPage > 1)) _fortListPage--;
-            GUI.Button100(-500, 260, _fortListPage.ToString(), false);
-        if (GUI.Button100(-400, 260, ">", _fortListPage <= ((_activeDirectory == "" ? 0 : 1) + _directories.Length + _fortFiles.Length)/12)) _fortListPage++;
-        
-        for (int i = 0; i < 12; i++)
-        {
-            int index = i + (_fortListPage - 1) * 12 + (_activeDirectory != "" ? -1 : 0);
-            if (index >= _directories.Length + _fortFiles.Length + 1) break;
-            if (index == -1) // This is the 'return to parent folder' button
-            {
-                if (GUI.Button300(-600, i * 40 - 240, "^  Return to Parent Folder  ^"))
-                {
-                    _activeDirectory = "";
-                    _directories = Directory.GetDirectories(Directory.GetCurrentDirectory() + "/forts/" + _activeDirectory);
-                    _fortFiles = Directory.GetFiles(Directory.GetCurrentDirectory() + "/forts/" + _activeDirectory);
-                }
-            }
-            else if (index < _directories.Length) // This is a directory
-            {
-                if (GUI.Button300(-600, i * 40 - 240,
-                        $"/{Path.GetFileName(_directories[index])}/"))
-                {
-                    _activeDirectory = Path.GetFileName(_directories[index]);
-                    _directories = Directory.GetDirectories(Directory.GetCurrentDirectory() + "/forts/" + _activeDirectory);
-                    _fortFiles = Directory.GetFiles(Directory.GetCurrentDirectory() + "/forts/" + _activeDirectory);
-                }
-            }
-            else if (index < _directories.Length + _fortFiles.Length) // This is a fort
-            {
-                string fortPath = _fortFiles[index - _directories.Length];
-                if (GUI.Button300(-600, i * 40 - 240,
-                        Path.GetFileNameWithoutExtension(fortPath)))
-                {
-                    GameConsole.WriteLine("Loading " + Path.GetFileName(fortPath));
-                    if (_loadingLeftSide)
-                    {
-                        _leftFort = Resources.LoadFort(fortPath.Substring(Directory.GetCurrentDirectory().Length));
-                        _leftFort.Name = Path.GetFileNameWithoutExtension(fortPath);
-                        _leftFort.Comment = _leftFort.FortSummary();
-                        _leftFort.LoadToBoard(new Int2D(1,1),false);
-                    }
-                    else
-                    {
-                        _rightFort = Resources.LoadFort(fortPath.Substring(Directory.GetCurrentDirectory().Length));
-                        _rightFort.Name = Path.GetFileNameWithoutExtension(fortPath);
-                        _rightFort.Comment = _rightFort.FortSummary();
-                        _rightFort.LoadToBoard(new Int2D(26, 1), true);
-                    }
-
-                    _loadingLeftSide = !_loadingLeftSide;
-                }
-            }
-            else
-            {
-                if (GUI.Button300(-600, i * 40 - 240, "+  New Fort  +"))
-                {
-                    string path = "/forts/" + _activeDirectory;
-                    Fort f = new Fort(Resources.GetUnusedFortName(path), path);
-                    new EditorScene().Start(Start, f);
-                }
-            }
         }
     }
 }

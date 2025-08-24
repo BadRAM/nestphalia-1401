@@ -9,8 +9,7 @@ public static class Utils
 {
     public static void OpenFolder(string path)
     {
-        // System.Diagnostics.Process.Start("explorer.exe", Directory.GetCurrentDirectory() + @"\forts");
-        path = Directory.GetCurrentDirectory() + path;
+        path = path.MakePathAbsolute();
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
@@ -163,6 +162,32 @@ public static class Utils
         if (index < 0) 
             index = ~index;
         @this.Insert(index, item);
+    }
+    
+    public static string MakePathRelative(this string path)
+    {
+        if (path.Contains(Directory.GetCurrentDirectory()))
+        {
+            return path.Substring(Directory.GetCurrentDirectory().Length);
+        }
+        else
+        {
+            GameConsole.WriteLine($"{path} is not absolute or is not inside current directory");
+            return path;
+        }
+    }
+
+    public static string MakePathAbsolute(this string path)
+    {
+        if (!path.Contains(Directory.GetCurrentDirectory()))
+        {
+            return Directory.GetCurrentDirectory() + path;
+        }
+        else
+        {
+            GameConsole.WriteLine($"{path} is already absolute");
+            return path;
+        }
     }
 }
 

@@ -8,6 +8,11 @@ public static class GUI
 {
     private static Texture2D _buttonWideTexture;
     private static Texture2D _buttonNarrowTexture;
+    private static Texture2D _button360Texture;
+    private static Texture2D _button270Texture;
+    private static Texture2D _button180Texture;
+    private static Texture2D _button90Texture;
+    private static Texture2D _button36Texture;
     private static Texture2D _sliderBarTexture;
     private static Texture2D _sliderPinTexture;
     private static SoundResource _buttonClickSFX;
@@ -27,6 +32,11 @@ public static class GUI
     {
         _buttonWideTexture = Resources.GetTextureByName("button_wide");
         _buttonNarrowTexture = Resources.GetTextureByName("button_narrow");
+        _button360Texture = Resources.GetTextureByName("button_360");
+        _button270Texture = Resources.GetTextureByName("button_270");
+        _button180Texture = Resources.GetTextureByName("button_180");
+        _button90Texture = Resources.GetTextureByName("button_90");
+        _button36Texture = Resources.GetTextureByName("button_36");
         _sliderBarTexture = Resources.GetTextureByName("slider_bar");
         _sliderPinTexture = Resources.GetTextureByName("slider_pin");
         _buttonClickSFX = Resources.GetSoundByName("shovel");
@@ -59,15 +69,65 @@ public static class GUI
         DrawTextEx(Resources.Font, text, pos, size, size/FontSize, c);
     }
 
-    public static void DrawTextLeft(int x, int y, string text, float size = FontSize, Color? color = null, Vector2? anchor = null)
+    public static void DrawTextLeft(int x, int y, string text, float size = FontSize, int wrapWidth = 0, Color? color = null, Vector2? anchor = null)
     {
         anchor ??= Screen.Center;
         x += (int)anchor.Value.X;
         y += (int)anchor.Value.Y;
         
         Color c = color ?? new Color(255, 255, 255, 255);
+
+        if (wrapWidth != 0)
+        {
+            text = WrapText(text, wrapWidth, size);
+        }
         
         DrawTextEx(Resources.Font, text, new Vector2(x,y), size, size/FontSize, c);
+    }
+
+    public static void DrawTextLeft(Vector2 pos, string text, float size = FontSize, int wrapWidth = 0, Color? color = null, Vector2? anchor = null)
+    {
+        DrawTextLeft((int)pos.X, (int)pos.Y, text, size, wrapWidth, color, anchor);
+    }
+
+    public static string WrapText(string text, int wrapWidth, float size = FontSize)
+    {
+        List<string> lines = new List<string>(text.Split("\n"));
+        for (int i = 0; i < lines.Count; i++)
+        {
+            if (MeasureTextEx(Resources.Font, lines[i], size, size / FontSize).X > wrapWidth)
+            {
+                List<string> words = new List<string>(lines[i].Split(" "));
+                if (MeasureTextEx(Resources.Font, words[0], size, size / FontSize).X > wrapWidth) // if the first word is too long and needs to be cut
+                {
+                    for (int j = 2; j < lines[i].Length; j++)
+                    {
+                        if (MeasureTextEx(Resources.Font, lines[i].Substring(0, j), size, size / FontSize).X > wrapWidth)
+                        {
+                            lines.Insert(i + 1, lines[i].Substring(j-1).Trim());
+                            lines[i] = lines[i].Substring(0, j-1);
+                            break;
+                        }
+                    }
+                    continue;
+                }
+                for (int j = 1; j < words.Count; j++)
+                {
+                    if (MeasureTextEx(Resources.Font, string.Join(" ", words.GetRange(0, j+1)), size, size / FontSize).X > wrapWidth)
+                    {
+                        lines.Insert(i + 1, string.Join(" ", words.GetRange(j, words.Count - j)).Trim());
+                        lines[i] = string.Join(" ", words.GetRange(0, j)).Trim();
+                        break;
+                    }
+                }
+            }
+        }
+        return string.Join("\n", lines);
+    }
+
+    public static Vector2 MeasureText(string text, float size = FontSize)
+    {
+        return MeasureTextEx(Resources.Font, text, size, size / FontSize);
     }
 
     public static Rectangle Draw9Slice(Texture2D texture, Rectangle rect, Vector2? anchor = null, bool draggable = false, bool resizable = false)
@@ -192,16 +252,16 @@ public static class GUI
             switch (state)
             {
                 case ButtonState.Disabled:
-                    subSprite.Y = texture.Value.Height/3 * 2;
+                    subSprite.Y = rect.Height * 2;
                     break;
                 case ButtonState.Enabled:
                     subSprite.Y = 0;
                     break;
                 case ButtonState.Hovered:
-                    subSprite.Y = texture.Value.Height/3 * 1;
+                    subSprite.Y = rect.Height * 1;
                     break;
                 case ButtonState.Pressed:
-                    subSprite.Y = texture.Value.Height/3 * 2;
+                    subSprite.Y = rect.Height * 2;
                     break; 
             }
             DrawTextureRec(texture.Value, subSprite, rect.Position, Color.White);
@@ -248,16 +308,34 @@ public static class GUI
         return false;
     }
     
-    // 180x36 pixel button
-    public static bool Button180(int x, int y, string text, bool enabled = true, Vector2? anchor = null)
+    // 360x36 pixel button
+    public static bool Button360(int x, int y, string text, bool enabled = true, Vector2? anchor = null)
     {
-        return Button(new Rectangle(x, y, 180, 36), text, enabled:enabled, anchor:anchor);
+        return Button(new Rectangle(x, y, 360, 36), text, _button360Texture, enabled, anchor);
     }
     
     // 270x36 pixel button
     public static bool Button270(int x, int y, string text, bool enabled = true, Vector2? anchor = null)
     {
-        return Button(new Rectangle(x, y, 270, 36), text, enabled:enabled, anchor:anchor);
+        return Button(new Rectangle(x, y, 270, 36), text, _button270Texture, enabled, anchor);
+    }
+    
+    // 180x36 pixel button
+    public static bool Button180(int x, int y, string text, bool enabled = true, Vector2? anchor = null)
+    {
+        return Button(new Rectangle(x, y, 180, 36), text, _button180Texture, enabled, anchor);
+    }
+    
+    // 90x36 pixel button
+    public static bool Button90(int x, int y, string text, bool enabled = true, Vector2? anchor = null)
+    {
+        return Button(new Rectangle(x, y, 90, 36), text, _button90Texture, enabled, anchor);
+    }
+    
+    // 36x36 pixel button
+    public static bool Button36(int x, int y, string text, bool enabled = true, Vector2? anchor = null)
+    {
+        return Button(new Rectangle(x, y, 36, 36), text, _button36Texture, enabled, anchor);
     }
     
     // 300x40 pixel button
@@ -332,13 +410,13 @@ public static class GUI
         x += (int)anchor.Value.X;
         y += (int)anchor.Value.Y;
         
-        bool hover = !Input.IsSuppressed() && CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(x, y, 300, 40));
+        bool active = !Input.IsSuppressed() && CheckCollisionPointRec(Input.GetClickPos(), new Rectangle(x, y, 180, 36));
         
-        Rectangle subSprite = new Rectangle(0, !hover ? 0 : 40, 300, 40);
-        DrawTextureRec(_buttonWideTexture, subSprite, new Vector2(x,y), Color.White);
-        DrawTextCentered(x+150, y+20, text + (hover ? "_" : ""), anchor: Vector2.Zero);
+        Rectangle subSprite = new Rectangle(0, !active ? 0 : 72, 180, 36);
+        DrawTextureRec(_button180Texture, subSprite, new Vector2(x,y), Color.White);
+        DrawTextLeft(x+6, y+12, text + (active ? "_" : ""), anchor: Vector2.Zero);
         
-        if (hover)
+        if (active)
         {
             // Set the window's cursor to the I-Beam
             _cursorLook = MouseCursor.IBeam;
@@ -360,6 +438,11 @@ public static class GUI
             if ((Input.Pressed(KeyboardKey.Backspace) || Input.Repeat(KeyboardKey.Backspace)) && text.Length > 0)
             {
                 text = text.Substring(0, text.Length - 1);
+            }
+
+            if (Input.Pressed(KeyboardKey.Enter))
+            {
+                Input.ResetClickPos();
             }
         }
         return text;

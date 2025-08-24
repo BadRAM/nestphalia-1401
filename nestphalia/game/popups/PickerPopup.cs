@@ -6,17 +6,17 @@ public class PickerPopup : Popup
 {
     private string _titleText;
     private List<string> _items;
-    private Action<int> _pickAction;
+    private Action<int> _closeAction;
 
     private Rectangle _rect;
     private Texture2D _bgTex;
     private int _page = 0;
     
-    public PickerPopup(string titleText, string[] items, Action<int> pickAction, int height = 590) : base(() => { })
+    public PickerPopup(string titleText, string[] items, Action<int> closeAction, int height = 590)
     {
         _titleText = titleText;
         _items = new List<string>(items);
-        _pickAction = pickAction;
+        _closeAction = closeAction;
         
         _rect = new Rectangle(-160, -height / 2, 320, height);
         _bgTex = Resources.GetTextureByName("9slice");
@@ -52,6 +52,6 @@ public class PickerPopup : Popup
     private void Pick(int picked)
     {
         Close();
-        _pickAction.Invoke(picked);
+        _closeAction.Invoke(picked);
     }
 }

@@ -24,23 +24,17 @@
         <DebugType>None</DebugType>
     </PropertyGroup>
 
-<!--    <PropertyGroup Condition="'$(RuntimeIdentifier)' == 'linux-x64'">-->
-<!--        <LibraryFilename>libwren.so</LibraryFilename>-->
-<!--    </PropertyGroup>-->
-
-<!--    <PropertyGroup Condition="'$(RuntimeIdentifier)' == 'win-x64'">-->
-<!--        <LibraryFilename>wren.dll</LibraryFilename>-->
-<!--    </PropertyGroup>-->
-
     <ItemGroup>
-        <None Update="libwren.so" Condition="'$(RuntimeIdentifier)' == 'linux-x64'">
+        <!--Terrible hack: Wrensharp doesn't properly include libraries in publish builds, so we're gonna do it ourselves.-->
+        <None Update="libwren.so" Condition="'$(RuntimeIdentifier)' == 'linux-x64'"> 
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
         </None>
-        <None Update="wren.dll" Condition="'$(RuntimeIdentifier)' == 'win-x64'">
+        <None Update="wren.dll" Condition="'$(RuntimeIdentifier)' == 'win-x64' or '$(RuntimeIdentifier)' == ''">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
         </None>
+        <!--/hack-->
         <None Update="resources/**/*">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <ExcludeFromSingleFile>true</ExcludeFromSingleFile>

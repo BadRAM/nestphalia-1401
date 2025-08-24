@@ -192,6 +192,11 @@ public static class Input
         return _clickStartPos;
     }
 
+    public static void ResetClickPos()
+    {
+        _clickStartPos = new Vector2(-100000, -100000);
+    }
+
     public static Vector2 GetScaledClickPos()
     {
         return _clickStartPos / GUI.GetWindowScale();

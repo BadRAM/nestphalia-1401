@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Numerics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -39,9 +38,6 @@ public class CampaignScene : Scene
     private Fort? _fort;
     private string _fortValidityMessage = "";
     private string _outcomeText = "";
-    private string[] _directories;
-    private string[] _fortFiles;
-    private int _fortListPage = 1;
     private Level? _selectedLevel;
     private List<Level> _levels = new List<Level>();
 
@@ -60,14 +56,13 @@ public class CampaignScene : Scene
         }
     }
 
-    public void Start()
+    public void Start(Fort? fort = null)
     {
         Program.CurrentScene = this;
         Screen.RegenerateBackground();
         _data.Save();
         Resources.PlayMusicByName("hook_-_paranoya");
-        _directories = Directory.GetDirectories(Directory.GetCurrentDirectory() + "/forts/Campaign/");
-        _fortFiles = Directory.GetFiles(Directory.GetCurrentDirectory() + "/forts/Campaign/");
+        if (fort != null) _fort = fort;
         _levels.Clear();
         foreach (Level level in Assets.GetAllLevels())
         {
@@ -85,7 +80,7 @@ public class CampaignScene : Scene
 
         if (_fort != null)
         {
-            _fort = Resources.LoadFort(_fort.Path  + "/" + _fort.Name  + ".fort");
+            _fort = Fort.LoadFromDisc(_fort.Path);
         }
     }
     
@@ -158,11 +153,17 @@ public class CampaignScene : Scene
         // Select fort button
         if (GUI.Button180(-460, 310, "Select Fort"))
         {
-            PopupManager.Start(new FortPickerPopup("Select Fort", Directory.GetCurrentDirectory() + "/forts/Campaign/", i =>
+            PopupManager.Start(new FortPickerPopup(Directory.GetCurrentDirectory() + "/forts/Campaign/", 
+            i => 
             {
                 _fort = i;
                 _fortValidityMessage = _fort.IsValid(_data);
-            } ));
+            },
+            i =>
+            {
+                Fort f = new Fort(i);
+                new EditorScene().Start(Start, f, _data);
+            }));
         }
         
         if (GUI.Button180(-280, 310, "Edit Fort", _fort != null)) new EditorScene().Start(Start, _fort, _data);

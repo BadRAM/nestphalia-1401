@@ -98,8 +98,9 @@ public static class GameConsole
             int i = LogHistory.Count-1;
             while (y > -14 && i >= 0)
             {
-                y -= 14;
-                GUI.DrawTextLeft(4, y, LogHistory[i], anchor: Screen.TopLeft);
+                string line = GUI.WrapText(LogHistory[i], Screen.RightX);
+                y -= (int)GUI.MeasureText(line).Y;
+                GUI.DrawTextLeft(4, y, line, anchor: Screen.TopLeft);
                 i--;
             }
         }

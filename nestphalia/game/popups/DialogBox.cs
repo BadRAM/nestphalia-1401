@@ -15,6 +15,7 @@ public class DialogBox : Popup
     private Texture2D _background;
     private Mode _mode;
     private Rectangle _rect = new Rectangle(-300, 50, 600, 200);
+    private Action _closeAction;
     
     public enum Mode // Where the portrait is on the dialog box
     {
@@ -23,18 +24,14 @@ public class DialogBox : Popup
         Left
     }
     
-    public DialogBox(string text, Action closeAction, Mode mode = Mode.None, Texture2D? portrait = null) : base(closeAction)
+    public DialogBox(string text, Action closeAction, Mode mode = Mode.None, Texture2D? portrait = null) : base()
     {
+        _text = text;
+        _closeAction = closeAction;
         _mode = mode;
         _portrait = portrait ?? Resources.MissingTexture;
         _portraitPanel = Resources.GetTextureByName("ability_slot");
         _background = Resources.GetTextureByName("9slice");
-        _lastCharRevealTime = Time.Unscaled;
-        _text = text;
-    }
-    
-    public void Start()
-    {
         _lastCharRevealTime = Time.Unscaled;
     }
     
@@ -65,6 +62,7 @@ public class DialogBox : Popup
             else
             {
                 Close();
+                _closeAction.Invoke();
             }
         }
     }

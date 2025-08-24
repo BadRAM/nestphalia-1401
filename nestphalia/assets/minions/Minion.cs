@@ -60,6 +60,16 @@ public class MinionTemplate : JsonAsset
     {
         return true;
     }
+
+    public virtual void DrawPreview(int x, int y, Color teamColor)
+    {
+        int size = Texture.Height / 2;
+        Vector2 pos = new Vector2(x - size / 2f, y - size / 2f);
+        Rectangle source = new Rectangle(0, 0, size, size);
+        Raylib.DrawTextureRec(Texture, source, pos, Color.White);
+        source.Y += size;
+        Raylib.DrawTextureRec(Texture, source, pos, teamColor);
+    }
 }
 
 public partial class Minion : ISprite
@@ -345,12 +355,12 @@ public partial class Minion : ISprite
             Die();
         }
     }
-
+    
     public virtual void Die()
     {
         World.MinionsToRemove.Add(this);
     }
-
+    
     public Int2D GetTargetTile()
     {
         return NavPath.Destination;
@@ -365,7 +375,7 @@ public partial class Minion : ISprite
 
         WaitForPath(thinkDuration);
     }
-
+    
     public virtual NavPath WaitForPath(double thinkDuration = 0.5)
     {
         // Wait a bit, then force pathfinding if it hasn't happened yet.

@@ -1,23 +1,32 @@
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace nestphalia;
 
 public class Fort
 {
-    [JsonInclude] public string Name = "Your Fort";
-    [JsonInclude] public string Comment = "It's a fort!";
-    [JsonInclude] public string[] Board = new string[20 * 20]; // TODO: Make this a dimensional array, currently blocked by serialization strategy. New serializer could fix.
+    public string Name;
+    public string Comment = "It's a fort!";
+    public string[] Board = new string[20 * 20]; // TODO: Make this a dimensional array, currently blocked by serialization strategy. New serializer could fix.
     [JsonIgnore] public string Path = "";
     [JsonIgnore] public double TotalCost;
     
-    public Fort(string name, string path)
+    // This constructor is for making new forts from scratch
+    public Fort(string path)
     {
-        Name = name;
+        Name = "fort";
         Path = path;
     }
 
-    // This constructor is for the json deserializer, please use the other one for creating new forts.
-    public Fort() { }
+    // This constructor is for the json deserializer.
+    public Fort(JObject j, string path)
+    {
+        Name = j.Value<string?>("Name") ?? throw new ArgumentNullException();
+        Comment = j.Value<string?>("Comment") ?? throw new ArgumentNullException();
+        Board = j.Value<JArray>("Board")?.ToObject<string[]>() ?? throw new ArgumentNullException();
+        if (Board.Length != 20 * 20) throw new Exception("Invalid board size");
+        Path = path;
+    }
     
     public void LoadToBoard(Int2D position, bool flip)
     {
@@ -97,7 +106,7 @@ public class Fort
         for (int x = 0; x < 20; x++)
         for (int y = 0; y < 20; y++)
         {
-            Board[x+y*20] = World.GetTile(x+1,y+1)?.Template.ID ?? "";
+            Board[x+y*20] = World.GetTile(x+1,y+1)?.Template.ID ?? ""; // TODO: respect level's player offset?
         }
     }
 
@@ -114,5 +123,64 @@ public class Fort
         }
         
         TotalCost = totalCost;
+    }
+
+    public string GetFullPath()
+    {
+        return Directory.GetCurrentDirectory() + Path + "/" + Name + ".fort";
+    }
+    
+    public void SaveToDisc()
+    {
+        string filename = System.IO.Path.GetFileName(Path);
+        if (System.IO.Path.GetFileName(Path) == "")
+        {
+            Path = GetUnusedFileName(Name, Path);
+        }
+        string jsonString = JObject.FromObject(this).ToString();
+        File.WriteAllText(Path, jsonString);
+    }
+
+    public static Fort? LoadFromDisc(string filepath)
+    {
+        filepath = filepath.MakePathAbsolute();
+        
+        if (!System.IO.Path.Exists(filepath))
+        {
+            GameConsole.WriteLine($"Failed to find fort at {filepath}");
+            return null;
+        }
+        
+        string jsonString = File.ReadAllText(filepath);
+        Fort fort = new Fort(JObject.Parse(jsonString), filepath);
+        fort.UpdateCost();
+        GameConsole.WriteLine($"Loaded {fort.Name}, path: {filepath}");
+        return fort;
+    }
+
+    // Two use cases: Making a new fort, and saving in a directory that may already have a fort with that filename
+    public static string GetUnusedFileName(string name, string path)
+    {
+        name = string.Concat(name.Where(c => (char.IsLetterOrDigit(c) || char.IsWhiteSpace(c) || c == '-')) ?? "");
+        GameConsole.WriteLine(name);
+        name = name.Replace(' ', '-');
+        if (name == "") name = "fort";
+
+        if (File.Exists($"{path}/{name}.fort")) // Collision!
+        {
+            int number = 2;
+            while (File.Exists($"{path}/{name}{number}.fort"))
+            {
+                number++;
+                if (number > 9999) throw new Exception("Can't find a valid fort name!");
+            }
+            name = $"{path}/{name}{number}.fort";
+        }
+        else
+        {
+            name = $"{path}/{name}.fort";
+        }
+
+        return name;
     }
 }
