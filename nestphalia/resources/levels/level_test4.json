@@ -1,5 +1,6 @@
 {
   "ID": "level_test4",
+  "Type": "Level",
   "Name": "Mount Scary",
   "Description": ">.<",
   "EnemyColor": {

@@ -1,5 +1,6 @@
 {
   "ID": "level_test2",
+  "Type": "Level",
   "Name": "Leftsville",
   "Description": "Something's not right about this place...",
   "EnemyColor": {

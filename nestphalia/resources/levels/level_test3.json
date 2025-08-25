@@ -1,5 +1,6 @@
 {
   "ID": "level_test3",
+  "Type": "Level",
   "Name": "Snail Lairns",
   "Description": "the power of the ooze.",
   "EnemyColor": {
