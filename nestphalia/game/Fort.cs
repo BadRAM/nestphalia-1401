@@ -28,18 +28,18 @@ public class Fort
         Path = path;
     }
     
-    public void LoadToBoard(Int2D position, bool flip)
+    public void LoadToBoard(Level.FortSpawnZone spawnZone)
     {
         for (int x = 0; x < 20; x++)
         for (int y = 0; y < 20; y++)
         {
-            if (flip)
+            if (spawnZone.Flip)
             {
-                World.SetTile(Assets.GetStructureByID(Board[x+y*20]), World.RightTeam, (20 + position.X) - x,y + position.Y);
+                World.SetTile(Assets.GetStructureByID(Board[x+y*20]), World.RightTeam, (20 + spawnZone.X) - x,y + spawnZone.Y);
             }
             else
             {
-                World.SetTile(Assets.GetStructureByID(Board[x+y*20]), World.LeftTeam, x + position.X,y + position.Y);
+                World.SetTile(Assets.GetStructureByID(Board[x+y*20]), World.LeftTeam, x + spawnZone.X,y + spawnZone.Y);
             }
         }
     }
@@ -162,7 +162,6 @@ public class Fort
     public static string GetUnusedFileName(string name, string path)
     {
         name = string.Concat(name.Where(c => (char.IsLetterOrDigit(c) || char.IsWhiteSpace(c) || c == '-')) ?? "");
-        GameConsole.WriteLine(name);
         name = name.Replace(' ', '-');
         if (name == "") name = "fort";
 

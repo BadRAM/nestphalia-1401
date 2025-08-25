@@ -73,8 +73,6 @@ public class Team
         }
         
         while (Beacons.Count < BeaconCap) Beacons.Add(null);
-
-        World.StructureChanged += OnStructureChanged;
     }
 
     #region Path Queue
@@ -347,7 +345,7 @@ public class Team
         return weight;
     }
     
-    private void OnStructureChanged(object? sender, Int2D pos)
+    public void OnStructureChanged(object? sender, Int2D pos)
     {
         _weightMap[pos.X, pos.Y] = CalculateWeight(pos.X, pos.Y);
         _navSolidMap[pos.X, pos.Y] = World.GetTile(pos.X, pos.Y)?.NavSolid(this) ?? false;

@@ -172,7 +172,7 @@ public static class Utils
         }
         else
         {
-            GameConsole.WriteLine($"{path} is not absolute or is not inside current directory");
+            // GameConsole.WriteLine($"{path} is not absolute or is not inside current directory");
             return path;
         }
     }
@@ -185,7 +185,7 @@ public static class Utils
         }
         else
         {
-            GameConsole.WriteLine($"{path} is already absolute");
+            // GameConsole.WriteLine($"{path} is already absolute");
             return path;
         }
     }

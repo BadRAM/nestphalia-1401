@@ -99,12 +99,12 @@ public class Spawner : Structure
 
     public override bool NavSolid(Team team)
     {
-        return team != Team;
+        return true;
     }
     
     public override bool PhysSolid()
     {
-        return false;
+        return true;
     }
     
     public void AddSpawnBonus(int bonus)

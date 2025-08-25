@@ -13,17 +13,17 @@ public class CustomBattleMenu : Scene
     private bool _loadingLeftSide = true;
     private string _outcomeMessage = "";
     private string _activeDirectory = "";
+    private Level _arenaLevel;
 
     public void Start(Fort? leftFort = null, Fort? rightFort = null)
     {
-        World.InitializePreview();
+        _arenaLevel = Assets.GetLevelByID("level_arena");
+        World.InitializePreview(_arenaLevel);
 
         if (leftFort != null) _leftFort = leftFort;
         if (rightFort != null) _rightFort = rightFort;
-        // if (_leftFort  != null) _leftFort  = Resources.LoadFort(_leftFort.Path  + "/" + _leftFort.Name  + ".fort") ?? _leftFort;
-        // if (_rightFort != null) _rightFort = Resources.LoadFort(_rightFort.Path + "/" + _rightFort.Name + ".fort") ?? _rightFort;
-        _leftFort?.LoadToBoard(new Int2D(1,1),false);
-        _rightFort?.LoadToBoard(new Int2D(26, 1), true);
+        _leftFort?.LoadToBoard(_arenaLevel.FortSpawnZones[0]);
+        _rightFort?.LoadToBoard(_arenaLevel.FortSpawnZones[1]);
         _loadingLeftSide = true;
         _outcomeMessage = "";
         _activeDirectory = "";
@@ -59,7 +59,7 @@ public class CustomBattleMenu : Scene
             fort =>
             {
                 _leftFort = fort;
-                _leftFort.LoadToBoard(new Int2D(1, 1), false);
+                _leftFort.LoadToBoard(_arenaLevel.FortSpawnZones[0]);
             },
             path =>
             {
@@ -72,7 +72,7 @@ public class CustomBattleMenu : Scene
             fort =>
             {
                 _rightFort = fort;
-                _rightFort.LoadToBoard(new Int2D(26, 1), true);
+                _rightFort.LoadToBoard(_arenaLevel.FortSpawnZones[1]);
             },
             path =>
             {

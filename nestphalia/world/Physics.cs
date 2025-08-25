@@ -36,15 +36,15 @@ public static class Physics
         int y = tilePos.Y;
         Vector2 tileCenter = World.GetTileCenter(x, y);
         
-        bool n = (World.GetTile(x, y-1)?.PhysSolid() ?? false) || y <= 0;
-        bool s = (World.GetTile(x, y+1)?.PhysSolid() ?? false) || y >= World.BoardHeight-1;
-        bool w = (World.GetTile(x-1, y)?.PhysSolid() ?? false) || x <= 0;
-        bool e = (World.GetTile(x+1, y)?.PhysSolid() ?? false) || x >= World.BoardWidth-1;
-        bool nw = World.GetTile(x-1, y-1)?.PhysSolid() ?? false;
-        bool ne = World.GetTile(x+1, y-1)?.PhysSolid() ?? false;
-        bool sw = World.GetTile(x-1, y+1)?.PhysSolid() ?? false;
-        bool se = World.GetTile(x+1, y+1)?.PhysSolid() ?? false;
-        bool c = World.GetTile(x, y)?.PhysSolid() ?? false;
+        bool n =  !minion.IsOrigin(x  , y-1) && (World.GetTile(x  , y-1)?.PhysSolid() ?? false) || y <= 0;
+        bool s =  !minion.IsOrigin(x  , y+1) && (World.GetTile(x  , y+1)?.PhysSolid() ?? false) || y >= World.BoardHeight-1;
+        bool w =  !minion.IsOrigin(x-1, y  ) && (World.GetTile(x-1, y  )?.PhysSolid() ?? false) || x <= 0;
+        bool e =  !minion.IsOrigin(x+1, y  ) && (World.GetTile(x+1, y  )?.PhysSolid() ?? false) || x >= World.BoardWidth-1;
+        bool nw = !minion.IsOrigin(x-1, y-1) && (World.GetTile(x-1, y-1)?.PhysSolid() ?? false);
+        bool ne = !minion.IsOrigin(x+1, y-1) && (World.GetTile(x+1, y-1)?.PhysSolid() ?? false);
+        bool sw = !minion.IsOrigin(x-1, y+1) && (World.GetTile(x-1, y+1)?.PhysSolid() ?? false);
+        bool se = !minion.IsOrigin(x+1, y+1) && (World.GetTile(x+1, y+1)?.PhysSolid() ?? false);
+        bool c =  !minion.IsOrigin(x  , y  ) && (World.GetTile(x  , y  )?.PhysSolid() ?? false);
 
         // Handle being clipped inside a wall
         if (c)

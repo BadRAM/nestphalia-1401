@@ -6,8 +6,8 @@ namespace nestphalia;
 
 public static class World
 {
-    public static int BoardWidth = 48;
-    public static int BoardHeight = 22;
+    public static int BoardWidth = 54;
+    public static int BoardHeight = 28;
     private static FloorTile[,] _floor = new FloorTile[BoardWidth, BoardHeight];
     private static Structure?[,] _board = new Structure?[BoardWidth, BoardHeight];
     public static List<Minion> Minions = new List<Minion>();
@@ -51,14 +51,9 @@ public static class World
     // private static int _totalCollideChecks;
     private static string _debugString = "";
     
-    public static event EventHandler<Int2D> StructureChanged = delegate {};
+    // public static event EventHandler<Int2D> StructureChanged = delegate {};
     
-    public class StructureChangedEventArgs(int x, int y) : EventArgs
-    {
-        public Int2D Pos { get; set; } = new(x, y);
-    }
-    
-    private static void Initialize()
+    private static void Initialize(Level level)
     {
         Time.Reset();
         Camera.Target = new Vector2(BoardWidth * 12, BoardHeight * 12);
@@ -77,6 +72,12 @@ public static class World
         PreWave = false;
         _waveStartSoundEffect = Resources.GetSoundByName("start");
         _battleOver = false;
+
+        BoardWidth = level.WorldSize.X;
+        BoardHeight = level.WorldSize.Y;
+        _floor = new FloorTile[BoardWidth, BoardHeight];
+        _board = new Structure?[BoardWidth, BoardHeight];
+        MinionGrid = new List<Minion>[BoardWidth, BoardHeight];
         
         LeftTeam = new Team("Player", false, Color.Blue);
         RightTeam = new Team("Enemy", true, Color.Red);
@@ -93,9 +94,9 @@ public static class World
         }
     }
 
-    public static void InitializeEditor(Fort fortToLoad)
+    public static void InitializeEditor(Level level, Fort fortToLoad)
     {
-        Initialize();
+        Initialize(level);
         Camera.Target = new Vector2(22 * 12, BoardHeight * 12 + 8);
         
         // set up floor tile checkerboard
@@ -117,14 +118,14 @@ public static class World
             _board[x,y] = null;
         }
         
-        fortToLoad.LoadToBoard(new Int2D(1, 1), false);
+        fortToLoad.LoadToBoard(new Level.FortSpawnZone(1, 1, 0, false));
         LeftTeam.Initialize();
         RightTeam.Initialize();
     }
 
-    public static void InitializePreview()
+    public static void InitializePreview(Level level)
     {
-        Initialize();
+        Initialize(level);
         Camera.Zoom = 0.5f * GUI.GetWindowScale().X;
         Camera.Offset = new Vector2(Screen.CenterX, Screen.CenterY+50) * GUI.GetWindowScale();
         
@@ -139,7 +140,7 @@ public static class World
     
     public static void InitializeBattle(Level level, Fort leftFort, Fort? rightFort, bool leftIsPlayer, bool rightIsPlayer, bool deterministic)
     {
-        Initialize();
+        Initialize(level);
         
         // TODO: let levels override seed
         
@@ -161,8 +162,8 @@ public static class World
         level.LoadToBoard();
         
         // Load forts to board
-        leftFort.LoadToBoard(new Int2D(1,1), false);
-        rightFort?.LoadToBoard(new Int2D(26, 1), true);
+        leftFort.LoadToBoard(level.FortSpawnZones[0]);
+        rightFort?.LoadToBoard(level.FortSpawnZones[1]);
         
         // Tell teams they can generate fear and hate
         LeftTeam.Name = leftFort.Name;
@@ -184,7 +185,7 @@ public static class World
 
     public static void InitializeLevelEditor(Level level)
     {
-        Initialize();
+        Initialize(level);
         
         for (int x = 0; x < BoardWidth; x++)
         for (int y = 0; y < BoardHeight; y++)
@@ -561,7 +562,7 @@ public static class World
             Sprites.Add(_board[x,y]!);
         }
         
-        StructureChanged.Invoke(null, new Int2D(x,y));
+        StructureChanged(null, new Int2D(x,y));
     }
     
     public static void SetTile(StructureTemplate? tile, Team team, Int2D tilePos)
@@ -578,7 +579,7 @@ public static class World
             Sprites.Add(_board[x,y]!);
         }
         
-        StructureChanged.Invoke(null, new Int2D(x,y));
+        StructureChanged(null, new Int2D(x,y));
     }
 
     public static Structure? GetTile(Int2D tilePos)
@@ -722,5 +723,11 @@ public static class World
     public static FloorTile GetFloorTile(int x, int y)
     {
         return _floor[x, y];
+    }
+
+    public static void StructureChanged(object? sender, Int2D pos)
+    {
+        LeftTeam.OnStructureChanged(sender, pos);
+        RightTeam.OnStructureChanged(sender, pos);
     }
 }

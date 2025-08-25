@@ -188,7 +188,7 @@ public partial class Minion : ISprite
     protected bool CanAttack()
     {
         // Don't attack while we're on top of structures
-        if (World.GetTileAtPos(Position)?.PhysSolid() ?? false) return false;
+        if ((World.PosToTilePos(Position) != OriginTile) && (World.GetTileAtPos(Position)?.PhysSolid() ?? false)) return false;
         // Guard against out of range attacks
         if (Vector2.Distance(Position.XY(), NextPos) > 24 + Template.PhysicsRadius) return false;
         Structure? t = World.GetTileAtPos(NextPos);
@@ -268,7 +268,7 @@ public partial class Minion : ISprite
     {
         int size = Template.Texture.Height / 2;
         Vector2 pos = new Vector2(Position.X - size / 2f, Position.Y - size / 2f - Position.Z) + DrawOffset.XYZ2D();
-        if (!IsFlying && (World.GetTileAtPos(Position)?.PhysSolid() ?? false)) pos.Y -= 8;
+        if (!IsFlying && (World.PosToTilePos(Position) != OriginTile) && (World.GetTileAtPos(Position)?.PhysSolid() ?? false)) pos.Y -= 8;
         bool flip = NextPos.X > Position.X;
         Rectangle source = new Rectangle(flip ? size : 0, 0, flip ? size : -size, size);
         source.X = size * frame;
@@ -278,7 +278,7 @@ public partial class Minion : ISprite
         if (Position.Z + DrawOffset.Z > 0)
         {
             pos = new Vector2(Position.X - Template.ShadowTexture.Width / 2f, Position.Y - Template.ShadowTexture.Height / 2f) + DrawOffset.XY();
-            if (World.GetTileAtPos(Position)?.PhysSolid() ?? false) pos.Y -= 8;
+            if ((World.PosToTilePos(Position) != OriginTile) && (World.GetTileAtPos(Position)?.PhysSolid() ?? false)) pos.Y -= 8;
             Raylib.DrawTextureV(Template.ShadowTexture, pos, Raylib.ColorAlpha(Color.White, Math.Min((Position.Z + DrawOffset.Z)/12, 1)));
         }
     }
@@ -323,8 +323,13 @@ public partial class Minion : ISprite
             }
             
             Raylib.DrawCircleV(World.GetTileCenter(NavPath.Destination), 3, Color.Red);
-            
-            if (Screen.DebugMode) GUI.DrawTextLeft((int)Position.X, (int)Position.Y, State.ToString(), anchor: Screen.TopLeft);
+
+            if (Screen.DebugMode)
+            {
+                Raylib.DrawCircleLinesV(Position.XY(), Template.PhysicsRadius, Color.Orange);
+                Raylib.DrawLineV(Position.XY(), Position.XY() + DrawOffset.XYZ2D(), Color.Orange);
+                GUI.DrawTextLeft((int)Position.X, (int)Position.Y, State.ToString(), anchor: Screen.TopLeft);
+            }
         }
     }
     #endregion
@@ -419,4 +424,9 @@ public partial class Minion : ISprite
             Resources.GetTextureByName("particle_confused")));
     }
     #endregion
+
+    public bool IsOrigin(int x, int y)
+    {
+        return OriginTile.X == x && OriginTile.Y == y;
+    }
 }

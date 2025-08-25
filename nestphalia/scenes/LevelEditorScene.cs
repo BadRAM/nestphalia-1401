@@ -10,7 +10,7 @@ namespace nestphalia;
 
 public class LevelEditorScene : Scene
 {
-    private Level _level = new Level();
+    private Level _level;
     private string _idBuffer = "level_id";
     private string _levelBuffer = "";
     private string _scriptBuffer = "";
@@ -38,7 +38,7 @@ public class LevelEditorScene : Scene
         }
         else
         {
-            _level = new Level();
+            _level = new Level(JObject.Parse($@"{{""ID"": ""level""}}"));
         }
         World.InitializeLevelEditor(_level);
         
@@ -102,8 +102,11 @@ public class LevelEditorScene : Scene
         
         // Draw outline of player's fort position
         Screen.SetCamera(World.Camera);
-        Rectangle playerRect = new Rectangle(World.GetTileCenter(_level.PlayerOffset) + Vector2.One * -12, Vector2.One * 24 * 20);
-        Raylib.DrawRectangleLinesEx(playerRect, 2, Raylib.ColorAlpha(Color.Blue, 0.8f));
+        foreach (Level.FortSpawnZone spawnZone in _level.FortSpawnZones)
+        {
+            Rectangle playerRect = new Rectangle(World.GetTileCenter(spawnZone.Offset()) + Vector2.One * -12, Vector2.One * 24 * 20);
+            Raylib.DrawRectangleLinesEx(playerRect, 2, Raylib.ColorAlpha(Color.Blue, 0.8f));
+        }
         Screen.SetCamera();
 
         Raylib.DrawRectangle(0, Screen.TopY, 300, Screen.BottomY, Raylib.ColorAlpha(Color.Black, 0.5f));
@@ -154,9 +157,6 @@ public class LevelEditorScene : Scene
                     World.SetFloorTile(_selectedFloors[Random.Shared.Next(_selectedFloors.Count)], x, y);
                 }
             }
-            // if (Button100(100, 260, "Smaller", guiSpace: false)) _brushRadius--;
-            // if (Button100(200, 260, "Bigger", guiSpace: false)) _brushRadius++;
-            // if (_brushRadius < 0) _brushRadius = 0;
         }
         if (_toolActive == LevelEditorTool.StructureBrush)
         {
@@ -209,8 +209,10 @@ public class LevelEditorScene : Scene
     
     private void Save()
     {
-        _level.ID = _idBuffer;
-        _level.LoadValues(_levelBuffer);
+        JObject j = JObject.Parse(_levelBuffer);
+        j.Add("ID", _idBuffer);
+        _level = new Level(j);
+        _level.LoadFromBoard();
         _level.Script = _scriptBuffer;
 
         if (_level.WorldSize.X != World.BoardWidth || _level.WorldSize.Y != World.BoardHeight)
@@ -227,6 +229,7 @@ public class LevelEditorScene : Scene
         }
         
         File.WriteAllText(SelectedSavePath(), JsonConvert.SerializeObject(_level, Formatting.Indented));
+        Assets.UpdateLevel(_level);
         
         Load();
     }
@@ -235,7 +238,7 @@ public class LevelEditorScene : Scene
     {
         if (File.Exists(SelectedSavePath()))
         {
-            _level.LoadValues(File.ReadAllText(SelectedSavePath()));
+            _level = new Level(JObject.Parse(File.ReadAllText(SelectedSavePath())));
             GameConsole.WriteLine($"loaded {SelectedSavePath()}");
         }
         

@@ -378,23 +378,23 @@ public class PathFinder
         int barX = Screen.CenterX-500;
         int width = (int)(totalWidth * _swMisc.ElapsedMilliseconds / totalSWTime);
         
-        Raylib.DrawRectangle(barX, Screen.CenterY-300, width, 40, Color.Gray);
-        GUI.DrawTextLeft(barX, Screen.CenterY-290, $"Misc: {(int)(100 * _swMisc.ElapsedMilliseconds / totalSWTime)}%");
+        Raylib.DrawRectangle(barX, 0, width, 40, Color.Gray);
+        GUI.DrawTextLeft(barX, 10, $"Misc: {(int)(100 * _swMisc.ElapsedMilliseconds / totalSWTime)}%", anchor:Screen.TopLeft);
         barX += width;
         width = (int)(totalWidth * _swFindNext.ElapsedMilliseconds / totalSWTime);
-        Raylib.DrawRectangle(barX, Screen.CenterY-300, width, 40, Color.Green);
-        GUI.DrawTextLeft(barX, Screen.CenterY-290, $"FindNext: {(int)(100 * _swFindNext.ElapsedMilliseconds / totalSWTime)}%");
+        Raylib.DrawRectangle(barX, 0, width, 40, Color.Green);
+        GUI.DrawTextLeft(barX, 10, $"FindNext: {(int)(100 * _swFindNext.ElapsedMilliseconds / totalSWTime)}%", anchor:Screen.TopLeft);
         barX += width;
         width = (int)(totalWidth * _swAddNodes.ElapsedMilliseconds / totalSWTime);
-        Raylib.DrawRectangle(barX, Screen.CenterY-300, width, 40, Color.SkyBlue);
-        GUI.DrawTextLeft(barX, Screen.CenterY-290, $"AddNodes: {(int)(100 * _swAddNodes.ElapsedMilliseconds / totalSWTime)}%");
+        Raylib.DrawRectangle(barX, 0, width, 40, Color.SkyBlue);
+        GUI.DrawTextLeft(barX, 10, $"AddNodes: {(int)(100 * _swAddNodes.ElapsedMilliseconds / totalSWTime)}%", anchor:Screen.TopLeft);
         barX += width;
         
         width = totalWidth - barX;
-        Raylib.DrawRectangle(barX, Screen.CenterY-300, width, 40, Color.Gray);
-        GUI.DrawTextLeft(barX, Screen.CenterY-290, $"Out of loop: {100 * width / totalWidth}%");
+        Raylib.DrawRectangle(barX, 0, width, 40, Color.Gray);
+        GUI.DrawTextLeft(barX, 10, $"Out of loop: {100 * width / totalWidth}%", anchor:Screen.TopLeft);
         #endif
 
-        GUI.DrawTextLeft(350, -250, debugText);
+        GUI.DrawTextLeft(-300, 0, debugText, anchor: Screen.TopRight);
     }
 }

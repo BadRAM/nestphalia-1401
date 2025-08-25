@@ -23,14 +23,14 @@ public class FortPickerPopup : Popup
         _path = path;
         _parent = parent;
         _forts = new List<Fort>();
-        var files = new List<string>(Directory.GetFiles(path));
-        for (int i = files.Count - 1; i >= 0; i--)
+        foreach (string file in Directory.GetFiles(path))
         {
-            if (files[i].Substring(files[i].Length - 5) == ".fort")
+            if (file.Substring(file.Length - 5) == ".fort")
             {
-                _forts.Add(Fort.LoadFromDisc(files[i]));
+                _forts.Add(Fort.LoadFromDisc(file));
             }
         }
+        _forts = _forts.OrderBy(o => o.Name.ToLower()).ToList();
 
         _directories = new List<string>(Directory.GetDirectories(path));
         _items = new List<string>();

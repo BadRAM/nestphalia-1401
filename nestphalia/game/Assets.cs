@@ -18,6 +18,7 @@ public static class Assets
     // constructor when publishing with trimmed assemblies. it also provides serializer stability if type names change internally.
     private static readonly Dictionary<string, ConstructorInfo> JsonAssetTypes = new Dictionary<string, ConstructorInfo>()
     {
+        { "Level",                     typeof(Level).GetConstructor([typeof(JObject)])! },
         { "StructureTemplate",         typeof(StructureTemplate).GetConstructor([typeof(JObject)])! },
         { "SpawnerTemplate",           typeof(SpawnerTemplate).GetConstructor([typeof(JObject)])! },
         { "DoorTemplate",              typeof(DoorTemplate).GetConstructor([typeof(JObject)])! },
@@ -86,7 +87,8 @@ public static class Assets
         {
             if (Path.GetExtension(path).ToLower() == ".json")
             {
-                Level level = new Level(File.ReadAllText(path));
+                Level? level = LoadJsonAsset<Level>(JObject.Parse(File.ReadAllText(path)));
+                if (level == null) continue;
                 _levels.Add(level.ID, level);
             }
         }
@@ -120,5 +122,10 @@ public static class Assets
     public static Level[] GetAllLevels()
     {
         return _levels.Values.ToArray();
+    }
+
+    public static void UpdateLevel(Level level)
+    {
+        _levels[level.ID] = level;
     }
 }

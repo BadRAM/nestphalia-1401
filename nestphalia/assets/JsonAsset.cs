@@ -7,7 +7,9 @@ namespace nestphalia;
 
 public abstract class JsonAsset
 {
-    public string ID;
+    // ReSharper disable once InconsistentNaming
+    public readonly string ID;
+    public string Type = ""; // This is only needed for jsonAssets to serialize back to json correctly.
     
     public JsonAsset(JObject jObject)
     {
