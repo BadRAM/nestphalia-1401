@@ -11,7 +11,7 @@
     "X": 0,
     "Y": 0
   },
-  "Prerequisites": [],
+  "Prerequisites": ["never_unlocks"],
   "MoneyReward": 0,
   "UnlockReward": [],
   "FortSpawnZones": [

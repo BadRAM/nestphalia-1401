@@ -35,7 +35,7 @@ public class Fort
         {
             if (spawnZone.Flip)
             {
-                World.SetTile(Assets.GetStructureByID(Board[x+y*20]), World.RightTeam, (20 + spawnZone.X) - x,y + spawnZone.Y);
+                World.SetTile(Assets.GetStructureByID(Board[x+y*20]), World.RightTeam, (19 + spawnZone.X) - x,y + spawnZone.Y);
             }
             else
             {

@@ -137,7 +137,10 @@ public class PathFinder
             {
                 _nodes++;
             }
-
+            
+            // ----- Process selected node ------------------------------------------------------------------------
+            _nodeGrid[n.Pos.X,n.Pos.Y] = n;
+            
             // Batchmode stops once the entire board is filled with antinodes
             if (batchMode && _antinodes >= World.BoardHeight * World.BoardWidth)
             {
@@ -146,9 +149,6 @@ public class PathFinder
                 #endif
                 return; // <----- !!! EARLY RETURN HERE, TO AVOID TOUCHING THE NAVPATH !!!
             }
-            
-            // ----- Process selected node ------------------------------------------------------------------------
-            _nodeGrid[n.Pos.X,n.Pos.Y] = n;
             
             #if DEBUG
             _swMisc.Stop();

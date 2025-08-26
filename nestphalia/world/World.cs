@@ -81,6 +81,8 @@ public static class World
         
         LeftTeam = new Team("Player", false, Color.Blue);
         RightTeam = new Team("Enemy", true, Color.Red);
+        
+        level.LoadToBoard();
 
         for (int x = 0; x < BoardWidth; x++)
         for (int y = 0; y < BoardHeight; y++)
@@ -103,11 +105,7 @@ public static class World
         for (int x = 0; x < BoardWidth; x++)
         for (int y = 0; y < BoardHeight; y++)
         {
-            if (x > 21)
-            {
-                _floor[x, y] = Assets.BlankFloor.Instantiate(x, y);
-            }
-            else if (x == 0 || x == 21 || y == 0 || y == 21)
+            if (x == 0 || x == 21 || y == 0 || y == 21)
             {
                 _floor[x, y] = Assets.GetFloorTileByID("floor_2").Instantiate(x, y);
             }
@@ -115,10 +113,10 @@ public static class World
             {
                 _floor[x,y] = (x%2 != y%2) ? Assets.GetFloorTileByID("floor_1").Instantiate(x,y) : Assets.GetFloorTileByID("floor_2").Instantiate(x,y);
             }
-            _board[x,y] = null;
+            _board[x,y] = null; // Made redundant by editor level
         }
         
-        fortToLoad.LoadToBoard(new Level.FortSpawnZone(1, 1, 0, false));
+        fortToLoad.LoadToBoard(level.FortSpawnZones[0]);
         LeftTeam.Initialize();
         RightTeam.Initialize();
     }
@@ -128,14 +126,6 @@ public static class World
         Initialize(level);
         Camera.Zoom = 0.5f * GUI.GetWindowScale().X;
         Camera.Offset = new Vector2(Screen.CenterX, Screen.CenterY+50) * GUI.GetWindowScale();
-        
-        // set up floor tile checkerboard
-        for (int x = 0; x < BoardWidth; x++)
-        for (int y = 0; y < BoardHeight; y++)
-        {
-            _floor[x,y] = (x%2 != y%2) ? Assets.GetFloorTileByID("floor_1").Instantiate(x,y) : Assets.GetFloorTileByID("floor_2").Instantiate(x,y);
-            _board[x,y] = null;
-        }
     }
     
     public static void InitializeBattle(Level level, Fort leftFort, Fort? rightFort, bool leftIsPlayer, bool rightIsPlayer, bool deterministic)
@@ -146,21 +136,6 @@ public static class World
         
         _random = deterministic ? new Random(123) : new Random();
         
-        // TODO: Allow levels to change world size
-
-        // BoardWidth = level.WorldSize.X;
-        // BoardHeight = level.WorldSize.Y;
-        
-        // set up floor tile checkerboard
-        for (int x = 0; x < BoardWidth; x++)
-        for (int y = 0; y < BoardHeight; y++)
-        {
-            _floor[x,y] = (x%2 != y%2) ? Assets.GetFloorTileByID("floor_1").Instantiate(x,y) : Assets.GetFloorTileByID("floor_2").Instantiate(x,y);
-            _board[x,y] = null;
-        }
-        
-        level.LoadToBoard();
-        
         // Load forts to board
         leftFort.LoadToBoard(level.FortSpawnZones[0]);
         rightFort?.LoadToBoard(level.FortSpawnZones[1]);
@@ -169,7 +144,7 @@ public static class World
         LeftTeam.Name = leftFort.Name;
         LeftTeam.IsPlayerControlled = leftIsPlayer;
         LeftTeam.Initialize();
-        RightTeam.Name = level.Name;
+        RightTeam.Name = rightFort?.Name ?? level.Name;
         RightTeam.IsPlayerControlled = rightIsPlayer;
         RightTeam.Color = level.EnemyColor;
         GameConsole.WriteLine($"Rightteam color set to: {RightTeam.Color.ToString()}");
@@ -186,13 +161,6 @@ public static class World
     public static void InitializeLevelEditor(Level level)
     {
         Initialize(level);
-        
-        for (int x = 0; x < BoardWidth; x++)
-        for (int y = 0; y < BoardHeight; y++)
-        {
-            _floor[x, y] = Assets.GetFloorTileByID(level.FloorTiles[x,y])?.Instantiate(x, y) ?? Assets.BlankFloor.Instantiate(x,y);
-            _board[x, y] = Assets.GetStructureByID(level.Structures[x, y])?.Instantiate(RightTeam, x, y);
-        }
     }
     
     public static void Update()

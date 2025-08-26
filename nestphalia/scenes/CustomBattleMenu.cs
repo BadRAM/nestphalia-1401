@@ -10,7 +10,6 @@ public class CustomBattleMenu : Scene
     private static bool _leftIsPlayer;
     private static bool _rightIsPlayer;
     private static bool _deterministicMode;
-    private bool _loadingLeftSide = true;
     private string _outcomeMessage = "";
     private string _activeDirectory = "";
     private Level _arenaLevel;
@@ -24,7 +23,6 @@ public class CustomBattleMenu : Scene
         if (rightFort != null) _rightFort = rightFort;
         _leftFort?.LoadToBoard(_arenaLevel.FortSpawnZones[0]);
         _rightFort?.LoadToBoard(_arenaLevel.FortSpawnZones[1]);
-        _loadingLeftSide = true;
         _outcomeMessage = "";
         _activeDirectory = "";
         Program.CurrentScene = this;
@@ -47,11 +45,6 @@ public class CustomBattleMenu : Scene
         World.Camera.Zoom = 0.5f * GUI.GetWindowScale().X;
         World.DrawFloor();
         World.Draw();
-        
-        if (GUI.Button300(300, -300, _loadingLeftSide ? "Selecting Left Fort" : "Selecting Right Fort"))
-        {
-            _loadingLeftSide = !_loadingLeftSide;
-        }
         
         if (GUI.Button100(100, -260, $"Pick Left" ))
         {

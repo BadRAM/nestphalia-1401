@@ -55,8 +55,8 @@ public class Level : JsonAsset
 
     public void LoadFromBoard()
     {
-        for (int x = 0; x < World.BoardWidth; x++)
-        for (int y = 0; y < World.BoardHeight; y++)
+        for (int x = 0; x < WorldSize.X; x++)
+        for (int y = 0; y < WorldSize.Y; y++)
         {
             FloorTiles[x, y] = World.GetFloorTile(x, y).Template.ID;
             Structures[x, y] = World.GetTile(x, y)?.Template.ID ?? "";
@@ -65,8 +65,8 @@ public class Level : JsonAsset
 
     public void LoadToBoard()
     {
-        for (int x = 0; x < World.BoardWidth; x++)
-        for (int y = 0; y < World.BoardHeight; y++)
+        for (int x = 0; x < WorldSize.X; x++)
+        for (int y = 0; y < WorldSize.Y; y++)
         {
             World.SetFloorTile(Assets.GetFloorTileByID(FloorTiles[x,y]) ?? Assets.BlankFloor, x, y);
             World.SetTile(Assets.GetStructureByID(Structures[x,y]),World.RightTeam,x,y);

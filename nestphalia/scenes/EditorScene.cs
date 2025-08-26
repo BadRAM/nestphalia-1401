@@ -52,7 +52,7 @@ public class EditorScene : Scene
         Screen.RegenerateBackground();
         _panelTex = Resources.GetTextureByName("9slice");
         _bg = Resources.GetTextureByName("editor_bg");
-        World.InitializeEditor(Assets.GetLevelByID("level_arena"), _fort);
+        World.InitializeEditor(Assets.GetLevelByID("level_fortedit"), _fort);
         World.Camera.Offset = new Vector2(Screen.CenterX, Screen.CenterY);
         Resources.PlayMusicByName("so_lets_get_killed");
         

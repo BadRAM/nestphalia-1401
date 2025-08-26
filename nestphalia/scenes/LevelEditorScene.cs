@@ -215,12 +215,6 @@ public class LevelEditorScene : Scene
         _level.LoadFromBoard();
         _level.Script = _scriptBuffer;
 
-        if (_level.WorldSize.X != World.BoardWidth || _level.WorldSize.Y != World.BoardHeight)
-        {
-            throw new NotImplementedException("Tried to change level board size!");
-            // World.SetBoardSize(_level.WorldSize);
-        }
-
         for (int x = 0; x < _level.WorldSize.X; x++)
         for (int y = 0; y < _level.WorldSize.Y; y++)
         {
@@ -242,12 +236,7 @@ public class LevelEditorScene : Scene
             GameConsole.WriteLine($"loaded {SelectedSavePath()}");
         }
         
-        for (int x = 0; x < _level.WorldSize.X; x++)
-        for (int y = 0; y < _level.WorldSize.Y; y++)
-        {
-             World.SetFloorTile(Assets.GetFloorTileByID(_level.FloorTiles[x, y]) ?? Assets.BlankFloor, x, y);
-             World.SetTile(Assets.GetStructureByID(_level.Structures[x, y]), World.RightTeam, x, y);
-        }
+        World.InitializeLevelEditor(_level);
         
         JObject j = JObject.FromObject(_level);
 
