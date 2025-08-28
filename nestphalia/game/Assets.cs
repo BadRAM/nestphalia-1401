@@ -70,7 +70,7 @@ public static class Assets
         _floorTiles.Add("floor_empty", new FloorTileTemplate("floor_empty", Resources.GetTextureByName("clear")));
         BlankFloor = _floorTiles["floor_empty"];
         
-        foreach (string path in Directory.GetFiles(Directory.GetCurrentDirectory() + "/resources/content"))
+        foreach (string path in Directory.GetFiles(Resources.Dir + "/resources/content"))
         {
             if (Path.GetExtension(path).ToLower() == ".json")
             {
@@ -83,7 +83,7 @@ public static class Assets
             }
         }
         
-        foreach (string path in Directory.GetFiles(Directory.GetCurrentDirectory() + "/resources/levels"))
+        foreach (string path in Directory.GetFiles(Resources.Dir + "/resources/levels"))
         {
             if (Path.GetExtension(path).ToLower() == ".json")
             {

@@ -12,7 +12,7 @@ public class SavedSettings
     [JsonInclude] public double MusicVolume = 1;
     [JsonInclude] public double WindowScale = 1;
     [JsonInclude] public bool AccessibleFont;
-    [JsonInclude] public string AssetPathOverride = "";
+    [JsonInclude] public string ResourcePathOverride = "";
 }
 
 public static class Settings

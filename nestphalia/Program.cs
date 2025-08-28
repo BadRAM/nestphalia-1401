@@ -9,7 +9,6 @@ static class Program
 	
     public static void Main()
     {
-	    
 	    // Complete install if needed
 	    if (!Directory.Exists(Directory.GetCurrentDirectory() + "/forts/"))
 	    {

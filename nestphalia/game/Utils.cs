@@ -177,6 +177,10 @@ public static class Utils
         {
             return path.Substring(Directory.GetCurrentDirectory().Length);
         }
+        else if (path.Contains(Resources.Dir))
+        {
+            return path.Substring(Resources.Dir.Length);
+        }
         else
         {
             // GameConsole.WriteLine($"{path} is not absolute or is not inside current directory");
@@ -189,6 +193,10 @@ public static class Utils
         if (!path.Contains(Directory.GetCurrentDirectory()))
         {
             return Directory.GetCurrentDirectory() + path;
+        }
+        else if (!path.Contains(Resources.Dir))
+        {
+            return Resources.Dir + path;
         }
         else
         {

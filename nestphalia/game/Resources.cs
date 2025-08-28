@@ -78,6 +78,7 @@ public static class Resources
     private static Font _accessibleFont;
     private static Font _defaultFont;
     public static Music MusicPlaying;
+    public static string Dir;
 
     public static void PreLoad()
     {
@@ -86,11 +87,12 @@ public static class Resources
         _accessibleFont = Raylib.LoadFont("resources/pixelplay16.png");
         _defaultFont = Raylib.LoadFont("resources/alagard.png");
         Font = Settings.Saved.AccessibleFont ? _accessibleFont : _defaultFont;
+        Dir = Settings.Saved.ResourcePathOverride == "" ? Directory.GetCurrentDirectory() : Settings.Saved.ResourcePathOverride;
     }
     
     public static void Load()
     {
-        foreach (string path in Directory.GetFiles(Directory.GetCurrentDirectory() + "/resources/music"))
+        foreach (string path in Directory.GetFiles(Dir + "/resources/music"))
         {
             MusicResource r = new MusicResource(Path.GetFileNameWithoutExtension(path), Raylib.LoadMusicStream("resources/music/" + Path.GetFileName(path)));
             _music.Add(r.Name, r);
@@ -101,13 +103,13 @@ public static class Resources
         Raylib.SetMusicVolume(MusicPlaying, 0f); // Purge the random garbage from the music stream
         Raylib.UpdateMusicStream(MusicPlaying);
         
-        foreach (string path in Directory.GetFiles(Directory.GetCurrentDirectory() + "/resources/sprites"))
+        foreach (string path in Directory.GetFiles(Dir + "/resources/sprites"))
         {
             SpriteResource r = new SpriteResource(Path.GetFileNameWithoutExtension(path), Raylib.LoadTexture("resources/sprites/" + Path.GetFileName(path)));
             _sprites.Add(r.Name, r);
         }
         
-        foreach (string path in Directory.GetFiles(Directory.GetCurrentDirectory() + "/resources/sfx"))
+        foreach (string path in Directory.GetFiles(Dir + "/resources/sfx"))
         {
             SoundResource r = new SoundResource(Path.GetFileNameWithoutExtension(path), Raylib.LoadSound("resources/sfx/" + Path.GetFileName(path)), 16);
             _sounds.Add(r.Name, r);

@@ -251,7 +251,7 @@ public class LevelEditorScene : Scene
 
     private void ShowLoadPopup()
     {
-        _loadableLevels = Directory.GetFiles(Directory.GetCurrentDirectory() + "/resources/levels/").ToList();
+        _loadableLevels = Directory.GetFiles(Resources.Dir + "/resources/levels/").ToList();
         for (int i = 0; i < _loadableLevels.Count; i++)
         {
             _loadableLevels[i] = Path.GetFileNameWithoutExtension(_loadableLevels[i]);
@@ -269,6 +269,6 @@ public class LevelEditorScene : Scene
 
     private string SelectedSavePath()
     {
-        return Directory.GetCurrentDirectory() + "/resources/levels/" + _idBuffer + ".json";
+        return Resources.Dir + "/resources/levels/" + _idBuffer + ".json";
     }
 }
