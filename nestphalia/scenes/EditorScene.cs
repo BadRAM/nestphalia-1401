@@ -199,10 +199,10 @@ public class EditorScene : Scene
         if (_sellAllConfirm && Button90(212, -358, "Confirm"))  SellAll();
         
         // Structure Category buttons
-        if (Button90(-470, -350, (_newUtil ? "NEW! " : "") + "Basic", _structureClassSelected != StructureTemplate.StructureClass.Utility)) _structureClassSelected = StructureTemplate.StructureClass.Utility;
-        if (Button90(-380, -350, (_newUtil ? "NEW! " : "") + "Utility", _structureClassSelected != StructureTemplate.StructureClass.Utility)) _structureClassSelected = StructureTemplate.StructureClass.Utility;
-        if (Button90(-290, -350, (_newTower ? "NEW! " : "") + "Defense", _structureClassSelected != StructureTemplate.StructureClass.Tower)) _structureClassSelected = StructureTemplate.StructureClass.Tower;
-        if (Button90(-200, -350, (_newNest ? "NEW! " : "") + "Nest", _structureClassSelected != StructureTemplate.StructureClass.Nest)) _structureClassSelected = StructureTemplate.StructureClass.Nest;
+        if (Button90(-470, -350, _newUtil  ? "! Basic !" : "Basic",     _structureClassSelected != StructureTemplate.StructureClass.Utility)) _structureClassSelected = StructureTemplate.StructureClass.Utility;
+        if (Button90(-380, -350, _newUtil  ? "! Utility !" : "Utility", _structureClassSelected != StructureTemplate.StructureClass.Utility)) _structureClassSelected = StructureTemplate.StructureClass.Utility;
+        if (Button90(-290, -350, _newTower ? "! Defense !" : "Defense", _structureClassSelected != StructureTemplate.StructureClass.Tower))   _structureClassSelected = StructureTemplate.StructureClass.Tower;
+        if (Button90(-200, -350, _newNest  ? "! Nest !" : "Nest",       _structureClassSelected != StructureTemplate.StructureClass.Nest))    _structureClassSelected = StructureTemplate.StructureClass.Nest;
         
         StructureList();
         
@@ -340,7 +340,7 @@ public class EditorScene : Scene
 
     private void PathTestTool()
     {
-        NavPath navPath = new NavPath("editor", new Int2D(28, 11), World.GetMouseTilePos(), World.RightTeam);
+        NavPath navPath = new NavPath("editor", new Int2D(21, 11), World.GetMouseTilePos(), World.RightTeam);
         pathFinder.FindPath(navPath);
         
         Screen.SetCamera(World.Camera);
@@ -410,6 +410,7 @@ public class EditorScene : Scene
         
         _sellAllConfirm = false;
         _unsaved = true;
+        UpdateFortStats();
     }
     
     private void UpdateFortStats()

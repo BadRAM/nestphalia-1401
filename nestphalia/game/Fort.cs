@@ -124,16 +124,11 @@ public class Fort
         
         TotalCost = totalCost;
     }
-
-    public string GetFullPath()
-    {
-        return Directory.GetCurrentDirectory() + Path + "/" + Name + ".fort";
-    }
     
     public void SaveToDisc()
     {
         string filename = System.IO.Path.GetFileName(Path);
-        if (System.IO.Path.GetFileName(Path) == "")
+        if (System.IO.Path.GetFileName(Path) == "" || System.IO.Path.EndsInDirectorySeparator(Path) || !System.IO.Path.HasExtension(Path))
         {
             Path = GetUnusedFileName(Name, Path);
         }

@@ -1,4 +1,6 @@
 ﻿using Raylib_cs;
+using WrenNET;
+
 namespace nestphalia;
 
 static class Program
@@ -7,6 +9,7 @@ static class Program
 	
     public static void Main()
     {
+	    
 	    // Complete install if needed
 	    if (!Directory.Exists(Directory.GetCurrentDirectory() + "/forts/"))
 	    {
@@ -31,6 +34,7 @@ static class Program
 	    Screen.Load();
 	    Assets.Load();
         GUI.Initialize();
+        WrenCommand.Execute("""System.print("Wren VM is running.")""");
         
         // Start the first scene. TODO: loading screen, then intro cutscene, rather than menu
         

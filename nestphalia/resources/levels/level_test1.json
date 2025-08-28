@@ -18,13 +18,16 @@
   "UnlockReward": [
     "tower_machinegun",
     "door_weak",
-    "nest_hopper"
+    "nest_grasshopper"
   ],
-  "PlayerOffset": {
-    "X": 1,
-    "Y": 1
-  },
-  "PlayerRotation": 0,
+  "FortSpawnZones": [
+    {
+      "X": 1,
+      "Y": 1,
+      "Rotations": 0,
+      "Flip": false
+    }
+  ],
   "Script": "",
   "WorldSize": {
     "X": 48,

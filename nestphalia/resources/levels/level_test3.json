@@ -22,11 +22,14 @@
     "wall_wood",
     "nest_snail"
   ],
-  "PlayerOffset": {
-    "X": 1,
-    "Y": 1
-  },
-  "PlayerRotation": 0,
+  "FortSpawnZones": [
+    {
+      "X": 1,
+      "Y": 1,
+      "Rotations": 0,
+      "Flip": false
+    }
+  ],
   "Script": "Command.dialog(\"Snail time :)\")\r\n",
   "WorldSize": {
     "X": 48,

@@ -1,6 +1,4 @@
 using System.Reflection;
-using Raylib_cs;
-using WrenSharp;
 
 namespace nestphalia;
 

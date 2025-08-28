@@ -3,7 +3,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Raylib_cs;
 using static nestphalia.GUI;
-using WrenSharp;
 using Formatting = Newtonsoft.Json.Formatting;
 
 namespace nestphalia;

@@ -62,7 +62,7 @@ public class CampaignScene : Scene
         Screen.RegenerateBackground();
         _data.Save();
         Resources.PlayMusicByName("hook_-_paranoya");
-        if (fort != null) _fort = fort;
+        if (fort != null && !Path.EndsInDirectorySeparator(fort.Path)) _fort = fort;
         _levels.Clear();
         foreach (Level level in Assets.GetAllLevels())
         {
@@ -77,10 +77,11 @@ public class CampaignScene : Scene
             if(!locked) _levels.Add(level);
         }
         _levelIcon = Resources.GetTextureByName("level_icon");
-
+        
         if (_fort != null)
         {
             _fort = Fort.LoadFromDisc(_fort.Path);
+            _fortValidityMessage = _fort.IsValid(_data);
         }
     }
     
@@ -159,9 +160,9 @@ public class CampaignScene : Scene
                 _fort = i;
                 _fortValidityMessage = _fort.IsValid(_data);
             },
-            i =>
+            path =>
             {
-                Fort f = new Fort(i);
+                Fort f = new Fort(path);
                 new EditorScene().Start(Start, f, _data);
             }));
         }

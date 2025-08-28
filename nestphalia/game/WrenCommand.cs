@@ -1,32 +1,38 @@
 using System.Reflection;
 using Raylib_cs;
-using WrenSharp;
+using WrenNET;
+using static WrenNET.Wren;
 
 namespace nestphalia;
 
 public static class WrenCommand
 {
-    // private static Dictionary<string, Func<string, string>> _commands;
-    private static WrenSharpVM _vm;
-    private static WrenBufferOutput _output = new WrenBufferOutput();
+    private static WrenConfiguration _config;
+    private static WrenVM _vm;
+
+    private static WrenHandle _threadResumeCallHandle;
 
     static WrenCommand()
     {
-        _vm = new WrenSharpVM(new WrenVMConfiguration()
-        {
-            LogErrors = true,
-            ErrorOutput = _output,
-            WriteOutput = _output,
-        });
+        GameConsole.WriteLine("Initializing Wren VM...");
+        
+        _config = new();
+        wrenInitConfiguration(ref _config);
+        _config.writeFn = WriteFn;
+        _config.errorFn = ErrorFn;
+        _config.loadModuleFn = LoadModuleFn;
+        _config.bindForeignMethodFn = BindForeignMethodFn;
+        
+        _vm = wrenNewVM(_config);
         
         string script = """
 var MainFiber = Fiber.current
 
 class Command {
     foreign static kill(team, id)
-    foreign static dialogForeign(mode, portrait, text)
     foreign static build(structure, team, x, y)
-    foreign static destroy(x, y)
+    foreign static demolish(x, y)
+    foreign static dialogForeign(mode, portrait, text)
     static dialog(text) {
         MainFiber = Fiber.current
         dialogForeign(0, "", text)
@@ -45,45 +51,67 @@ class Command {
 }
 """;
         
-        var cm = _vm.Foreign("main", "Command");
-        cm.Static("kill(_,_)", ctx => Kill(ctx.GetArgString(0), ctx.GetArgString(1)));
-        cm.Static("dialogForeign(_,_,_)", ctx => Dialog((DialogBox.Mode)ctx.GetArgInt32(0), ctx.GetArgString(1), ctx.GetArgString(2)));
-        cm.Static("build(_,_,_,_)", ctx => Build(ctx.GetArgString(0), ctx.GetArgString(1), ctx.GetArgInt32(2), ctx.GetArgInt32(3)));
-        cm.Static("destroy(_,_)", ctx => Destroy(ctx.GetArgInt32(0), ctx.GetArgInt32(1)));
+        wrenInterpret(_vm, "main", script);
         
-        _vm.Interpret("main", script);
-    }
-    
-    public static string Execute(string input)
-    {
-        _vm.Interpret(
-            module: "main",
-            source: input,
-            throwOnFailure: false);
+        GameConsole.WriteLine("Wren VM init complete!");
 
-        return _output.GetBuffer();
+        // Confusing name overlap:
+        //   - Call       - the action of invoking a method
+        //   - CallHandle - wren's way of storing a method signature to invoke later
+        //   - call()     - is the signature of the method that resumes fibers
+        _threadResumeCallHandle = wrenMakeCallHandle(_vm, "call()");
     }
     
-    public static void Dialog(DialogBox.Mode mode, string portrait, string text)
+    public static void WriteFn(WrenVM vm, string text) => GameConsole.WriteLine(text);
+	
+    public static void ErrorFn(WrenVM vm, WrenErrorType errorType, string module, int line, string msg)
     {
+        GameConsole.WriteLine($"Wren {errorType} error from {module}, line {line}: {msg}");
+    }
+	
+    public static WrenLoadModuleResult LoadModuleFn(WrenVM vm, string module)
+    {
+        return new WrenLoadModuleResult { source = "" };
+    }
+
+    public static WrenForeignMethodFn BindForeignMethodFn(WrenVM vm, string module, string classname, bool isStatic, string signature)
+    {
+        if (signature == "kill(_,_)") return Kill;
+        if (signature == "dialogForeign(_,_,_)") return Dialog;
+        if (signature == "build(_,_,_,_)") return Build;
+        if (signature == "demolish(_,_)") return Demolish;
+        return null;
+    }
+    
+    public static void Execute(string input)
+    {
+        wrenInterpret(_vm, "main", input);
+    }
+    
+    public static void Dialog(WrenVM vm)
+    {
+        DialogBox.Mode mode = (DialogBox.Mode)wrenGetSlotDouble(vm, 1);
+        string portrait = wrenGetSlotString(vm, 2);
+        string text = wrenGetSlotString(vm, 3);
+        
         Texture2D portraitTex = Resources.GetTextureByName(portrait);
-
+        
         Action resume = () =>
         {
-            using (WrenHandle main = _vm.CreateHandle("main", "MainFiber"))
-            using (WrenCallHandle callHandle = _vm.CreateCallHandle("call()"))
-            {
-                var call = _vm.CreateCall(main, callHandle);
-                call.Call();
-            }
+            wrenEnsureSlots(vm, 1);
+            wrenGetVariable(vm, "main", "MainFiber", 0);
+            wrenCall(vm, _threadResumeCallHandle);
         };
         
         PopupManager.Start(new DialogBox(text, resume, mode));
     }
-
-    //
-    public static void Kill(string team, string id)
+    
+    // Wren signature: kill(team,id)
+    public static void Kill(WrenVM vm)
     {
+        string team = wrenGetSlotString(vm, 1);
+        string id = wrenGetSlotString(vm, 2);
+        
         if (Program.CurrentScene is not BattleScene)
         {
             GameConsole.WriteLine("Can't do that in this scene!");
@@ -107,8 +135,14 @@ class Command {
         GameConsole.WriteLine($"Killed {count} Minions");
     }
 
-    public static void Build(string structure, string team, int x, int y)
+    // Wren signature: build(structure, team, x, y)
+    public static void Build(WrenVM vm)
     {
+        string structure = wrenGetSlotString(vm, 1);
+        string team = wrenGetSlotString(vm, 2);
+        int x = (int)wrenGetSlotDouble(vm, 3);
+        int y = (int)wrenGetSlotDouble(vm, 4);
+        
         if (Program.CurrentScene is not BattleScene)
         {
             GameConsole.WriteLine("Build() error: Can't do that in this scene!");
@@ -132,8 +166,12 @@ class Command {
         World.SetTile(st, t, x, y);
     }
 
-    public static void Destroy(int x, int y)
+    // Wren signature: destroy(x, y)
+    public static void Demolish(WrenVM vm)
     {
+        int x = (int)wrenGetSlotDouble(vm, 1);
+        int y = (int)wrenGetSlotDouble(vm, 2);
+        
         if (Program.CurrentScene is not BattleScene)
         {
             GameConsole.WriteLine("Destroy() error: Can't do that in this scene!");

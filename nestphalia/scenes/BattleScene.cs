@@ -43,7 +43,7 @@ public class BattleScene : Scene
         _winner = null;
         _state = SceneState.BattleActive;
         _battleOverCallback = battleOverCallback;
-        int zoomIndex = _zoomLevels.IndexOf(GetWindowScaleDPI().X);
+        int zoomIndex = _zoomLevels.IndexOf(Settings.Saved.WindowScale);
         _zoomLevel = zoomIndex == -1 ? 1 : zoomIndex;
         
         Time.TimeScale = 1;

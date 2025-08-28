@@ -12,9 +12,7 @@ public class SavedSettings
     [JsonInclude] public double MusicVolume = 1;
     [JsonInclude] public double WindowScale = 1;
     [JsonInclude] public bool AccessibleFont;
-
-    // Default settings constructor
-    public SavedSettings() { }
+    [JsonInclude] public string AssetPathOverride = "";
 }
 
 public static class Settings

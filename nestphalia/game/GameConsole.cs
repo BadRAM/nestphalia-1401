@@ -84,8 +84,7 @@ public static class GameConsole
             {
                 _commandHistory.Insert(0, _input);
                 WriteLine(_input);
-                string commandOutput = WrenCommand.Execute(_input);
-                if ((commandOutput ?? "") != "") WriteLine(commandOutput);
+                WrenCommand.Execute(_input);
                 _input = "";
             }
             

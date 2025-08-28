@@ -10,14 +10,6 @@
         <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
         <PathMap>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)'))=./</PathMap>
     </PropertyGroup>
-
-    <Target Name="ShowRID" BeforeTargets="BeforeBuild">
-        <Message Text="nestphalia properties:" Importance="High" />
-        <Message Text="SelfContained = '$(SelfContained)'" Importance="High" />
-        <Message Text="RuntimeIdentifier = '$(RuntimeIdentifier)'" Importance="High" />
-        <Message Text="RuntimeIdentifiers = '$(RuntimeIdentifiers)'" Importance="High" />
-        <Message Text="OS = '$(OS)'" Importance="High" />
-    </Target>
     
     <PropertyGroup Condition="'$(Configuration)'=='Release'">
         <DebugSymbols>False</DebugSymbols>
@@ -25,16 +17,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <!--Terrible hack: Wrensharp doesn't properly include libraries in publish builds, so we're gonna do it ourselves.-->
-        <None Update="libwren.so" Condition="'$(RuntimeIdentifier)' == 'linux-x64'"> 
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-        </None>
-        <None Update="wren.dll" Condition="'$(RuntimeIdentifier)' == 'win-x64' or '$(RuntimeIdentifier)' == ''">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-        </None>
-        <!--/hack-->
         <None Update="resources/**/*">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
@@ -56,10 +38,7 @@
     <ItemGroup>
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
         <PackageReference Include="Raylib-cs" Version="7.0.1" />
-    </ItemGroup>
-    
-    <ItemGroup>
-        <ProjectReference Include="..\WrenSharp\WrenSharp\WrenSharp.csproj" />
+        <PackageReference Include="Wren.NET" Version="2.0.0" />
     </ItemGroup>
     
     <ItemGroup>

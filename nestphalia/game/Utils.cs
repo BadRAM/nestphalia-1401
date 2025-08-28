@@ -21,24 +21,31 @@ public static class Utils
         }
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
-            using Process dbusShowItemsProcess = new Process
+            try
             {
-                StartInfo = new ProcessStartInfo
+                using Process dbusShowItemsProcess = new Process
                 {
-                    FileName = "dbus-send",
-                    Arguments = "--print-reply --dest=org.freedesktop.FileManager1 /org/freedesktop/FileManager1 org.freedesktop.FileManager1.ShowItems array:string:\"file://"+ path +"\" string:\"\"",
-                    UseShellExecute = true
-                }
-            };
-            dbusShowItemsProcess.Start();
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "dbus-send",
+                        Arguments = "--print-reply --dest=org.freedesktop.FileManager1 /org/freedesktop/FileManager1 org.freedesktop.FileManager1.ShowItems array:string:\"file://"+ path +"\" string:\"\"",
+                        UseShellExecute = true
+                    }
+                };
+                dbusShowItemsProcess.Start();
     
-            if (dbusShowItemsProcess.ExitCode == 0)
-            {            
-                // The dbus invocation can fail for a variety of reasons:
-                // - dbus is not available
-                // - no programs implement the service,
-                // - ...
-                return;
+                if (dbusShowItemsProcess.ExitCode == 0)
+                {            
+                    // The dbus invocation can fail for a variety of reasons:
+                    // - dbus is not available
+                    // - no programs implement the service,
+                    // - ...
+                    return;
+                }
+            }
+            catch (Exception e)
+            {
+                GameConsole.WriteLine(e.ToString());
             }
         }
     }

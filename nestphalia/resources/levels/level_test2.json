@@ -22,11 +22,14 @@
     "tower_mortar",
     "wall_wood"
   ],
-  "PlayerOffset": {
-    "X": 1,
-    "Y": 1
-  },
-  "PlayerRotation": 0,
+  "FortSpawnZones": [
+    {
+      "X": 1,
+      "Y": 1,
+      "Rotations": 0,
+      "Flip": false
+    }
+  ],
   "Script": "Command.dialog(\"Here in leftsville we have a saying:\")\r\nCommand.dialog(\"...\")\r\nCommand.dialog(\"I forgot :(\")",
   "WorldSize": {
     "X": 48,
