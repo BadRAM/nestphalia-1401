@@ -8,6 +8,7 @@ public class SpawnerTemplate : StructureTemplate
     public int WaveSize;
     public double WaveGrowth;
     public double TimeBetweenSpawns;
+    public bool StandardBearer;
     
     public SpawnerTemplate(JObject jObject) : base(jObject)
     {
@@ -15,6 +16,7 @@ public class SpawnerTemplate : StructureTemplate
         WaveSize = jObject.Value<int?>("WaveSize") ?? throw new ArgumentNullException();
         WaveGrowth = jObject.Value<int?>("WaveGrowth") ?? throw new ArgumentNullException();
         TimeBetweenSpawns = jObject.Value<double?>("TimeBetweenSpawns") ?? throw new ArgumentNullException();
+        StandardBearer = jObject.Value<bool?>("StandardBearer") ?? false;
         Class = jObject.Value<StructureClass?>("Class") ?? StructureClass.Nest;
     }
     
@@ -43,6 +45,7 @@ public class Spawner : Structure
     private int _nextWaveSpawnBonus;
     private Int2D _targetTile;
     private NavPath _navPath;
+    private bool _spawnStandardBearer;
     
     public Spawner(SpawnerTemplate template, Team team, int x, int y) : base(template, team, x, y)
     {
@@ -60,7 +63,12 @@ public class Spawner : Structure
             {
                 GameConsole.WriteLine($"Creating a minion without a path, PathQueueLength: {Team.GetQueueLength()}");
             }
-            _template.Minion.Instantiate(Team, position.XYZ(), _navPath.Clone(_template.Minion.Name));
+            Minion m = _template.Minion.Instantiate(Team, position.XYZ(), _navPath.Clone(_template.Minion.Name));
+            if (_spawnStandardBearer)
+            {
+                m.StandardBearer = true;
+                _spawnStandardBearer = false;
+            }
             _spawnsRemaining--;
             _lastSpawnTime = Time.Scaled;
         }
@@ -86,6 +94,7 @@ public class Spawner : Structure
         _spawnsRemaining += _template.WaveSize + (int)(World.Wave * _template.WaveGrowth);
         _spawnsRemaining += _nextWaveSpawnBonus;
         _nextWaveSpawnBonus = 0;
+        if (_template.StandardBearer) _spawnStandardBearer = true;
     }
 
     public override void Destroy()

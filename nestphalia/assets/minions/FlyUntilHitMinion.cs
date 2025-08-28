@@ -12,9 +12,11 @@ public class FlyUntilHitMinionTemplate : FlyingMinionTemplate
         LandSpeed = jObject.Value<double?>("LandSpeed") ?? throw new ArgumentNullException();
     }
     
-    public override void Instantiate(Team team, Vector3 position, NavPath? navPath)
+    public override Minion Instantiate(Team team, Vector3 position, NavPath? navPath)
     {
-        World.RegisterMinion(new FlyUntilHitMinion(this, team, position, navPath));
+        Minion m = new FlyUntilHitMinion(this, team, position, navPath);
+        World.RegisterMinion(m);
+        return m;
     }
 }
     

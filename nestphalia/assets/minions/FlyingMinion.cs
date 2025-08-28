@@ -12,9 +12,11 @@ public class FlyingMinionTemplate : MinionTemplate
     {
     }
     
-    public override void Instantiate(Team team, Vector3 position, NavPath? navPath)
+    public override Minion Instantiate(Team team, Vector3 position, NavPath? navPath)
     {
-        World.RegisterMinion(new FlyingMinion(this, team, position, navPath));
+        Minion m = new FlyingMinion(this, team, position, navPath);
+        World.RegisterMinion(m);
+        return m;
     }
     
     public override bool PathFromNest()

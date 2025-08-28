@@ -20,9 +20,11 @@ public class SapperMinionTemplate : MinionTemplate
         Projectile = new MortarShellTemplate(JObject.Parse(j));
     }
 
-    public override void Instantiate(Team team, Vector3 position, NavPath? navPath)
+    public override Minion Instantiate(Team team, Vector3 position, NavPath? navPath)
     {
-        World.RegisterMinion(new SapperMinion(this, team, position, navPath));
+        Minion m = new SapperMinion(this, team, position, navPath);
+        World.RegisterMinion(m);
+        return m;
     }
     
     public override bool PathFromNest()

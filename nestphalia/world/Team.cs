@@ -20,6 +20,7 @@ public class Team
     public List<ActiveAbilityBeacon?> Beacons = new List<ActiveAbilityBeacon?>();
     public const int BeaconCap = 4;
     public Color Color;
+    public Texture2D BattleStandard;
     private Texture2D _abilitySlot;
     private Texture2D _healthBar;
     private int _usingAbility = -1;
@@ -40,6 +41,7 @@ public class Team
         Color = color;
         _abilitySlot = Resources.GetTextureByName("ability_slot");
         _healthBar = Resources.GetTextureByName("button_wide");
+        BattleStandard = Resources.GetTextureByName("battle_standard");
     }
 
     public void Initialize()

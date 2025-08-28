@@ -23,6 +23,16 @@ Project management todo:
   - Campaign plot summary
   - Intro Cutscene storyboard
 
+Art todo:
+=========
+- Terrain scatters
+  - Dead leaves
+  - Moss
+  - Footprints
+- Bug animations
+- Structure reworks
+- Big
+
 Programming todo:
 =================
 
@@ -95,10 +105,11 @@ Programming todo:
   - Bug Death
   - Bug take damage
   - Tower Shoot
-- File Select popup
 - Migrate old JSON functions to newtonsoft
 - Stateful GUI
 - Repeatable LARP gauntlet challenge
+- sell mode has no indicator for what is about to be sold if you click (along the lines of placement ghosts) 
+- Show wave clock on screen in battle
 
 
 ----- Premature Optimizations -----
@@ -179,6 +190,7 @@ Programming todo:
 - Minion vs Minion melee
 - Multiple team colors via shader & rgb swizzling, or channel splitting assets at load time, or something.
 - Special power to rotate entire fort
+- Magnifying glass instead of global zoom
 
 
 Design todo:
@@ -216,6 +228,9 @@ Design todo:
   - Repair/Rebuild building
   - Destroy Wall 
   - Spiderling egg sac mortar
+  - Delay wave clock
+  - Remove fear
+  - Convert fear into zombugs
 
 - Workers?
  - Are spawned by core structure

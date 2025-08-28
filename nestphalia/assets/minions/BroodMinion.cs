@@ -16,9 +16,11 @@ public class BroodMinionTemplate : MinionTemplate
         SpawnedMinion = Assets.LoadJsonAsset<MinionTemplate>(jObject.Value<JObject?>("SpawnedMinion")) ?? throw new ArgumentNullException();
     }
     
-    public override void Instantiate(Team team, Vector3 position, NavPath? navPath)
+    public override Minion Instantiate(Team team, Vector3 position, NavPath? navPath)
     {
-        World.RegisterMinion(new BroodMinion(this, team, position, navPath));
+        Minion m = new BroodMinion(this, team, position, navPath);
+        World.RegisterMinion(m);
+        return m;
     }
 
     public override string GetStats()

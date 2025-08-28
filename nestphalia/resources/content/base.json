@@ -309,6 +309,7 @@
       "WaveSize": 5,
       "WaveGrowth": 1.0,
       "TimeBetweenSpawns": 0.25,
+      "StandardBearer": true,
       "MaxHealth": 50.0,
       "Price": 250.0,
       "LevelRequirement": 0,

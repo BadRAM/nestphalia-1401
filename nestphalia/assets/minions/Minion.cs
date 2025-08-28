@@ -38,9 +38,11 @@ public class MinionTemplate : JsonAsset
     }
 
     // Implementations of Instantiate() must call Register!
-    public virtual void Instantiate(Team team, Vector3 position, NavPath? navPath)
+    public virtual Minion Instantiate(Team team, Vector3 position, NavPath? navPath)
     {
-        World.RegisterMinion(new Minion(this, team, position, navPath));
+        Minion m = new Minion(this, team, position, navPath);
+        World.RegisterMinion(m);
+        return m;
     }
     
     public virtual string GetStats()
@@ -92,6 +94,7 @@ public partial class Minion : ISprite
     protected Vector2 NextPos; // This is the world space position the minion is currently trying to reach
     
     // Status Effects
+    public bool StandardBearer;
     public bool Glued;
     public bool Frenzy;
     
@@ -270,6 +273,7 @@ public partial class Minion : ISprite
         Vector2 pos = new Vector2(Position.X - size / 2f, Position.Y - size / 2f - Position.Z) + DrawOffset.XYZ2D();
         if (!IsFlying && (World.PosToTilePos(Position) != OriginTile) && (World.GetTileAtPos(Position)?.PhysSolid() ?? false)) pos.Y -= 8;
         bool flip = NextPos.X > Position.X;
+        if (StandardBearer) Raylib.DrawTextureV(Team.BattleStandard, pos - new Vector2(Team.BattleStandard.Width/2-size/2, Team.BattleStandard.Height-size/2), Team.Color);
         Rectangle source = new Rectangle(flip ? size : 0, 0, flip ? size : -size, size);
         source.X = size * frame;
         Raylib.DrawTextureRec(Template.Texture, source, pos, Color.White);
