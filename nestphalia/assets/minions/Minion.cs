@@ -191,14 +191,14 @@ public partial class Minion : ISprite
     protected bool CanAttack()
     {
         // Don't attack while we're on top of structures
-        if ((World.PosToTilePos(Position) != OriginTile) && (World.GetTileAtPos(Position)?.PhysSolid() ?? false)) return false;
+        if ((World.PosToTilePos(Position) != OriginTile) && (World.GetTileAtPos(Position)?.PhysSolid(this) ?? false)) return false;
         // Guard against out of range attacks
         if (Vector2.Distance(Position.XY(), NextPos) > 24 + Template.PhysicsRadius) return false;
         Structure? t = World.GetTileAtPos(NextPos);
         // Guard against attacking tiles that could just be walked over
         if (t == null || t is Rubble || (!t.NavSolid(Team) && NavPath.NextTile(Position.XY()) != NavPath.Destination)) return false;
         // Guard against friendly tiles that can be traversed
-        if (t.Team == Team && !t.PhysSolid()) return false; 
+        if (t.Team == Team && !t.PhysSolid(this)) return false; 
 
         return true;
     }
@@ -271,7 +271,7 @@ public partial class Minion : ISprite
     {
         int size = Template.Texture.Height / 2;
         Vector2 pos = new Vector2(Position.X - size / 2f, Position.Y - size / 2f - Position.Z) + DrawOffset.XYZ2D();
-        if (!IsFlying && (World.PosToTilePos(Position) != OriginTile) && (World.GetTileAtPos(Position)?.PhysSolid() ?? false)) pos.Y -= 8;
+        if (!IsFlying && (World.PosToTilePos(Position) != OriginTile) && (World.GetTileAtPos(Position)?.PhysSolid(this) ?? false)) pos.Y -= 8;
         bool flip = NextPos.X > Position.X;
         if (StandardBearer) Raylib.DrawTextureV(Team.BattleStandard, pos - new Vector2(Team.BattleStandard.Width/2-size/2, Team.BattleStandard.Height-size/2), Team.Color);
         Rectangle source = new Rectangle(flip ? size : 0, 0, flip ? size : -size, size);
@@ -282,7 +282,7 @@ public partial class Minion : ISprite
         if (Position.Z + DrawOffset.Z > 0)
         {
             pos = new Vector2(Position.X - Template.ShadowTexture.Width / 2f, Position.Y - Template.ShadowTexture.Height / 2f) + DrawOffset.XY();
-            if ((World.PosToTilePos(Position) != OriginTile) && (World.GetTileAtPos(Position)?.PhysSolid() ?? false)) pos.Y -= 8;
+            if ((World.PosToTilePos(Position) != OriginTile) && (World.GetTileAtPos(Position)?.PhysSolid(this) ?? false)) pos.Y -= 8;
             Raylib.DrawTextureV(Template.ShadowTexture, pos, Raylib.ColorAlpha(Color.White, Math.Min((Position.Z + DrawOffset.Z)/12, 1)));
         }
     }

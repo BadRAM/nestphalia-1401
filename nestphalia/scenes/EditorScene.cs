@@ -214,27 +214,6 @@ public class EditorScene : Scene
         }
         
         DrawToolTip();
-        
-        // if (!_sandboxMode)
-        // {
-        //     int nestCap = _data.GetNestCap();
-        //     DrawTextLeft(-260, -290, $"Nests: {_nestCount}/{nestCap}", color: _nestCount > nestCap ? Color.Red : Color.White);
-        //     if (_sandboxMode)
-        //     {
-        //         DrawTextLeft(-80,  -290, $"Cost: ${_price} bug dollars");
-        //     }
-        //     else
-        //     {
-        //         DrawTextLeft(-80,  -290, $"Cost: ${_price}/{_data.Money} bug dollars", color: _price > _data.Money ? Color.Red : Color.White);
-        //     }
-        //     DrawTextLeft( 160, -290, $"Stratagems: {_beaconCount}/{4}", color: _beaconCount > 4 ? Color.Red : Color.White);
-        // }
-        // else
-        // {
-        //     DrawTextLeft(-260, -290, $"Nests: {_nestCount}");
-        //     DrawTextLeft(-80,  -290, $"Cost: ${_price} bug dollars");
-        //     DrawTextLeft( 160, -290, $"Stratagems: {_beaconCount}/{4}", color: _beaconCount > 4 ? Color.Red : Color.White);
-        // }
     }
 
     private void Save()
@@ -321,7 +300,8 @@ public class EditorScene : Scene
 
     private void DrawInfoPanel()
     {
-        DrawTextLeft(-94, 204, _fortStats);
+        DrawTextLeft(-94, 204, "Name:\nTowers:\nUtility:\nNests:\nActive:\nTotal:\nCost:");
+        DrawTextLeft(-30, 204, _fortStats);
     }
 
     private void DrawToolTip()
@@ -439,12 +419,12 @@ public class EditorScene : Scene
         _beaconCount = beaconCount;
         _price = totalCost;
         _fortStats = $"{_fort.Name}\n" +
-                     $"{turretCount} Towers\n" +
-                     $"{utilityCount} Utility\n" +
-                     nestCount + (_sandboxMode ? "" : "/"+(_data.BeatenLevels.Count*2+10)) + " Nests\n" +
-                     beaconCount + (_sandboxMode ? "" : "/4") + " Stratagems\n" +
-                     $"{structureCount} Total\n" +
-                     $"{totalCost} Cost";
+                     $"{turretCount}\n" +
+                     $"{utilityCount}\n" +
+                     nestCount + (_sandboxMode ? "" : " / "+(_data.GetNestCap())) + "\n" +
+                     beaconCount + " / 4\n" +
+                     $"{structureCount}\n" +
+                     $"{totalCost}" + (_sandboxMode ? "" : " / "+_data.Money);
     }
 
     private bool MouseIsInBounds()

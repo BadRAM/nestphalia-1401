@@ -26,26 +26,21 @@ public static class WrenCommand
         _vm = wrenNewVM(_config);
         
         string script = """
-var MainFiber = Fiber.current
-
 class Command {
     foreign static kill(team, id)
     foreign static build(structure, team, x, y)
     foreign static demolish(x, y)
-    foreign static dialogForeign(mode, portrait, text)
+    foreign static dialogForeign(mode, portrait, text, fiber)
     static dialog(text) {
-        MainFiber = Fiber.current
-        dialogForeign(0, "", text)
+        dialogForeign(0, "", text, Fiber.current)
         Fiber.yield()
     }
     static dialogL(portrait, text) {
-        MainFiber = Fiber.current
-        dialogForeign(1, portrait, text)
+        dialogForeign(1, portrait, text, Fiber.current)
         Fiber.yield()
     }
     static dialogR(portrait, text) {
-        MainFiber = Fiber.current
-        dialogForeign(2, portrait, text)
+        dialogForeign(2, portrait, text, Fiber.current)
         Fiber.yield()
     }
 }
@@ -77,7 +72,7 @@ class Command {
     public static WrenForeignMethodFn BindForeignMethodFn(WrenVM vm, string module, string classname, bool isStatic, string signature)
     {
         if (signature == "kill(_,_)") return Kill;
-        if (signature == "dialogForeign(_,_,_)") return Dialog;
+        if (signature == "dialogForeign(_,_,_,_)") return Dialog;
         if (signature == "build(_,_,_,_)") return Build;
         if (signature == "demolish(_,_)") return Demolish;
         return null;
@@ -93,14 +88,16 @@ class Command {
         DialogBox.Mode mode = (DialogBox.Mode)wrenGetSlotDouble(vm, 1);
         string portrait = wrenGetSlotString(vm, 2);
         string text = wrenGetSlotString(vm, 3);
+        WrenHandle fiber = wrenGetSlotHandle(vm, 4);
         
         Texture2D portraitTex = Resources.GetTextureByName(portrait);
         
         Action resume = () =>
         {
             wrenEnsureSlots(vm, 1);
-            wrenGetVariable(vm, "main", "MainFiber", 0);
+            wrenSetSlotHandle(vm, 0, fiber);
             wrenCall(vm, _threadResumeCallHandle);
+            wrenReleaseHandle(vm, fiber);
         };
         
         PopupManager.Start(new DialogBox(text, resume, mode));

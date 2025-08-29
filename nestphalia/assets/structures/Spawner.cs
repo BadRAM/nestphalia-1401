@@ -111,9 +111,9 @@ public class Spawner : Structure
         return true;
     }
     
-    public override bool PhysSolid()
+    public override bool PhysSolid(Minion minion)
     {
-        return true;
+        return !minion.IsOrigin(X, Y);
     }
     
     public void AddSpawnBonus(int bonus)

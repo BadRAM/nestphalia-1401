@@ -21,7 +21,7 @@ public class Rubble : Structure
         return false;
     }
     
-    public override bool PhysSolid()
+    public override bool PhysSolid(Minion minion)
     {
         return false;
     }

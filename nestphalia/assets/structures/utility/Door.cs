@@ -78,7 +78,7 @@ public class Door : Structure
         return team != Team;
     }
 
-    public override bool PhysSolid()
+    public override bool PhysSolid(Minion minion)
     {
         return !_isOpen;
     }

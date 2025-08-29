@@ -106,8 +106,8 @@ public class Structure : ISprite
     {
         return true;
     }
-    
-    public virtual bool PhysSolid()
+
+    public virtual bool PhysSolid(Minion minion)
     {
         return true;
     }

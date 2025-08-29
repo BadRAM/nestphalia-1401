@@ -23,7 +23,7 @@ public class HazardSign : Structure
         return Team == team;
     }
 
-    public override bool PhysSolid()
+    public override bool PhysSolid(Minion minion)
     {
         return false;
     }

@@ -36,7 +36,7 @@ public class HopperMinion : Minion
                 Structure? structureAhead = World.GetTile((Int2D)ahead);
 
                 if (structureAhead == null ||
-                    (!structureAhead.PhysSolid() &&
+                    (!structureAhead.PhysSolid(this) &&
                      (structureAhead.Team != Team || structureAhead is not Minefield)))
                 {
                     Vector2 to = World.GetTileCenter((Int2D)ahead);

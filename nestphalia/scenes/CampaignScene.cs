@@ -146,6 +146,8 @@ public class CampaignScene : Scene
 
         if (GUI.Button180(300, 300, battleButtonText, battleValid))
         {
+            _data.Money -= _fort.TotalCost;
+            GameConsole.WriteLine($"Paid {_fort.TotalCost} to challenge {_selectedLevel.Name}. Money before: {_data.Money + _fort.TotalCost}");
             new BattleScene().Start(_selectedLevel, _fort, null, BattleOver);
         }
 
