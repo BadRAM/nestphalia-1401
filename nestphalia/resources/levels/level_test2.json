@@ -30,7 +30,7 @@
       "Flip": false
     }
   ],
-  "Script": "Command.dialog(\"Here in leftsville we have a saying:\")\r\nCommand.dialog(\"...\")\r\nCommand.dialog(\"I forgot :(\")",
+  "Script": "Cmd.dialog(\"Here in leftsville we have a saying:\")\r\nCmd.dialog(\"...\")\r\nCmd.dialog(\"I forgot :(\")",
   "WorldSize": {
     "X": 48,
     "Y": 22

@@ -77,16 +77,7 @@ public class Spawner : Structure
     public override void PreWaveEffect()
     {
         Retarget();
-        _navPath.Reset(position.XYZ());
-        _navPath.Destination = _targetTile;
-        if (_template.Minion.PathFromNest())
-        {
-            Team.RequestPath(_navPath);
-        }
-        else
-        {
-            _navPath.Found = true;
-        }
+        _template.Minion.RequestPath(new Int2D(X, Y), _targetTile, _navPath, Team);
     }
     
     public override void WaveEffect()
@@ -148,16 +139,15 @@ public class Spawner : Structure
         }
         
         int i = World.WeightedRandom(targets.Count);
-        // Console.WriteLine($"Picked target {i}");
         _targetTile = targets[i].Value;
     }
 
+    // This is called by path overriding actions, like the brood beacon
     public void SetTarget(Int2D target)
     {
         _targetTile = target;
-        _navPath.Reset(position.XYZ());
-        _navPath.Destination = _targetTile;
-        if (_template.Minion.PathFromNest())
+        _template.Minion.RequestPath(new Int2D(X, Y), _targetTile, _navPath, Team);
+        if (!_navPath.Found)
         {
             Team.DemandPath(_navPath);
         }

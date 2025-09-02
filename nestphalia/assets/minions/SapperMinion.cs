@@ -26,11 +26,6 @@ public class SapperMinionTemplate : MinionTemplate
         World.RegisterMinion(m);
         return m;
     }
-    
-    public override bool PathFromNest()
-    {
-        return false;
-    }
 }
 
 public class SapperMinion : Minion
@@ -42,6 +37,7 @@ public class SapperMinion : Minion
     {
         _template = template;
         // We call from base to prevent resharper complaining about calling virtual method in constructor
+        // It's fine because we only override setTarget to change returning behavior
         base.SetTarget(GetNewTarget());
     }
 

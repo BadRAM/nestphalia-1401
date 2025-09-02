@@ -454,7 +454,7 @@ public static class World
             $"Wave: {Wave}\n" +
             $"Bugs: {Minions.Count}\n" +
             $"Sprites: {Sprites.Count}\n" +
-            $"Zoom: {Camera.Zoom}\n" +
+            $"Camera Target:{Camera.Target} Offset:{Camera.Offset} Zoom:{Camera.Zoom}\n" +
             $"Tile {GetMouseTilePos().ToString()}\n" +
             $"Fate: {(Determinator.Fate == Determinator.FateModes.Guarding ? "SET IN STONE" : Determinator.battleName)}\n" +
             // $"Total collision checks: {_totalCollideChecks/1000}k\n" +
@@ -671,6 +671,11 @@ public static class World
     {
         //Determinator.Stacks += Environment.StackTrace + "\n\n";
         return _random.NextDouble();
+    }
+
+    public static Vector2 RandomUnitCircle()
+    {
+        return _random.UnitCircle();
     }
 
     public static void EndBattle()

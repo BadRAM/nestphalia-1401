@@ -30,7 +30,7 @@
       "Flip": false
     }
   ],
-  "Script": "Command.dialog(\"Snail time :)\")\r\n",
+  "Script": "Cmd.dialog(\"Snail time :)\")\r\n",
   "WorldSize": {
     "X": 48,
     "Y": 22

@@ -29,7 +29,7 @@
       "Flip": false
     }
   ],
-  "Script": "Command.dialog(\"1. hello!\")\r\nCommand.dialog(\"2. hello!\")\r\nCommand.dialog(\"3. hello!\")",
+  "Script": "Cmd.dialog(\"1. hello!\")\r\nCmd.dialog(\"2. hello!\")\r\nCmd.dialog(\"3. hello!\")",
   "WorldSize": {
     "X": 48,
     "Y": 22

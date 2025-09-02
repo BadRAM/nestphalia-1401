@@ -147,6 +147,18 @@ public static class Utils
     {
         return Math.Min(random.Next(max), random.Next(max));
     }
+
+    public static Vector2 UnitCircle(this Random random)
+    {
+        float theta = random.NextSingle() * 2 * Single.Pi;
+        return new Vector2(MathF.Cos(theta), MathF.Sin(theta)) * MathF.Sqrt(random.NextSingle());
+    }
+    
+    public static Vector2 Direction(this Random random)
+    {
+        float theta = random.NextSingle() * 2 * Single.Pi;
+        return new Vector2(MathF.Cos(theta), MathF.Sin(theta));
+    }
     
     public static void InsertSorted<T>(this List<T> @this, T item) where T: IComparable<T>
     {

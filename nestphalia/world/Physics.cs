@@ -45,6 +45,19 @@ public static class Physics
         bool sw = (World.GetTile(x-1, y+1)?.PhysSolid(minion) ?? false);
         bool se = (World.GetTile(x+1, y+1)?.PhysSolid(minion) ?? false);
         bool c =  (World.GetTile(x  , y  )?.PhysSolid(minion) ?? false);
+        
+        // Handle being on top of a wall
+        if (minion.IsOnTopOfStructure)
+        {
+            if (!c)
+            {
+                minion.IsOnTopOfStructure = false;
+            }
+            else
+            {
+                return;
+            }
+        }
 
         // Handle being clipped inside a wall
         if (c)
@@ -56,6 +69,7 @@ public static class Physics
             if (!e) ejectPos.Add(new Vector2((tileCenter.X + 12) + minion.Template.PhysicsRadius, minion.Position.Y));
             if (ejectPos.Count == 0)
             {
+                minion.IsOnTopOfStructure = true;
                 // Console.WriteLine($"{minion.Template.Name} is trapped inside a wall with no way out! wall collision has been skipped.");
                 return;
             }

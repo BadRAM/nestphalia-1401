@@ -18,10 +18,19 @@ public class FlyingMinionTemplate : MinionTemplate
         World.RegisterMinion(m);
         return m;
     }
-    
-    public override bool PathFromNest()
+
+    public override void RequestPath(Int2D startPos, Int2D targetPos, NavPath navPath, Team team, Minion minion = null)
     {
-        return false;
+        if (minion == null || minion.IsFlying)
+        {
+            navPath.Reset(startPos);
+            navPath.Destination = targetPos;
+            navPath.Found = true;
+        }
+        else
+        {
+            base.RequestPath(startPos, targetPos, navPath, team, minion);
+        }
     }
 }
 
@@ -43,12 +52,6 @@ public class FlyingMinion : Minion
     
     public override void Update()
     {
-        // ugly hack to prevent fliers from following paths.
-        // if (NavPath.Found && IsFlying && NavPath.Points.Count > 0 )
-        // {
-        //     NavPath.Points.Clear();
-        // }
-        
         base.Update();
 
         if (WantToFly && !IsFlying)
@@ -59,6 +62,10 @@ public class FlyingMinion : Minion
         if (!WantToFly && IsFlying && Position.Z == 0)
         {
             IsFlying = false;
+            if (World.GetTile(World.PosToTilePos(Position))?.PhysSolid(this) ?? false)
+            {
+                IsOnTopOfStructure = true;
+            }
         }
 
         if (IsFlying)
@@ -96,21 +103,6 @@ public class FlyingMinion : Minion
         DrawBug((_currentFrame == 3 ? 1 : _currentFrame) + FlyAnimIndex);
         DrawDecorators();
         DrawDebug();
-    }
-    
-    // Flying Minions don't need pathfinding
-    public override void SetTarget(Int2D target, double thinkDuration = 0.2)
-    {
-        if (!IsFlying)
-        {
-            base.SetTarget(target, thinkDuration);
-            return;
-        }
-        
-        NavPath.Reset(Position);
-        NavPath.Destination = target;
-
-        SetState(new Wait(this, thinkDuration, () => { State = new Move(this); }));
     }
 
     // Flying minions can't get lost

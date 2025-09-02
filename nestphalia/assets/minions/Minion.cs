@@ -57,12 +57,6 @@ public class MinionTemplate : JsonAsset
             $"{Description}";
     }
 
-    // Override this to return false for bugs that handle their own pathfinding on spawn
-    public virtual bool PathFromNest()
-    {
-        return true;
-    }
-
     public virtual void DrawPreview(int x, int y, Color teamColor)
     {
         int size = Texture.Height / 2;
@@ -71,6 +65,14 @@ public class MinionTemplate : JsonAsset
         Raylib.DrawTextureRec(Texture, source, pos, Color.White);
         source.Y += size;
         Raylib.DrawTextureRec(Texture, source, pos, teamColor);
+    }
+    
+    // This is called by nests to get the initial path, and also by minions to repath
+    public virtual void RequestPath(Int2D startPos, Int2D targetPos, NavPath navPath, Team team, Minion minion = null)
+    {
+        navPath.Reset(startPos);
+        navPath.Destination = targetPos;
+        team.RequestPath(navPath);
     }
 }
 
@@ -90,6 +92,7 @@ public partial class Minion : ISprite
     public double Health;
     public double Armor;
     public bool IsFlying;
+    public bool IsOnTopOfStructure;
     public Int2D OriginTile;
     protected Vector2 NextPos; // This is the world space position the minion is currently trying to reach
     
@@ -188,10 +191,10 @@ public partial class Minion : ISprite
         return false;
     }
 
-    protected bool CanAttack()
+    protected virtual bool CanAttack()
     {
         // Don't attack while we're on top of structures
-        if ((World.PosToTilePos(Position) != OriginTile) && (World.GetTileAtPos(Position)?.PhysSolid(this) ?? false)) return false;
+        if (IsOnTopOfStructure) return false;
         // Guard against out of range attacks
         if (Vector2.Distance(Position.XY(), NextPos) > 24 + Template.PhysicsRadius) return false;
         Structure? t = World.GetTileAtPos(NextPos);
@@ -271,7 +274,7 @@ public partial class Minion : ISprite
     {
         int size = Template.Texture.Height / 2;
         Vector2 pos = new Vector2(Position.X - size / 2f, Position.Y - size / 2f - Position.Z) + DrawOffset.XYZ2D();
-        if (!IsFlying && (World.PosToTilePos(Position) != OriginTile) && (World.GetTileAtPos(Position)?.PhysSolid(this) ?? false)) pos.Y -= 8;
+        if (!IsFlying && IsOnTopOfStructure) pos.Y -= 8;
         bool flip = NextPos.X > Position.X;
         if (StandardBearer) Raylib.DrawTextureV(Team.BattleStandard, pos - new Vector2(Team.BattleStandard.Width/2-size/2, Team.BattleStandard.Height-size/2), Team.Color);
         Rectangle source = new Rectangle(flip ? size : 0, 0, flip ? size : -size, size);
@@ -282,7 +285,7 @@ public partial class Minion : ISprite
         if (Position.Z + DrawOffset.Z > 0)
         {
             pos = new Vector2(Position.X - Template.ShadowTexture.Width / 2f, Position.Y - Template.ShadowTexture.Height / 2f) + DrawOffset.XY();
-            if ((World.PosToTilePos(Position) != OriginTile) && (World.GetTileAtPos(Position)?.PhysSolid(this) ?? false)) pos.Y -= 8;
+            if (IsOnTopOfStructure) pos.Y -= 8;
             Raylib.DrawTextureV(Template.ShadowTexture, pos, Raylib.ColorAlpha(Color.White, Math.Min((Position.Z + DrawOffset.Z)/12, 1)));
         }
     }
@@ -377,16 +380,15 @@ public partial class Minion : ISprite
 
     public virtual void SetTarget(Int2D target, double thinkDuration = 0.5)
     {
-        NavPath.Reset(Position);
-        NavPath.Start = World.PosToTilePos(Position);
-        NavPath.Destination = target;
-        Team.RequestPath(NavPath);
+        Template.RequestPath(World.PosToTilePos(Position), target, NavPath, Team, this);
 
         WaitForPath(thinkDuration);
     }
     
     public virtual NavPath WaitForPath(double thinkDuration = 0.5)
     {
+        if (State is Jump) return NavPath;
+
         // Wait a bit, then force pathfinding if it hasn't happened yet.
         SetState(new Wait(this, thinkDuration, () =>
             {
@@ -413,7 +415,6 @@ public partial class Minion : ISprite
     public void SetStateFlee(List<Int2D> escapePoints)
     {
         NavPath.Reset(Position);
-        NavPath.Start = World.PosToTilePos(Position);
         NavPath.Points.AddRange(escapePoints);
         Team.RequestPath(NavPath);
 
@@ -427,10 +428,11 @@ public partial class Minion : ISprite
             }, 
             Resources.GetTextureByName("particle_confused")));
     }
-    #endregion
-
+    
     public bool IsOrigin(int x, int y)
     {
         return OriginTile.X == x && OriginTile.Y == y;
     }
+    
+    #endregion
 }

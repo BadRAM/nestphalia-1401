@@ -22,6 +22,7 @@ public static class Assets
         { "StructureTemplate",         typeof(StructureTemplate).GetConstructor([typeof(JObject)])! },
         { "SpawnerTemplate",           typeof(SpawnerTemplate).GetConstructor([typeof(JObject)])! },
         { "DoorTemplate",              typeof(DoorTemplate).GetConstructor([typeof(JObject)])! },
+        { "SpringBoardTemplate",       typeof(SpringBoardTemplate).GetConstructor([typeof(JObject)])! },
         { "GluePaperTemplate",         typeof(GluePaperTemplate).GetConstructor([typeof(JObject)])! },
         { "HazardSignTemplate",        typeof(HazardSignTemplate).GetConstructor([typeof(JObject)])! },
         { "MinefieldTemplate",         typeof(MinefieldTemplate).GetConstructor([typeof(JObject)])! },
@@ -39,6 +40,7 @@ public static class Assets
         { "FlyUntilHitMinionTemplate", typeof(FlyUntilHitMinionTemplate).GetConstructor([typeof(JObject)])! },
         { "HeroMinionTemplate",        typeof(HeroMinionTemplate).GetConstructor([typeof(JObject)])! },
         { "HopperMinionTemplate",      typeof(HopperMinionTemplate).GetConstructor([typeof(JObject)])! },
+        { "RangedMinionTemplate",      typeof(RangedMinionTemplate).GetConstructor([typeof(JObject)])! },
         { "SapperMinionTemplate",      typeof(SapperMinionTemplate).GetConstructor([typeof(JObject)])! },
     };
     

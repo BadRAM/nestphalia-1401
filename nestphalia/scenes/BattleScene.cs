@@ -176,7 +176,8 @@ public class BattleScene : Scene
         
         if (Input.Held(MouseButton.Right))
         {
-            World.Camera.Offset += GetMouseDelta();
+            World.Camera.Target -= GetMouseDelta() / World.Camera.Zoom;
+            World.Camera.Target = Vector2.Clamp(World.Camera.Target, Vector2.Zero, new Vector2(World.BoardWidth, World.BoardHeight) * 24);
         }
         
         // Snipped from raylib example
@@ -188,7 +189,7 @@ public class BattleScene : Scene
 
             // Set the offset to where the mouse is
             World.Camera.Offset = GetMousePosition();
-
+            
             // Set the target to match, so that the camera maps the world space point 
             // under the cursor to the screen space point under the cursor at any zoom
             World.Camera.Target = mouseWorldPos;
@@ -200,6 +201,17 @@ public class BattleScene : Scene
             _zoomLevel += wheel;
             _zoomLevel = Math.Clamp(_zoomLevel, 0, _zoomLevels.Count-1);
             World.Camera.Zoom = (float)_zoomLevels[(int)Math.Floor(_zoomLevel)];
+
+            World.Camera.Target -= (World.Camera.Offset - Screen.Center) / World.Camera.Zoom;
+            World.Camera.Offset = Screen.Center;
+            
+            World.Camera.Target = Vector2.Clamp(World.Camera.Target, Vector2.Zero, new Vector2(World.BoardWidth, World.BoardHeight) * 24);
+        }
+
+        if (IsWindowResized())
+        {
+            World.Camera.Offset = Screen.Center;
+            // World.Camera.Target = new Vector2(World.BoardWidth, World.BoardHeight) * 24 / 2;
         }
     }
 

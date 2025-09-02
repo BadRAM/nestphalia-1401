@@ -26,7 +26,7 @@ public static class WrenCommand
         _vm = wrenNewVM(_config);
         
         string script = """
-class Command {
+class Cmd {
     foreign static kill(team, id)
     foreign static build(structure, team, x, y)
     foreign static demolish(x, y)

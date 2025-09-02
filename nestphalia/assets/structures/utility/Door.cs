@@ -1,4 +1,3 @@
-using System.Numerics;
 using Newtonsoft.Json.Linq;
 using Raylib_cs;
 
@@ -12,7 +11,6 @@ public class DoorTemplate : StructureTemplate
     public DoorTemplate(JObject jObject) : base(jObject)
     {
         Texture = Resources.GetTextureByName(jObject.Value<string?>("Texture") ?? "");
-
         OpenTexture = Resources.GetTextureByName(jObject.Value<string?>("OpenTexture") ?? "");
         Range = jObject.Value<double?>("Range") ?? 32;
     }
@@ -69,8 +67,6 @@ public class Door : Structure
                 }
             }
         }
-
-        // _zOffset = position.Y - (_isOpen ? 24 : 0);
     }
 
     public override bool NavSolid(Team team)

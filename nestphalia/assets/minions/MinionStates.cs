@@ -87,6 +87,12 @@ public partial class Minion
         
         public override void Update()
         {
+            if (Me.IsOnTopOfStructure)
+            {
+                GameConsole.WriteLine($"{Me.Template.Name} tried to attack while climbing!");
+                Me.State = new Move(Me);
+            }
+            
             // Change to Move if target invalid
             if (!Me.CanAttack())
             {
@@ -165,10 +171,8 @@ public partial class Minion
             _landingLag = landingLag;
             _started = Time.Scaled;
             
-            Me.NavPath.Skip();
             _from = Me.Position.XY();
-            Me.NavPath.Skip();
-            Me.UpdateNextPos();
+            Me.NextPos = _to + (_to - _from);
         }
         
         public override string ToString() { return "Jump"; }
@@ -192,7 +196,17 @@ public partial class Minion
             {
                 Me.IsFlying = false;
                 Me.Position = _to.XYZ();
-                Me.State = new Wait(Me, _landingLag, () => { Me.State = new Move(Me); });
+                Me.IsOnTopOfStructure = World.GetTile(World.PosToTilePos(Me.Position))?.PhysSolid(Me) ?? false;
+                Me.NavPath.TargetNearestPoint(Me.Position.XY());
+                Me.UpdateNextPos();
+                if (Vector2.Distance(Me.Position.XY(), Me.NextPos) > 48)
+                {
+                    Me.SetTarget(Me.NavPath.Destination, _landingLag);
+                }
+                else
+                {
+                    Me.State = new Wait(Me, _landingLag, () => { Me.State = new Move(Me); });
+                }
             }
         }
 

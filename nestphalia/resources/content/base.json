@@ -8,7 +8,6 @@
       "Texture": "wall",
       "MaxHealth": 100.0,
       "Price": 10.0,
-      "LevelRequirement": 0,
       "BaseHate": -10.0
     },
     {
@@ -19,7 +18,6 @@
       "Texture": "wall_wood",
       "MaxHealth": 250.0,
       "Price": 55.0,
-      "LevelRequirement": 6,
       "BaseHate": -10.0
     },
     {
@@ -30,7 +28,6 @@
       "Texture": "wall2",
       "MaxHealth": 500.0,
       "Price": 215.0,
-      "LevelRequirement": 10,
       "BaseHate": -10.0
     },
     {
@@ -41,7 +38,6 @@
       "Texture": "honeypot",
       "MaxHealth": 75.0,
       "Price": 35.0,
-      "LevelRequirement": 5,
       "BaseHate": 100.0
     },
     {
@@ -51,8 +47,7 @@
       "Description": "",
       "Texture": "stickypaper",
       "MaxHealth": 150.0,
-      "Price": 25.0,
-      "LevelRequirement": 8
+      "Price": 25.0
     },
     {
       "ID": "hazard_sign",
@@ -62,7 +57,6 @@
       "Texture": "hazard_sign",
       "MaxHealth": 30.0,
       "Price": 10.0,
-      "LevelRequirement": 15,
       "BaseHate": -1.7976931348623157E+308
     },
     {
@@ -75,7 +69,6 @@
       "OpenTexture": "doorOpen",
       "MaxHealth": 80.0,
       "Price": 50.0,
-      "LevelRequirement": 1,
       "BaseHate": 5.0
     },
     {
@@ -88,8 +81,47 @@
       "OpenTexture": "vault_door_open",
       "MaxHealth": 250.0,
       "Price": 500.0,
-      "LevelRequirement": 15,
       "BaseHate": 5.0
+    },
+    {
+      "ID": "springboard_test",
+      "Type": "SpringBoardTemplate",
+      "Name": "Prototype Springboard",
+      "Description": "WHEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE",
+      "Texture": "spring",
+      "Target": {
+        "X": 200,
+        "Y": 0
+      },      
+      "IsRandom": true,
+      "MaxHealth": 250.0,
+      "Price": 500.0
+    },
+    {
+      "ID": "springboard_forward",
+      "Type": "SpringBoardTemplate",
+      "Name": "Prototype Springboard",
+      "Description": "Boing!",
+      "Texture": "spring",
+      "Target": {
+        "X": 96,
+        "Y": 0
+      },
+      "MaxHealth": 250.0,
+      "Price": 500.0
+    },
+    {
+      "ID": "springboard_backward",
+      "Type": "SpringBoardTemplate",
+      "Name": "Prototype Springboard",
+      "Description": "!gnioB",
+      "Texture": "spring",
+      "Target": {
+        "X": -96,
+        "Y": 0
+      },
+      "MaxHealth": 250.0,
+      "Price": 500.0
     },
     {
       "ID": "tower_basic",
@@ -110,7 +142,6 @@
       "ProjectileOriginZ": 0,
       "MaxHealth": 80.0,
       "Price": 75.0,
-      "LevelRequirement": 0,
       "BaseHate": 5.0
     },
     {
@@ -132,7 +163,6 @@
       "ProjectileOriginZ": 0,
       "MaxHealth": 95.0,
       "Price": 400.0,
-      "LevelRequirement": 2,
       "BaseHate": 5.0
     },
     {
@@ -156,7 +186,6 @@
       "Cooldown": 5.0,
       "MaxHealth": 80.0,
       "Price": 85.0,
-      "LevelRequirement": 2,
       "BaseHate": -1.7976931348623157E+308
     },
     {
@@ -183,7 +212,6 @@
       "ProjectileOriginZ": 0,
       "MaxHealth": 75.0,
       "Price": 500.0,
-      "LevelRequirement": 4,
       "BaseHate": 5.0
     },
     {
@@ -206,7 +234,6 @@
       "ProjectileOriginZ": 46,
       "MaxHealth": 160.0,
       "Price": 600.0,
-      "LevelRequirement": 7,
       "BaseHate": 5.0
     },
     {
@@ -228,7 +255,6 @@
       "ProjectileOriginZ": 0,
       "MaxHealth": 60.0,
       "Price": 3000.0,
-      "LevelRequirement": 14,
       "BaseHate": 5.0
     },
     {
@@ -242,7 +268,6 @@
       "AbilityIcon": "ability_icon_rally",
       "MaxHealth": 100.0,
       "Price": 750.0,
-      "LevelRequirement": 3,
       "BaseHate": 50.0
     },
     {
@@ -256,7 +281,6 @@
       "AbilityIcon": "ability_icon_repair",
       "MaxHealth": 100.0,
       "Price": 1000.0,
-      "LevelRequirement": 6,
       "BaseHate": 50.0
     },
     {
@@ -270,7 +294,6 @@
       "AbilityIcon": "ability_icon_spawnboost",
       "MaxHealth": 100.0,
       "Price": 2000.0,
-      "LevelRequirement": 9,
       "BaseHate": 50.0
     },
     {
@@ -284,7 +307,6 @@
       "AbilityIcon": "ability_icon_frenzy",
       "MaxHealth": 100.0,
       "Price": 1250.0,
-      "LevelRequirement": 12,
       "BaseHate": 50.0
     },
     {
@@ -312,7 +334,6 @@
       "StandardBearer": true,
       "MaxHealth": 50.0,
       "Price": 250.0,
-      "LevelRequirement": 0,
       "BaseHate": 50.0
     },
     {
@@ -339,7 +360,6 @@
       "TimeBetweenSpawns": 0.65,
       "MaxHealth": 50.0,
       "Price": 400.0,
-      "LevelRequirement": 3,
       "BaseHate": 50.0
     },
     {
@@ -367,7 +387,6 @@
       "TimeBetweenSpawns": 0.25,
       "MaxHealth": 50.0,
       "Price": 650.0,
-      "LevelRequirement": 5,
       "BaseHate": 50.0
     },
     {
@@ -395,7 +414,6 @@
       "TimeBetweenSpawns": 1.0,
       "MaxHealth": 50.0,
       "Price": 1200.0,
-      "LevelRequirement": 8,
       "BaseHate": 50.0
     },
     {
@@ -425,7 +443,34 @@
       "TimeBetweenSpawns": 1.0,
       "MaxHealth": 80.0,
       "Price": 2500.0,
-      "LevelRequirement": 11,
+      "BaseHate": 50.0
+    },
+    {
+      "ID": "nest_archer",
+      "Type": "SpawnerTemplate",
+      "Name": "Archer Anthill",
+      "Description": "Archer ants can attack from a distance.",
+      "Texture": "spawner",
+      "Minion": {
+        "ID": "minion_archer",
+        "Type": "RangedMinionTemplate",
+        "Name": "Archer Ant",
+        "Description": "",
+        "Texture": "ant12px",
+        "MaxHealth": 20.0,
+        "Armor": 0.0,
+        "Damage": 4.0,
+        "AttackDuration": 2.0,
+        "Speed": 45.0,
+        "PhysicsRadius": 3.0,
+        "WalkAnimDelay": 2,
+        "Range": 72
+      },
+      "WaveSize": 6,
+      "WaveGrowth": 1.0,
+      "TimeBetweenSpawns": 0.2,
+      "MaxHealth": 20.0,
+      "Price": 1000.0,
       "BaseHate": 50.0
     },
     {
@@ -454,7 +499,6 @@
       "TimeBetweenSpawns": 1.0,
       "MaxHealth": 50.0,
       "Price": 2500.0,
-      "LevelRequirement": 11,
       "BaseHate": 50.0
     },
     {
@@ -498,7 +542,6 @@
       "TimeBetweenSpawns": 6.0,
       "MaxHealth": 50.0,
       "Price": 2500.0,
-      "LevelRequirement": 13,
       "BaseHate": 50.0
     },
     {
@@ -526,7 +569,6 @@
       "TimeBetweenSpawns": 4.0,
       "MaxHealth": 50.0,
       "Price": 10000.0,
-      "LevelRequirement": 15,
       "BaseHate": 50.0
     },
     {
@@ -554,7 +596,6 @@
       "TimeBetweenSpawns": 4.0,
       "MaxHealth": 50.0,
       "Price": 10000000000.0,
-      "LevelRequirement": 999,
       "BaseHate": 50.0
     }
   ]

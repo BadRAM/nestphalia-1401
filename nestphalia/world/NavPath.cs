@@ -39,10 +39,22 @@ public class NavPath
 
         return Points[0];
     }
-
-    public void Skip()
+    
+    public void TargetNearestPoint(Vector2 Position)
     {
-        if (Points.Count > 0) Points.RemoveAt(0);
+        if (Points.Count == 0) return;
+        float minDist = Vector2.Distance(World.GetTileCenter(Points[0]), Position);
+        int mindex = 0;
+        for (int i = 1; i < Points.Count; i++)
+        {
+            float dist = Vector2.Distance(World.GetTileCenter(Points[i]), Position);
+            if (dist < minDist)
+            {
+                mindex = i;
+            }
+        }
+        
+        Points.RemoveRange(0, mindex);
     }
 
     public Int2D? LookAhead(int index)
@@ -72,5 +84,12 @@ public class NavPath
         Found = false;
         Points.Clear();
         Start = World.PosToTilePos(position);
+    }
+
+    public void Reset(Int2D position)
+    {
+        Found = false;
+        Points.Clear();
+        Start = position;
     }
 }
