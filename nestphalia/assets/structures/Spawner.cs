@@ -4,7 +4,7 @@ namespace nestphalia;
 
 public class SpawnerTemplate : StructureTemplate
 {
-    public MinionTemplate Minion;
+    public string Minion;
     public int WaveSize;
     public double WaveGrowth;
     public double TimeBetweenSpawns;
@@ -12,7 +12,7 @@ public class SpawnerTemplate : StructureTemplate
     
     public SpawnerTemplate(JObject jObject) : base(jObject)
     {
-        Minion = Assets.LoadJsonAsset<MinionTemplate>(jObject.Value<JObject?>("Minion"));
+        Minion = jObject.Value<string?>("Minion") ?? throw new ArgumentNullException();
         WaveSize = jObject.Value<int?>("WaveSize") ?? throw new ArgumentNullException();
         WaveGrowth = jObject.Value<int?>("WaveGrowth") ?? throw new ArgumentNullException();
         TimeBetweenSpawns = jObject.Value<double?>("TimeBetweenSpawns") ?? throw new ArgumentNullException();
@@ -33,13 +33,14 @@ public class SpawnerTemplate : StructureTemplate
                $"Wave Size: {WaveSize} + {WaveGrowth} per wave\n" +
                $"Spawn Delay: {TimeBetweenSpawns}\n" +
                $"{Description}\n" +
-               $"{Minion.GetStats()}";
+               $"{Assets.Get<MinionTemplate>(Minion).GetStats()}";
     }
 }
 
 public class Spawner : Structure
 {
     private SpawnerTemplate _template;
+    private MinionTemplate _minion;
     private double _lastSpawnTime;
     private int _spawnsRemaining;
     private int _nextWaveSpawnBonus;
@@ -50,8 +51,9 @@ public class Spawner : Structure
     public Spawner(SpawnerTemplate template, Team team, int x, int y) : base(template, team, x, y)
     {
         _template = template;
-        _navPath = new NavPath(_template.Name, team);
+        _navPath = new NavPath(template.Name, team);
         _navPath.Start = new Int2D(x, y);
+        _minion = Assets.Get<MinionTemplate>(template.Minion);
     }
     
     public override void Update()
@@ -63,7 +65,7 @@ public class Spawner : Structure
             {
                 GameConsole.WriteLine($"Creating a minion without a path, PathQueueLength: {Team.GetQueueLength()}");
             }
-            Minion m = _template.Minion.Instantiate(Team, position.XYZ(), _navPath.Clone(_template.Minion.Name));
+            Minion m = _minion.Instantiate(Team, position.XYZ(), _navPath.Clone(_minion.Name));
             if (_spawnStandardBearer)
             {
                 m.StandardBearer = true;
@@ -77,7 +79,7 @@ public class Spawner : Structure
     public override void PreWaveEffect()
     {
         Retarget();
-        _template.Minion.RequestPath(new Int2D(X, Y), _targetTile, _navPath, Team);
+        _minion.RequestPath(new Int2D(X, Y), _targetTile, _navPath, Team);
     }
     
     public override void WaveEffect()
@@ -146,7 +148,7 @@ public class Spawner : Structure
     public void SetTarget(Int2D target)
     {
         _targetTile = target;
-        _template.Minion.RequestPath(new Int2D(X, Y), _targetTile, _navPath, Team);
+        _minion.RequestPath(new Int2D(X, Y), _targetTile, _navPath, Team);
         if (!_navPath.Found)
         {
             Team.DemandPath(_navPath);

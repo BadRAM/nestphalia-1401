@@ -9,6 +9,7 @@ public class BattleScene : Scene
 {
     // private Fort _leftFort;
     // private Fort _rightFort;
+    private Level _level;
     private Team? _winner;
     private int _skips;
     private bool _pathFinderDebug;
@@ -24,6 +25,10 @@ public class BattleScene : Scene
     private double _cameraShakeRemaining = 0;
     
     private string _log;
+
+    private Vector2 _canopyTexOffset;
+    private Texture2D _canopyShadow;
+    private Texture2D _canopyShadowHighlights;
     
     private enum SceneState
     {
@@ -39,6 +44,7 @@ public class BattleScene : Scene
         // _leftFort = leftFort;
         // _rightFort = rightFort;
         // Debug.Assert(_leftFort != null && _rightFort != null);
+        _level = level;
         
         _winner = null;
         _state = SceneState.BattleActive;
@@ -51,8 +57,14 @@ public class BattleScene : Scene
         World.InitializeBattle(level, leftFort, rightFort, leftIsPlayer, rightIsPlayer, deterministic);
         World.Camera.Zoom = (float)_zoomLevels[(int)_zoomLevel];
         _log += $"first random: {World.RandomInt(100)}\n";
+
+        _canopyTexOffset = new Vector2(Random.Shared.Next(2048), Random.Shared.Next(2048));
+        _canopyShadow = Resources.GetTextureByName("shadow_canopy");
+        _canopyShadowHighlights = Resources.GetTextureByName("shadow_canopy_godray");
+        SetTextureFilter(_canopyShadow, TextureFilter.Bilinear);
+        SetTextureFilter(_canopyShadowHighlights, TextureFilter.Bilinear);
         
-        Resources.PlayMusicByName("jesper-kyd-highlands");
+        Resources.PlayMusicByName(level.Music == "" ? "jesper-kyd-highlands" : level.Music);
     }
 
     public override void Update()
@@ -71,8 +83,15 @@ public class BattleScene : Scene
         Screen.BeginDrawing();
         ClearBackground(new Color(16, 8, 4, 255));
         
+        DrawGradientBackground(_level.GradientTop, _level.GradientBottom);        
+        
         World.DrawFloor();
         World.Draw();
+
+        DrawCanopyShadows();
+        
+        World.DrawGUI();
+        
         
         if (_pathFinderDebug) World.LeftTeam.PathFinder.DrawDebug();
         // if (_pathFinderDebug) World.RightTeam.PathFinder.DrawDebug();
@@ -340,5 +359,25 @@ public class BattleScene : Scene
             World.Camera.Offset -= _cameraShakeDisplacement;
             _cameraShakeDisplacement = Vector2.Zero;
         }
+    }
+
+    private void DrawGradientBackground(Color topColor, Color bottomColor)
+    {
+        DrawRectangle(0, 0, Screen.RightX, Screen.BottomY/4, topColor);
+        DrawRectangleGradientV(0, Screen.BottomY/4, Screen.RightX, Screen.BottomY/4, topColor, bottomColor);
+        DrawRectangle(0, Screen.BottomY/2, Screen.RightX, Screen.BottomY/2, bottomColor);
+    }
+
+    private void DrawCanopyShadows()
+    {
+        Screen.SetCamera(World.Camera);
+        Rectangle source = new Rectangle(new Vector2((float)(-40 + Math.Sin(Time.Scaled / 10) * 40), 0) + _canopyTexOffset, World.BoardWidth * 24, World.BoardHeight * 24);
+        DrawTextureRec(_canopyShadow, source, new Vector2(0, 8), ColorAlpha(Color.White, 0.5f));
+        for (int i = 0; i < 30; i++)
+        {
+            DrawTextureRec(_canopyShadowHighlights, source, new Vector2(-i * 2, 8 - i * 8), ColorAlpha(Color.White, 0.025f * ((30-i) / 30f)) );
+
+        }
+        Screen.SetCamera();
     }
 }

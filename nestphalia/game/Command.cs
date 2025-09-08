@@ -215,7 +215,8 @@ public static class Command
         }
         
         List<string> words = new List<string>(args.Split(" "));
-        StructureTemplate structure = Assets.GetStructureByID(words[0]) ?? throw new Exception("Invalid structure ID!");
+        if (!Assets.Exists<StructureTemplate>(words[0])) throw new Exception("Invalid structure ID!");
+        StructureTemplate structure = Assets.Get<StructureTemplate>(words[0]);
         Team team = words[1].ToLower() == "left" ? World.LeftTeam : World.RightTeam;
         int startX = words[2] == "." ? World.GetMouseTilePos().X : int.Parse(words[2]);
         int startY = words[3] == "." ? World.GetMouseTilePos().Y : int.Parse(words[3]);

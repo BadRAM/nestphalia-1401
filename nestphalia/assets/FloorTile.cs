@@ -1,17 +1,18 @@
 using System.Numerics;
+using Newtonsoft.Json.Linq;
 using Raylib_cs;
 
 namespace nestphalia;
 
-public class FloorTileTemplate
+public class FloorTileTemplate : JsonAsset
 {
-    public string ID;
     public Texture2D Texture;
-    
-    public FloorTileTemplate(string id, Texture2D texture)
+    public Vector2 SubSprite;
+
+    public FloorTileTemplate(JObject jObject) : base(jObject)
     {
-        ID = id;
-        Texture = texture;
+        Texture = Resources.GetTextureByName(jObject.Value<string?>("Texture") ?? "");
+        SubSprite = jObject.Value<JObject>("SubSprite")?.ToObject<Vector2>() ?? Vector2.Zero;
     }
     
     public virtual FloorTile Instantiate(int x, int y)
@@ -31,6 +32,6 @@ public class FloorTile
     
     public virtual void Draw(int x, int y)
     {
-        Raylib.DrawTexture(Template.Texture, x, y, Color.White);
+        Raylib.DrawTextureRec(Template.Texture, new Rectangle(Template.SubSprite * 24, 24, 24), new Vector2(x,y), Color.White);
     }
 }

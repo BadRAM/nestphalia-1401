@@ -7,14 +7,14 @@ namespace nestphalia;
 public class MinefieldTemplate : StructureTemplate
 {
     public int MaxCharges;
-    public ProjectileTemplate Bomb;
+    public string Bomb;
     public double Range;
     public double Cooldown;
     
     public MinefieldTemplate(JObject jObject) : base(jObject)
     {
         MaxCharges = jObject.Value<int?>("MaxCharges") ?? throw new ArgumentNullException();
-        Bomb = Assets.LoadJsonAsset<ProjectileTemplate>(jObject.Value<JObject?>("Bomb"));
+        Bomb = jObject.Value<string?>("Bomb") ?? throw new ArgumentNullException();
         Range = jObject.Value<double?>("Range") ?? throw new ArgumentNullException();
         Cooldown = jObject.Value<double?>("Cooldown") ?? throw new ArgumentNullException();
         Class = jObject.Value<StructureClass?>("Class") ?? StructureClass.Tower;
@@ -30,6 +30,7 @@ public class MinefieldTemplate : StructureTemplate
 public class Minefield : Structure
 {
     private MinefieldTemplate _template;
+    private ProjectileTemplate _bomb;
     private int _chargesLeft;
     private double _timeLastTriggered;
     private Vector2[] _drawPoints = new []{new Vector2(6,6), new Vector2(-6,-6), new Vector2(-6,6), new Vector2(6,-6)};
@@ -44,6 +45,7 @@ public class Minefield : Structure
         {
             _drawPoints[i] += new Vector2(World.RandomInt(-2, 2), World.RandomInt(-2, 2));
         }
+        _bomb = Assets.Get<ProjectileTemplate>(_template.Bomb);
 
         // _zOffset = position.Y - 24;
     }
@@ -70,9 +72,9 @@ public class Minefield : Structure
     {
         for (int i = 0; i < Math.Min(_chargesLeft, _drawPoints.Length); i++)
         {
-            int x = (int)(_drawPoints[i].X + position.X - _template.Bomb.Texture.Width/2);
-            int y = (int)(_drawPoints[i].Y + position.Y - _template.Bomb.Texture.Height/2);
-            Raylib.DrawTexture(_template.Bomb.Texture, x, y, Color.White);
+            int x = (int)(_drawPoints[i].X + position.X - _bomb.Texture.Width/2);
+            int y = (int)(_drawPoints[i].Y + position.Y - _bomb.Texture.Height/2);
+            Raylib.DrawTexture(_bomb.Texture, x, y, Color.White);
         }
     }
 
@@ -80,7 +82,7 @@ public class Minefield : Structure
     {
         _armSound.PlayRandomPitch(SoundResource.WorldToPan(position.X));
         _chargesLeft--;
-        _template.Bomb.Instantiate((position + _drawPoints[_chargesLeft]).XYZ(), this, (position + _drawPoints[_chargesLeft]).XYZ());
+        _bomb.Instantiate((position + _drawPoints[_chargesLeft]).XYZ(), this, (position + _drawPoints[_chargesLeft]).XYZ());
         _timeLastTriggered = Time.Scaled;
         Health = Math.Max(_chargesLeft, Health);
         if (_chargesLeft <= 0) Destroy();

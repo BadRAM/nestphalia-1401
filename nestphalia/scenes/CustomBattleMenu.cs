@@ -16,7 +16,7 @@ public class CustomBattleMenu : Scene
 
     public void Start(Fort? leftFort = null, Fort? rightFort = null)
     {
-        _arenaLevel = Assets.GetLevelByID("level_arena");
+        _arenaLevel = Assets.Get<Level>("level_arena");
         World.InitializePreview(_arenaLevel);
 
         if (leftFort != null) _leftFort = leftFort;
@@ -101,7 +101,31 @@ public class CustomBattleMenu : Scene
         if (_leftFort != null && _rightFort != null &&
             GUI.Button300(-150, 260, "Begin!"))
         {
-            new BattleScene().Start(Assets.GetLevelByID("level_arena"), _leftFort, _rightFort, BattleOver, _leftIsPlayer, _rightIsPlayer, _deterministicMode);
+            new BattleScene().Start(Assets.Get<Level>("level_arena"), _leftFort, _rightFort, BattleOver, _leftIsPlayer, _rightIsPlayer, _deterministicMode);
+        }
+
+        if (Input.Pressed(KeyboardKey.T))
+        {
+            if (_rightFort == null || _leftFort == null)
+            {
+                List<Fort> forts = new List<Fort>();
+                foreach (string file in Directory.GetFiles(Directory.GetCurrentDirectory() + "/forts/"))
+                {
+                    if (file.Substring(file.Length - 5) == ".fort")
+                    {
+                        forts.Add(Fort.LoadFromDisc(file));
+                    }
+                }
+                forts = forts.OrderBy(o => o.Name.ToLower()).ToList();
+                _leftFort = forts[0];
+                _leftFort.LoadToBoard(_arenaLevel.FortSpawnZones[0]);
+                _rightFort = forts[0];
+                _rightFort.LoadToBoard(_arenaLevel.FortSpawnZones[1]);
+            }
+            else
+            {
+                new BattleScene().Start(Assets.Get<Level>("level_arena"), _leftFort, _rightFort, BattleOver, _leftIsPlayer, _rightIsPlayer, _deterministicMode);
+            }
         }
     }
 

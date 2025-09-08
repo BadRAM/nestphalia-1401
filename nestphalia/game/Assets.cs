@@ -8,17 +8,16 @@ namespace nestphalia;
 // more consistent to access these functions through Resources.
 public static class Assets
 {
-    private static Dictionary<string, FloorTileTemplate> _floorTiles = new Dictionary<string, FloorTileTemplate>();
-    public static FloorTileTemplate BlankFloor;
-    private static Dictionary<string, StructureTemplate> _structures = new Dictionary<string, StructureTemplate>();
-    private static Dictionary<string, Level> _levels = new Dictionary<string, Level>();
-
+    private static Dictionary<string, JsonAsset> _assets = new Dictionary<string, JsonAsset>();
+    private static Dictionary<Type, List<JsonAsset>> _assetSets = new Dictionary<Type, List<JsonAsset>>();
 
     // The lookup table must be used instead of reflection, so that static analysis knows not to trim the JsonAsset
-    // constructor when publishing with trimmed assemblies. it also provides serializer stability if type names change internally.
+    // constructor when publishing with trimmed assemblies. it also provides deserializer stability if type names change internally.
     private static readonly Dictionary<string, ConstructorInfo> JsonAssetTypes = new Dictionary<string, ConstructorInfo>()
     {
+        { "SpriteSet",                 typeof(SpriteSet).GetConstructor([typeof(JObject)])! },
         { "Level",                     typeof(Level).GetConstructor([typeof(JObject)])! },
+        { "FloorTileTemplate",         typeof(FloorTileTemplate).GetConstructor([typeof(JObject)])! },
         { "StructureTemplate",         typeof(StructureTemplate).GetConstructor([typeof(JObject)])! },
         { "SpawnerTemplate",           typeof(SpawnerTemplate).GetConstructor([typeof(JObject)])! },
         { "DoorTemplate",              typeof(DoorTemplate).GetConstructor([typeof(JObject)])! },
@@ -44,43 +43,33 @@ public static class Assets
         { "SapperMinionTemplate",      typeof(SapperMinionTemplate).GetConstructor([typeof(JObject)])! },
     };
     
-    public static T? LoadJsonAsset<T>(JObject jObject) where T : JsonAsset
+    public static T LoadJsonAsset<T>(JObject jObject) where T : JsonAsset
     {
         if (!jObject.ContainsKey("Type"))
         {
             throw new Exception($"Tried to load JsonAsset from JObject with no type. \n{jObject}");
-            return null;
         }
         
-        if (!JsonAssetTypes.ContainsKey(jObject.Value<string>("Type")))
+        if (!JsonAssetTypes.ContainsKey(jObject.Value<string>("Type") ?? ""))
         {
             throw new Exception($"Tried to load JsonAsset from JObject with invalid type. \n{jObject}");
-            return null;
         }
         
-        return JsonAssetTypes[jObject.Value<string>("Type")].Invoke([jObject]) as T;
+        return JsonAssetTypes[jObject.Value<string>("Type")!].Invoke([jObject]) as T ?? throw new NullReferenceException();
     }
     
     public static void Load()
     {
-        _floorTiles.Clear();
-        _structures.Clear();
-        _levels.Clear();
-        
-        _floorTiles.Add("floor_1", new FloorTileTemplate("floor_1", Resources.GetTextureByName("floor1")));
-        _floorTiles.Add("floor_2", new FloorTileTemplate("floor_2", Resources.GetTextureByName("floor2")));
-        _floorTiles.Add("floor_empty", new FloorTileTemplate("floor_empty", Resources.GetTextureByName("clear")));
-        BlankFloor = _floorTiles["floor_empty"];
-        
         foreach (string path in Directory.GetFiles(Resources.Dir + "/resources/content"))
         {
             if (Path.GetExtension(path).ToLower() == ".json")
             {
-                JObject content = JObject.Parse(File.ReadAllText(path));
-                foreach (JObject structure in content.Value<JArray>("Structures"))
+                JArray content = JArray.Parse(File.ReadAllText(path));
+                // ReSharper disable once PossibleInvalidCastExceptionInForeachLoop
+                foreach (JObject asset in content)
                 {
-                    StructureTemplate t = LoadJsonAsset<StructureTemplate>(structure);
-                    _structures.Add(t.ID, t);
+                    JsonAsset t = LoadJsonAsset<JsonAsset>(asset);
+                    _assets.Add(t.ID, t);
                 }
             }
         }
@@ -89,45 +78,51 @@ public static class Assets
         {
             if (Path.GetExtension(path).ToLower() == ".json")
             {
-                Level? level = LoadJsonAsset<Level>(JObject.Parse(File.ReadAllText(path)));
-                if (level == null) continue;
-                _levels.Add(level.ID, level);
+                Level level = LoadJsonAsset<Level>(JObject.Parse(File.ReadAllText(path)));
+                _assets.Add(level.ID, level);
             }
         }
     }
 
-    public static StructureTemplate? GetStructureByID(string? id)
+    public static T Get<T>(string id) where T : JsonAsset
     {
-        return _structures.GetValueOrDefault(id ?? "");
+        if (!_assets.ContainsKey(id)) throw new Exception($"Invalid Asset ID: {id}");
+        JsonAsset ass = _assets[id];
+        if (ass is T ret) return ret;
+        else throw new Exception($"Asset {id} is not a {typeof(T)}");
     }
 
-    public static StructureTemplate[] GetAllStructures()
+    public static List<T> GetAll<T>() where T : JsonAsset
     {
-        return _structures.Values.ToArray();
+        if (_assetSets.ContainsKey(typeof(T)))
+        {
+            return new List<T>(_assetSets[typeof(T)].Cast<T>());
+        }
+        
+        List<T> assets = new List<T>();
+        foreach (KeyValuePair<string,JsonAsset> asset in _assets)
+        {
+            if (asset.Value is T a) assets.Add(a);
+        }
+        _assetSets.Add(typeof(T), assets.Cast<JsonAsset>().ToList());
+        return assets;
     }
 
-    public static FloorTileTemplate? GetFloorTileByID(string id)
+    public static bool Exists<T>(string? id) where T : JsonAsset
     {
-        return _floorTiles.GetValueOrDefault(id ?? "");
-    }
-    
-    public static FloorTileTemplate[] GetAllFloorTiles()
-    {
-        return _floorTiles.Values.ToArray();
+        if (id == null || !_assets.ContainsKey(id)) return false;
+        return _assets[id] is T;
     }
 
-    public static Level GetLevelByID(string id)
+    public static bool Exists(string? id)
     {
-        return _levels.GetValueOrDefault(id ?? "", _levels["level_arena"]);
+        if (id == null) return false;
+        return _assets.ContainsKey(id);
     }
 
-    public static Level[] GetAllLevels()
+    public static void UpdateAsset(JsonAsset asset)
     {
-        return _levels.Values.ToArray();
-    }
-
-    public static void UpdateLevel(Level level)
-    {
-        _levels[level.ID] = level;
+        if (!Exists(asset.ID)) throw new Exception($"Tried to update unknown asset {asset.ID}");
+        _assets[asset.ID] = asset;
     }
 }

@@ -1,21 +1,20 @@
 using System.Numerics;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json.Linq;
 using Raylib_cs;
 
 namespace nestphalia;
 
 public class CampaignSaveData
 {
-    [JsonInclude] public double Money = 2000;
-    [JsonInclude] public double Battles;
-    [JsonInclude] public List<string> BeatenLevels = new List<string>();
-    [JsonInclude] public List<string> UnlockedStructures = new List<string>() {"wall_mud", "tower_basic", "nest_ant"};
-    [JsonInclude] public List<string> NewUnlocks = new List<string>();
-
+    public double Money = 2000;
+    public double Battles;
+    public List<string> BeatenLevels = new List<string>();
+    public List<string> UnlockedStructures = new List<string>();
+    public List<string> NewUnlocks = new List<string>();
+    
     public void Save()
     {
-        string jsonString = JsonSerializer.Serialize(this, SourceGenerationContext.Default.CampaignSaveData);
+        string jsonString = JObject.FromObject(this).ToString();
         //Console.WriteLine($"JSON campaign looks like: {jsonString}");
         File.WriteAllText(Directory.GetCurrentDirectory() + "/campaign.sav", jsonString);
     }
@@ -23,7 +22,7 @@ public class CampaignSaveData
     public static CampaignSaveData Load()
     {
         string jsonString = File.ReadAllText(Directory.GetCurrentDirectory() + "/campaign.sav");
-        return JsonSerializer.Deserialize<CampaignSaveData>(jsonString, SourceGenerationContext.Default.CampaignSaveData) ?? throw new NullReferenceException("Failed to deserialize campaign save file");
+        return JObject.Parse(jsonString).ToObject<CampaignSaveData>() ?? throw new NullReferenceException("Failed to deserialize campaign save file");
     }
     
     public int GetNestCap()
@@ -52,6 +51,7 @@ public class CampaignScene : Scene
         else
         {
             _data = new CampaignSaveData();
+            _data.UnlockedStructures = new List<string>() {"wall_mud", "tower_basic", "nest_ant"};
             _data.Save();
         }
     }
@@ -64,7 +64,7 @@ public class CampaignScene : Scene
         Resources.PlayMusicByName("hook_-_paranoya");
         if (fort != null && !Path.EndsInDirectorySeparator(fort.Path)) _fort = fort;
         _levels.Clear();
-        foreach (Level level in Assets.GetAllLevels())
+        foreach (Level level in Assets.GetAll<Level>())
         {
             bool locked = false;
             foreach (string levelID in level.Prerequisites)
@@ -116,7 +116,7 @@ public class CampaignScene : Scene
         {
             foreach (string level in _levels[i].Prerequisites)
             {
-                Raylib.DrawLineEx(mapRect.Center() + _levels[i].Location.ToVector2(), mapRect.Center() + Assets.GetLevelByID(level).Location.ToVector2(), 3, Color.DarkGreen);
+                Raylib.DrawLineEx(mapRect.Center() + _levels[i].Location.ToVector2(), mapRect.Center() + Assets.Get<Level>(level).Location.ToVector2(), 3, Color.DarkGreen);
             } 
         }
         for (int i = 0; i < _levels.Count; i++)

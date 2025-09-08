@@ -52,7 +52,7 @@ public class EditorScene : Scene
         Screen.RegenerateBackground();
         _panelTex = Resources.GetTextureByName("9slice");
         _bg = Resources.GetTextureByName("editor_bg");
-        World.InitializeEditor(Assets.GetLevelByID("level_fortedit"), _fort);
+        World.InitializeEditor(Assets.Get<Level>("level_fortedit"), _fort);
         World.Camera.Offset = new Vector2(Screen.CenterX, Screen.CenterY);
         Resources.PlayMusicByName("so_lets_get_killed");
         
@@ -68,20 +68,22 @@ public class EditorScene : Scene
         {
             foreach (string structure in _data.UnlockedStructures)
             {
-                StructureTemplate s = Assets.GetStructureByID(structure);
-                if (s == null)
+                if (!Assets.Exists<StructureTemplate>(structure))
                 {
                     GameConsole.WriteLine("Editor couldn't find structure: " + structure);
+                    continue;
                 }
-                else
-                {
-                    _buildableStructures.Add(s);
-                }
+                StructureTemplate s = Assets.Get<StructureTemplate>(structure);
+                _buildableStructures.Add(s);
             }
-
             foreach (string unlock in _data.NewUnlocks)
             {
-                switch (Assets.GetStructureByID(unlock)?.Class)
+                if (!Assets.Exists<StructureTemplate>(unlock))
+                {
+                    GameConsole.WriteLine("Editor couldn't find structure: " + unlock);
+                    continue;
+                }
+                switch (Assets.Get<StructureTemplate>(unlock).Class)
                 {
                     case StructureTemplate.StructureClass.Utility:
                         _newUtil = true;
@@ -97,7 +99,7 @@ public class EditorScene : Scene
         }
         else
         {
-            foreach (StructureTemplate s in Assets.GetAllStructures())
+            foreach (StructureTemplate s in Assets.GetAll<StructureTemplate>())
             {
                 _buildableStructures.Add(s);
             }
@@ -292,7 +294,7 @@ public class EditorScene : Scene
             DrawTexture(s.Texture, Screen.CenterX - 450, Screen.CenterY + y * 38 - 278 - s.Texture.Height, Color.White);
             if (s is SpawnerTemplate spawner)
             {
-                spawner.Minion.DrawPreview(Screen.CenterX - 410, Screen.CenterY + y * 38 - 292, Color.Red);
+                Assets.Get<MinionTemplate>(spawner.Minion).DrawPreview(Screen.CenterX - 410, Screen.CenterY + y * 38 - 292, Color.Red);
             }
             y++;
         }

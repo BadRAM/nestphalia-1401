@@ -8,13 +8,18 @@ public class Level : JsonAsset
     public string Name = "";
     public string Description = "";
     public Color EnemyColor = Color.Red;
+    public Color GradientTop = Color.Black;
+    public Color GradientBottom = Color.Black;
     public Int2D Location;
+    public Int2D SoilTexture;
     public string[] Prerequisites = [];
     public int MoneyReward;
     public string[] UnlockReward = [];
     public FortSpawnZone[] FortSpawnZones = [new FortSpawnZone(4, 4, 0, false)];
-    public string Script = "";
     public Int2D WorldSize = new Int2D(World.BoardWidth,World.BoardHeight);
+    public string Music = "";
+    public string Weather = "";
+    public string Script = "";
     public string[,] FloorTiles;
     public string[,] Structures;
 
@@ -24,13 +29,18 @@ public class Level : JsonAsset
         Name = jObject.Value<string>("Name") ?? Name;
         Description = jObject.Value<string>("Description") ?? Description;
         EnemyColor = jObject.Value<JObject>("EnemyColor")?.ToObject<Color?>() ?? EnemyColor;
+        GradientTop = jObject.Value<JObject>("GradientTop")?.ToObject<Color?>() ?? GradientTop;
+        GradientBottom = jObject.Value<JObject>("GradientBottom")?.ToObject<Color?>() ?? GradientBottom;
         Location = jObject.Value<JObject>("Location")?.ToObject<Int2D?>() ?? Location;
+        SoilTexture = jObject.Value<JObject>("Location")?.ToObject<Int2D?>() ?? SoilTexture;
         Prerequisites = jObject.Value<JArray>("Prerequisites")?.ToObject<string[]>() ?? Prerequisites;
         MoneyReward = jObject.Value<int?>("MoneyReward") ?? MoneyReward;
         UnlockReward = jObject.Value<JArray>("UnlockReward")?.ToObject<string[]>() ?? UnlockReward;
         FortSpawnZones = jObject.Value<JArray>("FortSpawnZones")?.ToObject<FortSpawnZone[]>() ?? FortSpawnZones;
-        Script = jObject.Value<string>("Script") ?? Script;
         WorldSize = jObject.Value<JObject>("WorldSize")?.ToObject<Int2D?>() ?? WorldSize;
+        Music = jObject.Value<string>("Music") ?? Music;
+        Weather = jObject.Value<string>("Weather") ?? Weather;
+        Script = jObject.Value<string>("Script") ?? Script;
         FloorTiles = jObject.Value<JArray>("FloorTiles")?.ToObject<string[,]>() ?? new string[WorldSize.X,WorldSize.Y];
         Structures = jObject.Value<JArray>("Structures")?.ToObject<string[,]>() ?? new string[WorldSize.X,WorldSize.Y];
         
@@ -68,8 +78,9 @@ public class Level : JsonAsset
         for (int x = 0; x < WorldSize.X; x++)
         for (int y = 0; y < WorldSize.Y; y++)
         {
-            World.SetFloorTile(Assets.GetFloorTileByID(FloorTiles[x,y]) ?? Assets.BlankFloor, x, y);
-            World.SetTile(Assets.GetStructureByID(Structures[x,y]),World.RightTeam,x,y);
+            World.SetFloorTile(Assets.Get<FloorTileTemplate>(FloorTiles[x,y]), x, y);
+            if (!Assets.Exists<StructureTemplate>(Structures[x,y])) continue;
+            World.SetTile(Assets.Get<StructureTemplate>(Structures[x,y]),World.RightTeam,x,y);
         }
     }
     

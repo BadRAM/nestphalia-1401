@@ -35,11 +35,13 @@ public class Fort
         {
             if (spawnZone.Flip)
             {
-                World.SetTile(Assets.GetStructureByID(Board[x+y*20]), World.RightTeam, (19 + spawnZone.X) - x,y + spawnZone.Y);
+                if (!Assets.Exists<StructureTemplate>(Board[x+y*20])) continue;
+                World.SetTile(Assets.Get<StructureTemplate>(Board[x+y*20]), World.RightTeam, (19 + spawnZone.X) - x,y + spawnZone.Y);
             }
             else
             {
-                World.SetTile(Assets.GetStructureByID(Board[x+y*20]), World.LeftTeam, x + spawnZone.X,y + spawnZone.Y);
+                if (!Assets.Exists<StructureTemplate>(Board[x+y*20])) continue;
+                World.SetTile(Assets.Get<StructureTemplate>(Board[x+y*20]), World.LeftTeam, x + spawnZone.X,y + spawnZone.Y);
             }
         }
     }
@@ -55,8 +57,8 @@ public class Fort
         for (int x = 0; x < 20; ++x)
         for (int y = 0; y < 20; ++y)
         {
-            StructureTemplate? t = Assets.GetStructureByID(Board[x+y*20]);
-            if (t == null) continue;
+            if (!Assets.Exists<StructureTemplate>(Board[x+y*20])) continue;
+            StructureTemplate t = Assets.Get<StructureTemplate>(Board[x+y*20]);
             structureCount++;
             totalCost += t.Price;
             if (t.Class == StructureTemplate.StructureClass.Utility) utilityCount++;
@@ -82,8 +84,8 @@ public class Fort
         for (int x = 0; x < 20; ++x)
         for (int y = 0; y < 20; ++y)
         {
-            StructureTemplate? t = Assets.GetStructureByID(Board[x+y*20]);
-            if (t == null) continue;
+            if (!Assets.Exists<StructureTemplate>(Board[x+y*20])) continue;
+            StructureTemplate t = Assets.Get<StructureTemplate>(Board[x+y*20]);
             totalCost += t.Price;
             if (t is SpawnerTemplate) nestCount++;
             if (t is ActiveAbilityBeaconTemplate) stratagemCount++;
@@ -117,8 +119,8 @@ public class Fort
         for (int x = 0; x < 20; ++x)
         for (int y = 0; y < 20; ++y)
         {
-            StructureTemplate? t = Assets.GetStructureByID(Board[x+y*20]);
-            if (t == null) continue;
+            if (!Assets.Exists<StructureTemplate>(Board[x+y*20])) continue;
+            StructureTemplate t = Assets.Get<StructureTemplate>(Board[x+y*20]);
             totalCost += t.Price;
         }
         
@@ -127,7 +129,6 @@ public class Fort
     
     public void SaveToDisc()
     {
-        string filename = System.IO.Path.GetFileName(Path);
         if (System.IO.Path.GetFileName(Path) == "" || System.IO.Path.EndsInDirectorySeparator(Path) || !System.IO.Path.HasExtension(Path))
         {
             Path = GetUnusedFileName(Name, Path);

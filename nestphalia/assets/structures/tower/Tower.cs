@@ -18,7 +18,7 @@ public class TowerTemplate : StructureTemplate
     }
     
     public double Range;
-    public ProjectileTemplate Projectile;
+    public string Projectile;
     public double RateOfFire;
     public TargetSelector TargetMode;
     public bool CanHitFlying;
@@ -29,7 +29,7 @@ public class TowerTemplate : StructureTemplate
     {
         Name = jObject.Value<string?>("Name") ?? throw new ArgumentNullException();
         Range = jObject.Value<double?>("Range") ?? throw new ArgumentNullException();
-        Projectile = Assets.LoadJsonAsset<ProjectileTemplate>(jObject.Value<JObject?>("Projectile"));
+        Projectile = jObject.Value<string?>("Projectile") ?? throw new ArgumentNullException();
         ProjectileOriginZ = jObject.Value<int?>("ProjectileOriginZ") ?? 8;
         RateOfFire = jObject.Value<double?>("RateOfFire") ?? throw new ArgumentNullException();
         TargetMode = (TargetSelector)(jObject.Value<int?>("TargetMode") ?? throw new ArgumentNullException());
@@ -45,10 +45,11 @@ public class TowerTemplate : StructureTemplate
     
     public override string GetStats()
     {
+        ProjectileTemplate projectile = Assets.Get<ProjectileTemplate>(Projectile);
         return $"{Name}\n" +
                $"${Price}\n" +
                $"HP: {MaxHealth}\n" +
-               $"Damage: {Projectile.Damage} ({(Projectile.Damage * (RateOfFire/60)).ToString("N0")}/s)\n" +
+               $"Damage: {projectile.Damage} ({(projectile.Damage * (RateOfFire/60)).ToString("N0")}/s)\n" +
                $"Range: {Range}\n" +
                $"{Description}\n";
     }
@@ -58,12 +59,14 @@ public class Tower : Structure
 {
     private double _timeLastFired;
     private TowerTemplate _template;
+    private ProjectileTemplate _projectile;
     private Minion? _target;
     private SoundResource _shootSound;
     
     public Tower(TowerTemplate template, Team team, int x, int y) : base(template, team, x, y)
     {
         _template = template;
+        _projectile = Assets.Get<ProjectileTemplate>(_template.Projectile);
         _shootSound = Resources.GetSoundByName("shoot");
     }
     
@@ -98,7 +101,7 @@ public class Tower : Structure
             if (_target != null)
             {
                 _shootSound.PlayRandomPitch(SoundResource.WorldToPan(position.X), 0.15f);
-                _template.Projectile.Instantiate(_target, this, position.XYZ(_template.ProjectileOriginZ));
+                _projectile.Instantiate(_target, this, position.XYZ(_template.ProjectileOriginZ));
                 _timeLastFired = Time.Scaled;
             }
         }
@@ -109,11 +112,11 @@ public class Tower : Structure
         base.Draw();
 
         // Draw range circle on hover
-        // if (World.PosToTilePos(Raylib.GetScreenToWorld2D(Raylib.GetMousePosition(), World.Camera)) == new Int2D(X,Y))
-        // {
-        //     Raylib.DrawCircleLinesV(position, (int)_template.Range, new Color(200, 50, 50, 255));
-        //     Raylib.DrawCircleV(position, (int)_template.Range, new Color(200, 50, 50, 64));
-        // }
+        if (Screen.DebugMode && World.PosToTilePos(Raylib.GetScreenToWorld2D(Raylib.GetMousePosition(), World.Camera)) == new Int2D(X,Y))
+        {
+            Raylib.DrawCircleLinesV(position, (int)_template.Range, new Color(200, 50, 50, 255));
+            Raylib.DrawCircleV(position, (int)_template.Range, new Color(200, 50, 50, 64));
+        }
     }
 
     public override void Destroy()
@@ -129,7 +132,7 @@ public class Tower : Structure
         }   
 
         double reduction = -(e.GetHateFor(X, Y) / protectedArea.Count);
-        // Console.WriteLine($"Tower at {X},{Y} destroyed, reducing {protectedArea.Count} surrounding tiles fear by {reduction}");
+        // GameConsole.WriteLine($"Tower at {X},{Y} destroyed, reducing {protectedArea.Count} surrounding tiles fear by {reduction}");
         while (protectedArea.Count > 0)
         {
             e.AddFearOf(reduction, protectedArea.Dequeue());

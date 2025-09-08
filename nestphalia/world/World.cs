@@ -107,11 +107,11 @@ public static class World
         {
             if (x == 0 || x == 21 || y == 0 || y == 21)
             {
-                _floor[x, y] = Assets.GetFloorTileByID("floor_2").Instantiate(x, y);
+                _floor[x, y] = Assets.Get<FloorTileTemplate>("floor_2").Instantiate(x, y);
             }
             else
             {
-                _floor[x,y] = (x%2 != y%2) ? Assets.GetFloorTileByID("floor_1").Instantiate(x,y) : Assets.GetFloorTileByID("floor_2").Instantiate(x,y);
+                _floor[x,y] = (x%2 != y%2) ? Assets.Get<FloorTileTemplate>("floor_1").Instantiate(x,y) : Assets.Get<FloorTileTemplate>("floor_2").Instantiate(x,y);
             }
             _board[x,y] = null; // Made redundant by editor level
         }
@@ -400,7 +400,7 @@ public static class World
         for (int x = 0; x < BoardWidth; ++x)
         for (int y = 0; y < BoardHeight; ++y)
         {
-            _floor[x,y].Draw(x*24, y*24);
+            _floor[x,y].Draw(x*24, y*24 + 8);
         }
         
         Screen.SetCamera();
@@ -419,16 +419,20 @@ public static class World
         }
         
         Screen.SetCamera();
+        
+        _swDraw.Stop();
+        
+        if (Screen.DebugMode) DrawDebug();
+        _swFrame.Restart();
+    }
 
+    public static void DrawGUI()
+    {
         if (_battleStarted)
         {
             LeftTeam.Draw();
             RightTeam.Draw();
         }
-        _swDraw.Stop();
-        
-        if (Screen.DebugMode) DrawDebug();
-        _swFrame.Restart();
     }
 
     public static void DrawDebug()

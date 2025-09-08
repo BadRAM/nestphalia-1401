@@ -41,10 +41,10 @@ public class LevelEditorScene : Scene
         }
         World.InitializeLevelEditor(_level);
         
-        _floors.AddRange(Assets.GetAllFloorTiles());
+        _floors.AddRange(Assets.GetAll<FloorTileTemplate>());
         _floors = _floors.OrderBy(o => o.ID).ToList();
         
-        _structures.AddRange(Assets.GetAllStructures());
+        _structures.AddRange(Assets.GetAll<StructureTemplate>());
         _structures = _structures.OrderBy(o => o.ID).ToList();
         
         Program.CurrentScene = this;
@@ -188,7 +188,7 @@ public class LevelEditorScene : Scene
                 }
                 else
                 {
-                    World.SetFloorTile(Assets.BlankFloor, tilePos.X, tilePos.Y);
+                    World.SetFloorTile(Assets.Get<FloorTileTemplate>("floor_empty"), tilePos.X, tilePos.Y);
                 }
             }
         }
@@ -222,7 +222,7 @@ public class LevelEditorScene : Scene
         }
         
         File.WriteAllText(SelectedSavePath(), JsonConvert.SerializeObject(_level, Formatting.Indented));
-        Assets.UpdateLevel(_level);
+        Assets.UpdateAsset(_level);
         
         Load();
     }

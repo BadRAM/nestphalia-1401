@@ -1,6 +1,5 @@
 using System.Numerics;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json.Linq;
 using Raylib_cs;
 using static nestphalia.GUI;
 
@@ -8,11 +7,11 @@ namespace nestphalia;
 
 public class SavedSettings
 {
-    [JsonInclude] public double SFXVolume = 1;
-    [JsonInclude] public double MusicVolume = 1;
-    [JsonInclude] public double WindowScale = 1;
-    [JsonInclude] public bool AccessibleFont;
-    [JsonInclude] public string ResourcePathOverride = "";
+    public double SFXVolume = 1;
+    public double MusicVolume = 1;
+    public double WindowScale = 1;
+    public bool AccessibleFont;
+    public string ResourcePathOverride = "";
 }
 
 public static class Settings
@@ -23,7 +22,7 @@ public static class Settings
     
     public static void Save()
     {
-        string jsonString = JsonSerializer.Serialize(Saved, SourceGenerationContext.Default.SavedSettings);
+        string jsonString = JObject.FromObject(Saved).ToString();
         //Console.WriteLine($"JSON campaign looks like: {jsonString}");
         File.WriteAllText(Directory.GetCurrentDirectory() + "/settings.cfg", jsonString);
     }
@@ -33,8 +32,7 @@ public static class Settings
         if (File.Exists(Directory.GetCurrentDirectory() + "/settings.cfg"))
         {
             string jsonString = File.ReadAllText(Directory.GetCurrentDirectory() + "/settings.cfg");
-            Saved = JsonSerializer.Deserialize<SavedSettings>(jsonString, SourceGenerationContext.Default.SavedSettings) 
-                    ?? throw new NullReferenceException("Failed to deserialize campaign save file");
+            Saved = JObject.Parse(jsonString).ToObject<SavedSettings>() ?? throw new NullReferenceException("Failed to deserialize settings file");
         }
         else
         {

@@ -82,19 +82,20 @@ public static class Resources
 
     public static void PreLoad()
     {
-        MissingTexture = Raylib.LoadTexture("resources/sprites/missingtex.png");
-        
-        _accessibleFont = Raylib.LoadFont("resources/pixelplay16.png");
-        _defaultFont = Raylib.LoadFont("resources/alagard.png");
-        Font = Settings.Saved.AccessibleFont ? _accessibleFont : _defaultFont;
         Dir = Settings.Saved.ResourcePathOverride == "" ? Directory.GetCurrentDirectory() : Settings.Saved.ResourcePathOverride;
+        
+        MissingTexture = Raylib.LoadTexture(Dir + "/resources/sprites/missingtex.png");
+        
+        _accessibleFont = Raylib.LoadFont(Dir + "/resources/pixelplay16.png");
+        _defaultFont = Raylib.LoadFont(Dir + "/resources/alagard.png");
+        Font = Settings.Saved.AccessibleFont ? _accessibleFont : _defaultFont;
     }
     
     public static void Load()
     {
         foreach (string path in Directory.GetFiles(Dir + "/resources/music"))
         {
-            MusicResource r = new MusicResource(Path.GetFileNameWithoutExtension(path), Raylib.LoadMusicStream("resources/music/" + Path.GetFileName(path)));
+            MusicResource r = new MusicResource(Path.GetFileNameWithoutExtension(path), Raylib.LoadMusicStream(path));
             _music.Add(r.Name, r);
         }
 
@@ -105,13 +106,13 @@ public static class Resources
         
         foreach (string path in Directory.GetFiles(Dir + "/resources/sprites"))
         {
-            SpriteResource r = new SpriteResource(Path.GetFileNameWithoutExtension(path), Raylib.LoadTexture("resources/sprites/" + Path.GetFileName(path)));
+            SpriteResource r = new SpriteResource(Path.GetFileNameWithoutExtension(path), Raylib.LoadTexture(path));
             _sprites.Add(r.Name, r);
         }
         
         foreach (string path in Directory.GetFiles(Dir + "/resources/sfx"))
         {
-            SoundResource r = new SoundResource(Path.GetFileNameWithoutExtension(path), Raylib.LoadSound("resources/sfx/" + Path.GetFileName(path)), 16);
+            SoundResource r = new SoundResource(Path.GetFileNameWithoutExtension(path), Raylib.LoadSound(path), 16);
             _sounds.Add(r.Name, r);
         }
 

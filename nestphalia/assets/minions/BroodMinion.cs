@@ -7,13 +7,13 @@ public class BroodMinionTemplate : MinionTemplate
 {
     public double SpawnInterval;
     public int SpawnsOnDeath;
-    public MinionTemplate SpawnedMinion;
+    public string SpawnedMinion;
     
     public BroodMinionTemplate(JObject jObject) : base(jObject)
     {
         SpawnInterval = jObject.Value<double?>("SpawnInterval") ?? 0;
         SpawnsOnDeath = jObject.Value<int?>("SpawnsOnDeath") ?? 0;
-        SpawnedMinion = Assets.LoadJsonAsset<MinionTemplate>(jObject.Value<JObject?>("SpawnedMinion")) ?? throw new ArgumentNullException();
+        SpawnedMinion = jObject.Value<string?>("SpawnedMinion") ?? throw new ArgumentNullException();
     }
     
     public override Minion Instantiate(Team team, Vector3 position, NavPath? navPath)
@@ -25,6 +25,7 @@ public class BroodMinionTemplate : MinionTemplate
 
     public override string GetStats()
     {
+        MinionTemplate spawn = Assets.Get<MinionTemplate>(SpawnedMinion);
         return                
             $"{Name}\n" +
             $"HP: {MaxHealth}\n" +
@@ -32,9 +33,9 @@ public class BroodMinionTemplate : MinionTemplate
             $"Speed: {Speed}\n" +
             $"Damage: {Projectile.Damage} ({Projectile.Damage / AttackDuration}/s)\n" +
             $"Size: {PhysicsRadius * 2}\n" +
-            $"spawns 1 {SpawnedMinion.Name} every {SpawnInterval}s\n" +
+            $"spawns 1 {spawn.Name} every {SpawnInterval}s\n" +
             $"spawns {SpawnsOnDeath} on death\n\n" +
-            $"{SpawnedMinion.GetStats()}\n" +
+            $"{spawn.GetStats()}\n" +
             $"{Description}";
     }
 }
@@ -43,11 +44,13 @@ public class BroodMinion : Minion
 {
     private double _lastSpawnTime;
     private BroodMinionTemplate _template;
+    private MinionTemplate _spawn;
     
     public BroodMinion(BroodMinionTemplate template, Team team, Vector3 position, NavPath navPath) : base(template, team, position, navPath)
     {
         _lastSpawnTime = Time.Scaled;
         _template = template;
+        _spawn = Assets.Get<MinionTemplate>(_template.SpawnedMinion);
     }
 
     public override void Update()
@@ -56,7 +59,7 @@ public class BroodMinion : Minion
         if (_template.SpawnInterval > 0 && Time.Scaled - _lastSpawnTime >= _template.SpawnInterval && !World.IsBattleOver())
         {
             _lastSpawnTime = Time.Scaled;
-            _template.SpawnedMinion.Instantiate(Team, Position, NavPath.Clone(_template.SpawnedMinion.Name));
+            _spawn.Instantiate(Team, Position, NavPath.Clone(_spawn.Name));
         }
     }
 
@@ -67,7 +70,7 @@ public class BroodMinion : Minion
         for (int i = 0; i < _template.SpawnsOnDeath; i++)
         {
             Vector3 offset = new Vector3((float)(World.RandomDouble() - 0.5), (float)(World.RandomDouble() - 0.5), 0f);
-            _template.SpawnedMinion.Instantiate(Team, Position + offset, null);
+            _spawn.Instantiate(Team, Position + offset, null);
         }
     }
 }

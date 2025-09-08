@@ -14,8 +14,6 @@ public static class WrenCommand
 
     static WrenCommand()
     {
-        GameConsole.WriteLine("Initializing Wren VM...");
-        
         _config = new();
         wrenInitConfiguration(ref _config);
         _config.writeFn = WriteFn;
@@ -48,8 +46,6 @@ class Cmd {
         
         wrenInterpret(_vm, "main", script);
         
-        GameConsole.WriteLine("Wren VM init complete!");
-
         // Confusing name overlap:
         //   - Call       - the action of invoking a method
         //   - CallHandle - wren's way of storing a method signature to invoke later
@@ -145,13 +141,13 @@ class Cmd {
             GameConsole.WriteLine("Build() error: Can't do that in this scene!");
             return;
         }
-
-        StructureTemplate? st = Assets.GetStructureByID(structure);
-        if (st == null)
+        
+        if (Assets.Exists<StructureTemplate>(structure))
         {
             GameConsole.WriteLine($"Build() error: Can't find structure {structure}");
             return;
         }
+        StructureTemplate st = Assets.Get<StructureTemplate>(structure);
 
         Team? t = World.GetTeam(team);
         if (t == null)
