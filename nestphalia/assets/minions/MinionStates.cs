@@ -6,6 +6,17 @@ namespace nestphalia;
 
 public partial class Minion
 {
+    public enum AnimationState
+    {
+        Base, // Used for single animation ImageSets
+        // Minion related sets:
+        Walking,
+        Flying,
+        Attacking,
+        Jumping,
+        Carrying
+    }
+    
     public abstract class BaseState
     {
         protected Minion Me;
@@ -13,7 +24,7 @@ public partial class Minion
         public BaseState(Minion minion) { Me = minion; } 
         
         public abstract void Update();
-        public abstract int GetAnimFrame();
+        public abstract Rectangle GetAnimFrame();
         public virtual void DrawDecorators() {}
         public new abstract string ToString();
 
@@ -29,10 +40,15 @@ public partial class Minion
     public class Move : BaseState
     {
         private int _animFrame;
-        private int _animCounter;
         
         public Move(Minion minion) : base(minion) { }
-        public override string ToString() { return $"Move, frame: {_animFrame}, counter: {_animCounter}"; }
+
+        public override string ToString()
+        {
+            int frames = Me.Template.GetAnimationFrameCount(AnimationState.Walking);
+            if (frames == 0) frames = 1;
+            return $"Move, frame: {(_animFrame / Me.Template.WalkAnimDelay) % frames}";
+        }
 
         public override void Update()
         {
@@ -61,17 +77,14 @@ public partial class Minion
             
             // If no state change is needed, move towards NextPos
             Me.Position = Me.Position.MoveTowardsXY(Me.NextPos, Me.AdjustedSpeed() * Time.DeltaTime); // else: Move
-            _animCounter++;
-            if (_animCounter >= Me.Template.WalkAnimDelay)
-            {
-                _animFrame = (_animFrame + 1) % 4;
-                _animCounter = 0;
-            }
+            
+            _animFrame++;
         }
 
-        public override int GetAnimFrame()
+        public override Rectangle GetAnimFrame()
         {
-            return _animFrame + 1;
+            AnimationState animState = Me.IsFlying ? AnimationState.Flying : AnimationState.Walking;
+            return Me.Template.GetAnimationFrame(animState, _animFrame/Me.Template.WalkAnimDelay);
         }
     }
 
@@ -109,9 +122,9 @@ public partial class Minion
             }
         }
 
-        public override int GetAnimFrame()
+        public override Rectangle GetAnimFrame()
         {
-            return 0;
+            return Me.Template.GetAnimationFrame(AnimationState.Base, 0);
         }
     }
 
@@ -139,9 +152,9 @@ public partial class Minion
             Debug.Assert(_waitRemaining >= 0);
         }
 
-        public override int GetAnimFrame()
+        public override Rectangle GetAnimFrame()
         {
-            return 0;
+            return Me.Template.GetAnimationFrame(AnimationState.Base, 0);
         }
 
         public override void DrawDecorators()
@@ -210,13 +223,13 @@ public partial class Minion
             }
         }
 
-        public override int GetAnimFrame()
+        public override Rectangle GetAnimFrame()
         {
             if (Time.Scaled - _started < _squatDuration) // Waiting in jumpSquat
             {
-                return 5;
+                return Me.Template.GetAnimationFrame(AnimationState.Jumping, 0);
             }
-            return 6;
+            return Me.Template.GetAnimationFrame(AnimationState.Jumping, 1);
         }
     }
     
@@ -231,9 +244,9 @@ public partial class Minion
             Me.DrawOffset = Vector3.UnitZ * (float)Math.Max((Math.Abs((Time.Scaled + Me.Position.X/150) % 3 - 1.5)-1.25)*4, 0) * 6;
         }
 
-        public override int GetAnimFrame()
+        public override Rectangle GetAnimFrame()
         {
-            return 0;
+            return Me.Template.GetAnimationFrame(AnimationState.Base, 0);
         }
     }
     
@@ -262,14 +275,15 @@ public partial class Minion
             _animCounter++;
             if (_animCounter >= Me.Template.WalkAnimDelay)
             {
-                _animFrame = (_animFrame + 1) % 4;
+                _animFrame++;
                 _animCounter = 0;
             }
         }
 
-        public override int GetAnimFrame()
+        public override Rectangle GetAnimFrame()
         {
-            return _animFrame + 1;
+            AnimationState animState = Me.IsFlying ? AnimationState.Flying : AnimationState.Walking;
+            return Me.Template.GetAnimationFrame(animState, _animFrame);
         }
     }
 }

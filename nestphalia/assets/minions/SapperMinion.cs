@@ -86,7 +86,7 @@ public class SapperMinion : Minion
             Raylib.DrawTextureV(_template.BombTexture, pos, Color.White);
         }
         
-        DrawBug(State.GetAnimFrame() + (_attacking ? 0 : 5));
+        DrawBug(_attacking ? Template.GetAnimationFrame(AnimationState.Carrying, 0) : State.GetAnimFrame());
         DrawDecorators();
         DrawDebug();
     }

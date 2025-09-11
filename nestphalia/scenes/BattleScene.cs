@@ -371,12 +371,14 @@ public class BattleScene : Scene
     private void DrawCanopyShadows()
     {
         Screen.SetCamera(World.Camera);
-        Rectangle source = new Rectangle(new Vector2((float)(-40 + Math.Sin(Time.Scaled / 10) * 40), 0) + _canopyTexOffset, World.BoardWidth * 24, World.BoardHeight * 24);
-        DrawTextureRec(_canopyShadow, source, new Vector2(0, 8), ColorAlpha(Color.White, 0.5f));
+        float scale = 4;
+        Rectangle source = new Rectangle(new Vector2((float)(-40 + Math.Sin(Time.Scaled / 10) * 40)/scale, 0) + _canopyTexOffset, World.BoardWidth * 24/scale, World.BoardHeight * 24/scale);
+        Rectangle dest = new Rectangle(new Vector2(0, 8), World.BoardWidth * 24, World.BoardHeight * 24);
+        DrawTexturePro(_canopyShadow, source, dest, Vector2.Zero, 0, ColorAlpha(Color.White, 0.5f));
         for (int i = 0; i < 30; i++)
         {
-            DrawTextureRec(_canopyShadowHighlights, source, new Vector2(-i * 2, 8 - i * 8), ColorAlpha(Color.White, 0.025f * ((30-i) / 30f)) );
-
+            dest.Position += new Vector2(-2, -8);
+            DrawTexturePro(_canopyShadowHighlights, source, dest, Vector2.Zero, 0, ColorAlpha(Color.White, 0.025f * ((30-i) / 30f)) );
         }
         Screen.SetCamera();
     }

@@ -28,7 +28,6 @@ public class FlyUntilHitMinion : FlyingMinion
     {
         _template = template;
         Armor = 0;
-        FlyAnimIndex = 5;
     }
 
     public override void Update()

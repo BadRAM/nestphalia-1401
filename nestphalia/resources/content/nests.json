@@ -19,13 +19,43 @@
     "Type": "MinionTemplate",
     "Name": "Ant",
     "Description": "\nThanks, ants. Thants.",
-    "Texture": "ant12px",
     "MaxHealth": 20.0,
     "Damage": 5.0,
     "AttackDuration": 1.0,
     "Speed": 75.0,
     "PhysicsRadius": 3.0,
-    "WalkAnimDelay": 2
+    "WalkAnimDelay": 2,
+    "Texture": "ant12px",
+    "SpriteSize": {
+      "X": 12.0,
+      "Y": 12.0
+    },
+    "SpriteFrames": {
+      "Base": [
+        {
+          "X": 0.0,
+          "Y": 0.0
+        }
+      ],
+      "Walking": [
+        {
+          "X": 12.0,
+          "Y": 0.0
+        },
+        {
+          "X": 24.0,
+          "Y": 0.0
+        },
+        {
+          "X": 36.0,
+          "Y": 0.0
+        },
+        {
+          "X": 48.0,
+          "Y": 0.0
+        }
+      ]
+    }
   },
   {
     "ID": "nest_grasshopper",
@@ -46,13 +76,53 @@
     "Type": "HopperMinionTemplate",
     "Name": "Grasshopper",
     "Description": "\nHoppers are renowned for their short temper and musical talent",
-    "Texture": "hopper",
     "MaxHealth": 40.0,
     "Damage": 10.0,
     "AttackDuration": 1.0,
     "Speed": 40.0,
     "PhysicsRadius": 5.0,
-    "WalkAnimDelay": 2
+    "WalkAnimDelay": 2,
+    "Texture": "hopper",
+    "SpriteSize": {
+      "X": 24.0,
+      "Y": 24.0
+    },
+    "SpriteFrames": {
+      "Base": [
+        {
+          "X": 0.0,
+          "Y": 0.0
+        }
+      ],
+      "Walking": [
+        {
+          "X": 24.0,
+          "Y": 0.0
+        },
+        {
+          "X": 48.0,
+          "Y": 0.0
+        },
+        {
+          "X": 72.0,
+          "Y": 0.0
+        },
+        {
+          "X": 96.0,
+          "Y": 0.0
+        }
+      ],
+      "Jumping": [
+        {
+          "X": 120.0,
+          "Y": 0.0
+        },
+        {
+          "X": 144.0,
+          "Y": 0.0
+        }
+      ]
+    }
   },
   {
     "ID": "nest_bee",
@@ -73,14 +143,44 @@
     "Type": "FlyingMinionTemplate",
     "Name": "Bee",
     "Description": "\n\"For the Queen!\"",
-    "Texture": "bee",
     "CruisingHeight": 32.0,
     "MaxHealth": 20.0,
     "Damage": 5.0,
     "AttackDuration": 1.0,
     "Speed": 45.0,
     "PhysicsRadius": 5.0,
-    "WalkAnimDelay": 2
+    "WalkAnimDelay": 2,
+    "Texture": "bee",
+    "SpriteSize": {
+      "X": 16.0,
+      "Y": 16.0
+    },
+    "SpriteFrames": {
+      "Base": [
+        {
+          "X": 0.0,
+          "Y": 0.0
+        }
+      ],
+      "Flying": [
+        {
+          "X": 0.0,
+          "Y": 0.0
+        },
+        {
+          "X": 16.0,
+          "Y": 0.0
+        },
+        {
+          "X": 32.0,
+          "Y": 0.0
+        },
+        {
+          "X": 16.0,
+          "Y": 0.0
+        }
+      ]
+    }
   },
   {
     "ID": "nest_snail",
@@ -129,7 +229,6 @@
     "Type": "FlyUntilHitMinionTemplate",
     "Name": "Ladybug",
     "Description": "\nWe're coming in hot!",
-    "Texture": "ladybug",
     "LandSpeed": 25.0,
     "CruisingHeight": 32.0,
     "MaxHealth": 55.0,
@@ -138,7 +237,56 @@
     "AttackDuration": 1.0,
     "Speed": 45.0,
     "PhysicsRadius": 6.0,
-    "WalkAnimDelay": 2
+    "WalkAnimDelay": 2,
+    "Texture": "ladybug",
+    "SpriteSize": {
+      "X": 16.0,
+      "Y": 16.0
+    },
+    "SpriteFrames": {
+      "Base": [
+        {
+          "X": 0.0,
+          "Y": 0.0
+        }
+      ],
+      "Walking": [
+        {
+          "X": 16.0,
+          "Y": 0.0
+        },
+        {
+          "X": 32.0,
+          "Y": 0.0
+        },
+        {
+          "X": 48.0,
+          "Y": 0.0
+        },
+        {
+          "X": 64.0,
+          "Y": 0.0
+        }
+      ],
+      "Flying": [
+        {
+          "X": 80.0,
+          "Y": 0.0
+        },
+        {
+          "X": 96.0,
+          "Y": 0.0
+        },
+        {
+          "X": 112.0,
+          "Y": 0.0
+        },
+        {
+          "X": 96.0,
+          "Y": 0.0
+        }
+      ]
+    }
   },
   {
     "ID": "nest_archer",
@@ -159,7 +307,6 @@
     "Type": "RangedMinionTemplate",
     "Name": "Archer Ant",
     "Description": "",
-    "Texture": "ant12px",
     "MaxHealth": 20.0,
     "Armor": 0.0,
     "Damage": 4.0,
@@ -167,7 +314,38 @@
     "Speed": 45.0,
     "PhysicsRadius": 3.0,
     "WalkAnimDelay": 2,
-    "Range": 72
+    "Range": 72,
+    "Texture": "ant12px",
+    "SpriteSize": {
+      "X": 12.0,
+      "Y": 12.0
+    },
+    "SpriteFrames": {
+      "Base": [
+        {
+          "X": 0.0,
+          "Y": 0.0
+        }
+      ],
+      "Walking": [
+        {
+          "X": 12.0,
+          "Y": 0.0
+        },
+        {
+          "X": 24.0,
+          "Y": 0.0
+        },
+        {
+          "X": 36.0,
+          "Y": 0.0
+        },
+        {
+          "X": 48.0,
+          "Y": 0.0
+        }
+      ]
+    }
   },
   {
     "ID": "nest_sapper_beetle",
@@ -188,15 +366,63 @@
     "Type": "SapperMinionTemplate",
     "Name": "Beetle",
     "Description": "\nWide load coming through!",
-    "Texture": "sapper",
-    "BombTexture": "sapper_bomb",
     "MaxHealth": 55.0,
     "Armor": 2.0,
     "Damage": 250.0,
     "AttackDuration": 0.0,
     "Speed": 65.0,
     "PhysicsRadius": 8.0,
-    "WalkAnimDelay": 2
+    "WalkAnimDelay": 2,
+    "Texture": "sapper",
+    "BombTexture": "sapper_bomb",
+    "SpriteSize": {
+      "X": 22.0,
+      "Y": 22.0
+    },
+    "SpriteFrames": {
+      "Base": [
+        {
+          "X": 0.0,
+          "Y": 0.0
+        }
+      ],
+      "Carrying": [
+        {
+          "X": 22.0,
+          "Y": 0.0
+        },
+        {
+          "X": 44.0,
+          "Y": 0.0
+        },
+        {
+          "X": 66.0,
+          "Y": 0.0
+        },
+        {
+          "X": 88.0,
+          "Y": 0.0
+        }
+      ],
+      "Walking": [
+        {
+          "X": 132.0,
+          "Y": 0.0
+        },
+        {
+          "X": 154.0,
+          "Y": 0.0
+        },
+        {
+          "X": 176.0,
+          "Y": 0.0
+        },
+        {
+          "X": 198.0,
+          "Y": 0.0
+        }
+      ]
+    }
   },
   {
     "ID": "nest_spider",
@@ -217,7 +443,6 @@
     "Type": "BroodMinionTemplate",
     "Name": "Spider Broodmother",
     "Description": "",
-    "Texture": "spidermom",
     "SpawnInterval": 1.0,
     "SpawnsOnDeath": 24,
     "SpawnedMinion": "minion_spiderling",
@@ -227,21 +452,82 @@
     "AttackDuration": 1.0,
     "Speed": 30.0,
     "PhysicsRadius": 10.0,
-    "WalkAnimDelay": 5
+    "WalkAnimDelay": 5,
+    "Texture": "spidermom",
+    "SpriteSize": {
+      "X": 24.0,
+      "Y": 24.0
+    },
+    "SpriteFrames": {
+      "Base": [
+        {
+          "X": 0.0,
+          "Y": 0.0
+        }
+      ],
+      "Walking": [
+        {
+          "X": 24.0,
+          "Y": 0.0
+        },
+        {
+          "X": 48.0,
+          "Y": 0.0
+        },
+        {
+          "X": 72.0,
+          "Y": 0.0
+        },
+        {
+          "X": 96.0,
+          "Y": 0.0
+        }
+      ]
+    }
   },
   {
     "ID": "minion_spiderling",
     "Type": "MinionTemplate",
     "Name": "Spiderling",
     "Description": "\n\"I was born ready!\"",
-    "Texture": "spiderling",
     "MaxHealth": 15.0,
     "Armor": 0.0,
     "Damage": 2.0,
     "AttackDuration": 0.5,
     "Speed": 55.0,
     "PhysicsRadius": 2.0,
-    "WalkAnimDelay": 2
+    "WalkAnimDelay": 2,
+    "Texture": "spiderling",
+    "SpriteSize": {
+      "X": 8.0,
+      "Y": 8.0
+    },
+    "SpriteFrames": {
+      "Base": [
+        {
+          "X": 0.0,
+          "Y": 0.0
+        }
+      ],
+      "Walking": [
+        {
+          "X": 8.0,
+          "Y": 0.0
+        },
+        {
+          "X": 16.0,
+          "Y": 0.0
+        },
+        {
+          "X": 24.0,
+          "Y": 0.0
+        },
+        {
+          "X": 32.0,
+          "Y": 0.0
+        }
+      ]
+    }
   },
   {
     "ID": "nest_frog",
@@ -262,14 +548,54 @@
     "Type": "HopperMinionTemplate",
     "Name": "Frog",
     "Description": "\nAt least it's on our side.\nFor now...",
-    "Texture": "frog",
     "MaxHealth": 1500.0,
     "Armor": 0.0,
     "Damage": 50.0,
     "AttackDuration": 1.0,
     "Speed": 20.0,
     "PhysicsRadius": 10.0,
-    "WalkAnimDelay": 2
+    "WalkAnimDelay": 2,
+    "Texture": "frog",
+    "SpriteSize": {
+      "X": 48.0,
+      "Y": 48.0
+    },
+    "SpriteFrames": {
+      "Base": [
+        {
+          "X": 0.0,
+          "Y": 0.0
+        }
+      ],
+      "Walking": [
+        {
+          "X": 48.0,
+          "Y": 0.0
+        },
+        {
+          "X": 96.0,
+          "Y": 0.0
+        },
+        {
+          "X": 144.0,
+          "Y": 0.0
+        },
+        {
+          "X": 192.0,
+          "Y": 0.0
+        }
+      ],
+      "Jumping": [
+        {
+          "X": 240.0,
+          "Y": 0.0
+        },
+        {
+          "X": 288.0,
+          "Y": 0.0
+        }
+      ]
+    }
   },
   {
     "ID": "nest_hero",

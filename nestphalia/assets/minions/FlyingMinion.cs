@@ -37,10 +37,8 @@ public class FlyingMinionTemplate : MinionTemplate
 public class FlyingMinion : Minion
 {
     private int _currentFrame;
-    private int _frameCounter;
     private FlyingMinionTemplate _template;
     protected bool WantToFly;
-    protected int FlyAnimIndex = 0;
     
     public FlyingMinion(FlyingMinionTemplate template, Team team, Vector3 position, NavPath? navPath) : base(template, team, position, navPath)
     {
@@ -82,13 +80,7 @@ public class FlyingMinion : Minion
                 }
             }
             
-            _frameCounter++;
-            if (_frameCounter >= 2)
-            {
-                _currentFrame++;
-                _currentFrame %= 4;
-                _frameCounter = 0;
-            }
+            _currentFrame++;
         }
     }
     
@@ -100,7 +92,7 @@ public class FlyingMinion : Minion
             return;
         }
         // Always pingpong the wings instead of using state anim frame
-        DrawBug((_currentFrame == 3 ? 1 : _currentFrame) + FlyAnimIndex);
+        DrawBug(Template.GetAnimationFrame(AnimationState.Flying, _currentFrame/2));
         DrawDecorators();
         DrawDebug();
     }

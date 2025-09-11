@@ -8,8 +8,6 @@ public class MinionTemplate : JsonAsset
 {
     public string Name;
     public string Description;
-    public Texture2D Texture;
-    public Texture2D ShadowTexture;
     public double MaxHealth;
     public double Armor;
     public double Damage;
@@ -18,13 +16,15 @@ public class MinionTemplate : JsonAsset
     public double Speed;
     public float PhysicsRadius; // This is a float because Raylib.CheckCircleOverlap() wants floats
     public int WalkAnimDelay;
+    public Texture2D Texture;
+    public Texture2D ShadowTexture;
+    public Vector2 SpriteSize;
+    public Dictionary<Minion.AnimationState, List<Vector2>> SpriteFrames;
 
     public MinionTemplate(JObject jObject) : base(jObject)
     {
         Name = jObject.Value<string?>("Name") ?? throw new ArgumentNullException();
         Description = jObject.Value<string?>("Description") ?? "";
-        Texture = Resources.GetTextureByName(jObject.Value<string?>("Texture") ?? "");
-        ShadowTexture = Resources.GetTextureByName("shadow");
         MaxHealth = jObject.Value<double?>("MaxHealth") ?? throw new ArgumentNullException();
         Armor = jObject.Value<double?>("Armor") ?? 0;
         Damage = jObject.Value<double?>("Damage") ?? 0;
@@ -32,6 +32,14 @@ public class MinionTemplate : JsonAsset
         Speed = jObject.Value<double?>("Speed") ?? 0;
         PhysicsRadius = jObject.Value<int?>("PhysicsRadius") ?? throw new ArgumentNullException();
         WalkAnimDelay = jObject.Value<int?>("WalkAnimDelay") ?? 2;
+        Texture = Resources.GetTextureByName(jObject.Value<string?>("Texture") ?? "");
+        ShadowTexture = Resources.GetTextureByName(jObject.Value<string?>("ShadowTexture") ?? "shadow");
+        SpriteSize = jObject.Value<JObject?>("SpriteSize")?.ToObject<Vector2>() ?? Vector2.One * Texture.Height/2;
+        SpriteFrames = jObject.Value<JObject?>("SpriteFrames")?.ToObject<Dictionary<Minion.AnimationState, List<Vector2>>>() ?? new Dictionary<Minion.AnimationState, List<Vector2>>();
+        if (!SpriteFrames.ContainsKey(Minion.AnimationState.Base))
+        {
+            SpriteFrames.Add(Minion.AnimationState.Base, new List<Vector2>([Vector2.Zero]));
+        }
 
         string j = $@"{{""ID"": ""{ID}_attack"", ""Texture"": ""minion_bullet"", ""Damage"": {Damage}, ""Speed"": 400}}";
         Projectile = new ProjectileTemplate(JObject.Parse(j));
@@ -73,6 +81,22 @@ public class MinionTemplate : JsonAsset
         navPath.Reset(startPos);
         navPath.Destination = targetPos;
         team.RequestPath(navPath);
+    }
+
+    public Rectangle GetAnimationFrame(Minion.AnimationState animation, int frame)
+    {
+        if (!SpriteFrames.ContainsKey(animation))
+        {
+            return new Rectangle(SpriteFrames[Minion.AnimationState.Base][0], SpriteSize);
+        }
+        List<Vector2> frames = SpriteFrames[animation];
+        return new Rectangle(frames[frame % frames.Count], SpriteSize);
+    }
+
+    public int GetAnimationFrameCount(Minion.AnimationState animation)
+    {
+        if (!SpriteFrames.ContainsKey(animation)) return 0;
+        return SpriteFrames[animation].Count;
     }
 }
 
@@ -263,25 +287,22 @@ public partial class Minion : ISprite
             return new Int2D(0,0);
         }
 
-        // NavPath.Reset(Position);
         int i = Math.Min(targets.Count, 16);
         i = Math.Min(World.RandomInt(i), World.RandomInt(i));
-        // i = World.Random.WeightedRandom(i);
+        // i = World.WeightedRandom(i);
         return targets[i].Value;
     }
 
-    protected void DrawBug(int frame)
+    protected void DrawBug(Rectangle frame)
     {
-        int size = Template.Texture.Height / 2;
-        Vector2 pos = new Vector2(Position.X - size / 2f, Position.Y - size / 2f - Position.Z) + DrawOffset.XYZ2D();
+        Vector2 size = Template.SpriteSize;
+        Vector2 pos = Position.XYZ2D() - size/2 + DrawOffset.XYZ2D();
         if (!IsFlying && IsOnTopOfStructure) pos.Y -= 8;
-        bool flip = NextPos.X > Position.X;
-        if (StandardBearer) Raylib.DrawTextureV(Team.BattleStandard, pos - new Vector2(Team.BattleStandard.Width/2-size/2, Team.BattleStandard.Height-size/2), Team.Color);
-        Rectangle source = new Rectangle(flip ? size : 0, 0, flip ? size : -size, size);
-        source.X = size * frame;
-        Raylib.DrawTextureRec(Template.Texture, source, pos, Color.White);
-        source.Y += size;
-        Raylib.DrawTextureRec(Template.Texture, source, pos, _tintOverride ?? Team.Color);
+        if (NextPos.X < Position.X) frame = frame.FlipX();
+        if (StandardBearer) Raylib.DrawTextureV(Team.BattleStandard, pos - new Vector2(Team.BattleStandard.Width/2-size.X/2, Team.BattleStandard.Height-size.Y/2), _tintOverride ?? Team.Color);
+        Raylib.DrawTextureRec(Template.Texture, frame, pos, Color.White);
+        frame.Y += size.Y;
+        Raylib.DrawTextureRec(Template.Texture, frame, pos, _tintOverride ?? Team.Color);
         if (Position.Z + DrawOffset.Z > 0)
         {
             pos = new Vector2(Position.X - Template.ShadowTexture.Width / 2f, Position.Y - Template.ShadowTexture.Height / 2f) + DrawOffset.XY();

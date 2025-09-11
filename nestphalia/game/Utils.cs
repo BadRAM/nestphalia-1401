@@ -50,6 +50,16 @@ public static class Utils
         }
     }
 
+    public static Rectangle FlipX(this Rectangle rect)
+    {
+        rect.Width *= -1;
+        return rect;
+    }
+    public static Rectangle FlipY(this Rectangle rect)
+    {
+        rect.Height *= -1;
+        return rect;
+    }
     public static Vector2 TopLeft(this Rectangle rect) { return rect.Position; }
     public static Vector2 Top(this Rectangle rect) { return new Vector2(rect.X + rect.Width/2, rect.Y) ; }
     public static Vector2 TopRight(this Rectangle rect) { return new Vector2(rect.X + rect.Width, rect.Y) ; }
