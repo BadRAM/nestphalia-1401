@@ -15,7 +15,6 @@ public static class Assets
     // constructor when publishing with trimmed assemblies. it also provides deserializer stability if type names change internally.
     private static readonly Dictionary<string, ConstructorInfo> JsonAssetTypes = new Dictionary<string, ConstructorInfo>()
     {
-        { "SpriteSet",                 typeof(SpriteSet).GetConstructor([typeof(JObject)])! },
         { "Level",                     typeof(Level).GetConstructor([typeof(JObject)])! },
         { "FloorTileTemplate",         typeof(FloorTileTemplate).GetConstructor([typeof(JObject)])! },
         { "StructureTemplate",         typeof(StructureTemplate).GetConstructor([typeof(JObject)])! },

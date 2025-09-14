@@ -11,8 +11,10 @@ public class LevelEditorScene : Scene
 {
     private Level _level;
     private string _idBuffer = "level_id";
+    private string _fullLevelData = "";
     private string _levelBuffer = "";
     private string _scriptBuffer = "";
+    private string _levelInfo = "";
 
     private List<FloorTileTemplate> _floors = new List<FloorTileTemplate>();
     private List<StructureTemplate> _structures = new List<StructureTemplate>();
@@ -107,7 +109,7 @@ public class LevelEditorScene : Scene
             Raylib.DrawRectangleLinesEx(playerRect, 2, Raylib.ColorAlpha(Color.Blue, 0.8f));
         }
         Screen.SetCamera();
-
+        
         Raylib.DrawRectangle(0, Screen.TopY, 300, Screen.BottomY, Raylib.ColorAlpha(Color.Black, 0.5f));
         
         if (Button100(0, 0, "Floor", anchor: Screen.TopLeft))
@@ -125,10 +127,10 @@ public class LevelEditorScene : Scene
         if (Button100(0, 340, "Save", anchor: Screen.TopLeft)) Save();
         if (Button100(100, 340, "Folder", anchor: Screen.TopLeft)) Utils.OpenFolder(@"\resources\levels");
         if (Button100(200, 340, "Load", anchor: Screen.TopLeft)) ShowLoadPopup();
-        BigTextCopyPad(0, 380, "Full Level Data", JObject.FromObject(_level).ToString(), anchor: Screen.TopLeft);
+        BigTextCopyPad(0, 380, "Full Level Data", _fullLevelData, anchor: Screen.TopLeft, allowPaste:false);
         
-        _levelBuffer = BigTextCopyPad(0, 460, "Level Metadata", _levelBuffer, anchor: Screen.TopLeft);
-        _scriptBuffer = BigTextCopyPad(0, 500, "Script", _scriptBuffer, anchor: Screen.TopLeft);
+        _levelBuffer = BigTextCopyPad(15, 460, "Level Metadata", _levelBuffer, anchor: Screen.TopLeft);
+        _scriptBuffer = BigTextCopyPad(15, 500, "Script", _scriptBuffer, anchor: Screen.TopLeft);
 
         if (_toolActive == LevelEditorTool.FloorBrush)
         {
@@ -173,6 +175,8 @@ public class LevelEditorScene : Scene
                 DrawTextLeft(4, 240, _selectedStructure.ID);
             }
         }
+        
+        DrawTextLeft(0, 550, _levelInfo, anchor:Screen.TopLeft);
     }
 
     private void FloorBrush()
@@ -238,8 +242,14 @@ public class LevelEditorScene : Scene
         World.InitializeLevelEditor(_level);
         
         JObject j = JObject.FromObject(_level);
+        
+        _fullLevelData = j.ToString();
+        _fullLevelData = _fullLevelData.Replace("\r\n", "\n");
 
         _scriptBuffer = j.Value<string>("Script") ?? "";
+        _scriptBuffer = _scriptBuffer.Replace("\r\n", "\n");
+
+        _levelInfo = _level.GetLevelStats();
 
         j.Remove("ID");
         j.Remove("Script");
@@ -247,6 +257,8 @@ public class LevelEditorScene : Scene
         j.Remove("Structures");
 
         _levelBuffer = j.ToString();
+        _levelBuffer = _levelBuffer.Replace("\r\n", "\n");
+
     }
 
     private void ShowLoadPopup()

@@ -448,18 +448,17 @@ public static class GUI
         return text;
     }
     
-    public static string BigTextCopyPad(int x, int y, string label, string text, Vector2? anchor = null)
+    public static string BigTextCopyPad(int x, int y, string label, string text, Vector2? anchor = null, bool allowCopy = true, bool allowPaste = true)
     {
         anchor ??= Screen.Center;
         x += (int)anchor.Value.X;
         y += (int)anchor.Value.Y;
         
-        bool hover = !Input.IsSuppressed() && CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(x, y, 300, 40));
-        bool press = (hover && (Input.Held(MouseButton.Left) || Input.Held(MouseButton.Right)));
+        bool hover = !Input.IsSuppressed() && CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(x, y, 270, 40));
         
-        Rectangle subSprite = new Rectangle(0, !press ? !hover ? 0 : 40 : 80, 300, 40);
-        DrawTextureRec(_buttonWideTexture, subSprite, new Vector2(x,y), Color.White);
-        DrawTextCentered(x+150, y+20, label, anchor: Vector2.Zero);
+        Rectangle subSprite = new Rectangle(0, 0, 270, 36);
+        DrawTextureRec(_button270Texture, subSprite, new Vector2(x,y), Color.White);
+        DrawTextCentered(x+(int)subSprite.Width/2, y+(int)subSprite.Height/2, label, anchor: Vector2.Zero);
 
         if (hover)
         {
@@ -468,12 +467,12 @@ public static class GUI
             DrawRectangle(Screen.CenterX, Screen.CenterY - 300, 600, 600, ColorAlpha(Color.Black, 0.5f));
             DrawTextLeft(2, -298, text);
 
-            if (Input.Released(MouseButton.Left))
+            if (allowPaste && Button90(x + 180, y, "Paste", anchor:anchor))
             {
                 text = GetClipboardText_();
             }
 
-            if (Input.Released(MouseButton.Right))
+            if (allowCopy && Button90(x, y, "Copy", anchor:anchor))
             {
                 SetClipboardText(text);
             }

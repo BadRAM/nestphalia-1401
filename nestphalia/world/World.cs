@@ -151,9 +151,6 @@ public static class World
         RightTeam.Initialize();
         
         Determinator.Start(deterministic);
-
-        WrenCommand.Execute(level.Script);
-        GameConsole.WriteLine($"World.InitializeBattle executed script:{level.Script}");
         
         _battleStarted = true;
     }

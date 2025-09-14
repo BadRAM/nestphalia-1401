@@ -78,10 +78,41 @@ public class Level : JsonAsset
         for (int x = 0; x < WorldSize.X; x++)
         for (int y = 0; y < WorldSize.Y; y++)
         {
-            World.SetFloorTile(Assets.Get<FloorTileTemplate>(FloorTiles[x,y]), x, y);
+            if ((FloorTiles[x,y] ?? "") == "") 
+            {
+                World.SetFloorTile(Assets.Get<FloorTileTemplate>("floor_empty"), x, y);
+            }
+            else
+            {
+                World.SetFloorTile(Assets.Get<FloorTileTemplate>(FloorTiles[x,y]), x, y);
+            }
             if (!Assets.Exists<StructureTemplate>(Structures[x,y])) continue;
             World.SetTile(Assets.Get<StructureTemplate>(Structures[x,y]),World.RightTeam,x,y);
         }
+    }
+    
+    public string GetLevelStats()
+    {
+        int structureCount = 0;
+        int turretCount = 0;
+        int utilityCount = 0;
+        int nestCount = 0;
+        double totalCost = 0;
+        
+        for (int x = 0; x < WorldSize.X; ++x)
+        for (int y = 0; y < WorldSize.Y; ++y)
+        {
+            if (!Assets.Exists<StructureTemplate>(Structures[x,y])) continue;
+            StructureTemplate t = Assets.Get<StructureTemplate>(Structures[x,y]);
+            structureCount++;
+            totalCost += t.Price;
+            if (t.Class == StructureTemplate.StructureClass.Utility) utilityCount++;
+            if (t.Class == StructureTemplate.StructureClass.Tower) turretCount++;
+            if (t.Class == StructureTemplate.StructureClass.Nest) nestCount++;
+        }
+
+        return $"{Name}\n" +
+               $"Cost: ${totalCost}\n";
     }
     
     // TODO: This struct should live somewhere else.

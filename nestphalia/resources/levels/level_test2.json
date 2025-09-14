@@ -1,6 +1,4 @@
 {
-  "ID": "level_test2",
-  "Type": "Level",
   "Name": "Leftsville",
   "Description": "Something's not right about this place...",
   "EnemyColor": {
@@ -9,7 +7,23 @@
     "B": 0,
     "A": 255
   },
+  "GradientTop": {
+    "R": 0,
+    "G": 0,
+    "B": 0,
+    "A": 255
+  },
+  "GradientBottom": {
+    "R": 0,
+    "G": 0,
+    "B": 0,
+    "A": 255
+  },
   "Location": {
+    "X": -100,
+    "Y": 0
+  },
+  "SoilTexture": {
     "X": -100,
     "Y": 0
   },
@@ -30,11 +44,13 @@
       "Flip": false
     }
   ],
-  "Script": "Cmd.dialog(\"Here in leftsville we have a saying:\")\r\nCmd.dialog(\"...\")\r\nCmd.dialog(\"I forgot :(\")",
   "WorldSize": {
     "X": 48,
     "Y": 22
   },
+  "Music": "",
+  "Weather": "",
+  "Script": "Event.teamHealthBelow(\"right\", 0.5, Fn.new {\r\n  Cmd.dialog(\"Noooo! It's all falling apart!\")\r\n  Cmd.dialog(\"You won't get away with this!\") \r\n})\r\n\r\nCmd.dialog(\"Here in leftsville we have a saying:\")\r\nCmd.dialog(\"...\")\r\nCmd.dialog(\"I forgot :(\")",
   "FloorTiles": [
     [
       "floor_1",
@@ -2342,5 +2358,7 @@
       "",
       ""
     ]
-  ]
+  ],
+  "ID": "level_test2",
+  "Type": "Level"
 }

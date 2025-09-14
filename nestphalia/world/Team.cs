@@ -28,6 +28,8 @@ public class Team
     private double _timeLastAbilityUsed = -10;
     private double _maxHealth;
     private double _health;
+    public double Health => _health;
+    public double MaxHealth => _maxHealth;
 
     private List<NavPath> _pathQueue = new List<NavPath>();
     private List<NavPath> _priorityPathQueue = new List<NavPath>();
@@ -185,10 +187,10 @@ public class Team
         AddFearOf(fear, pos.X, pos.Y);
     }
 
-    public double GetHealth()
-    {
-        return _health;
-    }
+    // public double GetHealth()
+    // {
+    //     return _health;
+    // }
 
     public void AddBeacon(ActiveAbilityBeacon beacon)
     {

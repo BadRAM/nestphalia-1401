@@ -10,7 +10,7 @@ public static class WrenCommand
     private static WrenConfiguration _config;
     private static WrenVM _vm;
 
-    private static WrenHandle _threadResumeCallHandle;
+    private static readonly WrenHandle WrenInvokeCallCallHandle;
 
     static WrenCommand()
     {
@@ -42,6 +42,10 @@ class Cmd {
         Fiber.yield()
     }
 }
+
+class Event {
+    foreign static teamHealthBelow(team, threshold, action)
+}
 """;
         
         wrenInterpret(_vm, "main", script);
@@ -49,8 +53,8 @@ class Cmd {
         // Confusing name overlap:
         //   - Call       - the action of invoking a method
         //   - CallHandle - wren's way of storing a method signature to invoke later
-        //   - call()     - is the signature of the method that resumes fibers
-        _threadResumeCallHandle = wrenMakeCallHandle(_vm, "call()");
+        //   - call()     - the signature of the method that resumes fibers and invokes functions
+        WrenInvokeCallCallHandle = wrenMakeCallHandle(_vm, "call()");
     }
     
     public static void WriteFn(WrenVM vm, string text) => GameConsole.WriteLine(text);
@@ -71,9 +75,38 @@ class Cmd {
         if (signature == "dialogForeign(_,_,_,_)") return Dialog;
         if (signature == "build(_,_,_,_)") return Build;
         if (signature == "demolish(_,_)") return Demolish;
-        return null;
+        if (signature == "teamHealthBelow(_,_,_)") return TeamHealthBelowEvent;
+        throw new Exception($"Tried to bind foreign with unrecognized signature: {signature}");
     }
-    
+
+    private static void TeamHealthBelowEvent(WrenVM vm)
+    {
+        string team = wrenGetSlotString(vm, 1);
+        double threshold = wrenGetSlotDouble(vm, 2);
+        WrenHandle action = wrenGetSlotHandle(vm, 3);
+        
+        if (Program.CurrentScene is not BattleScene battleScene)
+        {
+            GameConsole.WriteLine("Can't do that outside of battle!");
+            return;
+        }
+
+        Team? t = World.GetTeam(team);
+        if (t == null)
+        {
+            GameConsole.WriteLine($"teamHealthBelowEvent() error: Invalid team {team}");
+            return;
+        }
+        
+        battleScene.AddEvent(new TeamHealthBelowEvent(t, threshold, () =>
+        {
+            wrenEnsureSlots(vm, 1);
+            wrenSetSlotHandle(vm, 0, action);
+            wrenCall(vm, WrenInvokeCallCallHandle);
+            wrenReleaseHandle(vm, action);
+        } ));
+    }
+
     public static void Execute(string input)
     {
         wrenInterpret(_vm, "main", input);
@@ -92,7 +125,7 @@ class Cmd {
         {
             wrenEnsureSlots(vm, 1);
             wrenSetSlotHandle(vm, 0, fiber);
-            wrenCall(vm, _threadResumeCallHandle);
+            wrenCall(vm, WrenInvokeCallCallHandle);
             wrenReleaseHandle(vm, fiber);
         };
         

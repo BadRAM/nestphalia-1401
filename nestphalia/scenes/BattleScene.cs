@@ -15,6 +15,7 @@ public class BattleScene : Scene
     private bool _pathFinderDebug;
     private Action<Team?> _battleOverCallback;
     private SceneState _state;
+    private static List<BattleEvent> _events = new List<BattleEvent>();
 
     private double _zoomLevel = 5;
     private readonly List<Double> _zoomLevels = [0.05, 0.1, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3, 3.5, 4, 5, 6, 7, 8, 10, 12, 14, 16]; 
@@ -57,7 +58,11 @@ public class BattleScene : Scene
         World.InitializeBattle(level, leftFort, rightFort, leftIsPlayer, rightIsPlayer, deterministic);
         World.Camera.Zoom = (float)_zoomLevels[(int)_zoomLevel];
         _log += $"first random: {World.RandomInt(100)}\n";
+        
+        WrenCommand.Execute(level.Script);
+        GameConsole.WriteLine($"World.InitializeBattle executed script:{level.Script}");
 
+        // TODO: Move weather effect rendering into world, or into it's own class managed by world.
         _canopyTexOffset = new Vector2(Random.Shared.Next(2048), Random.Shared.Next(2048));
         _canopyShadow = Resources.GetTextureByName("shadow_canopy");
         _canopyShadowHighlights = Resources.GetTextureByName("shadow_canopy_godray");
@@ -110,7 +115,7 @@ public class BattleScene : Scene
             case SceneState.BattleFinished:
                 DrawRectangle(Screen.CenterX-250,Screen.CenterY-150, 500, 300,new Color(0,0,0,128));
                 DrawTextCentered(0, -48, "BATTLE OVER!", 48);
-                DrawTextCentered(0, 0, $"{_winner.Name} is victorious!", 48);
+                DrawTextCentered(0, 0, $"{_winner?.Name} is victorious!", 48);
                 if (Screen.DebugMode) DrawTextCentered(0, 100, $"{_log}");
                 if (Button100(-50, 30, "Return"))
                 {
@@ -240,6 +245,7 @@ public class BattleScene : Scene
         double startTime = GetTime();
         
         World.Update();
+        UpdateEvents();
         CheckWinner();
         
         if (_state == SceneState.BattleActive && Input.Held(Input.InputAction.FastForward))
@@ -249,8 +255,20 @@ public class BattleScene : Scene
             {
                 Time.UpdateTime();
                 World.Update();
+                UpdateEvents();
                 CheckWinner();
                 _skips++;
+            }
+        }
+    }
+
+    private void UpdateEvents()
+    {
+        for (int i = _events.Count - 1; i >= 0; i--)
+        {
+            if (_events[i].Update())
+            {
+                _events.RemoveAt(i);
             }
         }
     }
@@ -275,12 +293,12 @@ public class BattleScene : Scene
         if (_winner != null) return;
 
         Team loser = World.LeftTeam;
-        if (World.LeftTeam.GetHealth() <= 0 || Input.Pressed(KeyboardKey.Minus))
+        if (World.LeftTeam.Health <= 0 || Input.Pressed(KeyboardKey.Minus))
         {
             _winner = World.RightTeam;
             loser = World.LeftTeam;
         }
-        if (World.RightTeam.GetHealth() <= 0)
+        if (World.RightTeam.Health <= 0)
         {
             _winner = World.LeftTeam;
             loser = World.RightTeam;
@@ -381,5 +399,10 @@ public class BattleScene : Scene
             DrawTexturePro(_canopyShadowHighlights, source, dest, Vector2.Zero, 0, ColorAlpha(Color.White, 0.025f * ((30-i) / 30f)) );
         }
         Screen.SetCamera();
+    }
+
+    public void AddEvent(BattleEvent e)
+    {
+        _events.Add(e);
     }
 }
