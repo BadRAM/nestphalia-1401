@@ -45,6 +45,8 @@ class Cmd {
 
 class Event {
     foreign static teamHealthBelow(team, threshold, action)
+    foreign static timer(duration, recurring, action)
+    foreign static structureDestroyed(x, y, action)
 }
 """;
         
@@ -76,7 +78,21 @@ class Event {
         if (signature == "build(_,_,_,_)") return Build;
         if (signature == "demolish(_,_)") return Demolish;
         if (signature == "teamHealthBelow(_,_,_)") return TeamHealthBelowEvent;
+        if (signature == "timer(_,_,_)") return TimerEvent;
+        if (signature == "structureDestroyed(_,_,_)") return StructureDestroyedEvent;
         throw new Exception($"Tried to bind foreign with unrecognized signature: {signature}");
+    }
+
+    public static void InvokeCallOnWrenHandle(WrenHandle handle)
+    {
+        wrenEnsureSlots(_vm, 1);
+        wrenSetSlotHandle(_vm, 0, handle);
+        wrenCall(_vm, WrenInvokeCallCallHandle);
+    }
+
+    public static void ReleaseWrenHandle(WrenHandle handle)
+    {
+        wrenReleaseHandle(_vm, handle);
     }
 
     private static void TeamHealthBelowEvent(WrenVM vm)
@@ -98,13 +114,39 @@ class Event {
             return;
         }
         
-        battleScene.AddEvent(new TeamHealthBelowEvent(t, threshold, () =>
+        battleScene.AddEvent(new TeamHealthBelowEvent(t, threshold, action));
+    }
+
+    // Wren: timer(duration, recurring, action)
+    private static void TimerEvent(WrenVM vm)
+    {
+        double duration = wrenGetSlotDouble(vm, 1);
+        bool recurring = wrenGetSlotBool(vm, 2);
+        WrenHandle action = wrenGetSlotHandle(vm, 3);
+        
+        if (Program.CurrentScene is not BattleScene battleScene)
         {
-            wrenEnsureSlots(vm, 1);
-            wrenSetSlotHandle(vm, 0, action);
-            wrenCall(vm, WrenInvokeCallCallHandle);
-            wrenReleaseHandle(vm, action);
-        } ));
+            GameConsole.WriteLine("Can't do that outside of battle!");
+            return;
+        }
+        
+        battleScene.AddEvent(new TimerEvent(duration, recurring, action));
+    }
+    
+    // Wren: structureDestroyed(x, y, action)
+    public static void StructureDestroyedEvent(WrenVM vm)
+    {
+        int x = (int)wrenGetSlotDouble(vm, 1);
+        int y = (int)wrenGetSlotDouble(vm, 2);
+        WrenHandle action = wrenGetSlotHandle(vm, 3);
+        
+        if (Program.CurrentScene is not BattleScene battleScene)
+        {
+            GameConsole.WriteLine("Can't do that outside of battle!");
+            return;
+        }
+        
+        battleScene.AddEvent(new StructureDestroyedEvent(new Int2D(x,y), action));
     }
 
     public static void Execute(string input)

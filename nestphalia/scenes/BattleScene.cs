@@ -16,6 +16,7 @@ public class BattleScene : Scene
     private Action<Team?> _battleOverCallback;
     private SceneState _state;
     private static List<BattleEvent> _events = new List<BattleEvent>();
+    // private static List<Action<string>> _battleOverEvent;
 
     private double _zoomLevel = 5;
     private readonly List<Double> _zoomLevels = [0.05, 0.1, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3, 3.5, 4, 5, 6, 7, 8, 10, 12, 14, 16]; 

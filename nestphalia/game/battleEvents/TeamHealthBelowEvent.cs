@@ -1,3 +1,5 @@
+using WrenNET;
+
 namespace nestphalia;
 
 // Triggers once, when team's health percentage drops below threshold
@@ -6,7 +8,7 @@ public class TeamHealthBelowEvent : BattleEvent
     public Team Team;
     public double HealthThreshold;
 
-    public TeamHealthBelowEvent(Team team, double healthThreshold, Action triggerEvent) : base(triggerEvent)
+    public TeamHealthBelowEvent(Team team, double healthThreshold, WrenHandle handle) : base(handle)
     {
         Team = team;
         HealthThreshold = healthThreshold;
@@ -16,7 +18,7 @@ public class TeamHealthBelowEvent : BattleEvent
     {
         if (Team.Health / Team.MaxHealth < HealthThreshold)
         {
-            Event.Invoke();
+            Invoke();
             return true;
         }
         return false;

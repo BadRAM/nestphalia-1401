@@ -50,7 +50,7 @@
   },
   "Music": "",
   "Weather": "",
-  "Script": "Event.teamHealthBelow(\"right\", 0.5, Fn.new {\r\n  Cmd.dialog(\"Noooo! It's all falling apart!\")\r\n  Cmd.dialog(\"You won't get away with this!\") \r\n})\r\n\r\nCmd.dialog(\"Here in leftsville we have a saying:\")\r\nCmd.dialog(\"...\")\r\nCmd.dialog(\"I forgot :(\")",
+  "Script": "Cmd.dialog(\"Here in leftsville we have a saying:\")\r\nCmd.dialog(\"...\")\r\nCmd.dialog(\"I forgot :(\")\r\n\r\nEvent.structureDestroyed(27, 15, Fn.new {\r\n  Cmd.dialog(\"AArgh! Our defense grid!\")\r\n})\r\n\r\nEvent.teamHealthBelow(\"right\", 0.5, Fn.new {\r\n  Cmd.dialog(\"Noooo! It's all falling apart!\")\r\n  Cmd.dialog(\"You won't get away with this!\") \r\n})\r\n\r\nEvent.timer(2, false, Fn.new {\r\n  Cmd.dialog(\"And stop asking about the saying!\")\r\n  Event.timer(2, false, Fn.new {\r\n    Cmd.dialog(\"Stop it!\")\r\n    Event.timer(2, false, Fn.new {\r\n      Cmd.dialog(\"Stooooooop!\")\r\n    })\r\n  })\r\n})\r\n",
   "FloorTiles": [
     [
       "floor_1",
