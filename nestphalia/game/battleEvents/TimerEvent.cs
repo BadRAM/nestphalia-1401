@@ -8,7 +8,7 @@ public class TimerEvent : BattleEvent
     public bool Recurring;
     private double _startTime;
     
-    public TimerEvent(double duration, bool recurring, WrenHandle handle) : base(handle)
+    public TimerEvent(double duration, bool recurring, WrenHandle handle, WrenCommand wrenCommand) : base(handle, wrenCommand)
     {
         Duration = duration;
         Recurring = recurring;

@@ -11,8 +11,8 @@ public abstract class Popup
     // Remember to invoke closeActions AFTER calling Close(), because if the closeAction opens a new popup, Close will clear the new popup.
     protected virtual void Close()
     {
-        PopupManager.Clear();
+        PopupManager.Remove(this);
         Time.TimeScale = 1;
-        Input.SetSuppressed(Input.SuppressionSource.Popup, false);
+        Input.SetSuppressed(Input.SuppressionSource.Popup, false); // TODO: Why isn't this in PopupManager.Clear() ?
     }
 }

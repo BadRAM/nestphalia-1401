@@ -39,6 +39,8 @@ public static class Settings
             Saved = new SavedSettings();
             Save();
         }
+        
+        Resources.Dir = Saved.ResourcePathOverride == "" ? Directory.GetCurrentDirectory() : Saved.ResourcePathOverride;
     }
     
     // returns true if the 'close' button has been pressed

@@ -1,18 +1,29 @@
-using System.Reflection;
+using System.Numerics;
 using Raylib_cs;
 using WrenNET;
 using static WrenNET.Wren;
 
 namespace nestphalia;
 
-public static class WrenCommand
+public class WrenCommand
 {
-    private static WrenConfiguration _config;
-    private static WrenVM _vm;
+    private static string _initScript;
+    
+    // the config needs to be kept around because _vm breaks when it gets GC'd
+    private WrenConfiguration _config;
+    private WrenVM _vm;
+    // keeps the foreign function delegates from getting GC'd
+    private List<WrenForeignMethodFn> _foreigns = new List<WrenForeignMethodFn>();
 
-    private static readonly WrenHandle WrenInvokeCallCallHandle;
+    // Unsure if this needs to be VM specific. internally it's a pointer, so probably?
+    private readonly WrenHandle _wrenInvokeCallCallHandle;
 
     static WrenCommand()
+    {
+        _initScript = File.ReadAllText(Resources.Dir + "/resources/api.wren");
+    }
+    
+    public WrenCommand()
     {
         _config = new();
         wrenInitConfiguration(ref _config);
@@ -23,79 +34,70 @@ public static class WrenCommand
         
         _vm = wrenNewVM(_config);
         
-        string script = """
-class Cmd {
-    foreign static kill(team, id)
-    foreign static build(structure, team, x, y)
-    foreign static demolish(x, y)
-    foreign static dialogForeign(mode, portrait, text, fiber)
-    static dialog(text) {
-        dialogForeign(0, "", text, Fiber.current)
-        Fiber.yield()
-    }
-    static dialogL(portrait, text) {
-        dialogForeign(1, portrait, text, Fiber.current)
-        Fiber.yield()
-    }
-    static dialogR(portrait, text) {
-        dialogForeign(2, portrait, text, Fiber.current)
-        Fiber.yield()
-    }
-}
-
-class Event {
-    foreign static teamHealthBelow(team, threshold, action)
-    foreign static timer(duration, recurring, action)
-    foreign static structureDestroyed(x, y, action)
-}
-""";
-        
-        wrenInterpret(_vm, "main", script);
+        wrenInterpret(_vm, "main", _initScript);
         
         // Confusing name overlap:
         //   - Call       - the action of invoking a method
         //   - CallHandle - wren's way of storing a method signature to invoke later
         //   - call()     - the signature of the method that resumes fibers and invokes functions
-        WrenInvokeCallCallHandle = wrenMakeCallHandle(_vm, "call()");
+        _wrenInvokeCallCallHandle = wrenMakeCallHandle(_vm, "call()");
+    }
+
+    ~WrenCommand()
+    {
+        wrenFreeVM(_vm);
     }
     
-    public static void WriteFn(WrenVM vm, string text) => GameConsole.WriteLine(text);
+    private void WriteFn(WrenVM vm, string text) => GameConsole.WriteLine(text);
 	
-    public static void ErrorFn(WrenVM vm, WrenErrorType errorType, string module, int line, string msg)
+    private void ErrorFn(WrenVM vm, WrenErrorType errorType, string module, int line, string msg)
     {
         GameConsole.WriteLine($"Wren {errorType} error from {module}, line {line}: {msg}");
     }
 	
-    public static WrenLoadModuleResult LoadModuleFn(WrenVM vm, string module)
+    private WrenLoadModuleResult LoadModuleFn(WrenVM vm, string module)
     {
         return new WrenLoadModuleResult { source = "" };
     }
 
-    public static WrenForeignMethodFn BindForeignMethodFn(WrenVM vm, string module, string classname, bool isStatic, string signature)
+    // If passed function is not static, then it's delegate must be kept in memory somehow.
+    private WrenForeignMethodFn BindForeignMethodFn(WrenVM vm, string module, string classname, bool isStatic, string signature)
     {
-        if (signature == "kill(_,_)") return Kill;
-        if (signature == "dialogForeign(_,_,_,_)") return Dialog;
-        if (signature == "build(_,_,_,_)") return Build;
-        if (signature == "demolish(_,_)") return Demolish;
-        if (signature == "teamHealthBelow(_,_,_)") return TeamHealthBelowEvent;
-        if (signature == "timer(_,_,_)") return TimerEvent;
-        if (signature == "structureDestroyed(_,_,_)") return StructureDestroyedEvent;
-        throw new Exception($"Tried to bind foreign with unrecognized signature: {signature}");
+        WrenForeignMethodFn foreign = null;
+        
+        if (signature == "spawn(_,_,_,_,_,_,_)") foreign = Spawn;
+        if (signature == "kill(_,_)") foreign = Kill;
+        if (signature == "dialogForeign(_,_,_,_)") foreign = Dialog;
+        if (signature == "build(_,_,_,_)") foreign = Build;
+        if (signature == "demolish(_,_)") foreign = Demolish;
+        if (signature == "teamHealthBelow(_,_,_)") foreign = TeamHealthBelowEvent;
+        if (signature == "timer(_,_,_)") foreign = TimerEvent;
+        if (signature == "structureDestroyed(_,_,_)") foreign = StructureDestroyedEvent;
+        if (signature == "battleOver(_,_)") foreign = BattleOverEvent;
+        
+        if (foreign == null) throw new Exception($"Tried to bind foreign with unrecognized signature: {signature}");
+        _foreigns.Add(foreign);
+        return foreign;
+    }
+    
+    public void Execute(string input)
+    {
+        wrenInterpret(_vm, "main", input);
     }
 
-    public static void InvokeCallOnWrenHandle(WrenHandle handle)
+    public void InvokeCallOnWrenHandle(WrenHandle handle)
     {
         wrenEnsureSlots(_vm, 1);
         wrenSetSlotHandle(_vm, 0, handle);
-        wrenCall(_vm, WrenInvokeCallCallHandle);
+        wrenCall(_vm, _wrenInvokeCallCallHandle);
     }
 
-    public static void ReleaseWrenHandle(WrenHandle handle)
+    public void ReleaseWrenHandle(WrenHandle handle)
     {
         wrenReleaseHandle(_vm, handle);
     }
 
-    private static void TeamHealthBelowEvent(WrenVM vm)
+    private void TeamHealthBelowEvent(WrenVM vm)
     {
         string team = wrenGetSlotString(vm, 1);
         double threshold = wrenGetSlotDouble(vm, 2);
@@ -114,11 +116,11 @@ class Event {
             return;
         }
         
-        battleScene.AddEvent(new TeamHealthBelowEvent(t, threshold, action));
+        battleScene.AddEvent(new TeamHealthBelowEvent(t, threshold, action, this));
     }
 
     // Wren: timer(duration, recurring, action)
-    private static void TimerEvent(WrenVM vm)
+    private void TimerEvent(WrenVM vm)
     {
         double duration = wrenGetSlotDouble(vm, 1);
         bool recurring = wrenGetSlotBool(vm, 2);
@@ -130,11 +132,11 @@ class Event {
             return;
         }
         
-        battleScene.AddEvent(new TimerEvent(duration, recurring, action));
+        battleScene.AddEvent(new TimerEvent(duration, recurring, action, this));
     }
     
     // Wren: structureDestroyed(x, y, action)
-    public static void StructureDestroyedEvent(WrenVM vm)
+    private void StructureDestroyedEvent(WrenVM vm)
     {
         int x = (int)wrenGetSlotDouble(vm, 1);
         int y = (int)wrenGetSlotDouble(vm, 2);
@@ -146,15 +148,24 @@ class Event {
             return;
         }
         
-        battleScene.AddEvent(new StructureDestroyedEvent(new Int2D(x,y), action));
-    }
-
-    public static void Execute(string input)
-    {
-        wrenInterpret(_vm, "main", input);
+        battleScene.AddEvent(new StructureDestroyedEvent(new Int2D(x,y), action, this));
     }
     
-    public static void Dialog(WrenVM vm)
+    // wren: battleOver(team, action)
+    private void BattleOverEvent(WrenVM vm)
+    {
+        string team = wrenGetSlotString(vm, 3);
+        WrenHandle action = wrenGetSlotHandle(vm, 3);
+
+        if (Program.CurrentScene is not BattleScene battleScene)
+        {
+            GameConsole.WriteLine("Can't do that outside of battle!");
+            return;
+        }
+    }
+    
+    // wren: dialogForeign(mode, portrait, text, fiber)
+    private void Dialog(WrenVM vm)
     {
         DialogBox.Mode mode = (DialogBox.Mode)wrenGetSlotDouble(vm, 1);
         string portrait = wrenGetSlotString(vm, 2);
@@ -167,18 +178,61 @@ class Event {
         {
             wrenEnsureSlots(vm, 1);
             wrenSetSlotHandle(vm, 0, fiber);
-            wrenCall(vm, WrenInvokeCallCallHandle);
+            wrenCall(vm, _wrenInvokeCallCallHandle);
             wrenReleaseHandle(vm, fiber);
         };
         
         PopupManager.Start(new DialogBox(text, resume, mode));
     }
     
-    // Wren signature: kill(team,id)
-    public static void Kill(WrenVM vm)
+    // wren: spawn(id, team, count, x, y, targetX, targetY)
+    private void Spawn(WrenVM vm)
     {
-        string team = wrenGetSlotString(vm, 1);
-        string id = wrenGetSlotString(vm, 2);
+        string id = wrenGetSlotString(vm, 1);
+        string team = wrenGetSlotString(vm, 2);
+        int count = (int)wrenGetSlotDouble(vm, 3);
+        int x = (int)wrenGetSlotDouble(vm, 4);
+        int y = (int)wrenGetSlotDouble(vm, 5);
+        int targetX = (int)wrenGetSlotDouble(vm, 6);
+        int targetY = (int)wrenGetSlotDouble(vm, 7);
+        
+        if (Program.CurrentScene is not BattleScene)
+        {
+            GameConsole.WriteLine("spawn() error: Can't do that in this scene!");
+            return;
+        }
+        
+        if (!Assets.Exists<MinionTemplate>(id))
+        {
+            GameConsole.WriteLine($"spawn() error: Can't find minion {id}");
+            return;
+        }
+        MinionTemplate mt = Assets.Get<MinionTemplate>(id);
+
+        Team? t = World.GetTeam(team);
+        if (t == null)
+        {
+            GameConsole.WriteLine($"spawn() error: Invalid team {team}");
+            return;
+        }
+
+        for (int i = 0; i < count; i++)
+        {
+            Vector2 pos = World.GetTileCenter(x, y);
+            if (count > 1)
+            {
+                pos += World.RandomUnitCircle() * (float)Math.Sqrt(mt.PhysicsRadius * count) * 2;
+            }
+            Minion m = mt.Instantiate(t, pos.XYZ(), new NavPath(id, t));
+            m.SetTarget(new Int2D(targetX, targetY));
+        }
+    }
+    
+    // Wren signature: kill(id, team)
+    private void Kill(WrenVM vm)
+    {
+        string id = wrenGetSlotString(vm, 1);
+        string team = wrenGetSlotString(vm, 2);
         
         if (Program.CurrentScene is not BattleScene)
         {
@@ -204,7 +258,7 @@ class Event {
     }
 
     // Wren signature: build(structure, team, x, y)
-    public static void Build(WrenVM vm)
+    private void Build(WrenVM vm)
     {
         string structure = wrenGetSlotString(vm, 1);
         string team = wrenGetSlotString(vm, 2);
@@ -217,7 +271,7 @@ class Event {
             return;
         }
         
-        if (Assets.Exists<StructureTemplate>(structure))
+        if (!Assets.Exists<StructureTemplate>(structure))
         {
             GameConsole.WriteLine($"Build() error: Can't find structure {structure}");
             return;
@@ -235,7 +289,7 @@ class Event {
     }
 
     // Wren signature: destroy(x, y)
-    public static void Demolish(WrenVM vm)
+    private void Demolish(WrenVM vm)
     {
         int x = (int)wrenGetSlotDouble(vm, 1);
         int y = (int)wrenGetSlotDouble(vm, 2);

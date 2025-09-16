@@ -10,6 +10,8 @@ static class Program
     public static void Main()
     {
 	    Stopwatch startupTimer = Stopwatch.StartNew();
+	    Settings.Load();
+	    
 	    // Complete install if needed
 	    if (!Directory.Exists(Directory.GetCurrentDirectory() + "/forts/"))
 	    {
@@ -23,7 +25,6 @@ static class Program
 	    }
 	    
 	    // Startup sequence
-	    Settings.Load();
 	    Screen.Initialize();
 	    Resources.PreLoad();
 	    Raylib.InitAudioDevice();
@@ -42,7 +43,7 @@ static class Program
 	    startupTimer.Stop();
 	    Screen.Load();
         GUI.Initialize();
-        WrenCommand.Execute("""System.print("Wren VM is running.")""");
+        GameConsole.WrenCommand.Execute("""System.print("Wren VM is running.")""");
         
         // Start the first scene. TODO: loading screen, then intro cutscene, rather than menu
         

@@ -37,7 +37,8 @@ public class MenuScene : Scene
                 CloseWindow();
                 return;
             }
-            if (Button180(150,  80, "Intro Test")) new IntroScene().Start();
+            if (DebugMode && Button180(150,  80, "Intro Test")) new IntroScene().Start();
+            if (DebugMode && Button180(150,  40, "Hydra")) Hydra();
 
             if (Settings.RestartNeeded) DrawTextLeft(155, 92, "Restart to apply changes");
             
@@ -47,5 +48,17 @@ public class MenuScene : Scene
         {
             _settingsOpen = !Settings.DrawSettingsMenu();
         }
+    }
+
+    private void Hydra()
+    {
+        AlertPopup p = new AlertPopup("Hydra", "Cut one head, two more take it's place!", "Slice!", () =>
+        {
+            Hydra();
+            Hydra();
+        });
+        p.Rect.X = Random.Shared.Next(0, CenterX) - CenterX;
+        p.Rect.Y = Random.Shared.Next(0, CenterY) - CenterY;
+        PopupManager.Start(p);
     }
 }

@@ -82,7 +82,7 @@ public static class Resources
 
     public static void PreLoad()
     {
-        Dir = Settings.Saved.ResourcePathOverride == "" ? Directory.GetCurrentDirectory() : Settings.Saved.ResourcePathOverride;
+        // Dir is set by settings load, which is the first thing that happens
         
         MissingTexture = Raylib.LoadTexture(Dir + "/resources/sprites/missingtex.png");
         

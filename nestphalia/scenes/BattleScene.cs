@@ -15,6 +15,7 @@ public class BattleScene : Scene
     private bool _pathFinderDebug;
     private Action<Team?> _battleOverCallback;
     private SceneState _state;
+    private WrenCommand _wrenCommand = new WrenCommand();
     private static List<BattleEvent> _events = new List<BattleEvent>();
     // private static List<Action<string>> _battleOverEvent;
 
@@ -60,7 +61,7 @@ public class BattleScene : Scene
         World.Camera.Zoom = (float)_zoomLevels[(int)_zoomLevel];
         _log += $"first random: {World.RandomInt(100)}\n";
         
-        WrenCommand.Execute(level.Script);
+        _wrenCommand.Execute(level.Script);
         GameConsole.WriteLine($"World.InitializeBattle executed script:{level.Script}");
 
         // TODO: Move weather effect rendering into world, or into it's own class managed by world.

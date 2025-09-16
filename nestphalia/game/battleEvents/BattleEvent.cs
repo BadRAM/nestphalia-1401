@@ -6,15 +6,17 @@ namespace nestphalia;
 public abstract class BattleEvent
 {
     public WrenHandle Handle;
+    private WrenCommand _wrenCommand;
 
-    public BattleEvent(WrenHandle handle)
+    public BattleEvent(WrenHandle handle, WrenCommand wrenCommand)
     {
         Handle = handle;
+        _wrenCommand = wrenCommand;
     }
 
     ~BattleEvent()
     {
-        WrenCommand.ReleaseWrenHandle(Handle);
+        _wrenCommand.ReleaseWrenHandle(Handle);
     }
     
     // Return true to destroy event
@@ -22,6 +24,6 @@ public abstract class BattleEvent
 
     public void Invoke()
     {
-        WrenCommand.InvokeCallOnWrenHandle(Handle);
+        _wrenCommand.InvokeCallOnWrenHandle(Handle);
     }
 }

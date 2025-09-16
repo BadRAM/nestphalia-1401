@@ -6,7 +6,7 @@ public class StructureDestroyedEvent : BattleEvent
 {
     public Int2D StructurePosition;
     
-    public StructureDestroyedEvent(Int2D pos, WrenHandle handle) : base(handle)
+    public StructureDestroyedEvent(Int2D pos, WrenHandle handle, WrenCommand wrenCommand) : base(handle, wrenCommand)
     {
         StructurePosition = pos;
     }

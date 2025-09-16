@@ -10,6 +10,7 @@ public static class GameConsole
     private static int _commandHistoryCursor = -1;
     private static bool _open;
     private static string _input;
+    public static WrenCommand WrenCommand = new WrenCommand();
 
     public static void Draw()
     {
