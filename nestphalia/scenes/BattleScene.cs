@@ -17,6 +17,7 @@ public class BattleScene : Scene
     private SceneState _state;
     private WrenCommand _wrenCommand = new WrenCommand();
     private static List<BattleEvent> _events = new List<BattleEvent>();
+    private static List<BattleEvent> _battleEndEvents = new List<BattleEvent>();
     // private static List<Action<string>> _battleOverEvent;
 
     private double _zoomLevel = 5;
@@ -308,6 +309,11 @@ public class BattleScene : Scene
 
         if (_winner != null)
         {
+            foreach (BattleEvent e in _battleEndEvents)
+            {
+                e.Update();
+            }
+            
             _log += $"last random: {World.RandomInt(100)}";
             _state = SceneState.BattleFinished;
             World.EndBattle();
@@ -398,7 +404,7 @@ public class BattleScene : Scene
         for (int i = 0; i < 30; i++)
         {
             dest.Position += new Vector2(-2, -8);
-            DrawTexturePro(_canopyShadowHighlights, source, dest, Vector2.Zero, 0, ColorAlpha(Color.White, 0.025f * ((30-i) / 30f)) );
+            DrawTexturePro(_canopyShadowHighlights, source, dest, Vector2.Zero, 0, ColorAlpha(Color.White, 0.025f * ((30-i) / 30f)));
         }
         Screen.SetCamera();
     }
@@ -406,5 +412,10 @@ public class BattleScene : Scene
     public void AddEvent(BattleEvent e)
     {
         _events.Add(e);
+    }
+
+    public void AddEndEvent(BattleEvent e)
+    {
+        _battleEndEvents.Add(e);
     }
 }

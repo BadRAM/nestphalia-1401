@@ -96,7 +96,7 @@ public class WrenCommand
     {
         wrenReleaseHandle(_vm, handle);
     }
-
+    
     private void TeamHealthBelowEvent(WrenVM vm)
     {
         string team = wrenGetSlotString(vm, 1);
@@ -108,7 +108,7 @@ public class WrenCommand
             GameConsole.WriteLine("Can't do that outside of battle!");
             return;
         }
-
+        
         Team? t = World.GetTeam(team);
         if (t == null)
         {
@@ -118,7 +118,7 @@ public class WrenCommand
         
         battleScene.AddEvent(new TeamHealthBelowEvent(t, threshold, action, this));
     }
-
+    
     // Wren: timer(duration, recurring, action)
     private void TimerEvent(WrenVM vm)
     {
@@ -154,14 +154,16 @@ public class WrenCommand
     // wren: battleOver(team, action)
     private void BattleOverEvent(WrenVM vm)
     {
-        string team = wrenGetSlotString(vm, 3);
-        WrenHandle action = wrenGetSlotHandle(vm, 3);
-
+        string team = wrenGetSlotString(vm, 1);
+        WrenHandle action = wrenGetSlotHandle(vm, 2);
+        
         if (Program.CurrentScene is not BattleScene battleScene)
         {
             GameConsole.WriteLine("Can't do that outside of battle!");
             return;
         }
+        
+        battleScene.AddEndEvent(new BattleEndEvent(team, action, this));
     }
     
     // wren: dialogForeign(mode, portrait, text, fiber)
@@ -208,14 +210,14 @@ public class WrenCommand
             return;
         }
         MinionTemplate mt = Assets.Get<MinionTemplate>(id);
-
+        
         Team? t = World.GetTeam(team);
         if (t == null)
         {
             GameConsole.WriteLine($"spawn() error: Invalid team {team}");
             return;
         }
-
+        
         for (int i = 0; i < count; i++)
         {
             Vector2 pos = World.GetTileCenter(x, y);
@@ -239,7 +241,7 @@ public class WrenCommand
             GameConsole.WriteLine("Can't do that in this scene!");
             return;
         }
-
+        
         Team? t = World.GetTeam(team);
         
         int count = 0;
@@ -277,7 +279,7 @@ public class WrenCommand
             return;
         }
         StructureTemplate st = Assets.Get<StructureTemplate>(structure);
-
+        
         Team? t = World.GetTeam(team);
         if (t == null)
         {
