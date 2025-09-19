@@ -325,7 +325,7 @@ public partial class Minion : ISprite
         State.DrawDecorators();
     }
 
-    protected void DrawDebug()
+    public void DrawDebug()
     {
         if (Raylib.CheckCollisionPointCircle(Raylib.GetScreenToWorld2D(Raylib.GetMousePosition(), World.Camera), Position.XYZ2D(), 2*Template.PhysicsRadius))
         {
@@ -369,12 +369,14 @@ public partial class Minion : ISprite
         _collisionOffset += distance;
     }
     
-    public virtual void Hurt(double damage, Projectile? damageSource = null)
+    public virtual void Hurt(double damage, Projectile? damageSource = null, bool ignoreArmor = false)
     {
-        // guard against second bullet in same frame.
+        // guard against dying twice one frame.
         if (Health <= 0) return;
 
-        Health -= Math.Max(1, damage - Armor);
+        if (!ignoreArmor) damage -= Armor;
+        
+        Health -= Math.Max(1, damage);
         if (Health <= 0)
         {
             Team.AddFearOf(Template.MaxHealth/10, World.PosToTilePos(Position));

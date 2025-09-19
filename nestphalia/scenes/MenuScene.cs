@@ -54,8 +54,11 @@ public class MenuScene : Scene
     {
         AlertPopup p = new AlertPopup("Hydra", "Cut one head, two more take it's place!", "Slice!", () =>
         {
-            Hydra();
-            Hydra();
+            if (!Input.Pressed(Input.InputAction.Exit))
+            {
+                Hydra();
+                Hydra();
+            }
         });
         p.Rect.X = Random.Shared.Next(0, CenterX) - CenterX;
         p.Rect.Y = Random.Shared.Next(0, CenterY) - CenterY;

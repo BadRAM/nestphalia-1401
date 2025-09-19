@@ -45,9 +45,9 @@ public class FlyUntilHitMinion : FlyingMinion
         }
     }
 
-    public override void Hurt(double damage, Projectile? damageSource = null)
+    public override void Hurt(double damage, Projectile? damageSource = null, bool ignoreArmor = false)
     {
-        base.Hurt(damage, damageSource);
+        base.Hurt(damage, damageSource, ignoreArmor);
 
         if (WantToFly)
         {

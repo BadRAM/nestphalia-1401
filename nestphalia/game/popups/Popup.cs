@@ -13,6 +13,5 @@ public abstract class Popup
     {
         PopupManager.Remove(this);
         Time.TimeScale = 1;
-        Input.SetSuppressed(Input.SuppressionSource.Popup, false); // TODO: Why isn't this in PopupManager.Clear() ?
     }
 }

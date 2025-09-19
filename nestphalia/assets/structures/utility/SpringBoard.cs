@@ -41,12 +41,10 @@ public class SpringBoard : Structure
 
             if (_template.IsRandom)
             {
-                m.SetState(new Minion.Jump(m, position + World.RandomUnitCircle() * _template.Target.Length(), 0, 0.5, 1));
+                _target = position + World.RandomUnitCircle() * _template.Target.Length();
             }
-            else
-            {
-                m.SetState(new Minion.Jump(m, _target, 0, 0.5, 1));
-            }
+
+            m.SetState(new Minion.Jump(m, _target, 0, 0.75, 1, 48));
         }
     }
 

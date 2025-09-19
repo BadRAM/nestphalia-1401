@@ -16,8 +16,9 @@ public class BattleScene : Scene
     private Action<Team?> _battleOverCallback;
     private SceneState _state;
     private WrenCommand _wrenCommand = new WrenCommand();
-    private static List<BattleEvent> _events = new List<BattleEvent>();
-    private static List<BattleEvent> _battleEndEvents = new List<BattleEvent>();
+    private List<BattleEvent> _events = new List<BattleEvent>();
+    private List<BattleEvent> _battleEndEvents = new List<BattleEvent>();
+    private Minion? _selectedMinion;
     // private static List<Action<string>> _battleOverEvent;
 
     private double _zoomLevel = 5;
@@ -33,6 +34,7 @@ public class BattleScene : Scene
     private Vector2 _canopyTexOffset;
     private Texture2D _canopyShadow;
     private Texture2D _canopyShadowHighlights;
+    private StretchyTexture _selectBoxBG;
     
     private enum SceneState
     {
@@ -71,6 +73,8 @@ public class BattleScene : Scene
         _canopyShadowHighlights = Resources.GetTextureByName("shadow_canopy_godray");
         SetTextureFilter(_canopyShadow, TextureFilter.Bilinear);
         SetTextureFilter(_canopyShadowHighlights, TextureFilter.Bilinear);
+
+        _selectBoxBG = Assets.Get<StretchyTexture>("stretch_default");
         
         Resources.PlayMusicByName(level.Music == "" ? "jesper-kyd-highlands" : level.Music);
     }
@@ -97,6 +101,8 @@ public class BattleScene : Scene
         World.Draw();
 
         DrawCanopyShadows();
+
+        DrawSelectHud();
         
         World.DrawGUI();
         
@@ -199,6 +205,18 @@ public class BattleScene : Scene
         if (Input.Pressed(Input.InputAction.PathDebug))
         {
             _pathFinderDebug = !_pathFinderDebug;
+        }
+
+        if (Input.Pressed(MouseButton.Left))
+        {
+            _selectedMinion = null;
+            foreach (Minion m in World.GetMinionsInRegion(World.GetMouseTilePos(), 2))
+            {
+                if (CheckCollisionPointCircle(GetScreenToWorld2D(GetMousePosition(), World.Camera), m.Position.XYZ2D(), 2*m.Template.PhysicsRadius))
+                {
+                    _selectedMinion = m;
+                }
+            }
         }
         
         if (Input.Held(MouseButton.Right))
@@ -385,6 +403,35 @@ public class BattleScene : Scene
             World.Camera.Offset -= _cameraShakeDisplacement;
             _cameraShakeDisplacement = Vector2.Zero;
         }
+    }
+    
+    private void DrawSelectHud()
+    {
+        if (_selectedMinion == null) return;
+        if (_selectedMinion.Health <= 0)
+        {
+            _selectedMinion = null;
+            return;
+        }
+        
+        Screen.SetCamera(World.Camera);
+        _selectedMinion.DrawDebug();
+
+        foreach (Minion m in World.Minions)
+        {
+            if (m.OriginTile == _selectedMinion.OriginTile)
+            {
+                DrawCircleLinesV(m.Position.XY(), m.Template.PhysicsRadius, Color.Blue);
+            }
+        }
+        DrawCircleLinesV(_selectedMinion.Position.XY(), _selectedMinion.Template.PhysicsRadius, Color.Green);
+        Screen.SetCamera();
+
+        DrawStretchyTexture(_selectBoxBG, new Rectangle(30, -150, 240, 320), Screen.Left);
+        string text = $"{_selectedMinion.Template.Name}\n" +
+                      $"HP: {_selectedMinion.Health:N1}/{_selectedMinion.Template.MaxHealth} - {(100 * _selectedMinion.Health / _selectedMinion.Template.MaxHealth):N1}%\n";
+        text = WrapText(text, 240);
+        DrawTextLeft(30, -150, text, color:Color.Black, anchor:Screen.Left);
     }
 
     private void DrawGradientBackground(Color topColor, Color bottomColor)

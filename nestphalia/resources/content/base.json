@@ -9,6 +9,15 @@
     "Bottom": 7
   },
   {
+    "ID": "stretch_xp",
+    "Type": "StretchyTexture",
+    "Texture": "9slice_xp",
+    "Left": 30,
+    "Right": 30,
+    "Top": 30,
+    "Bottom": 4
+  },
+  {
     "ID": "floor_1",
     "Type": "FloorTileTemplate",
     "Texture": "floor1"
@@ -123,7 +132,7 @@
   {
     "ID": "springboard_forward",
     "Type": "SpringBoardTemplate",
-    "Name": "Prototype Springboard",
+    "Name": "Forward Springboard",
     "Description": "Boing!",
     "Texture": "spring",
     "Target": {
@@ -136,7 +145,7 @@
   {
     "ID": "springboard_backward",
     "Type": "SpringBoardTemplate",
-    "Name": "Prototype Springboard",
+    "Name": "Backward Springboard",
     "Description": "!gnioB",
     "Texture": "spring",
     "Target": {

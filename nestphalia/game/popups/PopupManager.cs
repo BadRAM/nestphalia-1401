@@ -49,5 +49,10 @@ public static class PopupManager
             throw new Exception("Unregistered popup tried to exit the stack, something is VERY wrong!");
         }
         _popupStack.Remove(popup);
+        _firstFrame = true;
+        if (_popupStack.Count == 0)
+        {
+            Input.SetSuppressed(Input.SuppressionSource.Popup, false);
+        }
     }
 }

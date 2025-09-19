@@ -173,9 +173,9 @@ public partial class Minion
         private double _squatDuration;
         private double _jumpDuration;
         private double _landingLag;
-        private double _height = 24;
+        private double _height;
 
-        public Jump(Minion minion, Vector2 to, double squatDuration, double jumpDuration, double landingLag) 
+        public Jump(Minion minion, Vector2 to, double squatDuration, double jumpDuration, double landingLag, double height = 24) 
             : base(minion)
         {
             _to = to;
@@ -183,6 +183,7 @@ public partial class Minion
             _jumpDuration = jumpDuration;
             _landingLag = landingLag;
             _started = Time.Scaled;
+            _height = height;
             
             _from = Me.Position.XY();
             Me.NextPos = _to + (_to - _from);
@@ -209,9 +210,22 @@ public partial class Minion
             {
                 Me.IsFlying = false;
                 Me.Position = _to.XYZ();
-                Me.IsOnTopOfStructure = World.GetTile(World.PosToTilePos(Me.Position))?.PhysSolid(Me) ?? false;
+                Structure? landingOn = World.GetTile(World.PosToTilePos(Me.Position));
+                Me.IsOnTopOfStructure = landingOn?.PhysSolid(Me) ?? false;
                 Me.NavPath.TargetNearestPoint(Me.Position.XY());
                 Me.UpdateNextPos();
+                
+                // Fall Damage
+                if (Me is not HopperMinion && landingOn is not SpringBoard)
+                {
+                    // scale with maxhealth
+                    double fallDamage = Me.Template.MaxHealth; 
+                    // scale with drop height. 0% damage from 0-1 tile drop, 100% damage at 4 tile drop
+                    fallDamage *= Math.Max((_height - 24) / 96, 0); 
+                    fallDamage -= 4; // flat reduction to help small guys
+                    if (fallDamage >= 1) Me.Hurt(fallDamage, ignoreArmor:true); // Don't hurt below minimum damage
+                }
+                
                 if (Vector2.Distance(Me.Position.XY(), Me.NextPos) > 48)
                 {
                     Me.SetTarget(Me.NavPath.Destination, _landingLag);

@@ -19,16 +19,16 @@ public class AlertPopup : Popup
         _titleText = titleText;
         _bodyText = bodyText;
         _dismissText = dismissText;
-        _bgTex = Assets.Get<StretchyTexture>("stretch_default");
+        _bgTex = Assets.Get<StretchyTexture>("stretch_xp");
         _closeAction = closeAction;
     }
 
     public override void Draw()
     {
         Rect = GUI.DrawStretchyTexture(_bgTex, Rect, draggable:true, resizable:true);
-        GUI.DrawTextCentered(0, 20, _titleText, anchor: Screen.Center + Rect.Top());
-        GUI.DrawTextCentered(0, 40, _bodyText, anchor: Screen.Center + Rect.Top());
-        if (GUI.Button100(-50, -50, _dismissText, anchor: Screen.Center + Rect.Bottom()))
+        GUI.DrawTextCentered(0, 20, _titleText, color: Color.Black, anchor: Screen.Center + Rect.Top());
+        GUI.DrawTextCentered(0, 40, _bodyText, color: Color.Black, anchor: Screen.Center + Rect.Top());
+        if (GUI.Button90(-45, -50, _dismissText, anchor: Screen.Center + Rect.Bottom()) || Input.Pressed(Input.InputAction.Exit))
         {
             Close();
             _closeAction.Invoke();
