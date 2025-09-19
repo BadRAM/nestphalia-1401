@@ -12,7 +12,7 @@ public class DialogBox : Popup
     private double _timePerChar = 0.1;
     private Texture2D _portrait;
     private Texture2D _portraitPanel;
-    private Texture2D _background;
+    private StretchyTexture _background;
     private Mode _mode;
     private Rectangle _rect = new Rectangle(-300, 50, 600, 200);
     private Action _closeAction;
@@ -31,13 +31,13 @@ public class DialogBox : Popup
         _mode = mode;
         _portrait = portrait ?? Resources.MissingTexture;
         _portraitPanel = Resources.GetTextureByName("ability_slot");
-        _background = Resources.GetTextureByName("9slice");
+        _background = Assets.Get<StretchyTexture>("stretch_default");
         _lastCharRevealTime = Time.Unscaled;
     }
     
     public override void Draw()
     {
-        Draw9Slice(_background, _rect);
+        DrawStretchyTexture(_background, _rect);
 
         if (Time.Unscaled - _lastCharRevealTime > _timePerChar)
         {

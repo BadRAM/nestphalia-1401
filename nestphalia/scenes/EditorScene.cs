@@ -23,7 +23,7 @@ public class EditorScene : Scene
     private double _price;
     private int _nestCount;
     private int _beaconCount;
-    private Texture2D _panelTex;
+    private StretchyTexture _panelTex;
     private Texture2D _bg;
     private StructureTemplate? _toolTipStructure;
     private bool _unsaved;
@@ -50,7 +50,7 @@ public class EditorScene : Scene
         
         Program.CurrentScene = this;
         Screen.RegenerateBackground();
-        _panelTex = Resources.GetTextureByName("9slice");
+        _panelTex = Assets.Get<StretchyTexture>("stretch_default");
         _bg = Resources.GetTextureByName("editor_bg");
         World.InitializeEditor(Assets.Get<Level>("level_fortedit"), _fort);
         World.Camera.Offset = new Vector2(Screen.CenterX, Screen.CenterY);
@@ -316,7 +316,7 @@ public class EditorScene : Scene
 
         rect.Position = Vector2.Clamp(rect.Position, Vector2.Zero, Screen.BottomRight - rect.Size);
         
-        Draw9Slice(_panelTex, rect, anchor:Screen.TopLeft);
+        DrawStretchyTexture(_panelTex, rect, anchor:Screen.TopLeft);
         DrawTextLeft(rect.Position + Vector2.One * 2, tip, anchor:Screen.TopLeft);
     }
 

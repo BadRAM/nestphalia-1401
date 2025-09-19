@@ -11,7 +11,7 @@ public class AlertPopup : Popup
     private string _bodyText;
     private string _dismissText;
     public Rectangle Rect = new Rectangle(-180, -120, 360, 240);
-    private Texture2D _bgTex;
+    private StretchyTexture _bgTex;
     private Action _closeAction;
 
     public AlertPopup(string titleText, string bodyText, string dismissText, Action closeAction) : base()
@@ -19,13 +19,13 @@ public class AlertPopup : Popup
         _titleText = titleText;
         _bodyText = bodyText;
         _dismissText = dismissText;
-        _bgTex = Resources.GetTextureByName("9slice");
+        _bgTex = Assets.Get<StretchyTexture>("stretch_default");
         _closeAction = closeAction;
     }
 
     public override void Draw()
     {
-        Rect = GUI.Draw9Slice(_bgTex, Rect, draggable:true, resizable:true);
+        Rect = GUI.DrawStretchyTexture(_bgTex, Rect, draggable:true, resizable:true);
         GUI.DrawTextCentered(0, 20, _titleText, anchor: Screen.Center + Rect.Top());
         GUI.DrawTextCentered(0, 40, _bodyText, anchor: Screen.Center + Rect.Top());
         if (GUI.Button100(-50, -50, _dismissText, anchor: Screen.Center + Rect.Bottom()))

@@ -1,5 +1,14 @@
 [
   {
+    "ID": "stretch_default",
+    "Type": "StretchyTexture",
+    "Texture": "9slice_big",
+    "Left": 7,
+    "Right": 7,
+    "Top": 17,
+    "Bottom": 7
+  },
+  {
     "ID": "floor_1",
     "Type": "FloorTileTemplate",
     "Texture": "floor1"

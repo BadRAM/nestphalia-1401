@@ -130,86 +130,132 @@ public static class GUI
         return MeasureTextEx(Resources.Font, text, size, size / FontSize);
     }
 
-    public static Rectangle Draw9Slice(Texture2D texture, Rectangle rect, Vector2? anchor = null, bool draggable = false, bool resizable = false)
+    public static Rectangle DrawStretchyTexture(StretchyTexture stretchure, Rectangle rect, Vector2? anchor = null, bool draggable = false, bool resizable = false)
     {
         anchor ??= Screen.Center;
         rect.X += anchor.Value.X;
         rect.Y += anchor.Value.Y;
         
-        int tileSize = texture.Width / 3;
+        int tileWidth = stretchure.Texture.Width - (stretchure.Left + stretchure.Right);
+        int tileHeight = stretchure.Texture.Height - (stretchure.Top + stretchure.Bottom);
         
         // resize
-        if (resizable && Input.Held(MouseButton.Left) && CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(GetScaledMouseDelta() + rect.Position + rect.Size - Vector2.One * tileSize, tileSize, tileSize)))
+        if (resizable)
         {
-            rect.Size = Vector2.Clamp(rect.Size + GetScaledMouseDelta(), Vector2.Zero, Vector2.PositiveInfinity);
+            bool left =   CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(GetScaledMouseDelta() + rect.Position + new Vector2(-stretchure.Left, -stretchure.Top), stretchure.Left,  rect.Height + stretchure.Top + stretchure.Bottom));
+            bool right =  CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(GetScaledMouseDelta() + rect.Position + new Vector2(rect.Width, -stretchure.Top),       stretchure.Right, rect.Height + stretchure.Top + stretchure.Bottom));
+            bool bottom = CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(GetScaledMouseDelta() + rect.Position + new Vector2(-stretchure.Left, rect.Height),     rect.Width + stretchure.Right + stretchure.Bottom, stretchure.Bottom));
+            // resize left
+            if (left)
+            {
+                if (Input.Held(MouseButton.Left))
+                {
+                    rect.X += GetScaledMouseDelta().X;
+                    rect.Width -= GetScaledMouseDelta().X;
+                }
+            }
+            // resize right
+            if (right)
+            {
+                if (Input.Held(MouseButton.Left))
+                {
+                    rect.Width += GetScaledMouseDelta().X;
+                }
+            }
+            // resize bottom
+            if (bottom)
+            {
+                if (Input.Held(MouseButton.Left))
+                {
+                    rect.Height += GetScaledMouseDelta().Y;
+                }
+            }
+
+            // cursor look
+            if (bottom)
+            {
+                if (left)       _cursorLook = MouseCursor.ResizeNesw;
+                else if (right) _cursorLook = MouseCursor.ResizeNwse;
+                else            _cursorLook = MouseCursor.ResizeNs;
+            }
+            else if (right || left)
+            {
+                _cursorLook = MouseCursor.ResizeEw;
+            }
         }
         // move
-        else if (draggable && Input.Held(MouseButton.Left) && CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(rect.Position + GetScaledMouseDelta(), rect.Width, tileSize)))
+        if (draggable && CheckCollisionPointRec(GetScaledMousePosition() - GetScaledMouseDelta(), new Rectangle(rect.X, rect.Y - stretchure.Top, rect.Width, stretchure.Top)))
         {
-            rect.Position = Vector2.Clamp(rect.Position + GetScaledMouseDelta(), Vector2.Zero, Screen.BottomRight - rect.Size);
+            if (Input.Held(MouseButton.Left))
+            {
+                rect.Position = Vector2.Clamp(GetScaledMouseDelta() + rect.Position, Vector2.Zero, Screen.BottomRight - rect.Size);
+                _cursorLook = MouseCursor.ResizeAll;
+            }
+            _cursorLook = MouseCursor.ResizeAll;
         }
+
         
         // Draw background
-        int centerWidth = ((int)rect.Width - tileSize*2) / (tileSize);
-        int centerHeight = ((int)rect.Height - tileSize*2) / (tileSize);
-        Rectangle texRect = new Rectangle(tileSize, tileSize, tileSize, tileSize);
-        for (int x = 0; x <= centerWidth; x++)
-        for (int y = 0; y <= centerHeight; y++)
+        int countX = (int)rect.Width / tileWidth;
+        int countY = (int)rect.Height / tileHeight;
+        Rectangle texRect = new Rectangle(stretchure.Left, stretchure.Top, tileWidth, tileHeight);
+        for (int x = 0; x <= countX; x++)
+        for (int y = 0; y <= countY; y++)
         {
-            texRect = new Rectangle(tileSize, tileSize, tileSize, tileSize);
-            if (x == centerWidth) texRect.Width = (int)(rect.Width % tileSize)+1;
-            if (y == centerHeight) texRect.Height = (int)(rect.Height % tileSize)+1;
-            DrawTextureRec(texture, texRect, new Vector2(rect.X + (x+1) * tileSize, rect.Y + (y+1) * tileSize), Color.White);
+            texRect = new Rectangle(stretchure.Left, stretchure.Top, tileWidth, tileHeight);
+            if (x == countX) texRect.Width = (int)(rect.Width % tileWidth);
+            if (y == countY) texRect.Height = (int)(rect.Height % tileHeight);
+            DrawTextureRec(stretchure.Texture, texRect, new Vector2(rect.X + x * tileWidth, rect.Y + y * tileHeight), Color.White);
         }
 
         // Draw Top bar
-        for (int x = 0; x <= centerWidth; x++)
+        for (int x = 0; x <= countX; x++)
         {
-            texRect = new Rectangle(tileSize, 0, tileSize, tileSize);
-            if (x == centerWidth) texRect.Width = (int)(rect.Width % tileSize)+1;
-            DrawTextureRec(texture, texRect, new Vector2(rect.X + (x+1) * tileSize, rect.Y), Color.White);
+            texRect = new Rectangle(stretchure.Left, 0, tileWidth, stretchure.Top);
+            if (x == countX) texRect.Width = (int)(rect.Width % tileWidth);
+            DrawTextureRec(stretchure.Texture, texRect, new Vector2(rect.X + x * tileWidth, rect.Y - stretchure.Top), Color.White);
         }
         
         // Draw Bottom bar
-        for (int x = 0; x <= centerWidth; x++)
+        for (int x = 0; x <= countX; x++)
         {
-            texRect = new Rectangle(tileSize, tileSize*2, tileSize, tileSize);
-            if (x == centerWidth) texRect.Width = (int)(rect.Width % tileSize)+1;
-            DrawTextureRec(texture, texRect, new Vector2(rect.X + (x+1) * tileSize, rect.Y + rect.Height - tileSize), Color.White);
+            texRect = new Rectangle(stretchure.Left, stretchure.Texture.Height - stretchure.Bottom, tileWidth, stretchure.Bottom);
+            if (x == countX) texRect.Width = (int)(rect.Width % tileWidth);
+            DrawTextureRec(stretchure.Texture, texRect, new Vector2(rect.X + x * tileWidth, rect.Y + rect.Height), Color.White);
         }
         
         // Draw Left bar
-        for (int y = 0; y <= centerHeight; y++)
+        for (int y = 0; y <= countY; y++)
         {
-            texRect = new Rectangle(0, tileSize, tileSize, tileSize);
-            if (y == centerHeight) texRect.Height = (int)(rect.Height % tileSize)+1;
-            DrawTextureRec(texture, texRect, new Vector2(rect.X, rect.Y + (y+1) * tileSize), Color.White);
+            texRect = new Rectangle(0, stretchure.Top, stretchure.Left,  tileHeight);
+            if (y == countY) texRect.Height = (int)(rect.Height % tileHeight);
+            DrawTextureRec(stretchure.Texture, texRect, new Vector2(rect.X - stretchure.Left, rect.Y + y * tileHeight), Color.White);
         }
         
         // Draw Right bar
-        for (int y = 0; y <= centerHeight; y++)
+        for (int y = 0; y <= countY; y++)
         {
-            texRect = new Rectangle(tileSize*2, tileSize, tileSize, tileSize);
-            if (y == centerHeight) texRect.Height = (int)(rect.Height % tileSize)+1;
-            DrawTextureRec(texture, texRect, new Vector2(rect.X + rect.Width - tileSize, rect.Y + (y+1) * tileSize), Color.White);
+            texRect = new Rectangle(stretchure.Texture.Width - stretchure.Right, stretchure.Top, stretchure.Right, tileHeight);
+            if (y == countY) texRect.Height = (int)(rect.Height % tileHeight);
+            DrawTextureRec(stretchure.Texture, texRect, new Vector2(rect.X + rect.Width, rect.Y + y * tileHeight), Color.White);
         }
-
+        
         // Draw top left corner
-        texRect = new Rectangle(0, 0, tileSize, tileSize);
-        DrawTextureRec(texture, texRect, rect.Position, Color.White);
+        texRect = new Rectangle(0, 0, stretchure.Left, stretchure.Top);
+        DrawTextureRec(stretchure.Texture, texRect, rect.Position + new Vector2(-stretchure.Left, -stretchure.Top), Color.White);
         
         // Draw top right corner
-        texRect.X = tileSize*2; 
-        DrawTextureRec(texture, texRect, rect.Position + Vector2.UnitX * (rect.Width-tileSize), Color.White);
-        
-        // Draw bottom right corner
-        texRect.Y = tileSize*2;
-        DrawTextureRec(texture, texRect, rect.Position + Vector2.UnitX * (rect.Width-tileSize) + Vector2.UnitY * (rect.Height-tileSize), Color.White);
+        texRect = new Rectangle(stretchure.Texture.Width - stretchure.Right, 0, stretchure.Right, stretchure.Top);
+        DrawTextureRec(stretchure.Texture, texRect, rect.Position + new Vector2(rect.Width, -stretchure.Top), Color.White);
         
         // Draw bottom left corner
-        texRect.X = 0; 
-        DrawTextureRec(texture, texRect, rect.Position + Vector2.UnitY * (rect.Height-tileSize), Color.White);
+        texRect = new Rectangle(0, stretchure.Texture.Height - stretchure.Bottom, stretchure.Left, stretchure.Bottom);
+        DrawTextureRec(stretchure.Texture, texRect, rect.Position + new Vector2(-stretchure.Left, rect.Height), Color.White);
         
+        // Draw bottom right corner
+        texRect = new Rectangle(stretchure.Texture.Width - stretchure.Right, stretchure.Texture.Height - stretchure.Bottom, stretchure.Right, stretchure.Bottom);
+        DrawTextureRec(stretchure.Texture, texRect, rect.Position + new Vector2(rect.Width, rect.Height), Color.White);
+
         rect.X -= anchor.Value.X;
         rect.Y -= anchor.Value.Y;
         

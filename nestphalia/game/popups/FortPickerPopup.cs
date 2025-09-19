@@ -12,7 +12,7 @@ public class FortPickerPopup : Popup
     private Action<string> _newFortAction;
 
     private Rectangle _rect;
-    private Texture2D _bgTex;
+    private StretchyTexture _bgTex;
     private string _path;
     private int _page = 0;
     private FortPickerPopup? _parent;
@@ -43,7 +43,7 @@ public class FortPickerPopup : Popup
         _newFortAction = newFortAction;
 
         _rect = new Rectangle(-160, -height / 2, 320, height);
-        _bgTex = Resources.GetTextureByName("9slice");
+        _bgTex = Assets.Get<StretchyTexture>("stretch_default");
     }
 
     public override void Draw()
@@ -55,7 +55,7 @@ public class FortPickerPopup : Popup
         }
 
         // Draw background etc
-        GUI.Draw9Slice(_bgTex, _rect);
+        GUI.DrawStretchyTexture(_bgTex, _rect);
         GUI.DrawTextCentered(0, 10, _titleText, anchor: Screen.Center + _rect.Top());
 
         // Draw options
