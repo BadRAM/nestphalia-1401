@@ -35,12 +35,20 @@ public class Fort
         {
             if (spawnZone.Flip)
             {
-                if (!Assets.Exists<StructureTemplate>(Board[x+y*20])) continue;
+                if (!Assets.Exists<StructureTemplate>(Board[x + y * 20]))
+                {
+                    World.SetTile(null, World.RightTeam, (19 + spawnZone.X) - x,y + spawnZone.Y);
+                    continue;
+                };
                 World.SetTile(Assets.Get<StructureTemplate>(Board[x+y*20]), World.RightTeam, (19 + spawnZone.X) - x,y + spawnZone.Y);
             }
             else
             {
-                if (!Assets.Exists<StructureTemplate>(Board[x+y*20])) continue;
+                if (!Assets.Exists<StructureTemplate>(Board[x+y*20]))
+                {
+                    World.SetTile(null, World.LeftTeam, x + spawnZone.X,y + spawnZone.Y);
+                    continue;
+                }
                 World.SetTile(Assets.Get<StructureTemplate>(Board[x+y*20]), World.LeftTeam, x + spawnZone.X,y + spawnZone.Y);
             }
         }
