@@ -17,7 +17,7 @@ public class MinefieldTemplate : StructureTemplate
         Bomb = jObject.Value<string?>("Bomb") ?? throw new ArgumentNullException();
         Range = jObject.Value<double?>("Range") ?? throw new ArgumentNullException();
         Cooldown = jObject.Value<double?>("Cooldown") ?? throw new ArgumentNullException();
-        Class = jObject.Value<StructureClass?>("Class") ?? StructureClass.Tower;
+        Class = Enum.Parse<StructureClass>(jObject.Value<string?>("Class") ?? "Defense");
     }
 
     public override Minefield Instantiate(Team team, int x, int y)

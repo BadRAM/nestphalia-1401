@@ -4,7 +4,10 @@ namespace nestphalia;
 
 public class HazardSignTemplate : StructureTemplate
 {
-    public HazardSignTemplate(JObject jObject) : base(jObject) {}
+    public HazardSignTemplate(JObject jObject) : base(jObject)
+    {
+        Class = Enum.Parse<StructureClass>(jObject.Value<string?>("Class") ?? "Utility");
+    }
 
     public override Structure Instantiate(Team team, int x, int y)
     {

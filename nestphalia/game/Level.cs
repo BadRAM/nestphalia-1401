@@ -107,7 +107,7 @@ public class Level : JsonAsset
             structureCount++;
             totalCost += t.Price;
             if (t.Class == StructureTemplate.StructureClass.Utility) utilityCount++;
-            if (t.Class == StructureTemplate.StructureClass.Tower) turretCount++;
+            if (t.Class == StructureTemplate.StructureClass.Defense) turretCount++;
             if (t.Class == StructureTemplate.StructureClass.Nest) nestCount++;
         }
 

@@ -13,6 +13,7 @@ public class SpringBoardTemplate : StructureTemplate
     {
         Target = jObject.Value<JObject>("Target")?.ToObject<Vector2>() ?? new Vector2(0, 72);
         IsRandom = jObject.Value<bool?>("IsRandom") ?? false;
+        Class = Enum.Parse<StructureClass>(jObject.Value<string?>("Class") ?? "Defense");
     }
     
     public override SpringBoard Instantiate(Team team, int x, int y)

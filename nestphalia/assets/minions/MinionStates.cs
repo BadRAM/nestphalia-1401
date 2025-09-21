@@ -17,6 +17,18 @@ public partial class Minion
         Carrying
     }
     
+    public enum StateType
+    {
+        Move,
+        SwoopAttack,
+        MeleeAttack,
+        RangedAttack,
+        Wait,
+        Jump,
+        Cheer,
+        Flee
+    }
+    
     public abstract class BaseState
     {
         protected Minion Me;
@@ -64,7 +76,7 @@ public partial class Minion
             // If there's something in our way, change to attacking state
             if (Me.CanAttack())
             {
-                Me.State = new Attack(Me);
+                Me.ResetState(Me.Template.AttackType);
                 return;
             }
             
@@ -87,12 +99,95 @@ public partial class Minion
             return Me.Template.GetAnimationFrame(animState, _animFrame/Me.Template.WalkAnimDelay);
         }
     }
+    
+    public class SwoopAttack : BaseState
+    {
+        private double _attackStartedTime;
+        private float _altitude;
+        private Vector2 _startPos;
+        private Vector2 _endPos;
+        private double _duration;
+        private bool _hasAttacked = false;
+        private int _animFrame;
 
-    public class Attack : BaseState
+        public SwoopAttack(Minion minion) : base(minion)
+        {
+            _attackStartedTime = Time.Scaled;
+            _altitude = minion.Position.Z;
+            _startPos = minion.Position.XY();
+            _endPos = minion.Position.XY() + (Me.NextPos - Me.Position.XY()) * 2;
+            _duration = Me.Template.AttackDuration * 0.75f;
+        }
+        
+        public override string ToString() { return "SwoopAttack"; }
+
+        public override void Update()
+        {
+            _animFrame++;
+            float t = (float)((Time.Scaled - _attackStartedTime) / _duration);
+            Me.Position = new Vector3(Vector2.Lerp(_startPos, _endPos, t), _altitude - (float)(_altitude * Easings.Ballistic(t) * 0.8f));
+            if (!_hasAttacked && t >= 0.5)
+            {
+                _hasAttacked = true;
+                Me.DoAttack();
+            }
+            if (t >= 1)
+            {
+                Me.Position = _endPos.XYZ(_altitude);
+                Me.State = new Wait(Me, Me.Template.AttackDuration * 0.25f, () => { Me.ResetState(Me.Template.DefaultState); });
+                return;
+            }
+        }
+
+        public override Rectangle GetAnimFrame()
+        {
+            return Me.Template.GetAnimationFrame(AnimationState.Flying, _animFrame/Me.Template.WalkAnimDelay);
+        }
+    }
+    
+    public class MeleeAttack : BaseState
+    {
+        private double _attackStartedTime;
+        private int _animFrame;    
+        public MeleeAttack(Minion minion) : base(minion)
+        {
+            _attackStartedTime = Time.Scaled;
+        }
+        public override string ToString() { return "MeleeAttack"; }
+        
+        public override void Update()
+        {
+            _animFrame++;
+            // Abort if attack invalid
+            if (!Me.CanAttack())
+            {
+                Me.ResetState(Me.Template.DefaultState);
+                return;
+            }
+            
+            // ROCK THE FENCE
+            Me.Position = Me.Position.MoveTowardsXY(Me.NextPos, Me.AdjustedSpeed() * Time.DeltaTime);
+            
+            // Attack when it's time
+            Me._timeOfLastAction = Time.Scaled;
+            if (Time.Scaled - _attackStartedTime >= Me.Template.AttackDuration)
+            {
+                Me.DoAttack();
+                _attackStartedTime = Time.Scaled;
+            }
+        }
+
+        public override Rectangle GetAnimFrame()
+        {
+            return Me.Template.GetAnimationFrame(AnimationState.Walking, _animFrame/Me.Template.WalkAnimDelay);
+        }
+    }
+
+    public class RangedAttack : BaseState
     {
         private double _attackStartedTime;
 
-        public Attack(Minion minion) : base(minion)
+        public RangedAttack(Minion minion) : base(minion)
         {
             _attackStartedTime = Time.Scaled;
         }
@@ -103,13 +198,13 @@ public partial class Minion
             if (Me.IsOnTopOfStructure)
             {
                 GameConsole.WriteLine($"{Me.Template.Name} tried to attack while climbing!");
-                Me.State = new Move(Me);
+                Me.ResetState(Me.Template.DefaultState);
             }
             
             // Change to Move if target invalid
             if (!Me.CanAttack())
             {
-                Me.State = new Move(Me);
+                Me.ResetState(Me.Template.DefaultState);
                 return;
             }
             
@@ -117,7 +212,7 @@ public partial class Minion
             Me._timeOfLastAction = Time.Scaled;
             if (Time.Scaled - _attackStartedTime >= Me.Template.AttackDuration)
             {
-                Me.OnAttack();
+                Me.DoAttack();
                 _attackStartedTime = Time.Scaled;
             }
         }
@@ -149,7 +244,7 @@ public partial class Minion
             {
                 _finishAction();
             }
-            Debug.Assert(_waitRemaining >= 0);
+            // Debug.Assert(_waitRemaining >= 0);
         }
 
         public override Rectangle GetAnimFrame()
@@ -232,7 +327,14 @@ public partial class Minion
                 }
                 else
                 {
-                    Me.State = new Wait(Me, _landingLag, () => { Me.State = new Move(Me); });
+                    if (_landingLag == 0)
+                    {
+                        Me.ResetState(Me.Template.DefaultState);
+                    }
+                    else
+                    {
+                        Me.State = new Wait(Me, _landingLag, () => { Me.ResetState(Me.Template.DefaultState); });
+                    }
                 }
             }
         }

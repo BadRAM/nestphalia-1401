@@ -13,19 +13,21 @@ public class LightningBoltTemplate : ProjectileTemplate
     public override void Instantiate(object target, object source, Vector3 position)
     {
         LightningBolt p = new LightningBolt(this, position, target, source);
-        World.Projectiles.Add(p);
+        World.Effects.Add(p);
         World.Sprites.Add(p);
     }
 }
 
 public class LightningBolt : Projectile
 {
+    private LightningBoltTemplate _template;
     private double _timeFired;
     private List<Vector3> _points;
     private double _duration = 0.4;
     
     public LightningBolt(LightningBoltTemplate template, Vector3 position, object target, object source) : base(template, position, target, source)
     {
+        _template = template;
         _timeFired = Time.Scaled;
         _points = new List<Vector3>();
         _points.Add(position);
@@ -33,7 +35,7 @@ public class LightningBolt : Projectile
         if (target is Minion m)
         {
             targetPos = m.Position;
-            m.Hurt(Template.Damage*1.5 - Template.Damage*World.RandomDouble(), this);
+            m.Hurt(_template.Damage*1.5 - _template.Damage*World.RandomDouble(), this);
         }
         for (int i = 0; i < 8; i++)
         {

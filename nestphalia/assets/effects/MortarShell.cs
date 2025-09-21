@@ -20,7 +20,7 @@ public class MortarShellTemplate : ProjectileTemplate
     public override void Instantiate(object target, object source, Vector3 position)
     {
         MortarShell p = new MortarShell(this, position, target, source);
-        World.Projectiles.Add(p);
+        World.Effects.Add(p);
         World.Sprites.Add(p);
     }
 }
@@ -67,7 +67,7 @@ public class MortarShell : Projectile
         {
             if (Time.Scaled - _timeExploded > 1)
             {
-                World.ProjectilesToRemove.Add(this);
+                World.EffectsToRemove.Add(this);
             }
             return;
         }
@@ -95,6 +95,17 @@ public class MortarShell : Projectile
                     {
                         double falloff = Math.Clamp(2 * (_template.BlastRadius - dist) / _template.BlastRadius, 0, 1);
                         minion.Hurt(_template.Damage * falloff, this);
+                        // Knockback if max damage dealt
+                        if (falloff >= 0.99)
+                        {
+                            double blastFactor = 3 * _template.Damage * (_template.BlastRadius - dist / _template.BlastRadius) / (minion.Template.MaxHealth + 40) ;
+                            if (blastFactor > 12)
+                            {
+                                Vector2 target = minion.Position.XY() + (minion.Position.XY() - Position.XY()).Normalized() * (float)blastFactor;
+                                minion.SetState(new Minion.Jump(minion, target, 0, blastFactor / 80, 0, blastFactor/2));
+                                GameConsole.WriteLine($"Launched a {minion.Template.ID} with force {blastFactor:N3}");
+                            }
+                        }
                     }
                 }
             }

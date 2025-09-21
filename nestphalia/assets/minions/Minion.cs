@@ -15,6 +15,8 @@ public class MinionTemplate : JsonAsset
     public double AttackDuration;
     public double Speed;
     public float PhysicsRadius; // This is a float because Raylib.CheckCircleOverlap() wants floats
+    public Minion.StateType DefaultState;
+    public Minion.StateType AttackType;
     public int WalkAnimDelay;
     public Texture2D Texture;
     public Texture2D ShadowTexture;
@@ -31,6 +33,8 @@ public class MinionTemplate : JsonAsset
         AttackDuration = jObject.Value<double?>("AttackDuration") ?? 1;
         Speed = jObject.Value<double?>("Speed") ?? 0;
         PhysicsRadius = jObject.Value<int?>("PhysicsRadius") ?? throw new ArgumentNullException();
+        DefaultState = Enum.Parse<Minion.StateType>(jObject.Value<string?>("DefaultState") ?? "Move");
+        AttackType = Enum.Parse<Minion.StateType>(jObject.Value<string?>("AttackType") ?? "MeleeAttack");
         WalkAnimDelay = jObject.Value<int?>("WalkAnimDelay") ?? 2;
         Texture = Resources.GetTextureByName(jObject.Value<string?>("Texture") ?? "");
         ShadowTexture = Resources.GetTextureByName(jObject.Value<string?>("ShadowTexture") ?? "shadow");
@@ -42,7 +46,7 @@ public class MinionTemplate : JsonAsset
         }
 
         string j = $@"{{""ID"": ""{ID}_attack"", ""Texture"": ""minion_bullet"", ""Damage"": {Damage}, ""Speed"": 400}}";
-        Projectile = new ProjectileTemplate(JObject.Parse(j));
+        Projectile = new MeleeAttackTemplate(JObject.Parse(j));
     }
 
     // Implementations of Instantiate() must call Register!
@@ -146,7 +150,7 @@ public partial class Minion : ISprite
         // Color[] colors = { Color.Red, Color.Blue, Color.Green, Color.Yellow, Color.Purple, Color.Pink, Color.Orange, Color.White, Color.Beige, Color.Black, Color.Brown, Color.DarkBlue, Color.Lime, Color.Magenta, Color.SkyBlue, Color.Violet, Color.Maroon, Color.Gold };
         // _tintOverride = colors[Random.Shared.Next(colors.Length)];
         
-        State = new Move(this);
+        ResetState(Template.DefaultState);
 
         if (navPath != null)
         {
@@ -172,7 +176,7 @@ public partial class Minion : ISprite
         SetTarget(GetNewTarget());
     }
 
-    protected virtual void OnAttack()
+    protected virtual void DoAttack()
     {
         Template.Projectile.Instantiate(World.GetTileAtPos(NextPos), this, Position);
     }
@@ -429,7 +433,40 @@ public partial class Minion : ISprite
     {
         return Position.Y;
     }
+    
+    // This is used to transition between 'generic' states that take no arguments, so that they can be modularized as data in minionTemplates
+    public void ResetState(StateType stateType)
+    {
+        switch (stateType)
+        {
+            case StateType.Move:
+                State = new Move(this);
+                break;
+            case StateType.SwoopAttack:
+                State = new SwoopAttack(this);
+                break;
+            case StateType.MeleeAttack:
+                State = new MeleeAttack(this);
+                break;
+            case StateType.RangedAttack:
+                State = new RangedAttack(this);
+                break;
+            case StateType.Cheer:
+                State = new Cheer(this);
+                break;
+            case StateType.Flee:
+                State = new Flee(this);
+                break;
+            case StateType.Wait:
+            case StateType.Jump:
+                throw new Exception($"State: {stateType.ToString()} needs arguments!");
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(stateType), stateType, null);
+        }
+    }
 
+    // This one is used for direct state changes. Returns false if state change rejected.
     public bool SetState(BaseState state)
     {
         return State.Exit(state);
@@ -455,6 +492,11 @@ public partial class Minion : ISprite
     public bool IsOrigin(int x, int y)
     {
         return OriginTile.X == x && OriginTile.Y == y;
+    }
+    
+    public string GetStateString()
+    {
+        return State.ToString();
     }
     
     #endregion

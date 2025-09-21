@@ -100,7 +100,7 @@ public class BattleScene : Scene
         World.DrawFloor();
         World.Draw();
 
-        DrawCanopyShadows();
+        // DrawCanopyShadows();
 
         DrawSelectHud();
         
@@ -429,7 +429,8 @@ public class BattleScene : Scene
 
         DrawStretchyTexture(_selectBoxBG, new Rectangle(30, -150, 240, 320), Screen.Left);
         string text = $"{_selectedMinion.Template.Name}\n" +
-                      $"HP: {_selectedMinion.Health:N1}/{_selectedMinion.Template.MaxHealth} - {(100 * _selectedMinion.Health / _selectedMinion.Template.MaxHealth):N1}%\n";
+                      $"HP: {_selectedMinion.Health:N1}/{_selectedMinion.Template.MaxHealth} - {(100 * _selectedMinion.Health / _selectedMinion.Template.MaxHealth):N1}%\n" +
+                      $"{_selectedMinion.GetStateString()}";
         text = WrapText(text, 240);
         DrawTextLeft(30, -150, text, color:Color.Black, anchor:Screen.Left);
     }

@@ -41,9 +41,9 @@ public class SapperMinion : Minion
         base.SetTarget(GetNewTarget());
     }
 
-    protected override void OnAttack()
+    protected override void DoAttack()
     {
-        base.OnAttack();
+        base.DoAttack();
         _attacking = false;
         SetTarget(OriginTile);
     }

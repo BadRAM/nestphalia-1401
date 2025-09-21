@@ -9,6 +9,7 @@ public class GluePaperTemplate : StructureTemplate
 {
     public GluePaperTemplate(JObject jObject) : base(jObject)
     {
+        Class = Enum.Parse<StructureClass>(jObject.Value<string?>("Class") ?? "Defense");
     }
 
     public override GluePaper Instantiate(Team team, int x, int y)

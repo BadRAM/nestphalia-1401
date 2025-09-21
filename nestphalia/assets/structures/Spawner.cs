@@ -17,7 +17,7 @@ public class SpawnerTemplate : StructureTemplate
         WaveGrowth = jObject.Value<int?>("WaveGrowth") ?? throw new ArgumentNullException();
         TimeBetweenSpawns = jObject.Value<double?>("TimeBetweenSpawns") ?? throw new ArgumentNullException();
         StandardBearer = jObject.Value<bool?>("StandardBearer") ?? false;
-        Class = jObject.Value<StructureClass?>("Class") ?? StructureClass.Nest;
+        Class = Enum.Parse<StructureClass>(jObject.Value<string?>("Class") ?? "Nest");
     }
     
     public override Spawner Instantiate(Team team, int x, int y)

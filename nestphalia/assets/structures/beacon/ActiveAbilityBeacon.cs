@@ -15,7 +15,7 @@ public abstract class ActiveAbilityBeaconTemplate : StructureTemplate
         Cooldown = jObject.Value<double?>("Cooldown") ?? throw new ArgumentNullException();;
         // CooldownReduction = cooldownReduction;
         AbilityIcon = Resources.GetTextureByName(jObject.Value<string?>("AbilityIcon") ?? "");
-        Class = jObject.Value<StructureClass?>("Class") ?? StructureClass.Tower;
+        Class = Enum.Parse<StructureClass>(jObject.Value<string?>("Class") ?? "Utility");
     }
 }
 

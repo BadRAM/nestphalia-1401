@@ -31,7 +31,7 @@ public class MenuScene : Scene
             if (Button300(-150, -80, "Start")) new CampaignScene().Start();
             if (Button300(-150, -40, "Custom Battle") || Input.Pressed(KeyboardKey.T)) new CustomBattleMenu().Start();
             if (Button300(-150,   0, "Settings")) _settingsOpen = !_settingsOpen;
-            if (Button300(-150,  80, "Quit")) 
+            if (Button300(-150,  80, "Quit"))
             {
                 Screen.EndDrawing();
                 CloseWindow();
@@ -43,6 +43,13 @@ public class MenuScene : Scene
             if (Settings.RestartNeeded) DrawTextLeft(155, 92, "Restart to apply changes");
             
             if (DebugMode && Button300(200, -40, "Level Editor")) new LevelEditorScene().Start();
+
+            if (DebugMode)
+            {
+                double t = Math.Clamp((Time.Scaled / 2) % 3.0 - 1, 0, 1);
+                DrawCircle(CenterX - 250, (int)(CenterY + Easings.Bounce(t) * -100), 5, Color.Red);
+                DrawTextLeft(-300, 10, $"t = {t:n2}");
+            }
         }
         else
         {

@@ -10,6 +10,10 @@ public class RangedMinionTemplate : MinionTemplate
     public RangedMinionTemplate(JObject jObject) : base(jObject)
     {
         Range = jObject.Value<double?>("Range") ?? throw new ArgumentNullException();
+        AttackType = Enum.Parse<Minion.StateType>(jObject.Value<string?>("AttackType") ?? "RangedAttack");
+        
+        string j = $@"{{""ID"": ""{ID}_attack"", ""Texture"": ""minion_bullet"", ""Damage"": {Damage}, ""Speed"": 400}}";
+        Projectile = new ProjectileTemplate(JObject.Parse(j));
     }
     
     public override Minion Instantiate(Team team, Vector3 position, NavPath? navPath)
@@ -90,7 +94,7 @@ public class RangedMinion : Minion
                 else // else attack it
                 {
                     NextPos = _target;
-                    State = new Attack(this);
+                    ResetState(Template.AttackType);
                 }
             }
             else
@@ -103,7 +107,7 @@ public class RangedMinion : Minion
                     NextPos = World.GetTileCenter(pos.Value);
                     if (CanAttack())
                     {
-                        State = new Attack(this);
+                        ResetState(Template.AttackType);
                         break;
                     }
                     NextPos = n;

@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Numerics;
 using Newtonsoft.Json.Linq;
 using Raylib_cs;
@@ -32,10 +31,10 @@ public class TowerTemplate : StructureTemplate
         Projectile = jObject.Value<string?>("Projectile") ?? throw new ArgumentNullException();
         ProjectileOriginZ = jObject.Value<int?>("ProjectileOriginZ") ?? 8;
         RateOfFire = jObject.Value<double?>("RateOfFire") ?? throw new ArgumentNullException();
-        TargetMode = (TargetSelector)(jObject.Value<int?>("TargetMode") ?? throw new ArgumentNullException());
+        TargetMode = Enum.Parse<TargetSelector>(jObject.Value<string?>("TargetMode") ?? "Nearest");
         CanHitGround = jObject.Value<bool?>("CanHitGround") ?? true;
         CanHitFlying = jObject.Value<bool?>("CanHitFlying") ?? true;
-        Class = jObject.Value<StructureClass?>("Class") ?? StructureClass.Tower;
+        Class = Enum.Parse<StructureClass>(jObject.Value<string?>("Class") ?? "Defense");
     }
     
     public override Tower Instantiate(Team team, int x, int y)

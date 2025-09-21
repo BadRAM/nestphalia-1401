@@ -149,6 +149,7 @@
     "AttackDuration": 1.0,
     "Speed": 45.0,
     "PhysicsRadius": 5.0,
+    "AttackType": "SwoopAttack",
     "WalkAnimDelay": 2,
     "Texture": "bee",
     "SpriteSize": {
@@ -311,6 +312,7 @@
     "Armor": 0.0,
     "Damage": 4.0,
     "AttackDuration": 2.0,
+    "AttackType": "RangedAttack",
     "Speed": 45.0,
     "PhysicsRadius": 3.0,
     "WalkAnimDelay": 2,
@@ -370,6 +372,7 @@
     "Armor": 2.0,
     "Damage": 250.0,
     "AttackDuration": 0.0,
+    "AttackType": "RangedAttack",
     "Speed": 65.0,
     "PhysicsRadius": 8.0,
     "WalkAnimDelay": 2,

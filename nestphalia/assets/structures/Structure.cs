@@ -18,8 +18,9 @@ public class StructureTemplate : JsonAsset
     
     public enum StructureClass
     {
+        Basic,
         Utility,
-        Tower,
+        Defense,
         Nest
     }
     
@@ -32,7 +33,7 @@ public class StructureTemplate : JsonAsset
         Price = jObject.Value<double?>("Price") ?? 0;
         LevelRequirement = jObject.Value<int?>("LevelRequirement") ?? 0;
         BaseHate = jObject.Value<double?>("BaseHate") ?? 0;
-        Class = jObject.Value<StructureClass?>("Class") ?? StructureClass.Utility;
+        Class = Enum.Parse<StructureClass>(jObject.Value<string?>("Class") ?? "Basic");
     }
     
     public virtual Structure Instantiate(Team team, int x, int y)

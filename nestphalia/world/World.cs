@@ -13,8 +13,8 @@ public static class World
     public static List<Minion> Minions = new List<Minion>();
     public static List<Minion>[,] MinionGrid = new List<Minion>[BoardWidth, BoardHeight];
     public static List<Minion> MinionsToRemove = new List<Minion>();
-    public static List<Projectile> Projectiles = new List<Projectile>();
-    public static List<Projectile> ProjectilesToRemove = new List<Projectile>();
+    public static List<Effect> Effects = new List<Effect>();
+    public static List<Effect> EffectsToRemove = new List<Effect>();
     public static List<ISprite> Sprites = new List<ISprite>();
     private static Random _random = new Random();
     private static double WaveDuration = 20;
@@ -39,7 +39,7 @@ public static class World
     private static Stopwatch _swUpdateMinions = new Stopwatch();
     private static Stopwatch _swUpdateMinionsCollide = new Stopwatch();
     private static Stopwatch _swUpdateMinionsPostCollide = new Stopwatch();
-    private static Stopwatch _swUpdateProjectiles = new Stopwatch();
+    private static Stopwatch _swUpdateEffects = new Stopwatch();
 #if DEBUG
     private class EntityTracker
     {
@@ -61,7 +61,7 @@ public static class World
         Camera.Rotation = 0;
         Camera.Zoom = 1;
         Minions.Clear();
-        Projectiles.Clear();
+        Effects.Clear();
         Sprites.Clear();
         #if DEBUG
         _swEntitiesByID.Clear();
@@ -169,7 +169,7 @@ public static class World
             _swUpdateTeams.Reset();
             _swUpdateBoard.Reset();
             _swUpdateMinions.Reset();
-            _swUpdateProjectiles.Reset();
+            _swUpdateEffects.Reset();
             _swUpdateMinionsCollide.Reset();
             _swUpdateMinionsPostCollide.Reset();
             _swUpdatePathfinder.Reset();
@@ -247,28 +247,28 @@ public static class World
         MinionsToRemove.Clear();
         _swUpdateMinions.Stop();
         
-        _swUpdateProjectiles.Start();
-        for (int index = 0; index < Projectiles.Count; index++)
+        _swUpdateEffects.Start();
+        for (int index = 0; index < Effects.Count; index++)
         {
         #if DEBUG
-            string key = Projectiles[index].Template.ID;
+            string key = Effects[index].Template.ID;
             if (!_swEntitiesByID.ContainsKey(key)) _swEntitiesByID.Add(key, new EntityTracker());
             _swEntitiesByID[key].SW.Start();
         #endif
-            Projectiles[index].Update();
+            Effects[index].Update();
         #if DEBUG
             _swEntitiesByID[key].SW.Stop();
             _swEntitiesByID[key].Count++;
         #endif
         }
 
-        foreach (Projectile p in ProjectilesToRemove)
+        foreach (Effect e in EffectsToRemove)
         {
-            Projectiles.Remove(p);
-            Sprites.Remove(p);
+            Effects.Remove(e);
+            Sprites.Remove(e);
         }
-        ProjectilesToRemove.Clear();
-        _swUpdateProjectiles.Stop();
+        EffectsToRemove.Clear();
+        _swUpdateEffects.Stop();
         
         _swUpdatePathfinder.Start();
         // LeftTeam.ServeQueue(10);
@@ -493,9 +493,9 @@ public static class World
         Raylib.DrawRectangle(x, 10, width, 20, Color.Yellow);
         GUI.DrawTextLeft(x, 10, $"Minions {(int)(100 * _swUpdateMinions.Elapsed.TotalSeconds / totalSWTime)}%, {(_swUpdateMinions.Elapsed.TotalMilliseconds):N3}ms", anchor: Screen.TopLeft);
         x += width;
-        width = (int)(totalWidth * _swUpdateProjectiles.Elapsed.TotalSeconds / totalSWTime);
+        width = (int)(totalWidth * _swUpdateEffects.Elapsed.TotalSeconds / totalSWTime);
         Raylib.DrawRectangle(x, 10, width, 20, Color.Blue);
-        GUI.DrawTextLeft(x, 10, $"Proj {(int)(100 * _swUpdateProjectiles.Elapsed.TotalSeconds / totalSWTime)}%, {(_swUpdateProjectiles.Elapsed.TotalMilliseconds):N3}ms", anchor: Screen.TopLeft);
+        GUI.DrawTextLeft(x, 10, $"Effects {(int)(100 * _swUpdateEffects.Elapsed.TotalSeconds / totalSWTime)}%, {(_swUpdateEffects.Elapsed.TotalMilliseconds):N3}ms", anchor: Screen.TopLeft);
         x += width;
         width = (int)(totalWidth * _swUpdateMinionsCollide.Elapsed.TotalSeconds / totalSWTime);
         Raylib.DrawRectangle(x, 10, width, 20, Color.Red);

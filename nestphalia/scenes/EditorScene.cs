@@ -14,6 +14,7 @@ public class EditorScene : Scene
     private EditorTool _toolActive;
     private Fort _fort;
     private bool _sandboxMode;
+    private bool _newBasic;
     private bool _newUtil;
     private bool _newTower;
     private bool _newNest;
@@ -85,10 +86,13 @@ public class EditorScene : Scene
                 }
                 switch (Assets.Get<StructureTemplate>(unlock).Class)
                 {
+                    case StructureTemplate.StructureClass.Basic:
+                        _newBasic = true;
+                        break;
                     case StructureTemplate.StructureClass.Utility:
                         _newUtil = true;
                         break;
-                    case StructureTemplate.StructureClass.Tower:
+                    case StructureTemplate.StructureClass.Defense:
                         _newTower = true;
                         break;
                     case StructureTemplate.StructureClass.Nest:
@@ -104,6 +108,7 @@ public class EditorScene : Scene
                 _buildableStructures.Add(s);
             }
         }
+        _buildableStructures = _buildableStructures.OrderBy(o => o.Price).ToList();
     }
     
     public override void Update()
@@ -201,9 +206,9 @@ public class EditorScene : Scene
         if (_sellAllConfirm && Button90(212, -358, "Confirm"))  SellAll();
         
         // Structure Category buttons
-        if (Button90(-470, -350, _newUtil  ? "! Basic !" : "Basic",     _structureClassSelected != StructureTemplate.StructureClass.Utility)) _structureClassSelected = StructureTemplate.StructureClass.Utility;
+        if (Button90(-470, -350, _newBasic  ? "! Basic !" : "Basic",     _structureClassSelected != StructureTemplate.StructureClass.Basic)) _structureClassSelected = StructureTemplate.StructureClass.Basic;
         if (Button90(-380, -350, _newUtil  ? "! Utility !" : "Utility", _structureClassSelected != StructureTemplate.StructureClass.Utility)) _structureClassSelected = StructureTemplate.StructureClass.Utility;
-        if (Button90(-290, -350, _newTower ? "! Defense !" : "Defense", _structureClassSelected != StructureTemplate.StructureClass.Tower))   _structureClassSelected = StructureTemplate.StructureClass.Tower;
+        if (Button90(-290, -350, _newTower ? "! Defense !" : "Defense", _structureClassSelected != StructureTemplate.StructureClass.Defense))   _structureClassSelected = StructureTemplate.StructureClass.Defense;
         if (Button90(-200, -350, _newNest  ? "! Nest !" : "Nest",       _structureClassSelected != StructureTemplate.StructureClass.Nest))    _structureClassSelected = StructureTemplate.StructureClass.Nest;
         
         StructureList();
@@ -399,6 +404,7 @@ public class EditorScene : Scene
     {
         int structureCount = 0;
         int turretCount = 0;
+        int basicCount = 0;
         int utilityCount = 0;
         int beaconCount = 0;
         int nestCount = 0;
@@ -412,8 +418,9 @@ public class EditorScene : Scene
             structureCount++;
             totalCost += t.Template.Price;
             if (t is ActiveAbilityBeacon) beaconCount++;
+            else if (t.Template.Class == StructureTemplate.StructureClass.Basic) basicCount++;
             else if (t.Template.Class == StructureTemplate.StructureClass.Utility) utilityCount++;
-            else if (t.Template.Class == StructureTemplate.StructureClass.Tower) turretCount++;
+            else if (t.Template.Class == StructureTemplate.StructureClass.Defense) turretCount++;
             else if (t.Template.Class == StructureTemplate.StructureClass.Nest) nestCount++;
         }
 
