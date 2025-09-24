@@ -32,6 +32,9 @@ public class FloorTile
     
     public virtual void Draw(int x, int y)
     {
-        Raylib.DrawTextureRec(Template.Texture, new Rectangle(Template.SubSprite * 24, 24, 24), new Vector2(x,y), Color.White);
+        double maxFear = Math.Max(World.LeftTeam.GetFearOf(x, y), World.RightTeam.GetFearOf(x, y));
+        maxFear = Math.Clamp(maxFear / 100, 0, 1);
+        Color tint = Raylib.ColorLerp(Color.White, Color.DarkGray, (float)maxFear);
+        Raylib.DrawTextureRec(Template.Texture, new Rectangle(Template.SubSprite * 24, 24, 24), new Vector2(x*24,y*24+8), tint);
     }
 }

@@ -1,5 +1,3 @@
-using System.Numerics;
-using System.Security.Cryptography;
 using Newtonsoft.Json.Linq;
 using Raylib_cs;
 
@@ -26,26 +24,17 @@ public class GluePaper : Structure
     public GluePaper(GluePaperTemplate template, Team team, int x, int y) : base(template, team, x, y)
     {
         _template = template;
-        // _zOffset = position.Y - 24;
     }
 
     public override void Update()
     {
         base.Update();
         
-        foreach (Minion minion in World.GetMinionsInRegion(new Int2D(X,Y), 2))
+        foreach (Minion minion in World.GetMinionsInRegion(new Int2D(X,Y), 1))
         {
-            if (minion.Team != Team 
-                && !minion.IsFlying
-                && !minion.Glued
-                && World.PosToTilePos(minion.Position) == new Int2D(X,Y))
+            if (minion.Team != Team && !minion.IsFlying)
             {
-                minion.Glued = true;
-                Health -= minion.Health/2.0;
-                if (Health <= 0)
-                {
-                    Destroy();
-                }
+                minion.Status.Add(new StatusEffect("Glued", "Glued", 10, new Color(255,255,142)));
             }
         }
     }

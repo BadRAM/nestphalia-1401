@@ -113,6 +113,7 @@ public partial class Minion : ISprite
     public MinionTemplate Template;
     public Team Team;
     public NavPath NavPath;
+    public StatusCollect Status;
     
     // Public State
     public Vector3 Position;
@@ -125,9 +126,6 @@ public partial class Minion : ISprite
     protected Vector2 NextPos; // This is the world space position the minion is currently trying to reach
     
     // Status Effects
-    public bool StandardBearer;
-    public bool Glued;
-    public bool Frenzy;
     
     // Private State - Try to encapsulate these into state classes
     private Vector2 _collisionOffset;
@@ -140,6 +138,7 @@ public partial class Minion : ISprite
     {
         Template = template;
         Team = team;
+        Status = new StatusCollect(this);
         Position = position;
         NextPos = position.XY();
         OriginTile = World.PosToTilePos(position);
@@ -169,6 +168,7 @@ public partial class Minion : ISprite
     public virtual void Update()
     {
         State.Update();
+        Status.Update();
     }
 
     protected virtual void OnTargetReached()
@@ -185,6 +185,7 @@ public partial class Minion : ISprite
     {
         DrawBug(State.GetAnimFrame());
         DrawDecorators();
+        Status.Draw();
         DrawDebug();
     }
 
@@ -235,13 +236,13 @@ public partial class Minion : ISprite
     }
         
     // Returns move speed adjusted for glue, mine anxiety, etc.
-    protected virtual double AdjustedSpeed()
+    protected virtual double AdjustSpeed(double BaseSpeed)
     {
-        double adjustedSpeed = Template.Speed;
+        BaseSpeed = Template.Speed;
         Structure? structure = World.GetTileAtPos(Position);
-        if (Glued || (!IsFlying && structure?.Team == Team && structure is Minefield)) adjustedSpeed *= 0.5;
-        if (Frenzy) adjustedSpeed *= 2;
-        return adjustedSpeed;
+        if (Status.Has("Glued") || (!IsFlying && structure?.Team == Team && structure is Minefield)) BaseSpeed *= 0.5;
+        if (Status.Has("Frenzy")) BaseSpeed *= 2;
+        return BaseSpeed;
     }
     
     public void ApplyPush()
@@ -303,8 +304,10 @@ public partial class Minion : ISprite
         Vector2 pos = Position.XYZ2D() - size/2 + DrawOffset.XYZ2D();
         if (!IsFlying && IsOnTopOfStructure) pos.Y -= 8;
         if (NextPos.X < Position.X) frame = frame.FlipX();
-        if (StandardBearer) Raylib.DrawTextureV(Team.BattleStandard, pos - new Vector2(Team.BattleStandard.Width/2-size.X/2, Team.BattleStandard.Height-size.Y/2), _tintOverride ?? Team.Color);
-        Raylib.DrawTextureRec(Template.Texture, frame, pos, Color.White);
+        if (Status.Has("StandardBearer")) Raylib.DrawTextureV(Team.BattleStandard, pos - new Vector2(Team.BattleStandard.Width/2-size.X/2, Team.BattleStandard.Height-size.Y/2), _tintOverride ?? Team.Color);
+        Color baseTint = Color.White;
+        if (Status.Has("Burning")) baseTint = Color.Orange;
+        Raylib.DrawTextureRec(Template.Texture, frame, pos, baseTint);
         frame.Y += size.Y;
         Raylib.DrawTextureRec(Template.Texture, frame, pos, _tintOverride ?? Team.Color);
         if (Position.Z + DrawOffset.Z > 0)
@@ -329,9 +332,9 @@ public partial class Minion : ISprite
         State.DrawDecorators();
     }
 
-    public void DrawDebug()
+    public void DrawDebug(bool overrideHover = false)
     {
-        if (Raylib.CheckCollisionPointCircle(Raylib.GetScreenToWorld2D(Raylib.GetMousePosition(), World.Camera), Position.XYZ2D(), 2*Template.PhysicsRadius))
+        if (overrideHover || Raylib.CheckCollisionPointCircle(Raylib.GetScreenToWorld2D(Raylib.GetMousePosition(), World.Camera), Position.XYZ2D(), 2*Template.PhysicsRadius))
         {
             if (Screen.DebugMode) Raylib.DrawCircleV(NextPos, 2, Color.Green);
 
@@ -373,24 +376,25 @@ public partial class Minion : ISprite
         _collisionOffset += distance;
     }
     
-    public virtual void Hurt(double damage, Projectile? damageSource = null, bool ignoreArmor = false)
+    public virtual void Hurt(double damage, Projectile? damageSource = null, bool ignoreArmor = false, bool minDamage = true)
     {
         // guard against dying twice one frame.
         if (Health <= 0) return;
 
         if (!ignoreArmor) damage -= Armor;
+        damage = Math.Max(minDamage ? 1 : 0, damage);
+        if (damage <= 0) return;
         
-        Health -= Math.Max(1, damage);
+        Team.AddFearOf(damage/10, World.PosToTilePos(Position));
+        if (damageSource?.Source is Structure s)
+        {
+            Int2D pos = s.GetTilePos();
+            Team.AddHateFor(damage/10, pos.X, pos.Y);
+        }
+        
+        Health -= damage;
         if (Health <= 0)
         {
-            Team.AddFearOf(Template.MaxHealth/10, World.PosToTilePos(Position));
-            //Console.WriteLine($"{Template.Name} killed by {damageSource.Source.GetType().Name} which is " + (damageSource.Source is Structure ? "" : "not ") + "a structure, assigning hate...");
-            if (damageSource?.Source is Structure s)
-            {
-                //Console.WriteLine($"{Template.Name} killed by {s.Template.Name}, assigning hate...");
-                Int2D pos = s.GetTilePos();
-                Team.AddHateFor(Template.MaxHealth/10, pos.X, pos.Y);
-            }
             Die();
         }
     }
@@ -412,7 +416,7 @@ public partial class Minion : ISprite
         WaitForPath(thinkDuration);
     }
     
-    public virtual NavPath WaitForPath(double thinkDuration = 0.5)
+    public NavPath WaitForPath(double thinkDuration = 0.5)
     {
         if (State is Jump) return NavPath;
 

@@ -27,7 +27,7 @@ public class HopperMinion : Minion
 
     public override void Update()
     {
-        if (State is Move)
+        if (State is Move && !Status.Has("Glued"))
         {
             UpdateNextPos(); // we need to do this or else Move.Update() will switch to attack mode before we have the chance to intercept
             Int2D? ahead = NavPath.LookAhead(1);

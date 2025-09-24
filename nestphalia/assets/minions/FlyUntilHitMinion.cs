@@ -45,9 +45,9 @@ public class FlyUntilHitMinion : FlyingMinion
         }
     }
 
-    public override void Hurt(double damage, Projectile? damageSource = null, bool ignoreArmor = false)
+    public override void Hurt(double damage, Projectile? damageSource = null, bool ignoreArmor = false, bool minDamage = true)
     {
-        base.Hurt(damage, damageSource, ignoreArmor);
+        base.Hurt(damage, damageSource, ignoreArmor, minDamage);
 
         if (WantToFly)
         {
@@ -55,13 +55,9 @@ public class FlyUntilHitMinion : FlyingMinion
         }
     }
     
-    protected override double AdjustedSpeed()
+    protected override double AdjustSpeed(double BaseSpeed)
     {
-        double adjustedSpeed = Template.Speed;
-        if (!IsFlying) adjustedSpeed = _template.LandSpeed;
-        Structure? structure = World.GetTileAtPos(Position);
-        if (Glued || (!IsFlying && structure?.Team == Team && structure is Minefield)) adjustedSpeed *= 0.5;
-        if (Frenzy) adjustedSpeed *= 2;
-        return adjustedSpeed;
+        if (!IsFlying) BaseSpeed = _template.LandSpeed;
+        return base.AdjustSpeed(BaseSpeed);
     }
 }

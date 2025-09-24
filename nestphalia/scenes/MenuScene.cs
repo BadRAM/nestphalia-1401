@@ -13,7 +13,8 @@ public class MenuScene : Scene
     {
         Program.CurrentScene = this;
         RegenerateBackground();
-        Resources.PlayMusicByName("unreal_technology_demo_95_-_unreals");
+        // Resources.PlayMusicByName("unreal_technology_demo_95_-_unreals");
+        Resources.PlayMusicByName("nd_intro_live");
     }
     
     public override void Update()
@@ -25,7 +26,7 @@ public class MenuScene : Scene
         if (!_settingsOpen)
         {
             DrawTextCentered(0, -200, "NESTPHALIA 1401", 48);
-            DrawTextLeft(-470, -350, "V2.0.a09 - Quest Update");
+            DrawTextLeft(-470, -350, "V2.0.a11 - Quest Update");
             DrawTextLeft(-470, 320, "By BadRAM and rosettedotnet\nWith music from the mod archive");
         
             if (Button300(-150, -80, "Start")) new CampaignScene().Start();
@@ -46,7 +47,7 @@ public class MenuScene : Scene
 
             if (DebugMode)
             {
-                double t = Math.Clamp((Time.Scaled / 2) % 3.0 - 1, 0, 1);
+                double t = Math.Clamp((Time.Scaled / 10) % 3.0 - 1.5, -1, 1);
                 DrawCircle(CenterX - 250, (int)(CenterY + Easings.Bounce(t) * -100), 5, Color.Red);
                 DrawTextLeft(-300, 10, $"t = {t:n2}");
             }

@@ -1,4 +1,5 @@
 using Newtonsoft.Json.Linq;
+using Raylib_cs;
 
 namespace nestphalia;
 
@@ -68,7 +69,7 @@ public class Spawner : Structure
             Minion m = _minion.Instantiate(Team, position.XYZ(), _navPath.Clone(_minion.Name));
             if (_spawnStandardBearer)
             {
-                m.StandardBearer = true;
+                m.Status.Add(new StatusEffect("StandardBearer", "Standard Bearer", -1, new Color(0,0,0,0), true));
                 _spawnStandardBearer = false;
             }
             _spawnsRemaining--;

@@ -28,6 +28,18 @@ public static class Easings
 	{
 		return 1 - OutBounce(t);
 	}
+
+	// Bounce but it starts from 0 and travels up to 1 before falling and bouncing.
+	public static double FullBounce(double t)
+	{
+		// negative intersection point: -0.363636...
+		return Bounce(Map(t, 0, 1, -0.363636, 1));
+	}
+	
+	private static double Map(double value, double fromLow, double fromHigh, double toLow, double toHigh) 
+	{
+		return (value - fromLow) * (toHigh - toLow) / (fromHigh - fromLow) + toLow;
+	}
 	
 	// Easings from https://gist.githubusercontent.com/Kryzarel/bba64622057f21a1d6d44879f9cd7bd4/raw/83c21b579e5d261433cb7bab57533e40d4b1ff23/EasingFunctions.cs
 	// Made with the help of this great post: https://joshondesign.com/2013/03/01/improvedEasingEquations

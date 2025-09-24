@@ -76,7 +76,8 @@ public class BattleScene : Scene
 
         _selectBoxBG = Assets.Get<StretchyTexture>("stretch_default");
         
-        Resources.PlayMusicByName(level.Music == "" ? "jesper-kyd-highlands" : level.Music);
+        // Resources.PlayMusicByName(level.Music == "" ? "jesper-kyd-highlands" : level.Music);
+        Resources.PlayMusicByName(level.Music == "" ? "nd_battle_live" : level.Music);
     }
 
     public override void Update()
@@ -274,7 +275,7 @@ public class BattleScene : Scene
             _skips = 0;
             while (_state == SceneState.BattleActive && (GetTime() - startTime) + ((GetTime() - startTime) / (_skips + 1)) < 0.016)
             {
-                Time.UpdateTime();
+                Time.UpdateTime(true);
                 World.Update();
                 UpdateEvents();
                 CheckWinner();
@@ -415,7 +416,7 @@ public class BattleScene : Scene
         }
         
         Screen.SetCamera(World.Camera);
-        _selectedMinion.DrawDebug();
+        _selectedMinion.DrawDebug(true);
 
         foreach (Minion m in World.Minions)
         {
@@ -430,9 +431,11 @@ public class BattleScene : Scene
         DrawStretchyTexture(_selectBoxBG, new Rectangle(30, -150, 240, 320), Screen.Left);
         string text = $"{_selectedMinion.Template.Name}\n" +
                       $"HP: {_selectedMinion.Health:N1}/{_selectedMinion.Template.MaxHealth} - {(100 * _selectedMinion.Health / _selectedMinion.Template.MaxHealth):N1}%\n" +
-                      $"{_selectedMinion.GetStateString()}";
+                      $"{_selectedMinion.GetStateString()}\n" +
+                      $"{_selectedMinion.Status.ListEffects()}";
         text = WrapText(text, 240);
         DrawTextLeft(30, -150, text, color:Color.Black, anchor:Screen.Left);
+        if (Input.Pressed(KeyboardKey.B)) _selectedMinion.Status.Add(new BurningStatus(2, 5));
     }
 
     private void DrawGradientBackground(Color topColor, Color bottomColor)

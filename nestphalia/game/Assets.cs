@@ -22,6 +22,7 @@ public static class Assets
         { "SpawnerTemplate",           typeof(SpawnerTemplate).GetConstructor([typeof(JObject)])! },
         { "DoorTemplate",              typeof(DoorTemplate).GetConstructor([typeof(JObject)])! },
         { "SpringBoardTemplate",       typeof(SpringBoardTemplate).GetConstructor([typeof(JObject)])! },
+        { "TrapTemplate",              typeof(TrapTemplate).GetConstructor([typeof(JObject)])! },
         { "GluePaperTemplate",         typeof(GluePaperTemplate).GetConstructor([typeof(JObject)])! },
         { "HazardSignTemplate",        typeof(HazardSignTemplate).GetConstructor([typeof(JObject)])! },
         { "MinefieldTemplate",         typeof(MinefieldTemplate).GetConstructor([typeof(JObject)])! },

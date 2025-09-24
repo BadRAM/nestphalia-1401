@@ -56,10 +56,6 @@ public static class World
     private static void Initialize(Level level)
     {
         Time.Reset();
-        Camera.Target = new Vector2(BoardWidth * 12, BoardHeight * 12);
-        Camera.Offset = new Vector2(Screen.CenterX, Screen.CenterY) * GUI.GetWindowScale();
-        Camera.Rotation = 0;
-        Camera.Zoom = 1;
         Minions.Clear();
         Effects.Clear();
         Sprites.Clear();
@@ -83,6 +79,11 @@ public static class World
         RightTeam = new Team("Enemy", true, Color.Red);
         
         level.LoadToBoard();
+        
+        Camera.Target = new Vector2(BoardWidth * 12, BoardHeight * 12);
+        Camera.Offset = new Vector2(Screen.CenterX, Screen.CenterY) * GUI.GetWindowScale();
+        Camera.Rotation = 0;
+        Camera.Zoom = 1;
 
         for (int x = 0; x < BoardWidth; x++)
         for (int y = 0; y < BoardHeight; y++)
@@ -397,7 +398,7 @@ public static class World
         for (int x = 0; x < BoardWidth; ++x)
         for (int y = 0; y < BoardHeight; ++y)
         {
-            _floor[x,y].Draw(x*24, y*24 + 8);
+            _floor[x,y].Draw(x, y);
         }
         
         Screen.SetCamera();

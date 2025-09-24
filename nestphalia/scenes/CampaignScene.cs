@@ -61,7 +61,8 @@ public class CampaignScene : Scene
         Program.CurrentScene = this;
         Screen.RegenerateBackground();
         _data.Save();
-        Resources.PlayMusicByName("hook_-_paranoya");
+        // Resources.PlayMusicByName("hook_-_paranoya");
+        Resources.PlayMusicByName("nd_credits_live");
         if (fort != null && !Path.EndsInDirectorySeparator(fort.Path)) _fort = fort;
         _levels.Clear();
         foreach (Level level in Assets.GetAll<Level>())

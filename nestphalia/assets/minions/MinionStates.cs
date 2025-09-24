@@ -88,7 +88,7 @@ public partial class Minion
             }
             
             // If no state change is needed, move towards NextPos
-            Me.Position = Me.Position.MoveTowardsXY(Me.NextPos, Me.AdjustedSpeed() * Time.DeltaTime); // else: Move
+            Me.Position = Me.Position.MoveTowardsXY(Me.NextPos, Me.AdjustSpeed(Me.Template.Speed) * Time.DeltaTime); // else: Move
             
             _animFrame++;
         }
@@ -166,7 +166,7 @@ public partial class Minion
             }
             
             // ROCK THE FENCE
-            Me.Position = Me.Position.MoveTowardsXY(Me.NextPos, Me.AdjustedSpeed() * Time.DeltaTime);
+            Me.Position = Me.Position.MoveTowardsXY(Me.NextPos, Me.AdjustSpeed(Me.Template.Speed) * Time.DeltaTime);
             
             // Attack when it's time
             Me._timeOfLastAction = Time.Scaled;
@@ -387,7 +387,7 @@ public partial class Minion
             }
             
             // If no state change is needed, move towards NextPos
-            Me.Position = Me.Position.MoveTowardsXY(Me.NextPos, Me.AdjustedSpeed() * Time.DeltaTime); // else: Move
+            Me.Position = Me.Position.MoveTowardsXY(Me.NextPos, Me.AdjustSpeed(Me.Template.Speed) * Time.DeltaTime); // else: Move
             _animCounter++;
             if (_animCounter >= Me.Template.WalkAnimDelay)
             {

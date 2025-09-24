@@ -27,11 +27,15 @@ public class CustomBattleMenu : Scene
         _activeDirectory = "";
         Program.CurrentScene = this;
         Screen.RegenerateBackground();
-        Resources.PlayMusicByName("scene03");
+        // Resources.PlayMusicByName("scene03");
+        Resources.PlayMusicByName("nd_credits_live");
     }
     
     public override void Update()
     {
+        World.Camera.Zoom = 0.5f * GUI.GetWindowScale().X;
+        World.Camera.Offset = new Vector2(Screen.CenterX, Screen.CenterY+50) * GUI.GetWindowScale();
+        
         if (Input.Pressed(Input.InputAction.Exit))
         {
             new MenuScene().Start();

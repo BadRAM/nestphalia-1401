@@ -11,10 +11,10 @@ public class Team
     private const int FriendlyStructureWeightPenalty = 1000000;
     
     public string Name;
-    private double[,] _fearMap = new double[World.BoardWidth, World.BoardHeight];
-    private double[,] _hateMap = new double[World.BoardWidth, World.BoardHeight];
-    private double[,] _weightMap = new double[World.BoardWidth, World.BoardHeight];
-    private bool[,] _navSolidMap = new bool[World.BoardWidth, World.BoardHeight];
+    private double[,] _fearMap;
+    private double[,] _hateMap;
+    private double[,] _weightMap;
+    private bool[,] _navSolidMap;
     public bool IsRightSide;
     public bool IsPlayerControlled;
     public List<ActiveAbilityBeacon?> Beacons = new List<ActiveAbilityBeacon?>();
@@ -44,6 +44,10 @@ public class Team
         _abilitySlot = Resources.GetTextureByName("ability_slot");
         _healthBar = Resources.GetTextureByName("button_wide");
         BattleStandard = Resources.GetTextureByName("battle_standard");
+        _fearMap = new double[World.BoardWidth, World.BoardHeight];
+        _hateMap = new double[World.BoardWidth, World.BoardHeight];
+        _weightMap = new double[World.BoardWidth, World.BoardHeight];
+        _navSolidMap = new bool[World.BoardWidth, World.BoardHeight];
     }
 
     public void Initialize()

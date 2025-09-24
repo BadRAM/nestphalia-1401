@@ -55,7 +55,8 @@ public class EditorScene : Scene
         _bg = Resources.GetTextureByName("editor_bg");
         World.InitializeEditor(Assets.Get<Level>("level_fortedit"), _fort);
         World.Camera.Offset = new Vector2(Screen.CenterX, Screen.CenterY);
-        Resources.PlayMusicByName("so_lets_get_killed");
+        // Resources.PlayMusicByName("so_lets_get_killed");
+        Resources.PlayMusicByName("nd_editor_live");
         
         UpdateFortStats();
         
