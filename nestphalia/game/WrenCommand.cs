@@ -65,11 +65,16 @@ public class WrenCommand
     {
         WrenForeignMethodFn foreign = null;
         
+        // Commands
+        if (signature == "attack(_,_,_,_,_,_,_)") foreign = Attack;
         if (signature == "spawn(_,_,_,_,_,_,_)") foreign = Spawn;
         if (signature == "kill(_,_)") foreign = Kill;
         if (signature == "dialogForeign(_,_,_,_)") foreign = Dialog;
         if (signature == "build(_,_,_,_)") foreign = Build;
         if (signature == "demolish(_,_)") foreign = Demolish;
+        if (signature == "win(_)") foreign = Win;
+        
+        // Events
         if (signature == "teamHealthBelow(_,_,_)") foreign = TeamHealthBelowEvent;
         if (signature == "timer(_,_,_)") foreign = TimerEvent;
         if (signature == "structureDestroyed(_,_,_)") foreign = StructureDestroyedEvent;
@@ -91,81 +96,16 @@ public class WrenCommand
         wrenSetSlotHandle(_vm, 0, handle);
         wrenCall(_vm, _wrenInvokeCallCallHandle);
     }
-
+    
     public void ReleaseWrenHandle(WrenHandle handle)
     {
         wrenReleaseHandle(_vm, handle);
     }
+
+    #region Wren Foreigns
+    // Wren foreigns are grouped into classes, each one gets it's own region as well.
     
-    private void TeamHealthBelowEvent(WrenVM vm)
-    {
-        string team = wrenGetSlotString(vm, 1);
-        double threshold = wrenGetSlotDouble(vm, 2);
-        WrenHandle action = wrenGetSlotHandle(vm, 3);
-        
-        if (Program.CurrentScene is not BattleScene battleScene)
-        {
-            GameConsole.WriteLine("Can't do that outside of battle!");
-            return;
-        }
-        
-        Team? t = World.GetTeam(team);
-        if (t == null)
-        {
-            GameConsole.WriteLine($"teamHealthBelowEvent() error: Invalid team {team}");
-            return;
-        }
-        
-        battleScene.AddEvent(new TeamHealthBelowEvent(t, threshold, action, this));
-    }
-    
-    // Wren: timer(duration, recurring, action)
-    private void TimerEvent(WrenVM vm)
-    {
-        double duration = wrenGetSlotDouble(vm, 1);
-        bool recurring = wrenGetSlotBool(vm, 2);
-        WrenHandle action = wrenGetSlotHandle(vm, 3);
-        
-        if (Program.CurrentScene is not BattleScene battleScene)
-        {
-            GameConsole.WriteLine("Can't do that outside of battle!");
-            return;
-        }
-        
-        battleScene.AddEvent(new TimerEvent(duration, recurring, action, this));
-    }
-    
-    // Wren: structureDestroyed(x, y, action)
-    private void StructureDestroyedEvent(WrenVM vm)
-    {
-        int x = (int)wrenGetSlotDouble(vm, 1);
-        int y = (int)wrenGetSlotDouble(vm, 2);
-        WrenHandle action = wrenGetSlotHandle(vm, 3);
-        
-        if (Program.CurrentScene is not BattleScene battleScene)
-        {
-            GameConsole.WriteLine("Can't do that outside of battle!");
-            return;
-        }
-        
-        battleScene.AddEvent(new StructureDestroyedEvent(new Int2D(x,y), action, this));
-    }
-    
-    // wren: battleOver(team, action)
-    private void BattleOverEvent(WrenVM vm)
-    {
-        string team = wrenGetSlotString(vm, 1);
-        WrenHandle action = wrenGetSlotHandle(vm, 2);
-        
-        if (Program.CurrentScene is not BattleScene battleScene)
-        {
-            GameConsole.WriteLine("Can't do that outside of battle!");
-            return;
-        }
-        
-        battleScene.AddEndEvent(new BattleEndEvent(team, action, this));
-    }
-    
+    #region Cmd
     // wren: dialogForeign(mode, portrait, text, fiber)
     private void Dialog(WrenVM vm)
     {
@@ -185,6 +125,24 @@ public class WrenCommand
         };
         
         PopupManager.Start(new DialogBox(text, resume, mode));
+    }
+
+    // Wren: attack(id, posX, posY, posZ, targetX, targetY, targetZ)
+    private void Attack(WrenVM vm)
+    {
+        string id = wrenGetSlotString(vm, 1);
+        double posX = wrenGetSlotDouble(vm, 2);
+        double posY = wrenGetSlotDouble(vm, 3);
+        double posZ = wrenGetSlotDouble(vm, 4);
+        double targetX = wrenGetSlotDouble(vm, 5);
+        double targetY = wrenGetSlotDouble(vm, 6);
+        double targetZ = wrenGetSlotDouble(vm, 7);
+
+        AttackTemplate attack = Assets.Get<AttackTemplate>(id);
+        Vector3 pos = new Vector3((float)posX, (float)posY, (float)posZ);
+        Vector3 target = new Vector3((float)targetX, (float)targetY, (float)targetZ);
+
+        attack.Instantiate(target, null, pos);
     }
     
     // wren: spawn(id, team, count, x, y, targetX, targetY)
@@ -304,4 +262,105 @@ public class WrenCommand
         
         World.DestroyTile(x, y);
     }
+
+    private void Win(WrenVM vm)
+    {
+        string team = wrenGetSlotString(vm, 1);
+
+        
+        if (Program.CurrentScene is not BattleScene battleScene)
+        {
+            GameConsole.WriteLine("win() error: Can't do that in this scene!");
+            return;
+        }
+        
+        Team? t = World.GetTeam(team);
+        if (t == null)
+        {
+            GameConsole.WriteLine($"win() error: Invalid team {team}");
+            return;
+        }
+        
+        // do winning here
+        battleScene.SetWinner(t);
+    }
+    
+    #endregion
+
+    #region Event
+    // Events register callbacks in the battlescene event registry
+    
+    // Wren: teamHealthBelow(team, threshold, action)
+    private void TeamHealthBelowEvent(WrenVM vm)
+    {
+        string team = wrenGetSlotString(vm, 1);
+        double threshold = wrenGetSlotDouble(vm, 2);
+        WrenHandle action = wrenGetSlotHandle(vm, 3);
+        
+        if (Program.CurrentScene is not BattleScene battleScene)
+        {
+            GameConsole.WriteLine("Can't do that outside of battle!");
+            return;
+        }
+        
+        Team? t = World.GetTeam(team);
+        if (t == null)
+        {
+            GameConsole.WriteLine($"teamHealthBelowEvent() error: Invalid team {team}");
+            return;
+        }
+        
+        battleScene.AddEvent(new TeamHealthBelowEvent(t, threshold, action, this));
+    }
+    
+    // Wren: timer(duration, recurring, action)
+    private void TimerEvent(WrenVM vm)
+    {
+        double duration = wrenGetSlotDouble(vm, 1);
+        bool recurring = wrenGetSlotBool(vm, 2);
+        WrenHandle action = wrenGetSlotHandle(vm, 3);
+        
+        if (Program.CurrentScene is not BattleScene battleScene)
+        {
+            GameConsole.WriteLine("Can't do that outside of battle!");
+            return;
+        }
+        
+        battleScene.AddEvent(new TimerEvent(duration, recurring, action, this));
+    }
+    
+    // Wren: structureDestroyed(x, y, action)
+    private void StructureDestroyedEvent(WrenVM vm)
+    {
+        int x = (int)wrenGetSlotDouble(vm, 1);
+        int y = (int)wrenGetSlotDouble(vm, 2);
+        WrenHandle action = wrenGetSlotHandle(vm, 3);
+        
+        if (Program.CurrentScene is not BattleScene battleScene)
+        {
+            GameConsole.WriteLine("Can't do that outside of battle!");
+            return;
+        }
+        
+        battleScene.AddEvent(new StructureDestroyedEvent(new Int2D(x,y), action, this));
+    }
+    
+    // wren: battleOver(team, action)
+    private void BattleOverEvent(WrenVM vm)
+    {
+        string team = wrenGetSlotString(vm, 1);
+        WrenHandle action = wrenGetSlotHandle(vm, 2);
+        
+        if (Program.CurrentScene is not BattleScene battleScene)
+        {
+            GameConsole.WriteLine("Can't do that outside of battle!");
+            return;
+        }
+        
+        battleScene.AddEndEvent(new BattleEndEvent(team, action, this));
+    }
+    
+    #endregion
+    
+    #endregion
 }

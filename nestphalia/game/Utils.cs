@@ -10,7 +10,9 @@ public static class Utils
     public static void OpenFolder(string path)
     {
         path = path.MakePathAbsolute();
-
+        
+        GameConsole.WriteLine("Opening " + path);
+        
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             using Process fileOpener = new Process();
@@ -212,13 +214,9 @@ public static class Utils
 
     public static string MakePathAbsolute(this string path)
     {
-        if (!path.Contains(Directory.GetCurrentDirectory()))
+        if (!path.Contains(Directory.GetCurrentDirectory()) && !path.Contains(Resources.Dir))
         {
             return Directory.GetCurrentDirectory() + path;
-        }
-        else if (!path.Contains(Resources.Dir))
-        {
-            return Resources.Dir + path;
         }
         else
         {

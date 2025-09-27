@@ -227,8 +227,8 @@ public class BattleScene : Scene
         }
         
         // Snipped from raylib example
-        float wheel = GetMouseWheelMove();
-        if (wheel != 0)
+        Vector2 wheel = GetMouseWheelMoveV();
+        if (wheel.Y != 0)
         {
             // Get the world point that is under the mouse
             Vector2 mouseWorldPos = GetScreenToWorld2D(GetMousePosition(), World.Camera);
@@ -244,7 +244,7 @@ public class BattleScene : Scene
             // float scaleFactor = 1.0f + 0.25f;
             // if (wheel < 0) scaleFactor = 1.0f/scaleFactor;
             // World.Camera.Zoom = Math.Clamp(World.Camera.Zoom + wheel * 0.25f, 0.25f, 8f);
-            _zoomLevel += wheel;
+            _zoomLevel += wheel.Y;
             _zoomLevel = Math.Clamp(_zoomLevel, 0, _zoomLevels.Count-1);
             World.Camera.Zoom = (float)_zoomLevels[(int)Math.Floor(_zoomLevel)];
 
@@ -252,6 +252,10 @@ public class BattleScene : Scene
             World.Camera.Offset = Screen.Center;
             
             World.Camera.Target = Vector2.Clamp(World.Camera.Target, Vector2.Zero, new Vector2(World.BoardWidth, World.BoardHeight) * 24);
+        }
+        if (Screen.DebugMode)
+        {
+            World.Camera.Rotation += wheel.X;
         }
 
         if (IsWindowResized())
@@ -309,10 +313,15 @@ public class BattleScene : Scene
                 break;
         }
     }
+
+    public void SetWinner(Team team)
+    {
+        _winner = team;
+    }
     
     private void CheckWinner()
     {
-        if (_winner != null) return;
+        if (_state == SceneState.BattleFinished) return;
 
         Team loser = World.LeftTeam;
         if (World.LeftTeam.Health <= 0 || Input.Pressed(KeyboardKey.Minus))
@@ -420,7 +429,7 @@ public class BattleScene : Scene
 
         foreach (Minion m in World.Minions)
         {
-            if (m.OriginTile == _selectedMinion.OriginTile)
+            if (m.Origin == _selectedMinion.Origin)
             {
                 DrawCircleLinesV(m.Position.XY(), m.Template.PhysicsRadius, Color.Blue);
             }

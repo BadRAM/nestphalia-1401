@@ -176,6 +176,11 @@ public class Team
         _hateMap[x, y] += hate;
     }
     
+    public void AddHateFor(double hate, Int2D pos)
+    {
+        _hateMap[pos.X, pos.Y] += hate;
+    }
+    
     public double GetFearOf(int x, int y)
     {
         return _fearMap[x, y];

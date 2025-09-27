@@ -13,14 +13,12 @@ public class RangedMinionTemplate : MinionTemplate
         AttackType = Enum.Parse<Minion.StateType>(jObject.Value<string?>("AttackType") ?? "RangedAttack");
         
         string j = $@"{{""ID"": ""{ID}_attack"", ""Texture"": ""minion_bullet"", ""Damage"": {Damage}, ""Speed"": 400}}";
-        Projectile = new ProjectileTemplate(JObject.Parse(j));
+        Attack = new ProjectileTemplate(JObject.Parse(j));
     }
     
     public override Minion Instantiate(Team team, Vector3 position, NavPath? navPath)
     {
-        Minion m = new RangedMinion(this, team, position, navPath);
-        World.RegisterMinion(m);
-        return m;
+        return Register(new RangedMinion(this, team, position, navPath));
     }
 
     public override void RequestPath(Int2D startPos, Int2D targetPos, NavPath navPath, Team team, Minion minion = null)

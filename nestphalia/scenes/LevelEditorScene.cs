@@ -21,8 +21,11 @@ public class LevelEditorScene : Scene
 
     private LevelEditorTool _toolActive;
     private List<FloorTileTemplate> _selectedFloors = new List<FloorTileTemplate>();
+    private FloorTileTemplate? _tooltipFloor = null;
     private StructureTemplate? _selectedStructure = null;
+    private StructureTemplate? _tooltipStructure = null;
     private List<string> _loadableLevels = new List<string>();
+    private StretchyTexture _panelBg;
     // private int _brushRadius = 2;
 
     private enum LevelEditorTool
@@ -42,12 +45,15 @@ public class LevelEditorScene : Scene
             _level = new Level(JObject.Parse($@"{{""ID"": ""level""}}"));
         }
         World.InitializeLevelEditor(_level);
+        Screen.DebugMode = false;
         
         _floors.AddRange(Assets.GetAll<FloorTileTemplate>());
         _floors = _floors.OrderBy(o => o.ID).ToList();
         
         _structures.AddRange(Assets.GetAll<StructureTemplate>());
         _structures = _structures.OrderBy(o => o.ID).ToList();
+        
+        _panelBg = Assets.Get<StretchyTexture>("stretch_default");
         
         Program.CurrentScene = this;
         Load();
@@ -57,6 +63,7 @@ public class LevelEditorScene : Scene
     {
         if (Input.Pressed(Input.InputAction.Exit))
         {
+            Screen.DebugMode = true;
             new MenuScene().Start();
         }
 
@@ -125,19 +132,22 @@ public class LevelEditorScene : Scene
 
         _idBuffer = TextEntry(0, 300, _idBuffer, anchor: Screen.TopLeft);
         if (Button100(0, 340, "Save", anchor: Screen.TopLeft)) Save();
-        if (Button100(100, 340, "Folder", anchor: Screen.TopLeft)) Utils.OpenFolder(@"\resources\levels");
+        if (Button100(100, 340, "Folder", anchor: Screen.TopLeft)) Utils.OpenFolder(Resources.Dir + @"\resources\levels");
         if (Button100(200, 340, "Load", anchor: Screen.TopLeft)) ShowLoadPopup();
         BigTextCopyPad(0, 380, "Full Level Data", _fullLevelData, anchor: Screen.TopLeft, allowPaste:false);
         
         _levelBuffer = BigTextCopyPad(15, 460, "Level Metadata", _levelBuffer, anchor: Screen.TopLeft);
         _scriptBuffer = BigTextCopyPad(15, 500, "Script", _scriptBuffer, anchor: Screen.TopLeft);
-
+        _tooltipFloor = null;
+        _tooltipStructure = null;
+        
         if (_toolActive == LevelEditorTool.FloorBrush)
         {
             for (int i = 0; i < _floors.Count; i++)
             {
                 bool selected = _selectedFloors.Contains(_floors[i]);
-                if (TileButton((2) + (i%10)*28, 40 + (i/10)*28, _floors[i].Texture, selected, anchor: Screen.TopLeft))
+                ButtonState butt = TileButtonPro((2) + (i % 10) * 28, 40 + (i / 10) * 28, _floors[i].Texture, selected, anchor: Screen.TopLeft);
+                if (butt == ButtonState.Pressed)
                 {
                     if (selected)
                     {
@@ -148,9 +158,13 @@ public class LevelEditorScene : Scene
                         _selectedFloors.Add(_floors[i]);
                     }
                 }
+                if (butt == ButtonState.Hovered)
+                {
+                    _tooltipFloor = _floors[i];
+                }
             }
-
-            if (Button100(0, 260, "Fill", anchor: Screen.TopLeft))
+            
+            if (Button100(0, 260, "Fill", enabled:_selectedFloors.Count != 0, anchor: Screen.TopLeft))
             {
                 for (int x = 0; x < _level.WorldSize.X; x++)
                 for (int y = 0; y < _level.WorldSize.Y; y++)
@@ -164,21 +178,22 @@ public class LevelEditorScene : Scene
             for (int i = 0; i < _structures.Count; i++)
             {
                 bool selected = _selectedStructure == _structures[i];
-                if (TileButton((2) + (i%10)*28, 40 + (i/10)*28, _structures[i].Texture, selected, anchor: Screen.TopLeft))
+                ButtonState butt = TileButtonPro((2) + (i % 10) * 28, 40 + (i / 10) * 28, _structures[i].Texture, selected, anchor: Screen.TopLeft);
+                if (butt == ButtonState.Pressed)
                 {
                     _selectedStructure = _structures[i];
                 }
+                if (butt == ButtonState.Hovered)
+                {
+                    _tooltipStructure = _structures[i];
+                }
             }
             if (Button100(0, 260, "Erase", anchor: Screen.TopLeft)) _selectedStructure = null;
-            if (_selectedStructure != null)
-            {
-                DrawTextLeft(4, 240, _selectedStructure.ID);
-            }
         }
-        
+        DrawToolTip();
         DrawTextLeft(0, 550, _levelInfo, anchor:Screen.TopLeft);
     }
-
+    
     private void FloorBrush()
     {
         if (Input.Held(MouseButton.Left) && Raylib.GetMousePosition().X > 300)
@@ -197,7 +212,7 @@ public class LevelEditorScene : Scene
             }
         }
     }
-
+    
     private void StructureBrush()
     {
         if (Input.Held(MouseButton.Left) && Raylib.GetMousePosition().X > 300)
@@ -207,6 +222,26 @@ public class LevelEditorScene : Scene
             {
                 World.SetTile(_selectedStructure, World.RightTeam, tilePos);
             }
+        }
+    }
+    
+    private void DrawToolTip()
+    {
+        if (_tooltipStructure != null)
+        {
+            string tip = WrapText(_tooltipStructure.GetStats(), 270);
+            Rectangle rect = new Rectangle(GetScaledMousePosition() + Vector2.One * 12, MeasureText(tip) + Vector2.One * 4);
+            rect.Position = Vector2.Clamp(rect.Position, Vector2.Zero, Screen.BottomRight - rect.Size);
+            DrawStretchyTexture(_panelBg, rect, anchor:Screen.TopLeft);
+            DrawTextLeft(rect.Position + Vector2.One * 2, tip, anchor:Screen.TopLeft);
+        }
+        if (_tooltipFloor != null)
+        {
+            string tip = WrapText(_tooltipFloor.ID, 270);
+            Rectangle rect = new Rectangle(GetScaledMousePosition() + Vector2.One * 12, MeasureText(tip) + Vector2.One * 4);
+            rect.Position = Vector2.Clamp(rect.Position, Vector2.Zero, Screen.BottomRight - rect.Size);
+            DrawStretchyTexture(_panelBg, rect, anchor:Screen.TopLeft);
+            DrawTextLeft(rect.Position + Vector2.One * 2, tip, anchor:Screen.TopLeft);
         }
     }
     
@@ -226,6 +261,11 @@ public class LevelEditorScene : Scene
         }
         
         File.WriteAllText(SelectedSavePath(), JsonConvert.SerializeObject(_level, Formatting.Indented));
+
+        if (!Assets.Exists(_level.ID))
+        {
+            Assets.IndexAsset(_level);
+        }
         Assets.UpdateAsset(_level);
         
         Load();

@@ -17,14 +17,12 @@ public class SapperMinionTemplate : MinionTemplate
         AttackDuration = 0;
 
         string j = $@"{{""ID"": ""{ID}_bomb"", ""Texture"": ""{jObject.Value<string?>("BombTexture") ?? ""}"", ""ArcDuration"": 0.4, ""ArcHeight"": 4, ""Damage"": {Damage}}}";
-        Projectile = new MortarShellTemplate(JObject.Parse(j));
+        Attack = new MortarShellTemplate(JObject.Parse(j));
     }
 
     public override Minion Instantiate(Team team, Vector3 position, NavPath? navPath)
     {
-        Minion m = new SapperMinion(this, team, position, navPath);
-        World.RegisterMinion(m);
-        return m;
+        return Register(new SapperMinion(this, team, position, navPath));
     }
 }
 
@@ -45,15 +43,15 @@ public class SapperMinion : Minion
     {
         base.DoAttack();
         _attacking = false;
-        SetTarget(OriginTile);
+        SetTarget(Origin);
     }
 
     // Re-enter burrow when returning.
     protected override void OnTargetReached()
     {
-        if (!_attacking && NavPath.Destination == OriginTile)
+        if (!_attacking && NavPath.Destination == Origin)
         {
-            if (World.GetTile(OriginTile) is Spawner s)
+            if (World.GetTile(Origin) is Spawner s)
             {
                 s.AddSpawnBonus(1);
             }
@@ -72,7 +70,7 @@ public class SapperMinion : Minion
     // Refuse to go anywhere but home if attack is spent
     public override void SetTarget(Int2D target, double thinkDuration = 0.5)
     {
-        base.SetTarget(!_attacking ? OriginTile : target, thinkDuration);
+        base.SetTarget(!_attacking ? Origin : target, thinkDuration);
     }
 
     public override void Draw()

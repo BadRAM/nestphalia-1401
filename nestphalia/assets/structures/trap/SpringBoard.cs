@@ -31,7 +31,7 @@ public class SpringBoard : Structure
     {
         _template = template;
         if (team.IsRightSide) targetOffset.X = -targetOffset.X;
-        _target = position + targetOffset;
+        _target = Position.XY() + targetOffset;
     }
     
     public override void Update()
@@ -42,7 +42,7 @@ public class SpringBoard : Structure
 
             if (_template.IsRandom)
             {
-                _target = position + World.RandomUnitCircle() * _template.Target.Length();
+                _target = Position.XY() + World.RandomUnitCircle() * _template.Target.Length();
             }
 
             m.SetState(new Minion.Jump(m, _target, 0, 0.75, 1, 48));

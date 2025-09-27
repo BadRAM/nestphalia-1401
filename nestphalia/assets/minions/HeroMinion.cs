@@ -13,9 +13,7 @@ public class HeroMinionTemplate : MinionTemplate
     
     public override Minion Instantiate(Team team, Vector3 position, NavPath? navPath)
     {
-        Minion m = new HeroMinion(this, team, position, navPath);
-        World.RegisterMinion(m);
-        return m;
+        return Register(new HeroMinion(this, team, position, navPath));
     }
 }
     

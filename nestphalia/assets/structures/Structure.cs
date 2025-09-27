@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using Newtonsoft.Json.Linq;
 using Raylib_cs;
@@ -21,7 +20,8 @@ public class StructureTemplate : JsonAsset
         Basic,
         Utility,
         Defense,
-        Nest
+        Nest,
+        Secret
     }
     
     public StructureTemplate(JObject jObject) : base(jObject)
@@ -50,15 +50,16 @@ public class StructureTemplate : JsonAsset
     }
 }
 
-public class Structure : ISprite
+public class Structure : ISprite, IMortal
 {
     public StructureTemplate Template;
-    private protected int X;
-    private protected int Y;
-    private protected Vector2 position;
-    
-    public double Health;
-    public Team Team;
+    protected int X;
+    protected int Y;
+    public readonly Vector3 Position;
+    public double Health { get; set; }
+    public Team Team { get; }
+    public Int2D Origin { get; }
+
 
     private SoundResource _deathSound;
 
@@ -69,12 +70,10 @@ public class Structure : ISprite
         Template = template;
         X = x;
         Y = y;
-        position = new Vector2(x*24+12, y*24+20);
-        //_zOffset = 0;
-        
+        Position = new Vector3(x*24+12, y*24+20, 0);
         Health = template.MaxHealth;
         Team = team;
-
+        Origin = new Int2D(X, Y);
         _deathSound = Resources.GetSoundByName("shovel");
     }
 
@@ -88,8 +87,8 @@ public class Structure : ISprite
     {
         int t = 127 + (int)Math.Clamp(127 * (Health / Template.MaxHealth), 0, 128);
         if (Template.MaxHealth == 0) t = 255;
-        int x = (int)(position.X - 12);
-        int y = (int)(position.Y - (Template.Texture.Height - 12));
+        int x = (int)(Position.X - 12);
+        int y = (int)(Position.Y - (Template.Texture.Height - 12));
         Raylib.DrawTexture(Template.Texture, x, y, new Color(t,t,t,255));
     }
 
@@ -100,7 +99,7 @@ public class Structure : ISprite
     {
         // return position.Y + _zOffset;
         // return position.Y - (PhysSolid() ? 24 : 0);
-        return position.Y - 12;
+        return Position.Y - 12;
     }
 
     public virtual bool NavSolid(Team team)
@@ -113,7 +112,7 @@ public class Structure : ISprite
         return true;
     }
 
-    public virtual void Hurt(double damage)
+    public virtual void Hurt(double damage, Attack? damageSource = null, bool ignoreArmor = false, bool minDamage = true)
     {
         if (Health <= 0) { return; } // Guard against dying multiple times
         Health -= damage;
@@ -123,15 +122,15 @@ public class Structure : ISprite
         }
     }
 
+    public Vector3 GetPos()
+    {
+        return Position;
+    }
+
     public virtual void Destroy()
     {
-        _deathSound.PlayRandomPitch(SoundResource.WorldToPan(position.X));
+        _deathSound.PlayRandomPitch(SoundResource.WorldToPan(Position.X));
         World.DestroyTile(X, Y);
-    }
-    
-    public Vector2 GetCenter()
-    {
-        return position;
     }
 
     public Int2D GetTilePos()

@@ -514,12 +514,6 @@ public static class World
         Raylib.DrawRectangle(x, 10, width, 20, Color.Gray);
     }
     
-    public static void RegisterMinion(Minion minion)
-    {
-        Minions.Add(minion);
-        Sprites.Add(minion);
-    }
-    
     public static void SetTile(StructureTemplate? tile, Team team, int x, int y)
     {
         if (_board[x, y] != null)

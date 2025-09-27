@@ -25,7 +25,8 @@ public static class GUI
         Disabled,
         Enabled,
         Hovered,
-        Pressed
+        Held, // this is the state when the button is being held down
+        Pressed // this is the state for the frame the button is successfully pressed
     }
     
     public static void Initialize()
@@ -262,7 +263,7 @@ public static class GUI
         return rect;
     }
 
-    public static bool Button(Rectangle rect, string text, Texture2D? texture = null, bool enabled = true, Vector2? anchor = null)
+    public static ButtonState ButtonPro(Rectangle rect, string text, Texture2D? texture = null, bool enabled = true, Vector2? anchor = null)
     {
         anchor ??= Screen.Center;
         rect.X += (int)anchor.Value.X;
@@ -280,7 +281,7 @@ public static class GUI
         else if (Input.Held(MouseButton.Left) || Input.Released(MouseButton.Left)) // If click is held, button must be clicked or unhoverable
         {
             if (CheckCollisionPointRec(Input.GetScaledClickPos(), rect) && CheckCollisionPointRec(GetScaledMousePosition(), rect))
-                state = ButtonState.Pressed;
+                state = ButtonState.Held;
             else
                 state = ButtonState.Enabled;
         }
@@ -306,7 +307,7 @@ public static class GUI
                 case ButtonState.Hovered:
                     subSprite.Y = rect.Height * 1;
                     break;
-                case ButtonState.Pressed:
+                case ButtonState.Held:
                     subSprite.Y = rect.Height * 2;
                     break; 
             }
@@ -326,7 +327,7 @@ public static class GUI
                 case ButtonState.Hovered:
                     color = Color.Orange;
                     break;
-                case ButtonState.Pressed:
+                case ButtonState.Held:
                     color = Color.DarkBrown;
                     break; 
             }
@@ -341,20 +342,30 @@ public static class GUI
             _cursorLook = MouseCursor.PointingHand;
         }
         
-        if (state == ButtonState.Pressed)
+        if (state == ButtonState.Held)
         {
             _cursorLook = MouseCursor.PointingHand;
             if (Input.Released(MouseButton.Left))
             {
                 _buttonClickSFX.Play();
-                return true;
+                return ButtonState.Pressed;
             }
         }
         
-        return false;
+        return state;
     }
+
+    public static bool Button(Rectangle rect, string text, Texture2D? texture = null, bool enabled = true, Vector2? anchor = null)
+    {
+        return ButtonPro(rect, text, texture, enabled, anchor) == ButtonState.Pressed;
+    }
+
     
     // 360x36 pixel button
+    public static ButtonState Button360Pro(int x, int y, string text, bool enabled = true, Vector2? anchor = null)
+    {
+        return ButtonPro(new Rectangle(x, y, 360, 36), text, _button360Texture, enabled, anchor);
+    }
     public static bool Button360(int x, int y, string text, bool enabled = true, Vector2? anchor = null)
     {
         return Button(new Rectangle(x, y, 360, 36), text, _button360Texture, enabled, anchor);
@@ -396,7 +407,7 @@ public static class GUI
         return Button(new Rectangle(x, y, 100, 40), text, _buttonNarrowTexture, enabled, anchor);
     }
     
-    public static bool TileButton(int x, int y, Texture2D image, bool selected = false, Vector2? anchor = null)
+    public static ButtonState TileButtonPro(int x, int y, Texture2D image, bool selected = false, Vector2? anchor = null)
     {
         anchor ??= Screen.Center;
         x += (int)anchor.Value.X;
@@ -413,11 +424,16 @@ public static class GUI
             if (Input.Released(MouseButton.Left))
             {
                 _buttonClickSFX.Play();
-                return true;
+                return ButtonState.Pressed;
             }
         }
         
-        return false;
+        return hover ? ButtonState.Hovered : ButtonState.Enabled;
+    }
+    
+    public static bool TileButton(int x, int y, Texture2D image, bool selected = false, Vector2? anchor = null)
+    {
+        return TileButtonPro(x, y, image, selected, anchor) == ButtonState.Pressed;
     }
 
     public static double Slider(int x, int y, string label, double value, Vector2? anchor = null)

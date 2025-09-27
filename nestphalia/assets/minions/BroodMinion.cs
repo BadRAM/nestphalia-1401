@@ -18,9 +18,7 @@ public class BroodMinionTemplate : MinionTemplate
     
     public override Minion Instantiate(Team team, Vector3 position, NavPath? navPath)
     {
-        Minion m = new BroodMinion(this, team, position, navPath);
-        World.RegisterMinion(m);
-        return m;
+        return Register(new BroodMinion(this, team, position, navPath));
     }
 
     public override string GetStats()
@@ -31,7 +29,7 @@ public class BroodMinionTemplate : MinionTemplate
             $"HP: {MaxHealth}\n" +
             (Armor == 0 ? "" : $"Armor: {Armor}\n") +
             $"Speed: {Speed}\n" +
-            $"Damage: {Projectile.Damage} ({Projectile.Damage / AttackDuration}/s)\n" +
+            $"Damage: {Attack.Damage} ({Attack.Damage / AttackDuration}/s)\n" +
             $"Size: {PhysicsRadius * 2}\n" +
             $"spawns 1 {spawn.Name} every {SpawnInterval}s\n" +
             $"spawns {SpawnsOnDeath} on death\n\n" +

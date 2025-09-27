@@ -41,7 +41,7 @@ public class Door : Structure
                 if (m.IsFlying) continue;
                 if (m.Team == Team)
                 {
-                    if (Raylib.CheckCollisionCircles(position, (float)_template.Range, m.Position.XY(), m.Template.PhysicsRadius))
+                    if (Raylib.CheckCollisionCircles(Position.XY(), (float)_template.Range, m.Position.XY(), m.Template.PhysicsRadius))
                     {
                         _isOpen = true;
                     }
@@ -61,7 +61,7 @@ public class Door : Structure
             {
                 if (!m.IsFlying && 
                     m.Team == Team && 
-                    Raylib.CheckCollisionCircles(position, (float)_template.Range, m.Position.XY(), m.Template.PhysicsRadius))
+                    Raylib.CheckCollisionCircles(Position.XY(), (float)_template.Range, m.Position.XY(), m.Template.PhysicsRadius))
                 {
                     _isOpen = true;
                 }
@@ -82,8 +82,8 @@ public class Door : Structure
     public override void Draw()
     {
         int t = 127 + (int)(128 * (Health / Template.MaxHealth));
-        int x = (int)(position.X - 12);
-        int y = (int)(position.Y - (Template.Texture.Height - 12));
+        int x = (int)(Position.X - 12);
+        int y = (int)(Position.Y - (Template.Texture.Height - 12));
         Raylib.DrawTexture(_isOpen ? _template.OpenTexture : _template.Texture, x, y, new Color(t,t,t,255));
     }
 }

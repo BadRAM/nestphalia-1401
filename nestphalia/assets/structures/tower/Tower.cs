@@ -17,19 +17,19 @@ public class TowerTemplate : StructureTemplate
     }
     
     public double Range;
-    public string Projectile;
+    public string Attack;
     public double RateOfFire;
     public TargetSelector TargetMode;
     public bool CanHitFlying;
     public bool CanHitGround;
-    public int ProjectileOriginZ;
+    public int AttackOriginZ;
 
     public TowerTemplate(JObject jObject) : base(jObject)
     {
         Name = jObject.Value<string?>("Name") ?? throw new ArgumentNullException();
         Range = jObject.Value<double?>("Range") ?? throw new ArgumentNullException();
-        Projectile = jObject.Value<string?>("Projectile") ?? throw new ArgumentNullException();
-        ProjectileOriginZ = jObject.Value<int?>("ProjectileOriginZ") ?? 8;
+        Attack = jObject.Value<string?>("Attack") ?? throw new ArgumentNullException();
+        AttackOriginZ = jObject.Value<int?>("AttackOriginZ") ?? 8;
         RateOfFire = jObject.Value<double?>("RateOfFire") ?? throw new ArgumentNullException();
         TargetMode = Enum.Parse<TargetSelector>(jObject.Value<string?>("TargetMode") ?? "Nearest");
         CanHitGround = jObject.Value<bool?>("CanHitGround") ?? true;
@@ -44,11 +44,11 @@ public class TowerTemplate : StructureTemplate
     
     public override string GetStats()
     {
-        ProjectileTemplate projectile = Assets.Get<ProjectileTemplate>(Projectile);
+        AttackTemplate attack = Assets.Get<AttackTemplate>(Attack);
         return $"{Name}\n" +
                $"${Price}\n" +
                $"HP: {MaxHealth}\n" +
-               $"Damage: {projectile.Damage} ({(projectile.Damage * (RateOfFire/60)).ToString("N0")}/s)\n" +
+               $"Damage: {attack.Damage} ({(attack.Damage * (RateOfFire/60)).ToString("N0")}/s)\n" +
                $"Range: {Range}\n" +
                $"{Description}\n";
     }
@@ -58,14 +58,14 @@ public class Tower : Structure
 {
     private double _timeLastFired;
     private TowerTemplate _template;
-    private ProjectileTemplate _projectile;
+    private AttackTemplate _attack;
     private Minion? _target;
     private SoundResource _shootSound;
     
     public Tower(TowerTemplate template, Team team, int x, int y) : base(template, team, x, y)
     {
         _template = template;
-        _projectile = Assets.Get<ProjectileTemplate>(_template.Projectile);
+        _attack = Assets.Get<AttackTemplate>(_template.Attack);
         _shootSound = Resources.GetSoundByName("shoot");
     }
     
@@ -99,8 +99,8 @@ public class Tower : Structure
 
             if (_target != null)
             {
-                _shootSound.PlayRandomPitch(SoundResource.WorldToPan(position.X), 0.15f);
-                _projectile.Instantiate(_target, this, position.XYZ(_template.ProjectileOriginZ));
+                _shootSound.PlayRandomPitch(SoundResource.WorldToPan(Position.X), 0.15f);
+                _attack.Instantiate(_target, this, Position.XY().XYZ(_template.AttackOriginZ));
                 _timeLastFired = Time.Scaled;
             }
         }
@@ -113,8 +113,8 @@ public class Tower : Structure
         // Draw range circle on hover
         if (Screen.DebugMode && World.PosToTilePos(Raylib.GetScreenToWorld2D(Raylib.GetMousePosition(), World.Camera)) == new Int2D(X,Y))
         {
-            Raylib.DrawCircleLinesV(position, (int)_template.Range, new Color(200, 50, 50, 255));
-            Raylib.DrawCircleV(position, (int)_template.Range, new Color(200, 50, 50, 64));
+            Raylib.DrawCircleLinesV(Position.XY(), (int)_template.Range, new Color(200, 50, 50, 255));
+            Raylib.DrawCircleV(Position.XY(), (int)_template.Range, new Color(200, 50, 50, 64));
         }
     }
 
@@ -126,7 +126,7 @@ public class Tower : Structure
         for (int x = 0; x < World.BoardWidth; x++)
         for (int y = 0; y < World.BoardHeight; y++)
         {
-            if (Vector2.Distance(World.GetTileCenter(x,y), position) > _template.Range) continue;
+            if (Vector2.Distance(World.GetTileCenter(x,y), Position.XY()) > _template.Range) continue;
             if (e.GetFearOf(x, y) > 0) protectedArea.Enqueue(new Int2D(x,y));
         }   
 
@@ -150,7 +150,7 @@ public class Tower : Structure
             Minion m = nearbyMinions[i];
             if (m.Team == Team) continue;
             if ((m.IsFlying && !_template.CanHitFlying) || (!m.IsFlying && !_template.CanHitGround)) continue;
-            double d = Vector2.Distance(nearbyMinions[i].Position.XY(), position);
+            double d = Vector2.Distance(nearbyMinions[i].Position.XY(), Position.XY());
             if (d < _template.Range && d < minDist)
             {
                 minDist = d;
@@ -169,7 +169,7 @@ public class Tower : Structure
         foreach (Minion m in nearbyMinions)
         {
             if ((m.IsFlying && !_template.CanHitFlying) || (!m.IsFlying && !_template.CanHitGround)) continue;
-            if (m.Team != Team && Vector2.Distance(m.Position.XY(), position) < _template.Range)
+            if (m.Team != Team && Vector2.Distance(m.Position.XY(), Position.XY()) < _template.Range)
             {
                 ValidTargets.Add(m);
             }
@@ -186,7 +186,7 @@ public class Tower : Structure
     protected Minion? FindTargetRandomFocus()
     {
         Minion? random = _target;
-        if (random != null && random.Health > 0 && Vector2.Distance(random.Position.XY(), position) < _template.Range) return random;
+        if (random != null && random.Health > 0 && Vector2.Distance(random.Position.XY(), Position.XY()) < _template.Range) return random;
         return FindTargetRandom();
     }
 }

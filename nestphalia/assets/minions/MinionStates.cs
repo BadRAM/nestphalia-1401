@@ -298,8 +298,7 @@ public partial class Minion
                 double t = (Time.Scaled - (_started + _squatDuration)) / _jumpDuration;
                 double arcOffset = Math.Sin(t * Math.PI) * _height;
             
-                Me.Position = Vector2.Lerp(_from, _to, (float)t).XYZ();
-                Me.Position.Z = (float)arcOffset;
+                Me.Position = Vector2.Lerp(_from, _to, (float)t).XYZ((float)arcOffset);
             }
             else // Jump finished
             {

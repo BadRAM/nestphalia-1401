@@ -14,7 +14,7 @@ public class Rubble : Structure
         //zOffset = -24;
     }
     
-    public override void Hurt(double damage) { }
+    public override void Hurt(double damage, Attack? damageSource = null, bool ignoreArmor = false, bool minDamage = true) { }
     
     public override bool NavSolid(Team team)
     {

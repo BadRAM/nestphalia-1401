@@ -27,7 +27,7 @@ public static class Assets
         { "HazardSignTemplate",        typeof(HazardSignTemplate).GetConstructor([typeof(JObject)])! },
         { "MinefieldTemplate",         typeof(MinefieldTemplate).GetConstructor([typeof(JObject)])! },
         { "TowerTemplate",             typeof(TowerTemplate).GetConstructor([typeof(JObject)])! },
-        { "FrenzyBeaconTemplate",      typeof(FrenzyBeaconTemplate).GetConstructor([typeof(JObject)])! },
+        { "BuffBeaconTemplate",        typeof(BuffBeaconTemplate).GetConstructor([typeof(JObject)])! },
         { "RallyBeaconTemplate",       typeof(RallyBeaconTemplate).GetConstructor([typeof(JObject)])! },
         { "RepairBeaconTemplate",      typeof(RepairBeaconTemplate).GetConstructor([typeof(JObject)])! },
         { "SpawnBoostBeaconTemplate",  typeof(SpawnBoostBeaconTemplate).GetConstructor([typeof(JObject)])! },
@@ -70,7 +70,7 @@ public static class Assets
                 foreach (JObject asset in content)
                 {
                     JsonAsset t = LoadJsonAsset<JsonAsset>(asset);
-                    _assets.Add(t.ID, t);
+                    IndexAsset(t);
                 }
             }
         }
@@ -80,9 +80,14 @@ public static class Assets
             if (Path.GetExtension(path).ToLower() == ".json")
             {
                 Level level = LoadJsonAsset<Level>(JObject.Parse(File.ReadAllText(path)));
-                _assets.Add(level.ID, level);
+                IndexAsset(level);
             }
         }
+    }
+
+    public static void IndexAsset(JsonAsset asset)
+    {
+        _assets.Add(asset.ID, asset);
     }
 
     public static T Get<T>(string id) where T : JsonAsset

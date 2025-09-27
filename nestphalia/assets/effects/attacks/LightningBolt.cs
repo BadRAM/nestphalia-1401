@@ -4,45 +4,50 @@ using Raylib_cs;
 
 namespace nestphalia;
 
-public class LightningBoltTemplate : ProjectileTemplate
+public class LightningBoltTemplate : AttackTemplate
 {
     public LightningBoltTemplate(JObject jObject) : base(jObject)
     {
     }
 
-    public override void Instantiate(object target, object source, Vector3 position)
+    public override Attack Instantiate(IMortal target, IMortal? source, Vector3 position)
     {
-        LightningBolt p = new LightningBolt(this, position, target, source);
-        World.Effects.Add(p);
-        World.Sprites.Add(p);
+        return Register(new LightningBolt(this, position, target, source));
+    }
+
+    public override Attack Instantiate(Vector3 target, IMortal? source, Vector3 position)
+    {
+        return Register(new LightningBolt(this, position, target, source));
     }
 }
 
-public class LightningBolt : Projectile
+public class LightningBolt : Attack
 {
-    private LightningBoltTemplate _template;
     private double _timeFired;
-    private List<Vector3> _points;
+    private List<Vector3> _points = new List<Vector3>();
     private double _duration = 0.4;
     
-    public LightningBolt(LightningBoltTemplate template, Vector3 position, object target, object source) : base(template, position, target, source)
+    public LightningBolt(LightningBoltTemplate template, Vector3 position, IMortal targetEntity, IMortal? source) : base(template, position, targetEntity, source)
     {
-        _template = template;
+        Init();
+        targetEntity.Hurt(GetDamageModified(), this);
+    }
+    
+    public LightningBolt(LightningBoltTemplate template, Vector3 position, Vector3 targetPos, IMortal? source) : base(template, position, targetPos, source)
+    {
+        Init();
+    }
+
+    private void Init()
+    {
         _timeFired = Time.Scaled;
-        _points = new List<Vector3>();
-        _points.Add(position);
-        Vector3 targetPos = position;
-        if (target is Minion m)
-        {
-            targetPos = m.Position;
-            m.Hurt(_template.Damage*1.5 - _template.Damage*World.RandomDouble(), this);
-        }
+        _points.Add(Position);
         for (int i = 0; i < 8; i++)
         {
             float r = (3 - Math.Abs(i - 4)) * 10;
-            Vector3 point = Vector3.Lerp(position, targetPos, (float)i / 8);
+            Vector3 point = Vector3.Lerp(Position, TargetPos, (float)i / 8);
             point += new Vector3((Random.Shared.NextSingle() - 0.5f) * r, 
-                                 (Random.Shared.NextSingle() - 0.5f) * r, 0f);
+                (Random.Shared.NextSingle() - 0.5f) * r, 0f);
             _points.Add(point);
         }
     }

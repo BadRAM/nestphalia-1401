@@ -27,6 +27,7 @@ public class EditorScene : Scene
     private StretchyTexture _panelTex;
     private Texture2D _bg;
     private StructureTemplate? _toolTipStructure;
+    private string _name = "";
     private bool _unsaved;
     private Int2D _mouseTilePos = Int2D.Zero;
     
@@ -48,6 +49,7 @@ public class EditorScene : Scene
         _data = data;
         _sandboxMode = data == null;
         _unsaved = false;
+        _name = _fort.Name;
         
         Program.CurrentScene = this;
         Screen.RegenerateBackground();
@@ -106,7 +108,10 @@ public class EditorScene : Scene
         {
             foreach (StructureTemplate s in Assets.GetAll<StructureTemplate>())
             {
-                _buildableStructures.Add(s);
+                if (s.Class != StructureTemplate.StructureClass.Secret)
+                {
+                    _buildableStructures.Add(s);
+                }
             }
         }
         _buildableStructures = _buildableStructures.OrderBy(o => o.Price).ToList();
@@ -184,8 +189,13 @@ public class EditorScene : Scene
         }
         
         World.Draw();
-        
-        _fort.Name = TextEntry(290, 194, _fort.Name);
+
+        _name = TextEntry(290, 194, _name);
+        if (_fort.Name != _name)
+        {
+            _fort.Name = _name;
+            _unsaved = true;
+        }
         if (Button90(290, 238, "Save", enabled:_unsaved)) Save();
         if (Button90(380, 238, "Save As")) SaveAs();
         if (Button180(290, 276, "Load")) Load();

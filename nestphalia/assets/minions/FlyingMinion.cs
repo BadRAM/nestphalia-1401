@@ -14,9 +14,7 @@ public class FlyingMinionTemplate : MinionTemplate
     
     public override Minion Instantiate(Team team, Vector3 position, NavPath? navPath)
     {
-        Minion m = new FlyingMinion(this, team, position, navPath);
-        World.RegisterMinion(m);
-        return m;
+        return Register(new FlyingMinion(this, team, position, navPath));
     }
 
     public override void RequestPath(Int2D startPos, Int2D targetPos, NavPath navPath, Team team, Minion minion = null)

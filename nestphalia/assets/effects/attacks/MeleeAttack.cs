@@ -4,21 +4,20 @@ using Raylib_cs;
 
 namespace nestphalia;
 
-public class MeleeAttackTemplate : ProjectileTemplate
+public class MeleeAttackTemplate(JObject jObject) : AttackTemplate(jObject)
 {
-    public MeleeAttackTemplate(JObject jObject) : base(jObject)
+    public override Attack Instantiate(IMortal target, IMortal? source, Vector3 position)
     {
+        return Register(new MeleeAttack(this, position, target, source));
     }
 
-    public override void Instantiate(object target, object source, Vector3 position)
+    public override Attack Instantiate(Vector3 target, IMortal? source, Vector3 position)
     {
-        Projectile p = new MeleeAttack(this, position, target, source);
-        World.Effects.Add(p);
-        World.Sprites.Add(p);
+        return Register(new MeleeAttack(this, position, target, source));
     }
 }
 
-public class MeleeAttack : Projectile
+public class MeleeAttack : Attack
 {
     private MeleeAttackTemplate _template;
     private double _duration = 0.8;
@@ -27,20 +26,14 @@ public class MeleeAttack : Projectile
     private Rectangle _particleSrc = new Rectangle(0, 22, 2, 2);
     private Texture2D _texture;
     
-    
-    public MeleeAttack(MeleeAttackTemplate template, Vector3 position, object target, object source) : base(template, position, target, source)
+    public MeleeAttack(MeleeAttackTemplate template, Vector3 position, IMortal targetEntity, IMortal? source) : base(template, position, targetEntity, source)
     {
+        targetEntity.Hurt(GetDamageModified(), this);
         _template = template;
         
-        if (target is Minion minion)
+        if (targetEntity is Structure structure && source is Minion srcMinion)
         {
-            minion.Hurt(_template.Damage*1.5 - _template.Damage*World.RandomDouble(), this);
-            Position = minion.Position;
-        }
-        if (target is Structure structure && source is Minion srcMinion)
-        {
-            structure.Hurt(_template.Damage*1.5 - _template.Damage*World.RandomDouble());
-            Position = Vector3.Lerp(srcMinion.Position, structure.GetCenter().XYZ(), Random.Shared.NextSingle());
+            Position = Vector3.Lerp(srcMinion.Position, structure.Position, Random.Shared.NextSingle());
             _texture = structure.Template.Texture;
             _particleSrc.Width = (float)Math.Sqrt(_template.Damage);
             _particleSrc.Height = _particleSrc.Width;
@@ -49,6 +42,14 @@ public class MeleeAttack : Projectile
         
         _startTime = Time.Scaled;
         _move = Random.Shared.UnitCircle() * 8;
+    }
+    
+    public MeleeAttack(MeleeAttackTemplate template, Vector3 position, Vector3 targetPos, IMortal? source) : base(template, position, targetPos, source)
+    {
+        _template = template;
+        _duration = 0;
+        _startTime = Time.Scaled;
+        GameConsole.WriteLine($"Something tried to meleeAttack the ground.");
     }
 
     public override void Update()

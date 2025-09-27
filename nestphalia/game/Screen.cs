@@ -175,7 +175,11 @@ public static class Screen
         if (DebugMode && Input.Held(KeyboardKey.LeftShift))
         {
             Vector2 mPos = GUI.GetScaledMousePosition() - Center;
-            GUI.DrawTextLeft((int)mPos.X + 10, (int)mPos.Y, $"mPos: {mPos}\nAbs: {GUI.GetScaledMousePosition()}\nUnscaled: {GetMousePosition()}");
+            GUI.DrawTextLeft((int)mPos.X + 10, (int)mPos.Y, $"mPos: {mPos}\n" +
+                                                            $"Abs: {GUI.GetScaledMousePosition()}\n" +
+                                                            $"Unscaled: {GetMousePosition()}\n" +
+                                                            $"World: {GetScreenToWorld2D(GetMousePosition(), World.Camera)}\n" +
+                                                            $"World Tile: {World.GetMouseTilePos()}");
         }
         Raylib.EndDrawing();
     }

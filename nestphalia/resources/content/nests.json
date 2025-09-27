@@ -604,6 +604,7 @@
     "ID": "nest_hero",
     "Type": "SpawnerTemplate",
     "Name": "Hero Spawner",
+    "Class" : "Secret",
     "Description": "",
     "Texture": "spawner4",
     "Minion": "minion_hero",

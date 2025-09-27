@@ -14,9 +14,7 @@ public class FlyUntilHitMinionTemplate : FlyingMinionTemplate
     
     public override Minion Instantiate(Team team, Vector3 position, NavPath? navPath)
     {
-        Minion m = new FlyUntilHitMinion(this, team, position, navPath);
-        World.RegisterMinion(m);
-        return m;
+        return Register(new FlyUntilHitMinion(this, team, position, navPath));
     }
 }
     
@@ -45,7 +43,7 @@ public class FlyUntilHitMinion : FlyingMinion
         }
     }
 
-    public override void Hurt(double damage, Projectile? damageSource = null, bool ignoreArmor = false, bool minDamage = true)
+    public override void Hurt(double damage, Attack? damageSource = null, bool ignoreArmor = false, bool minDamage = true)
     {
         base.Hurt(damage, damageSource, ignoreArmor, minDamage);
 

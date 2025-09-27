@@ -11,7 +11,7 @@ public class MinionTemplate : JsonAsset
     public double MaxHealth;
     public double Armor;
     public double Damage;
-    public ProjectileTemplate Projectile;
+    public AttackTemplate Attack;
     public double AttackDuration;
     public double Speed;
     public float PhysicsRadius; // This is a float because Raylib.CheckCircleOverlap() wants floats
@@ -46,15 +46,20 @@ public class MinionTemplate : JsonAsset
         }
 
         string j = $@"{{""ID"": ""{ID}_attack"", ""Texture"": ""minion_bullet"", ""Damage"": {Damage}, ""Speed"": 400}}";
-        Projectile = new MeleeAttackTemplate(JObject.Parse(j));
+        Attack = new MeleeAttackTemplate(JObject.Parse(j));
     }
 
     // Implementations of Instantiate() must call Register!
     public virtual Minion Instantiate(Team team, Vector3 position, NavPath? navPath)
     {
-        Minion m = new Minion(this, team, position, navPath);
-        World.RegisterMinion(m);
-        return m;
+        return Register(new Minion(this, team, position, navPath));
+    }
+    
+    public static Minion Register(Minion minion)
+    {
+        World.Minions.Add(minion);
+        World.Sprites.Add(minion);
+        return minion;
     }
     
     public virtual string GetStats()
@@ -64,7 +69,7 @@ public class MinionTemplate : JsonAsset
             $"HP: {MaxHealth}\n" +
             (Armor == 0 ? "" : $"Armor: {Armor}\n") +
             $"Speed: {Speed}\n" +
-            $"Damage: {Projectile.Damage} ({Projectile.Damage / AttackDuration}/s)\n" +
+            $"Damage: {Attack.Damage} ({Attack.Damage / AttackDuration}/s)\n" +
             $"Size: {PhysicsRadius * 2}\n" +
             $"{Description}";
     }
@@ -104,25 +109,25 @@ public class MinionTemplate : JsonAsset
     }
 }
 
-public partial class Minion : ISprite
+public partial class Minion : ISprite, IMortal
 {
     // Great and mighty State
     protected BaseState State;
     
     // Components
     public MinionTemplate Template;
-    public Team Team;
+    public Team Team { get; }
     public NavPath NavPath;
     public StatusCollect Status;
     
     // Public State
     public Vector3 Position;
     public Vector3 DrawOffset;
-    public double Health;
+    public double Health { get; set; }
     public double Armor;
     public bool IsFlying;
     public bool IsOnTopOfStructure;
-    public Int2D OriginTile;
+    public Int2D Origin { get; }
     protected Vector2 NextPos; // This is the world space position the minion is currently trying to reach
     
     // Status Effects
@@ -141,7 +146,7 @@ public partial class Minion : ISprite
         Status = new StatusCollect(this);
         Position = position;
         NextPos = position.XY();
-        OriginTile = World.PosToTilePos(position);
+        Origin = World.PosToTilePos(position);
         Health = Template.MaxHealth;
         Armor = Template.Armor;
         _timeOfLastAction = Time.Scaled;
@@ -178,7 +183,14 @@ public partial class Minion : ISprite
 
     protected virtual void DoAttack()
     {
-        Template.Projectile.Instantiate(World.GetTileAtPos(NextPos), this, Position);
+        Structure target = World.GetTileAtPos(NextPos);
+        if (target == null)
+        {
+            GameConsole.WriteLine($"{Template.ID} attacked an empty tile");
+            Template.Attack.Instantiate(NextPos.XYZ(), this, Position);
+            return;
+        }
+        Template.Attack.Instantiate(target, this, Position);
     }
     
     public virtual void Draw()
@@ -376,7 +388,7 @@ public partial class Minion : ISprite
         _collisionOffset += distance;
     }
     
-    public virtual void Hurt(double damage, Projectile? damageSource = null, bool ignoreArmor = false, bool minDamage = true)
+    public virtual void Hurt(double damage, Attack? damageSource = null, bool ignoreArmor = false, bool minDamage = true)
     {
         // guard against dying twice one frame.
         if (Health <= 0) return;
@@ -386,10 +398,9 @@ public partial class Minion : ISprite
         if (damage <= 0) return;
         
         Team.AddFearOf(damage/10, World.PosToTilePos(Position));
-        if (damageSource?.Source is Structure s)
+        if (damageSource?.Source?.Origin != null)
         {
-            Int2D pos = s.GetTilePos();
-            Team.AddHateFor(damage/10, pos.X, pos.Y);
+            Team.AddHateFor(damage/10, damageSource.Source.Origin);
         }
         
         Health -= damage;
@@ -398,7 +409,13 @@ public partial class Minion : ISprite
             Die();
         }
     }
-    
+
+    // This is for IMortal
+    public Vector3 GetPos()
+    {
+        return Position;
+    }
+
     public virtual void Die()
     {
         World.MinionsToRemove.Add(this);
@@ -495,7 +512,7 @@ public partial class Minion : ISprite
     
     public bool IsOrigin(int x, int y)
     {
-        return OriginTile.X == x && OriginTile.Y == y;
+        return Origin.X == x && Origin.Y == y;
     }
     
     public string GetStateString()

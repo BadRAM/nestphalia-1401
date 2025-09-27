@@ -10,12 +10,12 @@ public abstract class EffectTemplate : JsonAsset
     {
     }
     
-    // public virtual void Instantiate(object target, object source, Vector3 position)
-    // {
-    //     Effect p = new Effect(this, position);
-    //     World.Effects.Add(p);
-    //     World.Sprites.Add(p);
-    // }
+    protected T Register<T>(T effect) where T : Effect
+    {
+        World.Effects.Add(effect);
+        World.Sprites.Add(effect);
+        return effect;
+    }
 }
 
 public abstract class Effect : ISprite

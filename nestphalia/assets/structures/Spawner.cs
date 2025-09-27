@@ -66,7 +66,7 @@ public class Spawner : Structure
             {
                 GameConsole.WriteLine($"Creating a minion without a path, PathQueueLength: {Team.GetQueueLength()}");
             }
-            Minion m = _minion.Instantiate(Team, position.XYZ(), _navPath.Clone(_minion.Name));
+            Minion m = _minion.Instantiate(Team, Position, _navPath.Clone(_minion.Name));
             if (_spawnStandardBearer)
             {
                 m.Status.Add(new StatusEffect("StandardBearer", "Standard Bearer", -1, new Color(0,0,0,0), true));

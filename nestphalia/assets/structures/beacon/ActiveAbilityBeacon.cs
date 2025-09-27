@@ -7,13 +7,11 @@ namespace nestphalia;
 public abstract class ActiveAbilityBeaconTemplate : StructureTemplate
 {
     public double Cooldown;
-    // public double CooldownReduction;
     public Texture2D AbilityIcon;
     
     public ActiveAbilityBeaconTemplate(JObject jObject) : base(jObject)
     {
-        Cooldown = jObject.Value<double?>("Cooldown") ?? throw new ArgumentNullException();;
-        // CooldownReduction = cooldownReduction;
+        Cooldown = jObject.Value<double?>("Cooldown") ?? throw new ArgumentNullException();
         AbilityIcon = Resources.GetTextureByName(jObject.Value<string?>("AbilityIcon") ?? "");
         Class = Enum.Parse<StructureClass>(jObject.Value<string?>("Class") ?? "Utility");
     }
