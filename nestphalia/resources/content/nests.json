@@ -599,34 +599,5 @@
         }
       ]
     }
-  },
-  {
-    "ID": "nest_hero",
-    "Type": "SpawnerTemplate",
-    "Name": "Hero Spawner",
-    "Class" : "Secret",
-    "Description": "",
-    "Texture": "spawner4",
-    "Minion": "minion_hero",
-    "WaveSize": 1,
-    "WaveGrowth": 0.0,
-    "TimeBetweenSpawns": 4.0,
-    "MaxHealth": 50.0,
-    "Price": 10000000000.0,
-    "BaseHate": 50.0
-  },
-  {
-    "ID": "minion_hero",
-    "Type": "HeroMinionTemplate",
-    "Name": "Hero",
-    "Description": "it's you!",
-    "Texture": "snail",
-    "MaxHealth": 50000.0,
-    "Armor": 1000.0,
-    "Damage": 50.0,
-    "AttackDuration": 1.0,
-    "Speed": 20.0,
-    "PhysicsRadius": 8.0,
-    "WalkAnimDelay": 2
   }
 ]
