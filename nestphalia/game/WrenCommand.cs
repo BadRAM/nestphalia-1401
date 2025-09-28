@@ -80,6 +80,10 @@ public class WrenCommand
         if (signature == "structureDestroyed(_,_,_)") foreign = StructureDestroyedEvent;
         if (signature == "battleOver(_,_)") foreign = BattleOverEvent;
         
+        // Math
+        if (signature == "random()") foreign = Random;
+        if (signature == "randInt(_)") foreign = RandInt;
+        
         if (foreign == null) throw new Exception($"Tried to bind foreign with unrecognized signature: {signature}");
         _foreigns.Add(foreign);
         return foreign;
@@ -360,6 +364,21 @@ public class WrenCommand
         battleScene.AddEndEvent(new BattleEndEvent(team, action, this));
     }
     
+    #endregion
+
+    #region Math
+
+    private void Random(WrenVM vm)
+    {
+        wrenSetSlotDouble(vm, 0, World.RandomDouble());
+    }
+
+    private void RandInt(WrenVM vm)
+    {
+        int max = (int)wrenGetSlotDouble(vm, 1);
+        wrenSetSlotDouble(vm, 0, World.RandomInt(max));
+    }
+
     #endregion
     
     #endregion

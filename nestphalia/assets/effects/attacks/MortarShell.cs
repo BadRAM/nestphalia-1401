@@ -111,7 +111,7 @@ public class MortarShell : Attack
                     {
                         Vector2 target = minion.Position.XY() + (minion.Position.XY() - Position.XY()).Normalized() * (float)blastFactor;
                         minion.SetState(new Minion.Jump(minion, target, 0, blastFactor / 80, 0, blastFactor/2));
-                        GameConsole.WriteLine($"Launched a {minion.Template.ID} with force {blastFactor:N3}");
+                        // GameConsole.WriteLine($"Launched a {minion.Template.ID} with force {blastFactor:N3}");
                     }
                 }
             }

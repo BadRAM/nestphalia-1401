@@ -61,3 +61,18 @@ class Event {
     // Currently, dialog boxes called here do not suppress the battle end screen, but this is planned to be fixed.
     foreign static battleOver(winner, action)
 }
+
+class Math {
+    // ======== Math Functions ========
+    // Useful functions for calculating game math.
+    
+    // ==== Random ====
+    // These use 'world random' which preserves determinism. 
+    // If other sources of randomness are used in ways that affect battles, determinism will be broken!
+
+    // Random double 0-1
+    foreign static random()
+
+    // Random integer from zero to max-1. Will never give max.
+    foreign static randInt(max)
+}
