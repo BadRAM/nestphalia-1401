@@ -26,7 +26,7 @@ public class MenuScene : Scene
         if (!_settingsOpen)
         {
             DrawTextCentered(0, -200, "NESTPHALIA 1401", 48);
-            DrawTextLeft(-470, -350, "V2.0.a11 - Quest Update");
+            DrawTextLeft(-470, -350, "V2.0.a13 - Quest Update");
             DrawTextLeft(-470, 320, "By BadRAM and rosettedotnet\nWith music from the mod archive");
         
             if (Button300(-150, -80, "Start")) new CampaignScene().Start();

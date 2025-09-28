@@ -17,6 +17,7 @@ public class MortarShellTemplate : AttackTemplate
         ArcDuration = jObject.Value<double?>("ArcDuration") ?? throw new ArgumentNullException();
         ArcHeight = jObject.Value<double?>("ArcHeight") ?? throw new ArgumentNullException();
         BlastRadius = jObject.Value<float?>("BlastRadius") ?? 0;
+        DamageBuildings = jObject.Value<bool?>("DamageBuildings") ?? false;
         Texture = Resources.GetTextureByName(jObject.Value<string?>("Texture") ?? "");
     }
 
@@ -86,8 +87,8 @@ public class MortarShell : Attack
         if (t >= 1)
         {
             _soundEffect.PlayRandomPitch(SoundResource.WorldToPan(Position.X));
-            TargetEntity?.Hurt(_template.Damage);
             if (_template.BlastRadius > 0) Explode();
+            else TargetEntity?.Hurt(_template.Damage);
             _timeExploded = Time.Scaled;
         }
     }
