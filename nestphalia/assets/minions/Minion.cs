@@ -58,6 +58,7 @@ public class MinionTemplate : JsonAsset
     public static Minion Register(Minion minion)
     {
         World.Minions.Add(minion);
+        World.MinionsByID.Add(minion.ID, minion);
         World.Sprites.Add(minion);
         return minion;
     }
@@ -111,10 +112,10 @@ public class MinionTemplate : JsonAsset
 
 public partial class Minion : ISprite, IMortal
 {
-    // Great and mighty State
-    protected BaseState State;
+    public readonly int ID;
     
     // Components
+    protected BaseState State; 
     public MinionTemplate Template;
     public Team Team { get; }
     public NavPath NavPath;
@@ -141,6 +142,7 @@ public partial class Minion : ISprite, IMortal
     
     public Minion(MinionTemplate template, Team team, Vector3 position, NavPath? navPath)
     {
+        ID = World.GetMinionId();
         Template = template;
         Team = team;
         Status = new StatusCollect(this);

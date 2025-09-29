@@ -11,6 +11,7 @@ public class CampaignSaveData
     public List<string> BeatenLevels = new List<string>();
     public List<string> UnlockedStructures = new List<string>();
     public List<string> NewUnlocks = new List<string>();
+    public Color TeamColor = Color.Blue;
     
     public void Save()
     {
@@ -37,10 +38,20 @@ public class CampaignScene : Scene
     private Fort? _fort;
     private string _fortValidityMessage = "";
     private string _outcomeText = "";
+    private CampaignScreen _screen = CampaignScreen.Map;
     private Level? _selectedLevel;
     private List<Level> _levels = new List<Level>();
 
+    private Vector3 _colorSelectHSV;
+
     private Texture2D _levelIcon;
+
+    enum CampaignScreen
+    {
+        Map,
+        Team,
+        Settings
+    }
 
     public CampaignScene()
     {
@@ -84,6 +95,8 @@ public class CampaignScene : Scene
             _fort = Fort.LoadFromDisc(_fort.Path);
             _fortValidityMessage = _fort.IsValid(_data);
         }
+
+        _colorSelectHSV = Raylib.ColorToHSV(_data.TeamColor);
     }
     
     public override void Update()
@@ -105,7 +118,25 @@ public class CampaignScene : Scene
         Screen.BeginDrawing();
         Raylib.ClearBackground(Color.Black);
         Screen.DrawBackground(Color.DarkBrown);
-        
+
+        switch (_screen)
+        {
+            case CampaignScreen.Map:
+                MapScreen();
+                break;
+            case CampaignScreen.Team:
+                TeamScreen();
+                break;
+            case CampaignScreen.Settings:
+                SettingsScreen();
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
+
+    private void MapScreen()
+    {
         int mapSize = 540;
         Rectangle mapRect = new Rectangle(Screen.CenterX - 70, Screen.CenterY - mapSize / 2, mapSize, mapSize);
         Raylib.DrawRectangleRec(mapRect, Color.Beige);
@@ -150,6 +181,7 @@ public class CampaignScene : Scene
             _data.Money -= _fort.TotalCost;
             GameConsole.WriteLine($"Paid {_fort.TotalCost} to challenge {_selectedLevel.Name}. Money before: {_data.Money + _fort.TotalCost}");
             new BattleScene().Start(_selectedLevel, _fort, null, BattleOver);
+            World.LeftTeam.Color = _data.TeamColor;
         }
 
 
@@ -180,6 +212,26 @@ public class CampaignScene : Scene
         }
         
         if (GUI.Button180(290, -350, "Quit")) new MenuScene().Start();
+        if (GUI.Button180(100, -350, "Settings")) _screen = CampaignScreen.Settings;
+        if (GUI.Button180(0, 350, "Team")) _screen = CampaignScreen.Team;
+    }
+
+    private void TeamScreen()
+    {
+        _colorSelectHSV.X = (float)GUI.Slider(0, 0, "Hue", _colorSelectHSV.X/255) * 255;
+        _colorSelectHSV.Y = (float)GUI.Slider(0, 40, "Saturation", _colorSelectHSV.Y);
+        _colorSelectHSV.Z = (float)GUI.Slider(0, 80, "Value", _colorSelectHSV.Z);
+
+        _data.TeamColor = Raylib.ColorFromHSV(_colorSelectHSV.X, _colorSelectHSV.Y, _colorSelectHSV.Z);
+        
+        Raylib.DrawCircle(Screen.CenterX - 100, Screen.CenterY, 10, _data.TeamColor);
+        
+        if (GUI.Button180(0, 200, "Map")) _screen = CampaignScreen.Map;
+    }
+
+    private void SettingsScreen()
+    {
+        if (Settings.DrawSettingsMenu()) _screen = CampaignScreen.Map;
     }
     
     private void BattleOver(Team? winner)

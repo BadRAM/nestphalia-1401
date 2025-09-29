@@ -33,7 +33,7 @@ public class RepairBeacon : ActiveAbilityBeacon
         Repair(pos + Int2D.Right, false);
         base.Activate(targetPosition);
     }
-
+    
     private void Repair(Int2D targetPosition, bool repairNonWalls)
     {
         Structure? structure = World.GetTile(targetPosition);

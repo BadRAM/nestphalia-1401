@@ -11,6 +11,7 @@ public static class World
     private static FloorTile[,] _floor = new FloorTile[BoardWidth, BoardHeight];
     private static Structure?[,] _board = new Structure?[BoardWidth, BoardHeight];
     public static List<Minion> Minions = new List<Minion>();
+    public static Dictionary<int, Minion> MinionsByID = new Dictionary<int, Minion>();
     public static List<Minion>[,] MinionGrid = new List<Minion>[BoardWidth, BoardHeight];
     public static List<Minion> MinionsToRemove = new List<Minion>();
     public static List<Effect> Effects = new List<Effect>();
@@ -28,6 +29,7 @@ public static class World
     private static bool _battleStarted;
     private static SoundResource _waveStartSoundEffect;
     private static bool _battleOver;
+    private static int _minionIdCounter;
     
     private static Stopwatch _swFrame = new Stopwatch();
     private static Stopwatch _swDraw = new Stopwatch();
@@ -243,6 +245,7 @@ public static class World
         foreach (Minion m in MinionsToRemove)
         {
             Minions.Remove(m);
+            MinionsByID.Remove(m.ID);
             Sprites.Remove(m);
         }
         MinionsToRemove.Clear();
@@ -671,7 +674,7 @@ public static class World
 
     public static Vector2 RandomUnitCircle()
     {
-        return _random.UnitCircle();
+        return _random.RandomInsideUnitCircle();
     }
 
     public static void EndBattle()
@@ -698,5 +701,15 @@ public static class World
     {
         LeftTeam.OnStructureChanged(sender, pos);
         RightTeam.OnStructureChanged(sender, pos);
+    }
+
+    public static int GetMinionId()
+    {
+        int i = _random.Next();
+        while (MinionsByID.ContainsKey(i))
+        {
+            i = _random.Next();
+        }
+        return i;
     }
 }

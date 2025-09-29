@@ -34,6 +34,8 @@ public class BattleScene : Scene
     private Vector2 _canopyTexOffset;
     private Texture2D _canopyShadow;
     private Texture2D _canopyShadowHighlights;
+    private Texture2D _clock;
+    private Texture2D _clockHand;
     private StretchyTexture _selectBoxBG;
     
     private enum SceneState
@@ -71,6 +73,8 @@ public class BattleScene : Scene
         _canopyTexOffset = new Vector2(Random.Shared.Next(2048), Random.Shared.Next(2048));
         _canopyShadow = Resources.GetTextureByName("shadow_canopy");
         _canopyShadowHighlights = Resources.GetTextureByName("shadow_canopy_godray");
+        _clock = Resources.GetTextureByName("clock");
+        _clockHand = Resources.GetTextureByName("clock_hand");
         SetTextureFilter(_canopyShadow, TextureFilter.Bilinear);
         SetTextureFilter(_canopyShadowHighlights, TextureFilter.Bilinear);
 
@@ -116,6 +120,7 @@ public class BattleScene : Scene
             case SceneState.StartPending:
                 break;
             case SceneState.BattleActive:
+                DrawClock();
                 if (Input.Held(Input.InputAction.FastForward))
                 {
                     DrawRectangle(0,0,Screen.RightX,Screen.BottomY,new Color(0,0,0,128));
@@ -452,6 +457,12 @@ public class BattleScene : Scene
         DrawRectangle(0, 0, Screen.RightX, Screen.BottomY/4, topColor);
         DrawRectangleGradientV(0, Screen.BottomY/4, Screen.RightX, Screen.BottomY/4, topColor, bottomColor);
         DrawRectangle(0, Screen.BottomY/2, Screen.RightX, Screen.BottomY/2, bottomColor);
+    }
+
+    private void DrawClock()
+    {
+        DrawTexture(_clock, 10, 10, Color.White);
+        DrawTexturePro(_clockHand, _clockHand.Rect(), new Rectangle(74, 74, _clockHand.Size()), _clockHand.Size()/2, (float)Time.Scaled * 18 - 27, Color.White);
     }
 
     private void DrawCanopyShadows()

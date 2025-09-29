@@ -160,16 +160,26 @@ public static class Utils
         return Math.Min(random.Next(max), random.Next(max));
     }
 
-    public static Vector2 UnitCircle(this Random random)
+    public static Vector2 RandomInsideUnitCircle(this Random random)
     {
         float theta = random.NextSingle() * 2 * Single.Pi;
         return new Vector2(MathF.Cos(theta), MathF.Sin(theta)) * MathF.Sqrt(random.NextSingle());
     }
     
-    public static Vector2 Direction(this Random random)
+    public static Vector2 RandomDirection(this Random random)
     {
         float theta = random.NextSingle() * 2 * Single.Pi;
         return new Vector2(MathF.Cos(theta), MathF.Sin(theta));
+    }
+
+    public static Vector2 Size(this Texture2D tex)
+    {
+        return new Vector2(tex.Width, tex.Height);
+    }
+    
+    public static Rectangle Rect(this Texture2D tex)
+    {
+        return new Rectangle(Vector2.Zero, tex.Width, tex.Height);
     }
     
     public static void InsertSorted<T>(this List<T> @this, T item) where T: IComparable<T>

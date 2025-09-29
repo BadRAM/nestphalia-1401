@@ -41,7 +41,7 @@ public class MeleeAttack : Attack
         }
         
         _startTime = Time.Scaled;
-        _move = Random.Shared.UnitCircle() * 8;
+        _move = Random.Shared.RandomInsideUnitCircle() * 8;
     }
     
     public MeleeAttack(MeleeAttackTemplate template, Vector3 position, Vector3 targetPos, IMortal? source) : base(template, position, targetPos, source)
