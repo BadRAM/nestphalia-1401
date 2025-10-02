@@ -7,11 +7,21 @@ namespace nestphalia;
 public class CampaignSaveData
 {
     public double Money = 2000;
-    public double Battles;
     public List<string> BeatenLevels = new List<string>();
     public List<string> UnlockedStructures = new List<string>();
     public List<string> NewUnlocks = new List<string>();
     public Color TeamColor = Color.Blue;
+    
+    // Stats
+    public int Battles;
+    public int BattlesWon;
+    public int BattlesLost;
+    public int StructuresDestroyed;
+    public int TowersDestroyed;
+    public double MoneyEarned;
+    public double MoneySpent;
+    public double TimeInEditor;
+    public double TimeInBattle;
     
     public void Save()
     {
@@ -19,7 +29,7 @@ public class CampaignSaveData
         //Console.WriteLine($"JSON campaign looks like: {jsonString}");
         File.WriteAllText(Directory.GetCurrentDirectory() + "/campaign.sav", jsonString);
     }
-
+    
     public static CampaignSaveData Load()
     {
         string jsonString = File.ReadAllText(Directory.GetCurrentDirectory() + "/campaign.sav");
@@ -183,8 +193,6 @@ public class CampaignScene : Scene
             new BattleScene().Start(_selectedLevel, _fort, null, BattleOver);
             World.LeftTeam.Color = _data.TeamColor;
         }
-
-
 
         // Select fort button
         if (GUI.Button180(-460, 310, "Select Fort"))

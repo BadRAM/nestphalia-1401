@@ -79,10 +79,6 @@ public class Structure : ISprite, IMortal
 
     public virtual void Update() { }
 
-    public virtual void PreWaveEffect() { }
-    
-    public virtual void WaveEffect() { }
-
     public virtual void Draw()
     {
         int t = 127 + (int)Math.Clamp(127 * (Health / Template.MaxHealth), 0, 128);

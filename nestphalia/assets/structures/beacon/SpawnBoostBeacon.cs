@@ -41,7 +41,7 @@ public class SpawnBoostBeacon : ActiveAbilityBeacon
         if (s is Spawner spawner)
         {
             spawner.SetTarget(target);
-            spawner.WaveEffect();
+            spawner.DeployWave();
         }
     }
 

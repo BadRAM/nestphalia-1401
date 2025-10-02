@@ -8,10 +8,11 @@ public abstract class Popup
     // This is supplied by implementations of Popup to be called when they are active.
     public abstract void Draw();
 
-    // Remember to invoke closeActions AFTER calling Close(), because if the closeAction opens a new popup, Close will clear the new popup.
+    // Remember to invoke closeActions AFTER calling Close(), because if the closeAction opens a new popup, Close will
+    // close the new popup instead of the old one.
     protected virtual void Close()
     {
         PopupManager.Remove(this);
-        Time.TimeScale = 1;
+        Time.Paused = false;
     }
 }

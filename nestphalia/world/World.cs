@@ -18,17 +18,10 @@ public static class World
     public static List<Effect> EffectsToRemove = new List<Effect>();
     public static List<ISprite> Sprites = new List<ISprite>();
     private static Random _random = new Random();
-    private static double WaveDuration = 20;
-    private static bool PreWave;
-    private static double PreWaveOffset = 1.6;
-    private static double FirstWaveTime = 0;
-    public static int Wave = 0;
     public static Camera2D Camera;
     public static Team LeftTeam;
     public static Team RightTeam;
-    private static bool _battleStarted;
-    private static SoundResource _waveStartSoundEffect;
-    private static bool _battleOver;
+    public static BattleScene? Battle;
     private static int _minionIdCounter;
     
     private static Stopwatch _swFrame = new Stopwatch();
@@ -64,12 +57,8 @@ public static class World
         #if DEBUG
         _swEntitiesByID.Clear();
         #endif
-        FirstWaveTime = Time.Scaled;
-        Wave = 0;
-        _battleStarted = false;
-        PreWave = false;
-        _waveStartSoundEffect = Resources.GetSoundByName("start");
-        _battleOver = false;
+        
+        Battle = null;
 
         BoardWidth = level.WorldSize.X;
         BoardHeight = level.WorldSize.Y;
@@ -131,9 +120,11 @@ public static class World
         Camera.Offset = new Vector2(Screen.CenterX, Screen.CenterY+50) * GUI.GetWindowScale();
     }
     
-    public static void InitializeBattle(Level level, Fort leftFort, Fort? rightFort, bool leftIsPlayer, bool rightIsPlayer, bool deterministic)
+    public static void InitializeBattle(BattleScene battle, Level level, Fort leftFort, Fort? rightFort, bool leftIsPlayer, bool rightIsPlayer, bool deterministic)
     {
         Initialize(level);
+
+        Battle = battle;
         
         // TODO: let levels override seed
         
@@ -154,8 +145,6 @@ public static class World
         RightTeam.Initialize();
         
         Determinator.Start(deterministic);
-        
-        _battleStarted = true;
     }
 
     public static void InitializeLevelEditor(Level level)
@@ -192,8 +181,6 @@ public static class World
             MinionGrid[pos.X, pos.Y].Add(minion);
         }
         _swUpdateMinionGrid.Stop();
-        
-        UpdateWaveTimer();
         
         // Reset the entity timers
         #if DEBUG
@@ -291,8 +278,6 @@ public static class World
         {
             m.ApplyPush();
             Physics.CollideTerrain(m);
-            // m.CollideTerrain();
-            // m.ApplyPush();
         }
         _swUpdateMinionsPostCollide.Stop();
         
@@ -304,41 +289,6 @@ public static class World
         Determinator.Update();
         
         _swUpdate.Stop();
-    }
-
-    private static void UpdateWaveTimer()
-    {
-        // Update wave timer
-        if (!_battleOver)
-        {
-            if (PreWave)
-            {
-                if (Time.Scaled - (FirstWaveTime + PreWaveOffset) > WaveDuration * Wave)
-                {
-                    Wave++;
-                    PreWave = false;
-                    for (int x = 0; x < BoardWidth; ++x)
-                    for (int y = 0; y < BoardHeight; ++y)
-                    {
-                        _board[x, y]?.WaveEffect();
-                    }
-                }
-            }
-            else
-            {
-                if (Time.Scaled - FirstWaveTime > WaveDuration * Wave)
-                {
-                    _waveStartSoundEffect.Play();
-
-                    PreWave = true;
-                    for (int x = 0; x < BoardWidth; ++x)
-                    for (int y = 0; y < BoardHeight; ++y)
-                    {
-                        _board[x, y]?.PreWaveEffect();
-                    }
-                }
-            }
-        }
     }
 
     private static void DoMinionCollision()
@@ -429,14 +379,14 @@ public static class World
 
     public static void DrawGUI()
     {
-        if (_battleStarted)
+        if (Battle?.State == BattleScene.States.BattleActive)
         {
             LeftTeam.Draw();
             RightTeam.Draw();
         }
     }
 
-    public static void DrawDebug()
+    private static void DrawDebug()
     {
         // ReSharper disable once InconsistentNaming
         double totalSWTime = _swFrame.Elapsed.TotalSeconds;
@@ -454,9 +404,9 @@ public static class World
         }
         #endif
         
-        GUI.DrawTextLeft(10, 10,
+        GUI.DrawTextLeft(10, 128,
             $"FPS: {Raylib.GetFPS()}\n" +
-            $"Wave: {Wave}\n" +
+            $"Clock: {Time.Scaled:N2} Tick: {Time.Tick}\n" +
             $"Bugs: {Minions.Count}\n" +
             $"Sprites: {Sprites.Count}\n" +
             $"Camera Target:{Camera.Target} Offset:{Camera.Offset} Zoom:{Camera.Zoom}\n" +
@@ -675,16 +625,6 @@ public static class World
     public static Vector2 RandomUnitCircle()
     {
         return _random.RandomInsideUnitCircle();
-    }
-
-    public static void EndBattle()
-    {
-        _battleOver = true;
-    }
-
-    public static bool IsBattleOver()
-    {
-        return _battleOver;
     }
 
     public static void SetFloorTile(FloorTileTemplate tile, int x, int y)

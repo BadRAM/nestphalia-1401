@@ -36,7 +36,7 @@ public static class PopupManager
     public static void Start(Popup popup)
     {
         _popupStack.Add(popup);
-        Time.TimeScale = 0;
+        Time.Paused = true;
         Input.SetSuppressed(Input.SuppressionSource.Popup, true);
         _firstFrame = true;
     }

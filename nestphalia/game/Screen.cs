@@ -48,7 +48,7 @@ public static class Screen
         Vector2 scaleDpi = (float)Settings.Saved.WindowScale * Vector2.One;
         
         InitWindow(MinWidth, MinHeight, "Nestphalia 1401");
-        SetTargetFPS(60);
+        SetTargetFPS(Time.FrameRate);
         SetExitKey(KeyboardKey.Null);
         BeginMode2D(_screenCamera);
         SetMouseScale(1, 1);

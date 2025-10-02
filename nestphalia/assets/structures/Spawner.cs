@@ -45,6 +45,7 @@ public class Spawner : Structure
     private double _lastSpawnTime;
     private int _spawnsRemaining;
     private int _nextWaveSpawnBonus;
+    private int _spawnDelay; // A random delay of up to 1 second before starting spawning for the wave.
     private Int2D _targetTile;
     private NavPath _navPath;
     private bool _spawnStandardBearer;
@@ -59,6 +60,22 @@ public class Spawner : Structure
     
     public override void Update()
     {
+        if (World.Battle?.WaveTick == 0)
+        {
+            _spawnDelay = World.RandomInt(Time.FrameRate/2);
+        }
+
+        if (World.Battle?.WaveTick == _spawnDelay)
+        {
+            Retarget();
+            _minion.RequestPath(new Int2D(X, Y), _targetTile, _navPath, Team);
+        }
+        if (World.Battle?.WaveTick == _spawnDelay + 5)
+        {
+            DeployWave();
+        }
+        
+        
         base.Update();
         if (_spawnsRemaining > 0 && Time.Scaled - _lastSpawnTime > _template.TimeBetweenSpawns)
         {
@@ -77,15 +94,9 @@ public class Spawner : Structure
         }
     }
 
-    public override void PreWaveEffect()
+    public void DeployWave()
     {
-        Retarget();
-        _minion.RequestPath(new Int2D(X, Y), _targetTile, _navPath, Team);
-    }
-    
-    public override void WaveEffect()
-    {
-        _spawnsRemaining += _template.WaveSize + (int)(World.Wave * _template.WaveGrowth);
+        _spawnsRemaining += _template.WaveSize + (int)((World.Battle?.Wave ?? 0) * _template.WaveGrowth);
         _spawnsRemaining += _nextWaveSpawnBonus;
         _nextWaveSpawnBonus = 0;
         if (_template.StandardBearer) _spawnStandardBearer = true;

@@ -48,10 +48,9 @@ public partial class Minion
         } 
     }
 
-    // Move acts as the 'default' state, that other states can safely return to without arguments
     public class Move : BaseState
     {
-        private int _animFrame;
+        private double _animTimer;
         
         public Move(Minion minion) : base(minion) { }
 
@@ -59,7 +58,7 @@ public partial class Minion
         {
             int frames = Me.Template.GetAnimationFrameCount(AnimationState.Walking);
             if (frames == 0) frames = 1;
-            return $"Move, frame: {(_animFrame / Me.Template.WalkAnimDelay) % frames}";
+            return $"Move, frame: {_animTimer % frames}";
         }
 
         public override void Update()
@@ -89,14 +88,14 @@ public partial class Minion
             
             // If no state change is needed, move towards NextPos
             Me.Position = Me.Position.MoveTowardsXY(Me.NextPos, Me.AdjustSpeed(Me.Template.Speed) * Time.DeltaTime); // else: Move
-            
-            _animFrame++;
+
+            _animTimer += Time.DeltaTime * Me.Template.AnimFrameRate;
         }
 
         public override Rectangle GetAnimFrame()
         {
             AnimationState animState = Me.IsFlying ? AnimationState.Flying : AnimationState.Walking;
-            return Me.Template.GetAnimationFrame(animState, _animFrame/Me.Template.WalkAnimDelay);
+            return Me.Template.GetAnimationFrame(animState, (int)_animTimer);
         }
     }
     
@@ -108,7 +107,7 @@ public partial class Minion
         private Vector2 _endPos;
         private double _duration;
         private bool _hasAttacked = false;
-        private int _animFrame;
+        private double _animTimer;
 
         public SwoopAttack(Minion minion) : base(minion)
         {
@@ -123,7 +122,6 @@ public partial class Minion
 
         public override void Update()
         {
-            _animFrame++;
             float t = (float)((Time.Scaled - _attackStartedTime) / _duration);
             Me.Position = new Vector3(Vector2.Lerp(_startPos, _endPos, t), _altitude - (float)(_altitude * Easings.Ballistic(t) * 0.8f));
             if (!_hasAttacked && t >= 0.5)
@@ -137,18 +135,20 @@ public partial class Minion
                 Me.State = new Wait(Me, Me.Template.AttackDuration * 0.25f, () => { Me.ResetState(Me.Template.DefaultState); });
                 return;
             }
+            _animTimer += Time.DeltaTime * Me.Template.AnimFrameRate;
         }
 
         public override Rectangle GetAnimFrame()
         {
-            return Me.Template.GetAnimationFrame(AnimationState.Flying, _animFrame/Me.Template.WalkAnimDelay);
+            return Me.Template.GetAnimationFrame(AnimationState.Flying, (int)_animTimer);
         }
     }
     
     public class MeleeAttack : BaseState
     {
         private double _attackStartedTime;
-        private int _animFrame;    
+        private double _animTimer;
+
         public MeleeAttack(Minion minion) : base(minion)
         {
             _attackStartedTime = Time.Scaled;
@@ -157,7 +157,6 @@ public partial class Minion
         
         public override void Update()
         {
-            _animFrame++;
             // Abort if attack invalid
             if (!Me.CanAttack())
             {
@@ -175,11 +174,12 @@ public partial class Minion
                 Me.DoAttack();
                 _attackStartedTime = Time.Scaled;
             }
+            _animTimer += Time.DeltaTime * Me.Template.AnimFrameRate;
         }
 
         public override Rectangle GetAnimFrame()
         {
-            return Me.Template.GetAnimationFrame(AnimationState.Walking, _animFrame/Me.Template.WalkAnimDelay);
+            return Me.Template.GetAnimationFrame(AnimationState.Walking, (int)_animTimer);
         }
     }
 
@@ -367,8 +367,7 @@ public partial class Minion
     
     public class Flee : BaseState
     {
-        private int _animFrame;
-        private int _animCounter;
+        private double _animTimer;
 
         public Flee(Minion minion) : base(minion) { }
         public override string ToString() { return $"Flee"; }
@@ -387,18 +386,13 @@ public partial class Minion
             
             // If no state change is needed, move towards NextPos
             Me.Position = Me.Position.MoveTowardsXY(Me.NextPos, Me.AdjustSpeed(Me.Template.Speed) * Time.DeltaTime); // else: Move
-            _animCounter++;
-            if (_animCounter >= Me.Template.WalkAnimDelay)
-            {
-                _animFrame++;
-                _animCounter = 0;
-            }
+            _animTimer += Time.DeltaTime * Me.Template.AnimFrameRate;
         }
 
         public override Rectangle GetAnimFrame()
         {
             AnimationState animState = Me.IsFlying ? AnimationState.Flying : AnimationState.Walking;
-            return Me.Template.GetAnimationFrame(animState, _animFrame);
+            return Me.Template.GetAnimationFrame(animState, (int)_animTimer);
         }
     }
 }

@@ -7,30 +7,20 @@ public static class Time
     public static double Scaled;
     public static double Unscaled;
     public static int Tick;
-    private static double _tickDelta;
-    public static double Real;
-    public const double DeltaTime = 1.0/60.0;
-    public static double TimeScale = 1;
+    public static double Real; // Seconds since program started
+    public const int FrameRate = 60;
+    public const double DeltaTime = 1.0/FrameRate;
+    public static bool Paused;
     
     public static void UpdateTime(bool fastForward = false)
     {
         if (!fastForward) Unscaled += DeltaTime;
-        Scaled += DeltaTime * TimeScale;
-        Real = Raylib.GetTime();
-        // ReSharper disable once CompareOfFloatsByEqualityOperator
-        if (TimeScale == 1)
+        if (!Paused)
         {
             Tick++;
+            Scaled = Tick * DeltaTime;
         }
-        else
-        {
-            _tickDelta += DeltaTime * TimeScale;
-            if (_tickDelta > DeltaTime)
-            {
-                _tickDelta -= DeltaTime;
-                Tick++;
-            }
-        }
+        Real = Raylib.GetTime();
     }
 
     public static void Reset()

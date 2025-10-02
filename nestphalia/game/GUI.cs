@@ -444,11 +444,10 @@ public static class GUI
 
         Rectangle rect = new Rectangle(x, y, 300, 40);
         
-        bool hover = !Input.IsSuppressed() && CheckCollisionPointRec(GetScaledMousePosition(), rect);
-        bool press = (hover && (Input.Held(MouseButton.Left) || Input.Released(MouseButton.Left)) && CheckCollisionPointRec(Input.GetScaledClickPos(), rect));
+        bool press = (Input.Held(MouseButton.Left) || Input.Released(MouseButton.Left)) && CheckCollisionPointRec(Input.GetClickPos(), rect);
         
         // if clicking on bar, move pin to mouse
-        if (hover && press)
+        if (press)
         {
             // value = Math.Clamp((GetScaledMousePosition().X - x + 20) / 260, 0, 1) * (max - min) + min ;
             value = Math.Clamp((GetScaledMousePosition().X - x - 10) / 280, 0, 1);

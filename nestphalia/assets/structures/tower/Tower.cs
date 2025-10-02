@@ -73,7 +73,7 @@ public class Tower : Structure
     {
         base.Update();
 
-        if (World.IsBattleOver()) return;
+        if (World.Battle?.State != BattleScene.States.BattleActive) return;
         
         if (Time.Scaled - _timeLastFired > 60/_template.RateOfFire)
         {

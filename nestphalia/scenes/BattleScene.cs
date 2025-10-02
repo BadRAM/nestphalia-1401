@@ -7,14 +7,17 @@ namespace nestphalia;
 
 public class BattleScene : Scene
 {
-    // private Fort _leftFort;
-    // private Fort _rightFort;
+    public States State;
+    public int Wave;
+    public int WaveTick;
+    private const double _waveDuration = 20;
+    private const int _waveTickCap = (int)(_waveDuration * Time.FrameRate);
+    
     private Level _level;
     private Team? _winner;
     private int _skips;
     private bool _pathFinderDebug;
     private Action<Team?> _battleOverCallback;
-    private SceneState _state;
     private WrenCommand _wrenCommand = new WrenCommand();
     private List<BattleEvent> _events = new List<BattleEvent>();
     private List<BattleEvent> _battleEndEvents = new List<BattleEvent>();
@@ -24,7 +27,6 @@ public class BattleScene : Scene
     private double _zoomLevel = 5;
     private readonly List<Double> _zoomLevels = [0.05, 0.1, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3, 3.5, 4, 5, 6, 7, 8, 10, 12, 14, 16]; 
     
-    // private List<Vector2> CameraShakeQueue = new List<Vector2>();
     private Vector2 _cameraShakeDisplacement = Vector2.Zero;
     private double _cameraShakeIntensity = 6;
     private double _cameraShakeRemaining = 0;
@@ -37,8 +39,9 @@ public class BattleScene : Scene
     private Texture2D _clock;
     private Texture2D _clockHand;
     private StretchyTexture _selectBoxBG;
+    private static SoundResource _waveStartSoundEffect;
     
-    private enum SceneState
+    public enum States
     {
         StartPending,
         BattleActive,
@@ -49,27 +52,26 @@ public class BattleScene : Scene
     
     public void Start(Level level, Fort leftFort, Fort? rightFort, Action<Team?> battleOverCallback, bool leftIsPlayer = true, bool rightIsPlayer = false, bool deterministic = false)
     {
-        // _leftFort = leftFort;
-        // _rightFort = rightFort;
-        // Debug.Assert(_leftFort != null && _rightFort != null);
         _level = level;
         
         _winner = null;
-        _state = SceneState.BattleActive;
+        State = States.BattleActive;
         _battleOverCallback = battleOverCallback;
         int zoomIndex = _zoomLevels.IndexOf(Settings.Saved.WindowScale);
         _zoomLevel = zoomIndex == -1 ? 1 : zoomIndex;
         
-        Time.TimeScale = 1;
+        Time.Paused = false;
         Program.CurrentScene = this;
-        World.InitializeBattle(level, leftFort, rightFort, leftIsPlayer, rightIsPlayer, deterministic);
+        World.InitializeBattle(this, level, leftFort, rightFort, leftIsPlayer, rightIsPlayer, deterministic);
         World.Camera.Zoom = (float)_zoomLevels[(int)_zoomLevel];
         _log += $"first random: {World.RandomInt(100)}\n";
         
         _wrenCommand.Execute(level.Script);
         GameConsole.WriteLine($"World.InitializeBattle executed script:{level.Script}");
 
-        // TODO: Move weather effect rendering into world, or into it's own class managed by world.
+        WaveTick = _waveTickCap - 2 * Time.FrameRate; // Start battle two seconds before first wave.
+
+        // TODO: Move weather effect rendering into components, maybe controlled by world?
         _canopyTexOffset = new Vector2(Random.Shared.Next(2048), Random.Shared.Next(2048));
         _canopyShadow = Resources.GetTextureByName("shadow_canopy");
         _canopyShadowHighlights = Resources.GetTextureByName("shadow_canopy_godray");
@@ -77,6 +79,7 @@ public class BattleScene : Scene
         _clockHand = Resources.GetTextureByName("clock_hand");
         SetTextureFilter(_canopyShadow, TextureFilter.Bilinear);
         SetTextureFilter(_canopyShadowHighlights, TextureFilter.Bilinear);
+        _waveStartSoundEffect = Resources.GetSoundByName("start");
 
         _selectBoxBG = Assets.Get<StretchyTexture>("stretch_default");
         
@@ -90,7 +93,7 @@ public class BattleScene : Scene
         HandleInputs();
 
         // ----- WORLD UPDATE PHASE -----
-        if (!PopupManager.PopupActive() && (_state == SceneState.BattleActive || _state == SceneState.BattleFinished))
+        if (!PopupManager.PopupActive() && (State == States.BattleActive || State == States.BattleFinished))
         {
             UpdateWorld();
             DoCameraShake();
@@ -113,13 +116,12 @@ public class BattleScene : Scene
         
         
         if (_pathFinderDebug) World.LeftTeam.PathFinder.DrawDebug();
-        // if (_pathFinderDebug) World.RightTeam.PathFinder.DrawDebug();
 
-        switch (_state)
+        switch (State)
         {
-            case SceneState.StartPending:
+            case States.StartPending:
                 break;
-            case SceneState.BattleActive:
+            case States.BattleActive:
                 DrawClock();
                 if (Input.Held(Input.InputAction.FastForward))
                 {
@@ -127,7 +129,7 @@ public class BattleScene : Scene
                     DrawTextCentered(0, 0, $"{_skips+1}X SPEED", 48);
                 }
                 break;
-            case SceneState.BattleFinished:
+            case States.BattleFinished:
                 DrawRectangle(Screen.CenterX-250,Screen.CenterY-150, 500, 300,new Color(0,0,0,128));
                 DrawTextCentered(0, -48, "BATTLE OVER!", 48);
                 DrawTextCentered(0, 0, $"{_winner?.Name} is victorious!", 48);
@@ -138,7 +140,7 @@ public class BattleScene : Scene
                     _battleOverCallback(_winner);
                 }
                 break;
-            case SceneState.Paused:
+            case States.Paused:
                 if (Screen.DebugMode || _pathFinderDebug)
                 {
                     DrawTextCentered(0, -Screen.BottomY/2, "PAUSED", 48);
@@ -149,7 +151,7 @@ public class BattleScene : Scene
                     DrawTextCentered(0, 0, "PAUSED", 48);
                     if (Button100(-50, 40, "Settings"))
                     {
-                        _state = SceneState.PausedSettings;
+                        State = States.PausedSettings;
                     }
                     if (Button100(-50, 80, "Resume"))
                     {
@@ -161,10 +163,21 @@ public class BattleScene : Scene
                     }
                 }
                 break;
-            case SceneState.PausedSettings:
+            case States.PausedSettings:
                 DrawRectangle(0,0,Screen.RightX,Screen.BottomY,new Color(0,0,0,128));
-                if (Settings.DrawSettingsMenu()) _state = SceneState.Paused;
+                if (Settings.DrawSettingsMenu()) State = States.Paused;
                 break;
+        }
+    }
+
+    private void UpdateWaveClock()
+    {
+        WaveTick++;
+        if (WaveTick >= _waveTickCap)
+        {
+            WaveTick = 0;
+            Wave++;
+            _waveStartSoundEffect.Play();
         }
     }
 
@@ -174,12 +187,12 @@ public class BattleScene : Scene
         {
             TogglePaused();
         }
-        if (_state == SceneState.Paused && Input.Pressed(Input.InputAction.FrameStep)) // Frame step
+        if (State == States.Paused && Input.Pressed(Input.InputAction.FrameStep)) // Frame step
         {
-            Time.TimeScale = 1;
+            Time.Paused = false;
             Time.UpdateTime();
             UpdateWorld();
-            Time.TimeScale = 0;
+            Time.Paused = true;
         }
         
         if (Input.Pressed(Input.InputAction.FastForward))
@@ -275,16 +288,18 @@ public class BattleScene : Scene
     {
         double startTime = GetTime();
         
+        UpdateWaveClock();
         World.Update();
         UpdateEvents();
         CheckWinner();
         
-        if (_state == SceneState.BattleActive && Input.Held(Input.InputAction.FastForward))
+        if (State == States.BattleActive && Input.Held(Input.InputAction.FastForward))
         {
             _skips = 0;
-            while (_state == SceneState.BattleActive && (GetTime() - startTime) + ((GetTime() - startTime) / (_skips + 1)) < 0.016)
+            while (State == States.BattleActive && (GetTime() - startTime) + ((GetTime() - startTime) / (_skips + 1)) < Time.DeltaTime)
             {
                 Time.UpdateTime(true);
+                UpdateWaveClock();
                 World.Update();
                 UpdateEvents();
                 CheckWinner();
@@ -306,15 +321,15 @@ public class BattleScene : Scene
 
     public void TogglePaused()
     {
-        switch (_state)
+        switch (State)
         {
-            case SceneState.BattleActive:
-                _state = SceneState.Paused;
-                Time.TimeScale = 0;
+            case States.BattleActive:
+                State = States.Paused;
+                Time.Paused = true;
                 break;
-            case SceneState.Paused:
-                _state = SceneState.BattleActive;
-                Time.TimeScale = 1;
+            case States.Paused:
+                State = States.BattleActive;
+                Time.Paused = false;
                 break;
         }
     }
@@ -326,7 +341,7 @@ public class BattleScene : Scene
     
     private void CheckWinner()
     {
-        if (_state == SceneState.BattleFinished) return;
+        if (State == States.BattleFinished) return;
 
         Team loser = World.LeftTeam;
         if (World.LeftTeam.Health <= 0 || Input.Pressed(KeyboardKey.Minus))
@@ -348,8 +363,7 @@ public class BattleScene : Scene
             }
             
             _log += $"last random: {World.RandomInt(100)}";
-            _state = SceneState.BattleFinished;
-            World.EndBattle();
+            State = States.BattleFinished;
             
             List<Int2D> edges = new List<Int2D>();
             for (int x = 0; x < World.BoardWidth; x++)
@@ -463,6 +477,8 @@ public class BattleScene : Scene
     {
         DrawTexture(_clock, 10, 10, Color.White);
         DrawTexturePro(_clockHand, _clockHand.Rect(), new Rectangle(74, 74, _clockHand.Size()), _clockHand.Size()/2, (float)Time.Scaled * 18 - 27, Color.White);
+        DrawTextLeft(174, 10, Wave.ToString(), 128, anchor:Screen.TopLeft);
+        if (Screen.DebugMode) DrawTextLeft(256, 10, $"WaveTick: {WaveTick}", anchor:Screen.TopLeft);
     }
 
     private void DrawCanopyShadows()

@@ -17,7 +17,7 @@ public class MinionTemplate : JsonAsset
     public float PhysicsRadius; // This is a float because Raylib.CheckCircleOverlap() wants floats
     public Minion.StateType DefaultState;
     public Minion.StateType AttackType;
-    public int WalkAnimDelay;
+    public double AnimFrameRate;
     public Texture2D Texture;
     public Texture2D ShadowTexture;
     public Vector2 SpriteSize;
@@ -35,7 +35,7 @@ public class MinionTemplate : JsonAsset
         PhysicsRadius = jObject.Value<int?>("PhysicsRadius") ?? throw new ArgumentNullException();
         DefaultState = Enum.Parse<Minion.StateType>(jObject.Value<string?>("DefaultState") ?? "Move");
         AttackType = Enum.Parse<Minion.StateType>(jObject.Value<string?>("AttackType") ?? "MeleeAttack");
-        WalkAnimDelay = jObject.Value<int?>("WalkAnimDelay") ?? 2;
+        AnimFrameRate = jObject.Value<double?>("AnimFrameRate") ?? 30.0;
         Texture = Resources.GetTextureByName(jObject.Value<string?>("Texture") ?? "");
         ShadowTexture = Resources.GetTextureByName(jObject.Value<string?>("ShadowTexture") ?? "shadow");
         SpriteSize = jObject.Value<JObject?>("SpriteSize")?.ToObject<Vector2>() ?? Vector2.One * Texture.Height/2;

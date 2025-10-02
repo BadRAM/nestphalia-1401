@@ -239,7 +239,7 @@ public class Team
             }
         }
         
-        if (World.IsBattleOver()) return;
+        if (World.Battle?.State != BattleScene.States.BattleActive) return;
         // use abilities
         if (IsPlayerControlled)
         {

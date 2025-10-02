@@ -24,7 +24,7 @@
     "AttackDuration": 1.0,
     "Speed": 75.0,
     "PhysicsRadius": 3.0,
-    "WalkAnimDelay": 2,
+    "AnimFrameRate": 30,
     "Texture": "ant12px",
     "SpriteSize": {
       "X": 12.0,
@@ -81,7 +81,7 @@
     "AttackDuration": 1.0,
     "Speed": 40.0,
     "PhysicsRadius": 5.0,
-    "WalkAnimDelay": 2,
+    "AnimFrameRate": 30,
     "Texture": "hopper",
     "SpriteSize": {
       "X": 24.0,
@@ -150,7 +150,7 @@
     "Speed": 45.0,
     "PhysicsRadius": 5.0,
     "AttackType": "SwoopAttack",
-    "WalkAnimDelay": 2,
+    "AnimFrameRate": 30,
     "Texture": "bee",
     "SpriteSize": {
       "X": 16.0,
@@ -209,7 +209,7 @@
     "AttackDuration": 1.0,
     "Speed": 35.0,
     "PhysicsRadius": 6.0,
-    "WalkAnimDelay": 2
+    "AnimFrameRate": 30,
   },
   {
     "ID": "nest_ladybug",
@@ -238,7 +238,7 @@
     "AttackDuration": 1.0,
     "Speed": 45.0,
     "PhysicsRadius": 6.0,
-    "WalkAnimDelay": 2,
+    "AnimFrameRate": 30,
     "Texture": "ladybug",
     "SpriteSize": {
       "X": 16.0,
@@ -315,7 +315,7 @@
     "AttackType": "RangedAttack",
     "Speed": 45.0,
     "PhysicsRadius": 3.0,
-    "WalkAnimDelay": 2,
+    "AnimFrameRate": 30,
     "Range": 72,
     "Texture": "ant12px",
     "SpriteSize": {
@@ -375,7 +375,7 @@
     "AttackType": "RangedAttack",
     "Speed": 65.0,
     "PhysicsRadius": 8.0,
-    "WalkAnimDelay": 2,
+    "AnimFrameRate": 30,
     "Texture": "sapper",
     "BombTexture": "sapper_bomb",
     "SpriteSize": {
@@ -455,7 +455,7 @@
     "AttackDuration": 1.0,
     "Speed": 30.0,
     "PhysicsRadius": 10.0,
-    "WalkAnimDelay": 5,
+    "AnimFrameRate": 12,
     "Texture": "spidermom",
     "SpriteSize": {
       "X": 24.0,
@@ -499,7 +499,7 @@
     "AttackDuration": 0.5,
     "Speed": 55.0,
     "PhysicsRadius": 2.0,
-    "WalkAnimDelay": 2,
+    "AnimFrameRate": 30,
     "Texture": "spiderling",
     "SpriteSize": {
       "X": 8.0,
@@ -557,7 +557,7 @@
     "AttackDuration": 1.0,
     "Speed": 20.0,
     "PhysicsRadius": 10.0,
-    "WalkAnimDelay": 2,
+    "AnimFrameRate": 30,
     "Texture": "frog",
     "SpriteSize": {
       "X": 48.0,
