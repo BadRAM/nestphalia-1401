@@ -120,10 +120,7 @@ public class CampaignScene : Scene
             _data.Money -= 1000;
         }
         
-        if (Input.Pressed(Input.InputAction.Exit))
-        {
-            new MenuScene().Start();
-        }
+
         
         Screen.BeginDrawing();
         Raylib.ClearBackground(Color.Black);
@@ -219,7 +216,7 @@ public class CampaignScene : Scene
                                          $"Cost: {_fort.TotalCost}");
         }
         
-        if (GUI.Button180(290, -350, "Quit")) new MenuScene().Start();
+        if (GUI.Button180(290, -350, "Quit") || Input.Pressed(Input.InputAction.Exit)) new MenuScene().Start();
         if (GUI.Button180(100, -350, "Settings")) _screen = CampaignScreen.Settings;
         if (GUI.Button180(0, 350, "Team")) _screen = CampaignScreen.Team;
     }
@@ -234,7 +231,7 @@ public class CampaignScene : Scene
         
         Raylib.DrawCircle(Screen.CenterX - 100, Screen.CenterY, 10, _data.TeamColor);
         
-        if (GUI.Button180(0, 200, "Map")) _screen = CampaignScreen.Map;
+        if (GUI.Button180(0, 200, "Map") || Input.Pressed(Input.InputAction.Exit)) _screen = CampaignScreen.Map;
     }
 
     private void SettingsScreen()

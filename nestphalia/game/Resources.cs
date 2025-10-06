@@ -130,7 +130,6 @@ public static class Resources
         if (!_sounds.ContainsKey(name)) return _sounds["shovel"];
         return _sounds[name];
     }
-
     public static void PlayMusicByName(string name)
     {
         Raylib.StopMusicStream(MusicPlaying);
@@ -157,6 +156,11 @@ public static class Resources
                 GameConsole.WriteLine($" - {m.Key}");
             }
         }
+    }
+
+    public static void StopMusic()
+    {
+        Raylib.StopMusicStream(MusicPlaying);
     }
 
     public static void MusicVolumeChanged()

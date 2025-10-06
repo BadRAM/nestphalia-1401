@@ -56,14 +56,21 @@ public static class GameConsole
                     _input = _commandHistory[_commandHistoryCursor];
                 }
 
-                if (Input.Pressed(MouseButton.Right))
+                if ((Input.Held(KeyboardKey.LeftControl) || Input.Held(KeyboardKey.RightControl)) && Input.Pressed(KeyboardKey.V))
                 {
                     _input += Raylib.GetClipboardText_();
                 }
                 
-                if (Input.Pressed(MouseButton.Left))
+                if ((Input.Held(KeyboardKey.LeftControl) || Input.Held(KeyboardKey.RightControl)) && Input.Pressed(KeyboardKey.C))
                 {
-                    Raylib.SetClipboardText(string.Join("\n", LogHistory));
+                    if (_input == "")
+                    {
+                        Raylib.SetClipboardText(string.Join("\n", LogHistory));
+                    }
+                    else
+                    {
+                        Raylib.SetClipboardText(_input);
+                    }
                 }
     
                 if ((Input.Pressed(KeyboardKey.Backspace) || Input.Repeat(KeyboardKey.Backspace)) && _input.Length > 0)

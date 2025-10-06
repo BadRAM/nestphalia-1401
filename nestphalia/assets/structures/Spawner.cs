@@ -70,7 +70,7 @@ public class Spawner : Structure
             Retarget();
             _minion.RequestPath(new Int2D(X, Y), _targetTile, _navPath, Team);
         }
-        if (World.Battle?.WaveTick == _spawnDelay + 5)
+        if (World.Battle?.State == BattleScene.States.BattleActive && World.Battle.WaveTick == _spawnDelay + 5)
         {
             DeployWave();
         }

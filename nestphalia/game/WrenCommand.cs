@@ -66,29 +66,54 @@ public class WrenCommand
         WrenForeignMethodFn foreign = null;
         
         // Commands
-        if (signature == "attack(_,_,_,_,_,_,_)") foreign = Attack;
-        if (signature == "spawn(_,_,_,_,_,_,_)") foreign = Spawn;
-        if (signature == "kill(_,_)") foreign = Kill;
-        if (signature == "dialogForeign(_,_,_,_)") foreign = Dialog;
-        if (signature == "build(_,_,_,_)") foreign = Build;
-        if (signature == "demolish(_,_)") foreign = Demolish;
-        if (signature == "win(_)") foreign = Win;
+        if (classname == "Cmd")
+        {
+            if (signature == "attack(_,_,_,_,_,_,_)") foreign = Attack;
+            if (signature == "spawn(_,_,_,_,_,_,_)") foreign = Spawn;
+            if (signature == "kill(_,_)") foreign = Kill;
+            if (signature == "dialogForeign(_,_,_,_)") foreign = Dialog;
+            if (signature == "build(_,_,_,_)") foreign = Build;
+            if (signature == "demolish(_,_)") foreign = Demolish;
+            if (signature == "win(_)") foreign = Win;
+        }
         
         // Events
-        if (signature == "teamHealthBelow(_,_,_)") foreign = TeamHealthBelowEvent;
-        if (signature == "timer(_,_,_)") foreign = TimerEvent;
-        if (signature == "structureDestroyed(_,_,_)") foreign = StructureDestroyedEvent;
-        if (signature == "battleOver(_,_)") foreign = BattleOverEvent;
+        if (classname == "Event")
+        {
+            if (signature == "teamHealthBelow(_,_,_)") foreign = TeamHealthBelowEvent;
+            if (signature == "timer(_,_,_)") foreign = TimerEvent;
+            if (signature == "structureDestroyed(_,_,_)") foreign = StructureDestroyedEvent;
+            if (signature == "battleOver(_,_)") foreign = BattleOverEvent;
+        }
+        
+        // Sound
+        if (classname == "Sound")
+        {
+            if (signature == "play(_,_,_,_)") foreign = PlaySound;
+        }
+        
+        // Music
+        if (classname == "Music")
+        {
+            if (classname == "Music" && signature == "play(_)") foreign = PlayMusic;
+            if (classname == "Music" && signature == "stop()") foreign = StopMusic;
+            if (classname == "Music" && signature == "getLength()") foreign = GetMusicLength;
+            if (classname == "Music" && signature == "getTime()") foreign = GetMusicTime;
+            if (classname == "Music" && signature == "setTime(_)") foreign = SetMusicTime;
+        }
         
         // Math
-        if (signature == "random()") foreign = Random;
-        if (signature == "randInt(_)") foreign = RandInt;
+        if (classname == "Math")
+        {
+            if (signature == "random()") foreign = Random;
+            if (signature == "randInt(_)") foreign = RandInt;
+        }
         
-        if (foreign == null) throw new Exception($"Tried to bind foreign with unrecognized signature: {signature}");
+        if (foreign == null) throw new Exception($"Tried to bind foreign with unrecognized signature: {signature} from class: {classname}");
         _foreigns.Add(foreign);
         return foreign;
     }
-    
+
     public void Execute(string input)
     {
         wrenInterpret(_vm, "main", input);
@@ -289,6 +314,66 @@ public class WrenCommand
         battleScene.SetWinner(t);
     }
     
+    #endregion
+
+    #region Sound
+
+    // Wren: play(soundID, pan, pitch, volume)
+    private void PlaySound(WrenVM vm)
+    {
+        string id = wrenGetSlotString(vm, 1);
+        double pan = wrenGetSlotDouble(vm, 2);
+        double pitch = wrenGetSlotDouble(vm, 3);
+        double volume = wrenGetSlotDouble(vm, 4);
+
+        Resources.GetSoundByName(id).Play((float)pan, (float)pitch, (float)volume);
+    }
+
+    #endregion
+
+    #region Music
+
+    // Wren: play(musicID)
+    private void PlayMusic(WrenVM vm)
+    {
+        string id = wrenGetSlotString(vm, 1);
+        
+        Resources.PlayMusicByName(id);
+    }
+
+    // Wren: stop()
+    private void StopMusic(WrenVM vm)
+    {
+        Resources.StopMusic();
+    }
+    
+    // Wren: 
+
+    // Wren: getLength()
+    private void GetMusicLength(WrenVM vm)
+    {
+        double time = Raylib.GetMusicTimeLength(Resources.MusicPlaying);
+        
+        wrenSetSlotDouble(vm, 0, time);
+    }
+    
+    // Wren: getTime()
+    private void GetMusicTime(WrenVM vm)
+    {
+        double time = Raylib.GetMusicTimePlayed(Resources.MusicPlaying);
+        
+        wrenSetSlotDouble(vm, 0, time);
+    }
+
+    // Wren: setTime(time)
+    private void SetMusicTime(WrenVM vm)
+    {
+        double time = wrenGetSlotDouble(vm, 1);
+        
+        Raylib.SeekMusicStream(Resources.MusicPlaying, (float)time);
+    }
+    
+
     #endregion
 
     #region Event

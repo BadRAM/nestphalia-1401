@@ -449,7 +449,6 @@ public static class GUI
         // if clicking on bar, move pin to mouse
         if (press)
         {
-            // value = Math.Clamp((GetScaledMousePosition().X - x + 20) / 260, 0, 1) * (max - min) + min ;
             value = Math.Clamp((GetScaledMousePosition().X - x - 10) / 280, 0, 1);
         }
         
@@ -459,7 +458,6 @@ public static class GUI
         DrawTextLeft(x + 2, y + 2, label, anchor: Vector2.Zero);
         // Draw scale labels
         // Draw pin
-        // DrawTexture(_sliderPinTexture, (int)(x + (value - min) / max * 260), y, Color.White);
         DrawTexture(_sliderPinTexture, (int)(x - 10 + value * 280), y, Color.White);
 
         return value;

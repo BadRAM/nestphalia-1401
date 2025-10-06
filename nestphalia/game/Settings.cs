@@ -90,6 +90,6 @@ public static class Settings
             resizing = true;
         }
         
-        return Button300(-150, 160, "Save & Return", enabled: !resizing);
+        return Button300(-150, 160, "Save & Return", enabled: !resizing) || Input.Pressed(Input.InputAction.Exit);
     }
 }

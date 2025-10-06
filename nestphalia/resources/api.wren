@@ -18,7 +18,7 @@ class Cmd {
     foreign static kill(id, team)
 
     // Places a structure on a tile. Replaces whatever is there already
-    foreign static build(id, team, x, y) 
+    foreign static build(id, team, x, y)
 
     // Destroys structure at x, y, still leaves repairable rubble
     foreign static demolish(x, y)
@@ -33,10 +33,45 @@ class Cmd {
     }
 }
 
+class Sound {
+    // ======== Sound Control ========
+    // This class plays SFX, not music
 
+    // Plays a sound
+    foreign static play(soundID, pan, pitch, volume)
+
+    // Versions of Play() with fewer arguments
+    static play(soundID) { 
+        play(soundID, 0.5, 1, 0.75) 
+    }
+    static playPan(soundID, pan) { 
+        play(soundID, pan, 1, 0.75) 
+    }
+    static playPitch(soundID, pitch) { 
+        play(soundID, 0.5, pitch, 0.75) 
+    }
+    static playVolume(soundID, volume) { 
+        play(soundID, 0.5, 1, volume) 
+    }
+}
+
+class Music {
+    // Start music playing, automatically stops previous music.
+    foreign static play(musicID)
+    // Stop all music
+    foreign static stop()
+    // Get the length of the current music
+    foreign static getLength() 
+    // Get the time the current music has been playing for
+    foreign static getTime()
+    // Skip to a certain part of the current music
+    foreign static setTime(time)   
+    // Crossfade to the same time of a different song. for dynamic soundtracks. Not implemented.
+    // foreign static Switch(musicID) 
+}
 
 class Event {
-    // ======== Events ========
+    // ======== Event Registration ========
     // Event functions register a callback for a certain condition, which usually only triggers once.
     // action can be a Function created with Fn.new {} or a static method from a class or regular method from an object.
     //

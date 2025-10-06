@@ -29,9 +29,9 @@ Art todo:
   - Dead leaves
   - Moss
   - Footprints
+  - Soil scratched away to reveal rock
 - Bug animations
 - Structure reworks
-- Big
 
 Programming todo:
 =================
@@ -40,20 +40,23 @@ Programming todo:
 
 - Game intro cutscene
 - Loading screen
-- Dialog boxes and scripted events at start of levels
-  - Allow dialog boxes to provide a list of choices
-  - SFX?
 - Nice title screen
 - Nice credits screen
+- Cutscene scripting
+  - Fullscreen image popup
+  - Captions
+  - Music
 - 2-3 more bugs & towers
-  - Ranged attack bug
+  - ~~Ranged attack bug~~ Ranged bug sprite
   - ~~Another flyer. Ladybug? Flies until attacked.~~
-  - Roaches - Gets within a radius of target then flies close to it.
+  - Roaches - Feigns death the first time it is killed, reanimating with full health after a couple seconds
   - Snail rework
   - Sapper rework. Attacks can damage the ball?
+  - Medic bug, heals/cures status effects in radius
   - Centipede that gets longer and shorter
+  - Bomber minon that attacks in a line/area hitting multiple structures
   - Tower with a big sawblade on an arm that slowly orbits
-  - Springboard trap that launches a bug towards the other fort based on it's weight
+  - ~~Springboard trap that launches a bug towards the other fort based on it's weight~~
   - Glue paper rework - Maybe it just works forever, but only affects bugs standing on it?
   - Multitarget tower, attacks 3 units simultaneously, but can't focus all attacks on one target
   - Penetrating tower, like spike roller from bloons
@@ -61,24 +64,16 @@ Programming todo:
   - Freeze minions in radius stratagem
   - Build new wall/tower stratagem (Can it build in the neutral zone, or even the enemy fort?)
   - Create/remove fear stratagem
-- Standard bearer
 - Crush damage
-- Minion Status Effect System
-- Make Frenzy Beacon work again
-- Make nests solid again
-- Command console
-  - Interface
-  - Command format, usable by json levels to script battle events.
 - Better level format, 
-  - allow structures in center
-  - customize floor
-  - scripted events
+  - ~~allow structures in center~~
+  - ~~customize floor~~
+  - ~~scripted events~~
   - soil texture triangle (meaningless)
+  - floor scatters
 - Nice campaign screen with a map and paths appearing every time you unlock a new level. Nonlinear campaign?
 - Design campaign levels
-- Corpses/bloodstains to indicate fear
-- Balance decision: Should flight grant immunity to explosions? Currently it does not.
-- Orphaned sapper beetles will seek another burrow
+- ~~Corpses/bloodstains~~GHOSTS to indicate fear
 - Help text / Tutorial
   - Dialog box
   - Campaign intro tutorial
@@ -105,23 +100,31 @@ Programming todo:
   - Bug Death
   - Bug take damage
   - Tower Shoot
-- Migrate old JSON functions to newtonsoft
-- Stateful GUI
 - Repeatable LARP gauntlet challenge
 - sell mode has no indicator for what is about to be sold if you click (along the lines of placement ghosts) 
-- Show wave clock on screen in battle
-
+- ~~Dialog boxes and scripted events at start of levels~~
+  - Allow dialog boxes to provide a list of choices
+- Rich Text System
+  - Delay
+  - Color
+  - Speaker
+  - SFX trigger
+  - Emoji
+- Character creator
+  - Base bugs: Ant, Isopod(?), Worm
+  - Carapace Paint (Worm doesn't like?)
+  - Accessories!
 
 ----- Premature Optimizations -----
 
 - Codebase Refactoring
   - Get rid of as many public fields as possible
-    - ~~Battlescene should accept callback function to report victory~~
-  - ~~Integrate Screen.HCenter/VCenter into GUI functions~~
   - Minion
-    - ~~State machine~~
-    - ~~Extract physics~~
     - Move flying behavior into base minion
+    - Composition, break Minion base class into components:
+      - Move behavior
+      - Attack behavior
+      - Draw
   - Projectile
     - Convert into general purpose gameEntity
   - World
@@ -130,15 +133,9 @@ Programming todo:
     - move all world function into a 'worldInstance' class, and leave World as a wrapper to it
     - add an integer frame counting 'battle clock' to handle wave timing
   - BattleScene
-    - Camera shake stores just the last offset.
   - Team
-    - ~~Move pathqueue and some pathfinding into team~~
     - Move target selection into team
   - Pathfinder
-    - ~~Make it not static so it can be multithreaded~~
-
-- Game Logic optimizations
-  - ~~profile tile entities separately by ID~~
 
 - Physics optimizations
   - ~~Sector based minion culling/lookup~~
@@ -147,7 +144,6 @@ Programming todo:
   - ~~Multi Threading~~
     - ~~multithreading collision made the game slower~~
     - ~~Giving pathfinding a background task while collision detection happens on the main thread seems to be helping a little bit.~~
-  - ~~Terrain collision doesn't need to figure out what sector (side/corner/center) of the tile it's in because for each tile you consider you already know from the offset.~~
   - Fix left side tug of war bias
 
 - Pathfinding optimizations:
@@ -202,7 +198,6 @@ Design todo:
   - Lightning tower?
   - 
  - Minions
-  - Ranged Minion that shoots over walls
   - Dragonfly
   - Centipede
   - Roach
@@ -237,3 +232,8 @@ Design todo:
  - Reloading turrets - Turrets run out of ammo?
  - Can walk along the top of walls?
  - Harvest worker resource, mushrooms? which sprout randomly everywhere on the map.
+
+- Nestphalia Pinball
+ - Spawning and other expensive actions are controlled by a plinko board inside your HQ
+ - Workers collect food and throw it into the top, when food lands in an "Action Pocket" the action occurs
+ - Actions: 

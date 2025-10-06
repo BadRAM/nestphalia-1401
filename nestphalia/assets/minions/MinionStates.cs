@@ -58,7 +58,7 @@ public partial class Minion
         {
             int frames = Me.Template.GetAnimationFrameCount(AnimationState.Walking);
             if (frames == 0) frames = 1;
-            return $"Move, frame: {_animTimer % frames}";
+            return $"Move, frame: {(_animTimer % frames):N1}";
         }
 
         public override void Update()

@@ -39,7 +39,7 @@ public class Fort
                 {
                     World.SetTile(null, World.RightTeam, (19 + spawnZone.X) - x,y + spawnZone.Y);
                     continue;
-                };
+                }
                 World.SetTile(Assets.Get<StructureTemplate>(Board[x+y*20]), World.RightTeam, (19 + spawnZone.X) - x,y + spawnZone.Y);
             }
             else
@@ -99,7 +99,7 @@ public class Fort
             if (t is ActiveAbilityBeaconTemplate) stratagemCount++;
             if (!campaign.UnlockedStructures.Contains(t.ID)) illegalBuilding = true;
         }
-
+        
         string reason = "";
         if (illegalBuilding) reason = "Fort contains locked structures!";
         else if (nestCount <= 0) reason = "Fort has no nests!";
