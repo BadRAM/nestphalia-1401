@@ -75,6 +75,7 @@ public static class Resources
     private static Dictionary<String, SoundResource> _sounds = new Dictionary<String, SoundResource>();
     private static Dictionary<String, MusicResource> _music = new Dictionary<String, MusicResource>();
     public static Font Font;
+    public static Font MonoFont;
     private static Font _accessibleFont;
     private static Font _defaultFont;
     public static Music MusicPlaying;
@@ -89,6 +90,7 @@ public static class Resources
         _accessibleFont = Raylib.LoadFont(Dir + "/resources/pixelplay16.png");
         _defaultFont = Raylib.LoadFont(Dir + "/resources/alagard.png");
         Font = Settings.Saved.AccessibleFont ? _accessibleFont : _defaultFont;
+        MonoFont = Raylib.LoadFont(Dir + "/resources/alagard-mono.png");
     }
     
     public static void Load()

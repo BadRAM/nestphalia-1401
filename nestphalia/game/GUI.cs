@@ -91,19 +91,36 @@ public static class GUI
         DrawTextLeft((int)pos.X, (int)pos.Y, text, size, wrapWidth, color, anchor);
     }
 
-    public static string WrapText(string text, int wrapWidth, float size = FontSize)
+    public static void DrawMonoTextLeft(int x, int y, string text, float size = FontSize, int wrapWidth = 0, Color? color = null, Vector2? anchor = null)
     {
+        anchor ??= Screen.Center;
+        x += (int)anchor.Value.X;
+        y += (int)anchor.Value.Y;
+        
+        Color c = color ?? new Color(255, 255, 255, 255);
+
+        if (wrapWidth != 0)
+        {
+            text = WrapText(text, wrapWidth, size);
+        }
+        
+        DrawTextEx(Resources.MonoFont, text, new Vector2(x,y), size, size/FontSize, c);
+    }
+
+    public static string WrapText(string text, int wrapWidth, float size = FontSize, Font? font = null)
+    {
+        font ??= Resources.Font;
         List<string> lines = new List<string>(text.Split("\n"));
         for (int i = 0; i < lines.Count; i++)
         {
-            if (MeasureTextEx(Resources.Font, lines[i], size, size / FontSize).X > wrapWidth)
+            if (MeasureTextEx(font.Value, lines[i], size, size / FontSize).X > wrapWidth)
             {
                 List<string> words = new List<string>(lines[i].Split(" "));
-                if (MeasureTextEx(Resources.Font, words[0], size, size / FontSize).X > wrapWidth) // if the first word is too long and needs to be cut
+                if (MeasureTextEx(font.Value, words[0], size, size / FontSize).X > wrapWidth) // if the first word is too long and needs to be cut
                 {
                     for (int j = 2; j < lines[i].Length; j++)
                     {
-                        if (MeasureTextEx(Resources.Font, lines[i].Substring(0, j), size, size / FontSize).X > wrapWidth)
+                        if (MeasureTextEx(font.Value, lines[i].Substring(0, j), size, size / FontSize).X > wrapWidth)
                         {
                             lines.Insert(i + 1, lines[i].Substring(j-1).Trim());
                             lines[i] = lines[i].Substring(0, j-1);
@@ -114,7 +131,7 @@ public static class GUI
                 }
                 for (int j = 1; j < words.Count; j++)
                 {
-                    if (MeasureTextEx(Resources.Font, string.Join(" ", words.GetRange(0, j+1)), size, size / FontSize).X > wrapWidth)
+                    if (MeasureTextEx(font.Value, string.Join(" ", words.GetRange(0, j+1)), size, size / FontSize).X > wrapWidth)
                     {
                         lines.Insert(i + 1, string.Join(" ", words.GetRange(j, words.Count - j)).Trim());
                         lines[i] = string.Join(" ", words.GetRange(0, j)).Trim();

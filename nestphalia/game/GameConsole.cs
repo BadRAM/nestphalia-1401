@@ -101,13 +101,13 @@ public static class GameConsole
 
             int y = Screen.BottomY / 2 - 14;
             
-            GUI.DrawTextLeft(4, y, "> " + _input, anchor: Screen.TopLeft);
+            GUI.DrawMonoTextLeft(4, y, "> " + _input, anchor: Screen.TopLeft);
             int i = LogHistory.Count-1;
             while (y > -14 && i >= 0)
             {
                 string line = GUI.WrapText(LogHistory[i], Screen.RightX);
                 y -= (int)GUI.MeasureText(line).Y;
-                GUI.DrawTextLeft(4, y, line, anchor: Screen.TopLeft);
+                GUI.DrawMonoTextLeft(4, y, line, anchor: Screen.TopLeft);
                 i--;
             }
         }

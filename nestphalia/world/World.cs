@@ -396,15 +396,17 @@ public static class World
         #if DEBUG
         List<KeyValuePair<string, EntityTracker>> tileTypeStopwatches = _swEntitiesByID.ToList();
         tileTypeStopwatches = tileTypeStopwatches.OrderByDescending(o => o.Value.SW.Elapsed).ToList();
-        
+        tileTypeTotals = "+=======================Entity==+===Sum==+Count+===Avg==+\n";
+
         foreach (var t in tileTypeStopwatches)
         {
             if (t.Value.Count == 0) continue;
-            tileTypeTotals += $"{t.Key} : {t.Value.SW.Elapsed.TotalMicroseconds.ToString("N5")} / {t.Value.Count} = {(t.Value.SW.Elapsed.TotalMicroseconds / t.Value.Count).ToString("N5")}\n";
+            tileTypeTotals += $"|{t.Key.PadLeft(30)} |{t.Value.SW.Elapsed.TotalMicroseconds.ToString("N2").PadRight(8)}|{t.Value.Count.ToString().PadRight(5)}|{(t.Value.SW.Elapsed.TotalMicroseconds / t.Value.Count).ToString("N4").PadRight(8)}|\n";
         }
+        tileTypeTotals += "+===============================+========+=====+========+\n";
         #endif
         
-        GUI.DrawTextLeft(10, 128,
+        GUI.DrawMonoTextLeft(10, 128,
             $"FPS: {Raylib.GetFPS()}\n" +
             $"Clock: {Time.Scaled:N2} Tick: {Time.Tick}\n" +
             $"Bugs: {Minions.Count}\n" +
