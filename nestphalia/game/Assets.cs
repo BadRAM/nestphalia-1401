@@ -16,6 +16,7 @@ public static class Assets
     private static readonly Dictionary<string, ConstructorInfo> JsonAssetTypes = new Dictionary<string, ConstructorInfo>()
     {
         { "StretchyTexture",           typeof(StretchyTexture).GetConstructor([typeof(JObject)])! },
+        { "FloorScatterTexList",       typeof(FloorScatterTexList).GetConstructor([typeof(JObject)])! },
         { "Level",                     typeof(Level).GetConstructor([typeof(JObject)])! },
         { "FloorTileTemplate",         typeof(FloorTileTemplate).GetConstructor([typeof(JObject)])! },
         { "StructureTemplate",         typeof(StructureTemplate).GetConstructor([typeof(JObject)])! },

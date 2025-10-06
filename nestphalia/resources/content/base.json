@@ -33,6 +33,14 @@
     "Texture": "clear"
   },
   {
+    "ID": "floor_scatters_default",
+    "Type": "FloorScatterTexList",
+    "Textures": 
+    [
+      "scatter_oak"
+    ]
+  },
+  {
     "ID": "wall_mud",
     "Type": "StructureTemplate",
     "Name": "Mud Wall",

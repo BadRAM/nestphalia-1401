@@ -18,12 +18,15 @@ public class LevelEditorScene : Scene
 
     private List<FloorTileTemplate> _floors = new List<FloorTileTemplate>();
     private List<StructureTemplate> _structures = new List<StructureTemplate>();
+    private List<string> _floorScatters = new List<string>();
+    private List<Texture2D> _floorScatterTex = new List<Texture2D>();
 
     private LevelEditorTool _toolActive;
     private List<FloorTileTemplate> _selectedFloors = new List<FloorTileTemplate>();
-    private FloorTileTemplate? _tooltipFloor = null;
     private StructureTemplate? _selectedStructure = null;
-    private StructureTemplate? _tooltipStructure = null;
+    private string _tooltip = "";
+    private string _selectedScatter = "";
+    private FloorScatter? _grabScatter = null;
     private List<string> _loadableLevels = new List<string>();
     private StretchyTexture _panelBg;
     // private int _brushRadius = 2;
@@ -31,7 +34,8 @@ public class LevelEditorScene : Scene
     private enum LevelEditorTool
     {
         FloorBrush,
-        StructureBrush
+        StructureBrush,
+        ScatterBrush
     }
     
     public void Start(Level? loadLevel = null)
@@ -52,6 +56,19 @@ public class LevelEditorScene : Scene
         
         _structures.AddRange(Assets.GetAll<StructureTemplate>());
         _structures = _structures.OrderBy(o => o.ID).ToList();
+
+        foreach (FloorScatterTexList list in Assets.GetAll<FloorScatterTexList>())
+        {
+            foreach (string texture in list.Textures)
+            {
+                if(!_floorScatters.Contains(texture)) _floorScatters.Add(texture);
+            }
+        }
+
+        foreach (string floorScatter in _floorScatters)
+        {
+            _floorScatterTex.Add(Resources.GetTextureByName(floorScatter));
+        }
         
         _panelBg = Assets.Get<StretchyTexture>("stretch_default");
         
@@ -95,6 +112,9 @@ public class LevelEditorScene : Scene
             case LevelEditorTool.FloorBrush:
                 FloorBrush();
                 break;
+            case LevelEditorTool.ScatterBrush:
+                ScatterBrush();
+                break;
             case LevelEditorTool.StructureBrush:
                 StructureBrush();
                 break; 
@@ -119,12 +139,17 @@ public class LevelEditorScene : Scene
         
         Raylib.DrawRectangle(0, Screen.TopY, 300, Screen.BottomY, Raylib.ColorAlpha(Color.Black, 0.5f));
         
-        if (Button100(0, 0, "Floor", anchor: Screen.TopLeft))
+        if (Button90(5, 2, "Floor", anchor: Screen.TopLeft))
         {
             _toolActive = LevelEditorTool.FloorBrush;
             _selectedFloors.Clear();
         }
-        if (Button100(200, 0, "Structure", anchor: Screen.TopLeft))
+        if (Button90(105, 2, "Scatter", anchor: Screen.TopLeft))
+        {
+            _toolActive = LevelEditorTool.ScatterBrush;
+            _selectedScatter = "";
+        }
+        if (Button90(205, 0, "Structure", anchor: Screen.TopLeft))
         {
             _toolActive = LevelEditorTool.StructureBrush;
             _selectedStructure = null;
@@ -138,8 +163,7 @@ public class LevelEditorScene : Scene
         
         _levelBuffer = BigTextCopyPad(15, 460, "Level Metadata", _levelBuffer, anchor: Screen.TopLeft);
         _scriptBuffer = BigTextCopyPad(15, 500, "Script", _scriptBuffer, anchor: Screen.TopLeft);
-        _tooltipFloor = null;
-        _tooltipStructure = null;
+        _tooltip = "";
         
         if (_toolActive == LevelEditorTool.FloorBrush)
         {
@@ -160,7 +184,7 @@ public class LevelEditorScene : Scene
                 }
                 if (butt == ButtonState.Hovered)
                 {
-                    _tooltipFloor = _floors[i];
+                    _tooltip = WrapText(_floors[i].ID, 270);
                 }
             }
             
@@ -170,6 +194,22 @@ public class LevelEditorScene : Scene
                 for (int y = 0; y < _level.WorldSize.Y; y++)
                 {
                     World.SetFloorTile(_selectedFloors[Random.Shared.Next(_selectedFloors.Count)], x, y);
+                }
+            }
+        }
+        if (_toolActive == LevelEditorTool.ScatterBrush)
+        {
+            for (int i = 0; i < _floorScatters.Count; i++)
+            {
+                bool selected = _selectedScatter == _floorScatters[i];
+                ButtonState butt = ImageButtonPro((2) + (i % 5) * 56, 40 + (i / 5) * 56, Resources.GetTextureByName(_floorScatters[i]), new Vector2(48, 48), selected, anchor: Screen.TopLeft);
+                if (butt == ButtonState.Pressed)
+                {
+                    _selectedScatter = _floorScatters[i];
+                }
+                if (butt == ButtonState.Hovered)
+                {
+                    _tooltip = WrapText(_floorScatters[i], 270);
                 }
             }
         }
@@ -185,7 +225,7 @@ public class LevelEditorScene : Scene
                 }
                 if (butt == ButtonState.Hovered)
                 {
-                    _tooltipStructure = _structures[i];
+                    _tooltip = WrapText(_structures[i].GetStats(), 270);
                 }
             }
             if (Button100(0, 260, "Erase", anchor: Screen.TopLeft)) _selectedStructure = null;
@@ -193,7 +233,67 @@ public class LevelEditorScene : Scene
         DrawToolTip();
         DrawTextLeft(0, 550, _levelInfo, anchor:Screen.TopLeft);
     }
-    
+
+    private void ScatterBrush()
+    {
+        if (!Input.Held(MouseButton.Left)) _grabScatter = null;
+        if (_grabScatter == null)
+        {
+            foreach (FloorScatter scatter in World.FloorScatters)
+            {
+                if (Raylib.CheckCollisionPointRec(World.GetMousePos() - GetScaledMouseDelta(), scatter.Rect()))
+                {
+                    _grabScatter = scatter;
+                    break;
+                }
+            }
+        }
+        if (_grabScatter != null)
+        {
+            SetCursorLook(MouseCursor.ResizeAll);
+            if (Input.Held(MouseButton.Left))
+            {
+                if (Input.Held(KeyboardKey.F))
+                {
+                    _grabScatter.Rotation += GetScaledMouseDelta().X;
+                }
+                else if (Input.Held(KeyboardKey.LeftShift))
+                {
+                    _grabScatter.Position = World.GetTileCenter(World.GetMouseTilePos()) - Vector2.One * 12;
+                }
+                else
+                {
+                    _grabScatter.Position += GetScaledMouseDelta();
+                }
+
+                if (Input.Pressed(KeyboardKey.R))
+                {
+                    if (_grabScatter.Rotation % 90 == 0)
+                    {
+                        _grabScatter.Rotation += 90;
+                    }
+                    else
+                    {
+                        _grabScatter.Rotation = (int)Math.Round((_grabScatter.Rotation / (double)90), MidpointRounding.AwayFromZero) * 90;
+                    }
+                }
+
+                if (Input.Pressed(KeyboardKey.E))
+                {
+                    World.FloorScatters.Remove(_grabScatter);
+                    _grabScatter = null;
+                }
+            }
+        }
+        else
+        {
+            if (_selectedScatter != "" && Input.Pressed(MouseButton.Left))
+            {
+                World.FloorScatters.Add(new FloorScatter(_selectedScatter, World.GetMousePos(), 0));
+            }
+        }
+    }
+
     private void FloorBrush()
     {
         if (Input.Held(MouseButton.Left) && Raylib.GetMousePosition().X > 300)
@@ -227,22 +327,12 @@ public class LevelEditorScene : Scene
     
     private void DrawToolTip()
     {
-        if (_tooltipStructure != null)
-        {
-            string tip = WrapText(_tooltipStructure.GetStats(), 270);
-            Rectangle rect = new Rectangle(GetScaledMousePosition() + Vector2.One * 12, MeasureText(tip) + Vector2.One * 4);
-            rect.Position = Vector2.Clamp(rect.Position, Vector2.Zero, Screen.BottomRight - rect.Size);
-            DrawStretchyTexture(_panelBg, rect, anchor:Screen.TopLeft);
-            DrawTextLeft(rect.Position + Vector2.One * 2, tip, anchor:Screen.TopLeft);
-        }
-        if (_tooltipFloor != null)
-        {
-            string tip = WrapText(_tooltipFloor.ID, 270);
-            Rectangle rect = new Rectangle(GetScaledMousePosition() + Vector2.One * 12, MeasureText(tip) + Vector2.One * 4);
-            rect.Position = Vector2.Clamp(rect.Position, Vector2.Zero, Screen.BottomRight - rect.Size);
-            DrawStretchyTexture(_panelBg, rect, anchor:Screen.TopLeft);
-            DrawTextLeft(rect.Position + Vector2.One * 2, tip, anchor:Screen.TopLeft);
-        }
+        if (_tooltip == "") return;
+        Rectangle rect = new Rectangle(GetScaledMousePosition() + Vector2.One * 12, MeasureText(_tooltip) + Vector2.One * 4);
+        rect.Position = Vector2.Clamp(rect.Position, Vector2.Zero, Screen.BottomRight - rect.Size);
+        DrawStretchyTexture(_panelBg, rect, anchor:Screen.TopLeft);
+        DrawTextLeft(rect.Position + Vector2.One * 2, _tooltip, anchor:Screen.TopLeft);
+
     }
     
     private void Save()

@@ -424,8 +424,9 @@ public static class GUI
         return Button(new Rectangle(x, y, 100, 40), text, _buttonNarrowTexture, enabled, anchor);
     }
     
-    public static ButtonState TileButtonPro(int x, int y, Texture2D image, bool selected = false, Vector2? anchor = null)
+    public static ButtonState TileButtonPro(int x, int y, Texture2D image, bool selected = false, Vector2? size = null, Vector2? anchor = null)
     {
+        size ??= image.Size();
         anchor ??= Screen.Center;
         x += (int)anchor.Value.X;
         y += (int)anchor.Value.Y;
@@ -451,6 +452,31 @@ public static class GUI
     public static bool TileButton(int x, int y, Texture2D image, bool selected = false, Vector2? anchor = null)
     {
         return TileButtonPro(x, y, image, selected, anchor) == ButtonState.Pressed;
+    }
+    
+    public static ButtonState ImageButtonPro(int x, int y, Texture2D image, Vector2 size, bool selected = false, Vector2? anchor = null)
+    {
+        anchor ??= Screen.Center;
+        x += (int)anchor.Value.X;
+        y += (int)anchor.Value.Y;
+        
+        bool hover = !Input.IsSuppressed() && CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(x, y, size));
+
+        if (selected) DrawRectangle(x-2, y-2, (int)size.X + 4, (int)size.Y+4, Color.White);
+        
+        DrawTexturePro(image, image.Rect(), new Rectangle(x, y, size), Vector2.Zero, 0, Color.White);
+
+        if (hover)
+        {
+            _cursorLook = MouseCursor.PointingHand;
+            if (Input.Released(MouseButton.Left))
+            {
+                _buttonClickSFX.Play();
+                return ButtonState.Pressed;
+            }
+        }
+        
+        return hover ? ButtonState.Hovered : ButtonState.Enabled;
     }
 
     public static double Slider(int x, int y, string label, double value, Vector2? anchor = null)
@@ -555,6 +581,11 @@ public static class GUI
         }
         
         return text;
+    }
+
+    public static void SetCursorLook(MouseCursor look)
+    {
+        _cursorLook = look;
     }
     
     public static void UpdateCursor()

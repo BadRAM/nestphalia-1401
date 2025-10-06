@@ -9,6 +9,7 @@ public static class World
     public static int BoardWidth = 54;
     public static int BoardHeight = 28;
     private static FloorTile[,] _floor = new FloorTile[BoardWidth, BoardHeight];
+    public static List<FloorScatter> FloorScatters = new List<FloorScatter>();
     private static Structure?[,] _board = new Structure?[BoardWidth, BoardHeight];
     public static List<Minion> Minions = new List<Minion>();
     public static Dictionary<int, Minion> MinionsByID = new Dictionary<int, Minion>();
@@ -353,6 +354,11 @@ public static class World
         {
             _floor[x,y].Draw(x, y);
         }
+
+        foreach (FloorScatter scatter in FloorScatters)
+        {
+            scatter.Draw();
+        }
         
         Screen.SetCamera();
     }
@@ -568,6 +574,11 @@ public static class World
     public static Int2D GetMouseTilePos()
     {
         return PosToTilePos(Raylib.GetScreenToWorld2D(Raylib.GetMousePosition(), Camera));
+    }
+    
+    public static Vector2 GetMousePos()
+    {
+        return Raylib.GetScreenToWorld2D(Raylib.GetMousePosition(), Camera);
     }
     
     public static Rectangle GetTileBounds(int x, int y)

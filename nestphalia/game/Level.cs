@@ -1,3 +1,5 @@
+using System.Numerics;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Raylib_cs;
 
@@ -22,6 +24,7 @@ public class Level : JsonAsset
     public string Script = "";
     public string[,] FloorTiles;
     public string[,] Structures;
+    public List<FloorScatter> Scatters;
 
     public Level(JObject jObject) : base(jObject)
     {
@@ -43,6 +46,7 @@ public class Level : JsonAsset
         Script = jObject.Value<string>("Script") ?? Script;
         FloorTiles = jObject.Value<JArray>("FloorTiles")?.ToObject<string[,]>() ?? new string[WorldSize.X,WorldSize.Y];
         Structures = jObject.Value<JArray>("Structures")?.ToObject<string[,]>() ?? new string[WorldSize.X,WorldSize.Y];
+        Scatters = jObject.Value<JArray>("Scatters")?.ToObject<List<FloorScatter>>() ?? new List<FloorScatter>();
         
         // Check that arrays match board size
         if (FloorTiles.GetLength(0) != WorldSize.X || FloorTiles.GetLength(1) != WorldSize.Y || 
@@ -71,6 +75,7 @@ public class Level : JsonAsset
             FloorTiles[x, y] = World.GetFloorTile(x, y).Template.ID;
             Structures[x, y] = World.GetTile(x, y)?.Template.ID ?? "";
         }
+        Scatters = new List<FloorScatter>(World.FloorScatters);
     }
 
     public void LoadToBoard()
@@ -89,6 +94,7 @@ public class Level : JsonAsset
             if (!Assets.Exists<StructureTemplate>(Structures[x,y])) continue;
             World.SetTile(Assets.Get<StructureTemplate>(Structures[x,y]),World.RightTeam,x,y);
         }
+        World.FloorScatters = new List<FloorScatter>(Scatters);
     }
     
     public string GetLevelStats()
