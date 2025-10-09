@@ -12,8 +12,6 @@ public class RangedMinionTemplate : MinionTemplate
         Range = jObject.Value<double?>("Range") ?? throw new ArgumentNullException();
         AttackType = Enum.Parse<Minion.StateType>(jObject.Value<string?>("AttackType") ?? "RangedAttack");
         
-        string j = $@"{{""ID"": ""{ID}_attack"", ""Texture"": ""minion_bullet"", ""Damage"": {Damage}, ""Speed"": 400}}";
-        Attack = new ProjectileTemplate(JObject.Parse(j));
     }
     
     public override Minion Instantiate(Team team, Vector3 position, NavPath? navPath)

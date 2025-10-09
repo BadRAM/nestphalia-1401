@@ -10,6 +10,7 @@ public static class Assets
 {
     private static Dictionary<string, JsonAsset> _assets = new Dictionary<string, JsonAsset>();
     private static Dictionary<Type, List<JsonAsset>> _assetSets = new Dictionary<Type, List<JsonAsset>>();
+    private static List<Action> _lateLoadActions = new List<Action>();
 
     // The lookup table must be used instead of reflection, so that static analysis knows not to trim the JsonAsset
     // constructor when publishing with trimmed assemblies. it also provides deserializer stability if type names change internally.
@@ -28,13 +29,17 @@ public static class Assets
         { "HazardSignTemplate",        typeof(HazardSignTemplate).GetConstructor([typeof(JObject)])! },
         { "MinefieldTemplate",         typeof(MinefieldTemplate).GetConstructor([typeof(JObject)])! },
         { "TowerTemplate",             typeof(TowerTemplate).GetConstructor([typeof(JObject)])! },
+        { "AttackBeaconTemplate",      typeof(AttackBeaconTemplate).GetConstructor([typeof(JObject)])! },
         { "BuffBeaconTemplate",        typeof(BuffBeaconTemplate).GetConstructor([typeof(JObject)])! },
         { "RallyBeaconTemplate",       typeof(RallyBeaconTemplate).GetConstructor([typeof(JObject)])! },
         { "RepairBeaconTemplate",      typeof(RepairBeaconTemplate).GetConstructor([typeof(JObject)])! },
         { "SpawnBoostBeaconTemplate",  typeof(SpawnBoostBeaconTemplate).GetConstructor([typeof(JObject)])! },
         { "LightningBoltTemplate",     typeof(LightningBoltTemplate).GetConstructor([typeof(JObject)])! },
-        { "MortarShellTemplate",       typeof(MortarShellTemplate).GetConstructor([typeof(JObject)])! },
+        { "ExplosionTemplate",         typeof(ExplosionTemplate).GetConstructor([typeof(JObject)])! },
+        { "MeleeAttackTemplate",       typeof(MeleeAttackTemplate).GetConstructor([typeof(JObject)])! },
+        { "BoulderTemplate",           typeof(BoulderTemplate).GetConstructor([typeof(JObject)])! },
         { "ProjectileTemplate",        typeof(ProjectileTemplate).GetConstructor([typeof(JObject)])! },
+        { "ArcProjectileTemplate",     typeof(ArcProjectileTemplate).GetConstructor([typeof(JObject)])! },
         { "MinionTemplate",            typeof(MinionTemplate).GetConstructor([typeof(JObject)])! },
         { "BroodMinionTemplate",       typeof(BroodMinionTemplate).GetConstructor([typeof(JObject)])! },
         { "FlyingMinionTemplate",      typeof(FlyingMinionTemplate).GetConstructor([typeof(JObject)])! },
@@ -58,6 +63,11 @@ public static class Assets
         }
         
         return JsonAssetTypes[jObject.Value<string>("Type")!].Invoke([jObject]) as T ?? throw new NullReferenceException();
+    }
+
+    public static void RegisterLateLoadAction(Action action)
+    {
+        _lateLoadActions.Add(action);
     }
     
     public static void Load()
@@ -84,6 +94,13 @@ public static class Assets
                 IndexAsset(level);
             }
         }
+
+        foreach (Action action in _lateLoadActions)
+        {
+            action.Invoke();
+        }
+        _lateLoadActions.Clear();
+        _lateLoadActions.TrimExcess();
     }
 
     public static void IndexAsset(JsonAsset asset)
@@ -131,5 +148,37 @@ public static class Assets
     {
         if (!Exists(asset.ID)) throw new Exception($"Tried to update unknown asset {asset.ID}");
         _assets[asset.ID] = asset;
+    }
+}
+
+public class SubAsset<T> where T : JsonAsset
+{
+    public T Asset;
+    public string ID = "";
+
+    public SubAsset(JToken jToken)
+    {
+        if (jToken.Type == JTokenType.String)
+        {
+            ID = jToken.Value<string>()!;
+            Assets.RegisterLateLoadAction(Link);
+        }
+
+        if (jToken is JObject jObject)
+        {
+            Asset = Assets.LoadJsonAsset<T>(jObject);
+            ID = Asset.ID;
+        }
+    }
+
+    public SubAsset(T asset)
+    {
+        Asset = asset;
+        ID = asset.ID;
+    }
+
+    private void Link()
+    {
+        Asset = Assets.Get<T>(ID);
     }
 }

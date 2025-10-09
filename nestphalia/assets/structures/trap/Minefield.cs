@@ -7,14 +7,14 @@ namespace nestphalia;
 public class MinefieldTemplate : StructureTemplate
 {
     public int MaxCharges;
-    public string Bomb;
+    public SubAsset<AttackTemplate> Bomb;
     public double Range;
     public double Cooldown;
     
     public MinefieldTemplate(JObject jObject) : base(jObject)
     {
         MaxCharges = jObject.Value<int?>("MaxCharges") ?? throw new ArgumentNullException();
-        Bomb = jObject.Value<string?>("Bomb") ?? throw new ArgumentNullException();
+        Bomb = new SubAsset<AttackTemplate>(jObject.GetValue("Bomb") ?? throw new ArgumentNullException());
         Range = jObject.Value<double?>("Range") ?? throw new ArgumentNullException();
         Cooldown = jObject.Value<double?>("Cooldown") ?? throw new ArgumentNullException();
         Class = Enum.Parse<StructureClass>(jObject.Value<string?>("Class") ?? "Defense");
@@ -24,13 +24,19 @@ public class MinefieldTemplate : StructureTemplate
     {
         return new Minefield(this, team, x, y);
     }
+    
+    public override void Draw(Vector2 pos, Color tint)
+    {
+        Raylib.DrawTexture(Texture, (int)(pos.X - 10), (int)(pos.Y - 10), tint);
+        Raylib.DrawTexture(Texture, (int)(pos.X + 10 - Texture.Width), (int)(pos.Y - 10), tint);
+        Raylib.DrawTexture(Texture, (int)(pos.X - 10), (int)(pos.Y + 10 - Texture.Height), tint);
+        Raylib.DrawTexture(Texture, (int)(pos.X + 10 - Texture.Width), (int)(pos.Y + 10 - Texture.Height), tint);
+    }
 }
-
 
 public class Minefield : Structure
 {
     private MinefieldTemplate _template;
-    private MortarShellTemplate _bomb;
     private int _chargesLeft;
     private double _timeLastTriggered;
     private Vector2[] _drawPoints = new []{new Vector2(6,6), new Vector2(-6,-6), new Vector2(-6,6), new Vector2(6,-6)};
@@ -45,7 +51,6 @@ public class Minefield : Structure
         {
             _drawPoints[i] += new Vector2(World.RandomInt(-2, 2), World.RandomInt(-2, 2));
         }
-        _bomb = Assets.Get<MortarShellTemplate>(_template.Bomb);
     }
 
     public override void Update()
@@ -53,16 +58,9 @@ public class Minefield : Structure
         base.Update();
         
         if (Time.Scaled - _timeLastTriggered < _template.Cooldown) return;
-        foreach (Minion minion in World.GetMinionsInRegion(World.PosToTilePos(Position), 2))
+        if (World.GetMinionsInRadius(Position.XY(), (float)_template.Range, false, Team).Count != 0)
         {
-            if (minion.Team != Team && !minion.IsFlying &&
-                Raylib.CheckCollisionCircles(
-                    Position.XY(), (float)_template.Range, 
-                    minion.Position.XY(),minion.Template.PhysicsRadius))
-            {
-                Trigger();
-                break;
-            }
+            Trigger();
         }
     }
     
@@ -70,9 +68,9 @@ public class Minefield : Structure
     {
         for (int i = 0; i < Math.Min(_chargesLeft, _drawPoints.Length); i++)
         {
-            int x = (int)(_drawPoints[i].X + Position.X - _bomb.Texture.Width/2);
-            int y = (int)(_drawPoints[i].Y + Position.Y - _bomb.Texture.Height/2);
-            Raylib.DrawTexture(_bomb.Texture, x, y, Color.White);
+            int x = (int)(_drawPoints[i].X + Position.X - _template.Texture.Width/2);
+            int y = (int)(_drawPoints[i].Y + Position.Y - _template.Texture.Height/2);
+            Raylib.DrawTexture(_template.Texture, x, y, Color.White);
         }
     }
 
@@ -80,7 +78,7 @@ public class Minefield : Structure
     {
         _armSound.PlayRandomPitch(SoundResource.WorldToPan(Position.X));
         _chargesLeft--;
-        _bomb.Instantiate((Position.XY() + _drawPoints[_chargesLeft]).XYZ(), this, (Position.XY() + _drawPoints[_chargesLeft]).XYZ());
+        _template.Bomb.Asset.Instantiate((Position.XY() + _drawPoints[_chargesLeft]).XYZ(), this, (Position.XY() + _drawPoints[_chargesLeft]).XYZ());
         _timeLastTriggered = Time.Scaled;
         Health = Math.Max(_chargesLeft, Health);
         if (_chargesLeft <= 0) Destroy();

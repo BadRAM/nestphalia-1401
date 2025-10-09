@@ -7,13 +7,17 @@ namespace nestphalia;
 
 public class ProjectileTemplate : AttackTemplate
 {
-    public Texture2D Texture;
     public double Speed;
+    public bool FaceForward;
+    public Texture2D Texture;
+    public SubAsset<AttackTemplate>? HitEffect;
     
     public ProjectileTemplate(JObject jObject) : base(jObject)
     {
-        Speed = jObject.Value<double?>("Speed") ?? 0;
+        Speed = jObject.Value<double?>("Speed") ?? throw new ArgumentNullException();
+        FaceForward = jObject.Value<bool?>("FaceForward") ?? false;
         Texture = Resources.GetTextureByName(jObject.Value<string?>("Texture") ?? "");
+        if (jObject.ContainsKey("HitEffect")) HitEffect = new SubAsset<AttackTemplate>(jObject.GetValue("HitEffect")!);
     }
     
     public override Attack Instantiate(IMortal target, IMortal? source, Vector3 position)
@@ -51,6 +55,17 @@ public class Projectile : Attack
         Position = Position.MoveTowards(TargetPos, _template.Speed * Time.DeltaTime);
         if (Position == TargetPos)
         {
+            if (_template.HitEffect != null)
+            {
+                if (TargetEntity != null)
+                {
+                    _template.HitEffect.Asset.Instantiate(TargetEntity, Source, Position);
+                }
+                else
+                {
+                    _template.HitEffect.Asset.Instantiate(TargetPos, Source, Position);
+                }
+            }
             TargetEntity?.Hurt(GetDamageModified(), this);
             World.EffectsToRemove.Add(this);
         }
@@ -58,6 +73,14 @@ public class Projectile : Attack
 
     public override void Draw()
     {
-        Raylib.DrawTexture(_template.Texture, (int)Position.X - _template.Texture.Width/2, (int)(Position.Y - _template.Texture.Width/2 - Position.Z), Color.White);
+        float rot = _template.FaceForward ? (float)((TargetPos - Position).XYZ2D().Angle() * (180/Math.PI)) : 0;
+        Raylib.DrawTexturePro(
+            _template.Texture, 
+            _template.Texture.Rect(), 
+            new Rectangle(Position.XYZ2D(), 
+            _template.Texture.Size()), 
+            _template.Texture.Size()/2, 
+            rot, 
+            Color.White);
     }
 }

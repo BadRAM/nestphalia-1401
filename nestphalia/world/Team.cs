@@ -15,7 +15,7 @@ public class Team
     private double[,] _hateMap;
     private double[,] _weightMap;
     private bool[,] _navSolidMap;
-    public bool IsRightSide;
+    public HUDLocation HudLocation;
     public bool IsPlayerControlled;
     public List<ActiveAbilityBeacon?> Beacons = new List<ActiveAbilityBeacon?>();
     public const int BeaconCap = 4;
@@ -35,11 +35,17 @@ public class Team
     private List<NavPath> _priorityPathQueue = new List<NavPath>();
 
     public PathFinder PathFinder = new PathFinder();
+    
+    public enum HUDLocation
+    {
+        Hidden,
+        Left,
+        Right
+    }
 
-    public Team(string name, bool isRightSide, Color color)
+    public Team(string name, HUDLocation hudLocation, Color color)
     {
         Name = name;
-        IsRightSide = isRightSide;
         Color = color;
         _abilitySlot = Resources.GetTextureByName("ability_slot");
         _healthBar = Resources.GetTextureByName("button_wide");
@@ -48,6 +54,7 @@ public class Team
         _hateMap = new double[World.BoardWidth, World.BoardHeight];
         _weightMap = new double[World.BoardWidth, World.BoardHeight];
         _navSolidMap = new bool[World.BoardWidth, World.BoardHeight];
+        HudLocation = hudLocation;
     }
 
     public void Initialize()
@@ -253,7 +260,9 @@ public class Team
             if ((Beacons[2]?.IsReady() ?? false) && Input.Pressed(Input.InputAction.Use3)) _usingAbility = 2;
             if ((Beacons[3]?.IsReady() ?? false) && Input.Pressed(Input.InputAction.Use4)) _usingAbility = 3;
 
-            int posX = IsRightSide ? Screen.CenterX + 450  : Screen.CenterX - 450;
+            int posX = 0;
+            if (HudLocation == HUDLocation.Right) posX = Screen.CenterX + 450;
+            if (HudLocation == HUDLocation.Left)  posX = Screen.CenterX - 450;
             for (int i = 0; i < BeaconCap; i++)
             {
                 if (Input.Pressed(MouseButton.Left) && Raylib.CheckCollisionPointRec(GUI.GetScaledMousePosition(), new Rectangle( posX + i*68 - 150, Screen.BottomY - 68, 64, 64)))
@@ -276,6 +285,8 @@ public class Team
     
     public void Draw()
     {
+        if (HudLocation == HUDLocation.Hidden) return;
+        
         // fear/hate debug
         if (Input.Held(KeyboardKey.H))
         {
@@ -295,7 +306,9 @@ public class Team
         }
         
         // ability slots
-        int posX = IsRightSide ? Screen.CenterX + 462  : Screen.CenterX - 462;
+        int posX = 0;
+        if (HudLocation == HUDLocation.Right) posX = Screen.CenterX + 462;
+        if (HudLocation == HUDLocation.Left)  posX = Screen.CenterX - 462;
         for (int i = 0; i < BeaconCap; i++)
         {
             int x = posX + i * 68 - 134;
@@ -316,10 +329,10 @@ public class Team
         }
         
         // health bar
-        Raylib.DrawTextureRec(_healthBar, new Rectangle(0, 80, 300, 40), new Vector2(IsRightSide ? Screen.CenterX + 20  : Screen.CenterX - 320, Screen.BottomY - 44), Color.White);
+        Raylib.DrawTextureRec(_healthBar, new Rectangle(0, 80, 300, 40), new Vector2(HudLocation == HUDLocation.Right ? Screen.CenterX + 20  : Screen.CenterX - 320, Screen.BottomY - 44), Color.White);
         float hpBarSize = (float)(300 * _health / _maxHealth);
-        Raylib.DrawTextureRec(_healthBar, new Rectangle( IsRightSide ? 300 - hpBarSize : 0, 40, hpBarSize, 40), new Vector2(IsRightSide ? (300 - hpBarSize) + Screen.CenterX + 20  : Screen.CenterX - 320, Screen.BottomY -44), Color.White);
-        GUI.DrawTextCentered(IsRightSide ? Screen.CenterX + 160 : Screen.CenterX - 160, Screen.BottomY - 24, $"{Name} - {_health:n0}/{_maxHealth:n0}", anchor: Screen.TopLeft);
+        Raylib.DrawTextureRec(_healthBar, new Rectangle( HudLocation == HUDLocation.Right ? 300 - hpBarSize : 0, 40, hpBarSize, 40), new Vector2(HudLocation == HUDLocation.Right ? (300 - hpBarSize) + Screen.CenterX + 20  : Screen.CenterX - 320, Screen.BottomY -44), Color.White);
+        GUI.DrawTextCentered(HudLocation == HUDLocation.Right ? Screen.CenterX + 160 : Screen.CenterX - 160, Screen.BottomY - 24, $"{Name} - {_health:n0}/{_maxHealth:n0}", anchor: Screen.TopLeft);
     }
     
     public double GetTileWeight(int x, int y)

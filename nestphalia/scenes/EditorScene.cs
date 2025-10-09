@@ -179,11 +179,10 @@ public class EditorScene : Scene
             if (_brush is TowerTemplate t)
             {
                 DrawCircleLines((int)mousePos.X, (int)mousePos.Y, (int)t.Range, new Color(200, 50, 50, 255));
-                //DrawCircle((int)mousePos.X, (int)mousePos.Y, (int)t.Range, new Color(200, 50, 50, 64));
             }
             if (_brush != null)
             {
-                DrawTexture(_brush.Texture, (int)mousePos.X-12, (int)mousePos.Y-(_brush.Texture.Height - 12), new Color(128, 128, 255, 128));
+                _brush.Draw(World.GetTileCenter(World.GetMouseTilePos()), new Color(128, 128, 255, 128));
             }
             Screen.SetCamera();
         }
@@ -307,10 +306,10 @@ public class EditorScene : Scene
                 _toolTipStructure = s;
             }
 
-            DrawTexture(s.Texture, Screen.CenterX - 450, Screen.CenterY + y * 38 - 278 - s.Texture.Height, Color.White);
+            s.Draw(new Vector2(Screen.CenterX - 450, Screen.CenterY + y * 38 - 290), Color.White);
             if (s is SpawnerTemplate spawner)
             {
-                Assets.Get<MinionTemplate>(spawner.Minion).DrawPreview(Screen.CenterX - 410, Screen.CenterY + y * 38 - 292, Color.Red);
+                spawner.Minion.Asset.DrawPreview(Screen.CenterX - 410, Screen.CenterY + y * 38 - 292, Color.Red);
             }
             y++;
         }

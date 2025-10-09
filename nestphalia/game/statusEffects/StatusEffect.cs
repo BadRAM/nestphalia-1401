@@ -67,4 +67,9 @@ public class StatusEffect
         if (Duration <= -1) return 0;
         return (Time.Scaled - StartTime) / Duration;
     }
+
+    public StatusEffect Clone()
+    {
+        return (StatusEffect)MemberwiseClone();
+    }
 }

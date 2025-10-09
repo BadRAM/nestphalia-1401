@@ -5,7 +5,7 @@ namespace nestphalia;
 
 public class SpawnerTemplate : StructureTemplate
 {
-    public string Minion;
+    public SubAsset<MinionTemplate> Minion;
     public int WaveSize;
     public double WaveGrowth;
     public double TimeBetweenSpawns;
@@ -13,7 +13,7 @@ public class SpawnerTemplate : StructureTemplate
     
     public SpawnerTemplate(JObject jObject) : base(jObject)
     {
-        Minion = jObject.Value<string?>("Minion") ?? throw new ArgumentNullException();
+        Minion = new SubAsset<MinionTemplate>(jObject.GetValue("Minion") ?? throw new ArgumentNullException());
         WaveSize = jObject.Value<int?>("WaveSize") ?? throw new ArgumentNullException();
         WaveGrowth = jObject.Value<int?>("WaveGrowth") ?? throw new ArgumentNullException();
         TimeBetweenSpawns = jObject.Value<double?>("TimeBetweenSpawns") ?? throw new ArgumentNullException();
@@ -34,14 +34,13 @@ public class SpawnerTemplate : StructureTemplate
                $"Wave Size: {WaveSize} + {WaveGrowth} per wave\n" +
                $"Spawn Delay: {TimeBetweenSpawns}\n" +
                $"{Description}\n" +
-               $"{Assets.Get<MinionTemplate>(Minion).GetStats()}";
+               $"{Minion.Asset.GetStats()}";
     }
 }
 
 public class Spawner : Structure
 {
     private SpawnerTemplate _template;
-    private MinionTemplate _minion;
     private double _lastSpawnTime;
     private int _spawnsRemaining;
     private int _nextWaveSpawnBonus;
@@ -55,7 +54,6 @@ public class Spawner : Structure
         _template = template;
         _navPath = new NavPath(template.Name, team);
         _navPath.Start = new Int2D(x, y);
-        _minion = Assets.Get<MinionTemplate>(template.Minion);
     }
     
     public override void Update()
@@ -68,7 +66,7 @@ public class Spawner : Structure
         if (World.Battle?.WaveTick == _spawnDelay)
         {
             Retarget();
-            _minion.RequestPath(new Int2D(X, Y), _targetTile, _navPath, Team);
+            _template.Minion.Asset.RequestPath(new Int2D(X, Y), _targetTile, _navPath, Team);
         }
         if (World.Battle?.State == BattleScene.States.BattleActive && World.Battle.WaveTick == _spawnDelay + 5)
         {
@@ -83,7 +81,7 @@ public class Spawner : Structure
             {
                 GameConsole.WriteLine($"Creating a minion without a path, PathQueueLength: {Team.GetQueueLength()}");
             }
-            Minion m = _minion.Instantiate(Team, Position, _navPath.Clone(_minion.Name));
+            Minion m = _template.Minion.Asset.Instantiate(Team, Position, _navPath.Clone(_template.Minion.Asset.Name));
             if (_spawnStandardBearer)
             {
                 m.Status.Add(new StatusEffect("StandardBearer", "Standard Bearer", -1, new Color(0,0,0,0), true));
@@ -160,7 +158,7 @@ public class Spawner : Structure
     public void SetTarget(Int2D target)
     {
         _targetTile = target;
-        _minion.RequestPath(new Int2D(X, Y), _targetTile, _navPath, Team);
+        _template.Minion.Asset.RequestPath(new Int2D(X, Y), _targetTile, _navPath, Team);
         if (!_navPath.Found)
         {
             Team.DemandPath(_navPath);

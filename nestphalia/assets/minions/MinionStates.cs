@@ -268,7 +268,7 @@ public partial class Minion
         private double _squatDuration;
         private double _jumpDuration;
         private double _landingLag;
-        private double _height;
+        public double Height;
 
         public Jump(Minion minion, Vector2 to, double squatDuration, double jumpDuration, double landingLag, double height = 24) 
             : base(minion)
@@ -278,7 +278,7 @@ public partial class Minion
             _jumpDuration = jumpDuration;
             _landingLag = landingLag;
             _started = Time.Scaled;
-            _height = height;
+            Height = height;
             
             _from = Me.Position.XY();
             Me.NextPos = _to + (_to - _from);
@@ -296,7 +296,7 @@ public partial class Minion
                 Me.IsFlying = true;
             
                 double t = (Time.Scaled - (_started + _squatDuration)) / _jumpDuration;
-                double arcOffset = Math.Sin(t * Math.PI) * _height;
+                double arcOffset = Math.Sin(t * Math.PI) * Height;
             
                 Me.Position = Vector2.Lerp(_from, _to, (float)t).XYZ((float)arcOffset);
             }
@@ -315,7 +315,7 @@ public partial class Minion
                     // scale with maxhealth
                     double fallDamage = Me.Template.MaxHealth; 
                     // scale with drop height. 0% damage from 0-1 tile drop, 100% damage at 4 tile drop
-                    fallDamage *= Math.Max((_height - 24) / 96, 0); 
+                    fallDamage *= Math.Max((Height - 24) / 96, 0); 
                     fallDamage -= 4; // flat reduction to help small guys
                     if (fallDamage >= 1) Me.Hurt(fallDamage, ignoreArmor:true); // Don't hurt below minimum damage
                 }

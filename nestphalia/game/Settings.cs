@@ -11,6 +11,7 @@ public class SavedSettings
     public double MusicVolume = 1;
     public double WindowScale = 1;
     public bool AccessibleFont;
+    public bool SmallScreenMode;
     public string ResourcePathOverride = "";
 }
 

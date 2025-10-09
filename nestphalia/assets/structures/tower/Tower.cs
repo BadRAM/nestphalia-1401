@@ -6,6 +6,14 @@ namespace nestphalia;
 
 public class TowerTemplate : StructureTemplate
 {
+    public double Range;
+    public SubAsset<AttackTemplate> Attack;
+    public double RateOfFire;
+    public TargetSelector TargetMode;
+    public bool CanHitFlying;
+    public bool CanHitGround;
+    public int AttackOriginZ;
+    
     public enum TargetSelector
     {
         Nearest,
@@ -16,19 +24,11 @@ public class TowerTemplate : StructureTemplate
         Flyer
     }
     
-    public double Range;
-    public string Attack;
-    public double RateOfFire;
-    public TargetSelector TargetMode;
-    public bool CanHitFlying;
-    public bool CanHitGround;
-    public int AttackOriginZ;
-
     public TowerTemplate(JObject jObject) : base(jObject)
     {
         Name = jObject.Value<string?>("Name") ?? throw new ArgumentNullException();
         Range = jObject.Value<double?>("Range") ?? throw new ArgumentNullException();
-        Attack = jObject.Value<string?>("Attack") ?? throw new ArgumentNullException();
+        if (jObject.ContainsKey("Attack")) Attack = new SubAsset<AttackTemplate>(jObject.GetValue("Attack")!);
         AttackOriginZ = jObject.Value<int?>("AttackOriginZ") ?? 8;
         RateOfFire = jObject.Value<double?>("RateOfFire") ?? throw new ArgumentNullException();
         TargetMode = Enum.Parse<TargetSelector>(jObject.Value<string?>("TargetMode") ?? "Nearest");
@@ -44,11 +44,10 @@ public class TowerTemplate : StructureTemplate
     
     public override string GetStats()
     {
-        AttackTemplate attack = Assets.Get<AttackTemplate>(Attack);
         return $"{Name}\n" +
                $"${Price}\n" +
                $"HP: {MaxHealth}\n" +
-               $"Damage: {attack.Damage} ({(attack.Damage * (RateOfFire/60)).ToString("N0")}/s)\n" +
+               $"Damage: {Attack.Asset.Damage} ({(Attack.Asset.Damage * (RateOfFire/60)).ToString("N0")}/s)\n" +
                $"Range: {Range}\n" +
                $"{Description}\n";
     }
@@ -58,14 +57,12 @@ public class Tower : Structure
 {
     private double _timeLastFired;
     private TowerTemplate _template;
-    private AttackTemplate _attack;
     private Minion? _target;
     private SoundResource _shootSound;
     
     public Tower(TowerTemplate template, Team team, int x, int y) : base(template, team, x, y)
     {
         _template = template;
-        _attack = Assets.Get<AttackTemplate>(_template.Attack);
         _shootSound = Resources.GetSoundByName("shoot");
     }
     
@@ -100,12 +97,12 @@ public class Tower : Structure
             if (_target != null)
             {
                 _shootSound.PlayRandomPitch(SoundResource.WorldToPan(Position.X), 0.15f);
-                _attack.Instantiate(_target, this, Position.XY().XYZ(_template.AttackOriginZ));
+                _template.Attack.Asset.Instantiate(_target, this, Position.XY().XYZ(_template.AttackOriginZ));
                 _timeLastFired = Time.Scaled;
             }
         }
     }
-
+    
     public override void Draw()
     {
         base.Draw();
@@ -142,14 +139,22 @@ public class Tower : Structure
 
     protected Minion? FindTargetNearest()
     {
-        List<Minion> nearbyMinions = World.GetMinionsInRegion(new Int2D(X, Y), (int)(1 + _template.Range / 24));
+        List<Minion> nearbyMinions;
+        if (_template.CanHitFlying != _template.CanHitGround)
+        {
+            nearbyMinions = World.GetMinionsInRadius(Position.XY(), (float)_template.Range, _template.CanHitFlying, Team);
+        }
+        else
+        {            
+            nearbyMinions = World.GetMinionsInRadius(Position.XY(), (float)_template.Range, Team);
+        }
+
+        World.GetMinionsInRadius(Position.XY(), (float)_template.Range, Team);
         Minion? nearest = null;
         double minDist = double.MaxValue;
         for (int i = 0; i < nearbyMinions.Count; i++)
         {
             Minion m = nearbyMinions[i];
-            if (m.Team == Team) continue;
-            if ((m.IsFlying && !_template.CanHitFlying) || (!m.IsFlying && !_template.CanHitGround)) continue;
             double d = Vector2.Distance(nearbyMinions[i].Position.XY(), Position.XY());
             if (d < _template.Range && d < minDist)
             {
@@ -163,21 +168,20 @@ public class Tower : Structure
 
     protected Minion? FindTargetRandom()
     {
-        List<Minion> nearbyMinions = World.GetMinionsInRegion(new Int2D(X, Y), (int)(1 + _template.Range / 24));
-        Minion? random = null;
-        List<Minion> ValidTargets = new List<Minion>();
-        foreach (Minion m in nearbyMinions)
+        List<Minion> validTargets;
+        if (_template.CanHitFlying != _template.CanHitGround)
         {
-            if ((m.IsFlying && !_template.CanHitFlying) || (!m.IsFlying && !_template.CanHitGround)) continue;
-            if (m.Team != Team && Vector2.Distance(m.Position.XY(), Position.XY()) < _template.Range)
-            {
-                ValidTargets.Add(m);
-            }
+            validTargets = World.GetMinionsInRadius(Position.XY(), (float)_template.Range, _template.CanHitFlying, Team);
         }
-
-        if (ValidTargets.Count > 0)
+        else
+        {            
+            validTargets = World.GetMinionsInRadius(Position.XY(), (float)_template.Range, Team);
+        }
+        
+        Minion? random = null;
+        if (validTargets.Count > 0)
         {
-            random = ValidTargets[World.RandomInt(ValidTargets.Count)];
+            random = validTargets[World.RandomInt(validTargets.Count)];
         }
         
         return random;

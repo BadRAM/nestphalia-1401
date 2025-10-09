@@ -424,18 +424,17 @@ public static class GUI
         return Button(new Rectangle(x, y, 100, 40), text, _buttonNarrowTexture, enabled, anchor);
     }
     
-    public static ButtonState TileButtonPro(int x, int y, Texture2D image, bool selected = false, Vector2? size = null, Vector2? anchor = null)
+    public static ButtonState TileButtonPro(int x, int y, Texture2D image, bool selected = false, Vector2? anchor = null)
     {
-        size ??= image.Size();
         anchor ??= Screen.Center;
         x += (int)anchor.Value.X;
         y += (int)anchor.Value.Y;
         
         bool hover = !Input.IsSuppressed() && CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(x, y, 24, 24));
-
+        
         if (selected) DrawRectangle(x-2, y-2, 28, 28, Color.White);
         DrawTexture(image, x, y+24 - image.Height, Color.White);
-
+        
         if (hover)
         {
             _cursorLook = MouseCursor.PointingHand;
@@ -449,9 +448,28 @@ public static class GUI
         return hover ? ButtonState.Hovered : ButtonState.Enabled;
     }
     
-    public static bool TileButton(int x, int y, Texture2D image, bool selected = false, Vector2? anchor = null)
+    public static ButtonState StructureButtonPro(int x, int y, StructureTemplate structureTemplate, bool selected = false, Vector2? anchor = null)
     {
-        return TileButtonPro(x, y, image, selected, anchor) == ButtonState.Pressed;
+        anchor ??= Screen.Center;
+        x += (int)anchor.Value.X;
+        y += (int)anchor.Value.Y;
+        
+        bool hover = !Input.IsSuppressed() && CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(x, y, 24, 24));
+        
+        if (selected) DrawRectangle(x-2, y-2, 28, 28, Color.White);
+        structureTemplate.Draw(new Vector2(x+12, y+12), Color.White);
+        
+        if (hover)
+        {
+            _cursorLook = MouseCursor.PointingHand;
+            if (Input.Released(MouseButton.Left))
+            {
+                _buttonClickSFX.Play();
+                return ButtonState.Pressed;
+            }
+        }
+        
+        return hover ? ButtonState.Hovered : ButtonState.Enabled;
     }
     
     public static ButtonState ImageButtonPro(int x, int y, Texture2D image, Vector2 size, bool selected = false, Vector2? anchor = null)
@@ -461,11 +479,11 @@ public static class GUI
         y += (int)anchor.Value.Y;
         
         bool hover = !Input.IsSuppressed() && CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(x, y, size));
-
+        
         if (selected) DrawRectangle(x-2, y-2, (int)size.X + 4, (int)size.Y+4, Color.White);
         
         DrawTexturePro(image, image.Rect(), new Rectangle(x, y, size), Vector2.Zero, 0, Color.White);
-
+        
         if (hover)
         {
             _cursorLook = MouseCursor.PointingHand;
@@ -484,7 +502,7 @@ public static class GUI
         anchor ??= Screen.Center;
         x += (int)anchor.Value.X;
         y += (int)anchor.Value.Y;
-
+        
         Rectangle rect = new Rectangle(x, y, 300, 40);
         
         bool press = (Input.Held(MouseButton.Left) || Input.Released(MouseButton.Left)) && CheckCollisionPointRec(Input.GetClickPos(), rect);
@@ -502,7 +520,7 @@ public static class GUI
         // Draw scale labels
         // Draw pin
         DrawTexture(_sliderPinTexture, (int)(x - 10 + value * 280), y, Color.White);
-
+        
         return value;
     }
 

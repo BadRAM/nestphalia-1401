@@ -170,20 +170,21 @@
     "Description": "\n\"Look! Ants!\"",
     "Texture": "turret",
     "Range": 120.0,
-    "Attack": "tower_basic_bullet",
+    "Attack":{
+      "ID": "tower_basic_arrow",
+      "Type": "ArcProjectileTemplate",
+      "Texture": "arrow",
+      "Damage": 15.0,
+      "ArcHeight": 18,
+      "ArcDuration": 0.3,
+      "FaceForward": true
+    },
     "RateOfFire": 40.0,
     "TargetMode": "Nearest",
-    "AttackOriginZ": 0,
+    "AttackOriginZ": 8,
     "MaxHealth": 80.0,
     "Price": 75.0,
     "BaseHate": 5.0
-  },
-  {
-    "ID": "tower_basic_bullet",
-    "Type": "ProjectileTemplate",
-    "Texture": "bullet",
-    "Damage": 15.0,
-    "Speed": 400.0
   },
   {
     "ID": "tower_machinegun",
@@ -192,7 +193,13 @@
     "Description": "\nWhen his accuracy is questioned, the Millipede ranger insists that he can put as many arrows in a target as a dozen ant archers.",
     "Texture": "turret2",
     "Range": 100.0,
-    "Attack": "tower_machinegun_bullet",
+    "Attack":{
+      "ID": "tower_machinegun_bullet",
+      "Type": "ProjectileTemplate",
+      "Texture": "bullet",
+      "Damage": 5.0,
+      "Speed": 400.0
+    },
     "RateOfFire": 400.0,
     "TargetMode": "RandomFocus",
     "AttackOriginZ": 0,
@@ -201,35 +208,32 @@
     "BaseHate": 5.0
   },
   {
-    "ID": "tower_machinegun_bullet",
-    "Type": "ProjectileTemplate",
-    "Texture": "bullet",
-    "Damage": 5.0,
-    "Speed": 400.0
-  },
-  {
     "ID": "minefield",
     "Type": "MinefieldTemplate",
     "Name": "Minefield",
     "Description": "\nFriendly bugs can safely traverse mines, but hate doing so.",
-    "Texture": "minefield",
+    "Texture": "mine",
     "MaxCharges": 4,
-    "Bomb": "mine_armed",
-    "Range": 12.0,
+    "Bomb": {
+      "ID": "mine_armed",
+      "Type": "ArcProjectileTemplate",
+      "Texture": "mine",
+      "ArcDuration": 0.4,
+      "ArcHeight": 0,
+      "HitEffect": {
+        "ID": "mine_explosion",
+        "Type": "ExplosionTemplate",
+        "Texture": "explosion32",
+        "SoundEffect": "explosion",
+        "BlastRadius": 48.0,
+        "Damage": 20.0
+      }
+    },
+    "Range": 18.0,
     "Cooldown": 5.0,
     "MaxHealth": 80.0,
     "Price": 85.0,
     "BaseHate": -1.7976931348623157E+308
-  },
-  {
-    "ID": "mine_armed",
-    "Type": "MortarShellTemplate",
-    "Texture": "mine",
-    "ArcDuration": 0.4,
-    "ArcHeight": 0.0,
-    "BlastRadius": 32.0,
-    "Damage": 20.0,
-    "Speed": 0.0
   },
   {
     "ID": "tower_mortar",
@@ -238,7 +242,21 @@
     "Description": "Splash damage, radius 48\nCan only hit grounded units",
     "Texture": "mortar",
     "Range": 90.0,
-    "Attack": "tower_mortar_shell",
+    "Attack":{
+      "ID": "tower_mortar_shell",
+      "Type": "ArcProjectileTemplate",
+      "Texture": "bullet",
+      "ArcDuration": 0.7,
+      "ArcHeight": 96.0,
+      "HitEffect":{
+        "ID": "tower_mortar_shell_explosion",
+        "Type": "ExplosionTemplate",
+        "Texture": "explosion32",
+        "SoundEffect": "explosion",
+        "BlastRadius": 48.0,
+        "Damage": 10.0
+      } 
+    },
     "RateOfFire": 30.0,
     "TargetMode": 1,
     "CanHitFlying": false,
@@ -249,23 +267,18 @@
     "BaseHate": 5.0
   },
   {
-    "ID": "tower_mortar_shell",
-    "Type": "MortarShellTemplate",
-    "Texture": "bullet",
-    "ArcDuration": 0.7,
-    "ArcHeight": 96.0,
-    "BlastRadius": 48.0,
-    "Damage": 10.0,
-    "Speed": 0.0
-  },
-  {
     "ID": "tower_lightning",
     "Type": "TowerTemplate",
     "Name": "Lightning Tower",
     "Description": "Can only hit midair units",
     "Texture": "tower_lightning",
     "Range": 120.0,
-    "Attack": "tower_lightning_attack",
+    "Attack":{
+      "ID": "tower_lightning_attack",
+      "Type": "LightningBoltTemplate",
+      "Damage": 10.0,
+      "Speed": 0.0
+    },
     "RateOfFire": 400.0,
     "TargetMode": 1,
     "CanHitFlying": true,
@@ -276,32 +289,25 @@
     "BaseHate": 5.0
   },
   {
-    "ID": "tower_lightning_attack",
-    "Type": "LightningBoltTemplate",
-    "Damage": 10.0,
-    "Speed": 0.0
-  },
-  {
     "ID": "tower_sniper",
     "Type": "TowerTemplate",
     "Name": "Mantis Sniper",
     "Description": "\n\"Don't tell my wife where I am.\"",
     "Texture": "turret3",
     "Range": 450.0,
-    "Attack": "tower_sniper_bullet",
+    "Attack":{
+      "ID": "tower_sniper_bullet",
+      "Type": "ProjectileTemplate",
+      "Texture": "bullet",
+      "Damage": 60.0,
+      "Speed": 800.0
+    },
     "RateOfFire": 25.0,
     "TargetMode": 1,
     "AttackOriginZ": 0,
     "MaxHealth": 60.0,
     "Price": 3000.0,
     "BaseHate": 5.0
-  },
-  {
-    "ID": "tower_sniper_bullet",
-    "Type": "ProjectileTemplate",
-    "Texture": "bullet",
-    "Damage": 60.0,
-    "Speed": 800.0
   },
   {
     "ID": "beacon_rally",
@@ -371,6 +377,33 @@
     "Effect": "Burning",
     "Power": 2,
     "Duration": 10,
+    "MaxHealth": 100.0,
+    "Price": 1250.0,
+    "BaseHate": 50.0
+  },
+  {
+    "ID": "beacon_boulder",
+    "Type": "AttackBeaconTemplate",
+    "Name": "Boulder Chucker",
+    "Description": "Drops a giant rock on a square.",
+    "Texture": "flag1",
+    "Cooldown": 45.0,
+    "CooldownReduction": 10.0,
+    "AbilityIcon": "ability_icon_frenzy",
+    "Attack": {
+      "ID": "beacon_boulder_boulder",
+      "Type": "ArcProjectileTemplate",
+      "Texture": "boulder",
+      "ArcDuration": 1.5,
+      "ArcHeight": 240.0,
+      "HitEffect": {
+        "ID": "beacon_boulder_boulder_boulder",
+        "Type": "BoulderTemplate",
+        "Texture": "explosion32",
+        "BlastRadius": 48.0,
+        "Damage": 10.0
+      }
+    },
     "MaxHealth": 100.0,
     "Price": 1250.0,
     "BaseHate": 50.0

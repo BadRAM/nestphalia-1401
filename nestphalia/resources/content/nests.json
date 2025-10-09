@@ -310,13 +310,21 @@
     "Description": "",
     "MaxHealth": 20.0,
     "Armor": 0.0,
-    "Damage": 4.0,
     "AttackDuration": 2.0,
     "AttackType": "RangedAttack",
     "Speed": 45.0,
     "PhysicsRadius": 3.0,
     "AnimFrameRate": 30,
     "Range": 72,
+    "Attack":{
+      "ID": "minion_archer_arrow",
+      "Type": "ArcProjectileTemplate",
+      "Texture": "arrow",
+      "Damage": 4.0,
+      "ArcHeight": 18,
+      "ArcDuration": 0.3,
+      "FaceForward": true
+    },
     "Texture": "ant12px",
     "SpriteSize": {
       "X": 12.0,
@@ -370,14 +378,28 @@
     "Description": "\nWide load coming through!",
     "MaxHealth": 55.0,
     "Armor": 2.0,
-    "Damage": 250.0,
-    "AttackDuration": 0.0,
     "AttackType": "RangedAttack",
     "Speed": 65.0,
     "PhysicsRadius": 8.0,
     "AnimFrameRate": 30,
     "Texture": "sapper",
     "BombTexture": "sapper_bomb",
+    "Attack":{
+      "ID": "minion_sapper_beetle_bomb",
+      "Type": "ArcProjectileTemplate",
+      "Texture": "sapper_bomb",
+      "ArcDuration": 0.4,
+      "ArcHeight": 4,
+      "HitEffect":{
+        "ID": "minion_sapper_beetle_bomb_explosion",
+        "Type": "ExplosionTemplate",
+        "Texture": "explosion32",
+        "SoundEffect": "explosion",
+        "BlastRadius": 0,
+        "Damage": 250.0,
+        "DamageBuildings": true
+      }
+    },
     "SpriteSize": {
       "X": 22.0,
       "Y": 22.0

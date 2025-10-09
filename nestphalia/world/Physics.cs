@@ -30,8 +30,7 @@ public static class Physics
     
     public static void CollideTerrain(Minion minion)
     {
-        // if (minion.Position.Z >= 16) return;
-        if (minion.IsFlying) return;
+        if (minion.Position.Z >= 16 || (minion.State is Minion.Jump jump && jump.Height > 16) ) return;
         Int2D tilePos = World.PosToTilePos(minion.Position);
         int x = tilePos.X;
         int y = tilePos.Y;

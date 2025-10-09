@@ -145,6 +145,11 @@ public static class Utils
         return new Vector2(vec.X, vec.Y - vec.Z);
     }
 
+    public static double Angle(this Vector2 vec)
+    {
+        return Math.Atan2(vec.Y, vec.X);
+    }
+
     public static Vector2 Normalized(this Vector2 vector)
     {
         return Vector2.Normalize(vector);

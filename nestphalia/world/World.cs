@@ -22,6 +22,7 @@ public static class World
     public static Camera2D Camera;
     public static Team LeftTeam;
     public static Team RightTeam;
+    public static Team NeutralTeam;
     public static BattleScene? Battle;
     private static int _minionIdCounter;
     
@@ -67,8 +68,9 @@ public static class World
         _board = new Structure?[BoardWidth, BoardHeight];
         MinionGrid = new List<Minion>[BoardWidth, BoardHeight];
         
-        LeftTeam = new Team("Player", false, Color.Blue);
-        RightTeam = new Team("Enemy", true, Color.Red);
+        LeftTeam = new Team("Player", Team.HUDLocation.Left, Color.Blue);
+        RightTeam = new Team("Enemy", Team.HUDLocation.Right, Color.Red);
+        NeutralTeam = new Team("Neutral", Team.HUDLocation.Hidden, Color.Gray);
         
         level.LoadToBoard();
         
@@ -112,6 +114,7 @@ public static class World
         fortToLoad.LoadToBoard(level.FortSpawnZones[0]);
         LeftTeam.Initialize();
         RightTeam.Initialize();
+        NeutralTeam.Initialize();
     }
 
     public static void InitializePreview(Level level)
@@ -142,8 +145,11 @@ public static class World
         RightTeam.Name = rightFort?.Name ?? level.Name;
         RightTeam.IsPlayerControlled = rightIsPlayer;
         RightTeam.Color = level.EnemyColor;
-        GameConsole.WriteLine($"Rightteam color set to: {RightTeam.Color.ToString()}");
         RightTeam.Initialize();
+        NeutralTeam.Name = "Neutral";
+        NeutralTeam.IsPlayerControlled = false;
+        NeutralTeam.Color = Color.Gray;
+        NeutralTeam.Initialize();
         
         Determinator.Start(deterministic);
     }
@@ -195,6 +201,7 @@ public static class World
         _swUpdateTeams.Start();
         LeftTeam.Update();
         RightTeam.Update();
+        NeutralTeam.Update();
         _swUpdateTeams.Stop();
         
         _swUpdateBoard.Start();
@@ -265,7 +272,7 @@ public static class World
         _swUpdatePathfinder.Start();
         // LeftTeam.ServeQueue(10);
         // RightTeam.ServeQueue(10);
-        Task pathfinderTask = Task.Run(() => { LeftTeam.ServeQueue(10); RightTeam.ServeQueue(10); });
+        Task pathfinderTask = Task.Run(() => { LeftTeam.ServeQueue(10); RightTeam.ServeQueue(10); NeutralTeam.ServeQueue(10);});
         // Task leftPathfinderTask = Task.Run(() => LeftTeam.ServeQueue(10));
         // Task rightPathfinderTask = Task.Run(() => RightTeam.ServeQueue(10));
         _swUpdatePathfinder.Stop();
@@ -389,6 +396,7 @@ public static class World
         {
             LeftTeam.Draw();
             RightTeam.Draw();
+            NeutralTeam.Draw();
         }
     }
 
@@ -530,6 +538,9 @@ public static class World
             case "right":
             case "enemy":
                 return RightTeam;
+            case "neutral":
+            case "zombugs":
+                return NeutralTeam;
         }
 
         return null;
@@ -537,7 +548,10 @@ public static class World
 
     public static Team GetEnemyTeam(Team team)
     {
-        return team == LeftTeam ? RightTeam : LeftTeam;
+        if (team == LeftTeam) return RightTeam;
+        if (team == RightTeam) return LeftTeam;
+        if (team == NeutralTeam) return RightTeam;
+        return RightTeam; // TODO: this sucks.
     }
 
     // Returns a list of all minions in the square of tiles described by the arguments
@@ -550,6 +564,189 @@ public static class World
         for (int y = Math.Max(center.Y - radius, 0); y <= Math.Min(center.Y + radius, BoardHeight-1); y++)
         {
             minions.AddRange(MinionGrid[x,y]);
+        }
+        return minions;
+    }
+    public static List<Minion> GetMinionsInRegion(Int2D center, int radius, bool isFlying)
+    {
+        radius--;
+        List<Minion> minions = new List<Minion>();
+        for (int x = Math.Max(center.X - radius, 0); x <= Math.Min(center.X + radius, BoardWidth-1); x++)
+        for (int y = Math.Max(center.Y - radius, 0); y <= Math.Min(center.Y + radius, BoardHeight-1); y++)
+        for (var index = 0; index < MinionGrid[x, y].Count; index++)
+        {
+            Minion m = MinionGrid[x, y][index];
+            if (m.IsFlying != isFlying) continue;
+            minions.Add(m);
+        }
+        return minions;
+    }
+    public static List<Minion> GetMinionsInRegion(Int2D center, int radius, Team? team, bool onlyTeam = false)
+    {
+        radius--;
+        List<Minion> minions = new List<Minion>();
+        for (int x = Math.Max(center.X - radius, 0); x <= Math.Min(center.X + radius, BoardWidth-1); x++)
+        for (int y = Math.Max(center.Y - radius, 0); y <= Math.Min(center.Y + radius, BoardHeight-1); y++)
+        for (var index = 0; index < MinionGrid[x, y].Count; index++)
+        {
+            Minion m = MinionGrid[x, y][index];
+            if ((m.Team == team) != onlyTeam) continue;
+            minions.Add(m);
+        }
+        return minions;
+    }
+    public static List<Minion> GetMinionsInRegion(Int2D center, int radius, bool isFlying, Team? team, bool onlyTeam = false)
+    {
+        radius--;
+        List<Minion> minions = new List<Minion>();
+        for (int x = Math.Max(center.X - radius, 0); x <= Math.Min(center.X + radius, BoardWidth-1); x++)
+        for (int y = Math.Max(center.Y - radius, 0); y <= Math.Min(center.Y + radius, BoardHeight-1); y++)
+        for (var index = 0; index < MinionGrid[x, y].Count; index++)
+        {
+            Minion m = MinionGrid[x, y][index];
+            if (m.IsFlying != isFlying) continue;
+            if ((m.Team == team) != onlyTeam) continue;
+            minions.Add(m);
+        }
+        return minions;
+    }
+    
+    // Returns a list of all minions in the pixel space circle described by the arguments
+    public static List<Minion> GetMinionsInRadius(Vector2 center, float radius)
+    {
+        Int2D centerTile = PosToTilePos(center);
+        int tileRadius = (int)(radius / 24) + 1;
+        radius--;
+        List<Minion> minions = new List<Minion>();
+        for (int x = Math.Max(centerTile.X - tileRadius, 0); x <= Math.Min(centerTile.X + tileRadius, BoardWidth-1); x++)
+        for (int y = Math.Max(centerTile.Y - tileRadius, 0); y <= Math.Min(centerTile.Y + tileRadius, BoardHeight-1); y++)
+        for (var index = 0; index < MinionGrid[x, y].Count; index++)
+        {
+            Minion m = MinionGrid[x, y][index];
+            if (Vector2.Distance(m.Position.XY(), center) > radius) continue;
+            minions.Add(m);
+        }
+        return minions;
+    }
+    public static List<Minion> GetMinionsInRadius(Vector2 center, float radius, Team? team, bool onlyTeam = false)
+    {
+        Int2D centerTile = PosToTilePos(center);
+        int tileRadius = (int)(radius / 24) + 1;
+        radius--;
+        List<Minion> minions = new List<Minion>();
+        for (int x = Math.Max(centerTile.X - tileRadius, 0); x <= Math.Min(centerTile.X + tileRadius, BoardWidth-1); x++)
+        for (int y = Math.Max(centerTile.Y - tileRadius, 0); y <= Math.Min(centerTile.Y + tileRadius, BoardHeight-1); y++)
+        for (var index = 0; index < MinionGrid[x, y].Count; index++)
+        {
+            Minion m = MinionGrid[x, y][index];
+            if ((m.Team == team) != onlyTeam) continue;
+            if (Vector2.Distance(m.Position.XY(), center) > radius) continue;
+            minions.Add(m);
+        }
+        return minions;
+    }
+    public static List<Minion> GetMinionsInRadius(Vector2 center, float radius, bool isFlying)
+    {
+        Int2D centerTile = PosToTilePos(center);
+        int tileRadius = (int)(radius / 24) + 1;
+        radius--;
+        List<Minion> minions = new List<Minion>();
+        for (int x = Math.Max(centerTile.X - tileRadius, 0); x <= Math.Min(centerTile.X + tileRadius, BoardWidth-1); x++)
+        for (int y = Math.Max(centerTile.Y - tileRadius, 0); y <= Math.Min(centerTile.Y + tileRadius, BoardHeight-1); y++)
+        for (var index = 0; index < MinionGrid[x, y].Count; index++)
+        {
+            Minion m = MinionGrid[x, y][index];
+            if (m.IsFlying != isFlying) continue;
+            if (Vector2.Distance(m.Position.XY(), center) > radius) continue;
+            minions.Add(m);
+        }
+        return minions;
+    }
+    public static List<Minion> GetMinionsInRadius(Vector2 center, float radius, bool isFlying, Team? team, bool onlyTeam = false)
+    {
+        Int2D centerTile = PosToTilePos(center);
+        int tileRadius = (int)(radius / 24) + 1;
+        radius--;
+        List<Minion> minions = new List<Minion>();
+        for (int x = Math.Max(centerTile.X - tileRadius, 0); x <= Math.Min(centerTile.X + tileRadius, BoardWidth-1); x++)
+        for (int y = Math.Max(centerTile.Y - tileRadius, 0); y <= Math.Min(centerTile.Y + tileRadius, BoardHeight-1); y++)
+        for (var index = 0; index < MinionGrid[x, y].Count; index++)
+        {
+            Minion m = MinionGrid[x, y][index];
+            if (m.IsFlying != isFlying) continue;
+            if ((m.Team == team) != onlyTeam) continue;
+            if (Vector2.Distance(m.Position.XY(), center) > radius) continue;
+            minions.Add(m);
+        }
+        return minions;
+    }
+    
+    // Returns a list of all minions in the pixel space sphere described by the arguments
+    public static List<Minion> GetMinionsInRadius3d(Vector3 center, float radius)
+    {
+        Int2D centerTile = PosToTilePos(center);
+        int tileRadius = (int)(radius / 24) + 1;
+        radius--;
+        List<Minion> minions = new List<Minion>();
+        for (int x = Math.Max(centerTile.X - tileRadius, 0); x <= Math.Min(centerTile.X + tileRadius, BoardWidth-1); x++)
+        for (int y = Math.Max(centerTile.Y - tileRadius, 0); y <= Math.Min(centerTile.Y + tileRadius, BoardHeight-1); y++)
+        for (var index = 0; index < MinionGrid[x, y].Count; index++)
+        {
+            Minion m = MinionGrid[x, y][index];
+            if (Vector3.Distance(m.Position, center) > radius) continue;
+            minions.Add(m);
+        }
+        return minions;
+    }
+    public static List<Minion> GetMinionsInRadius3d(Vector3 center, float radius, Team? team, bool onlyTeam = false)
+    {
+        Int2D centerTile = PosToTilePos(center);
+        int tileRadius = (int)(radius / 24) + 1;
+        radius--;
+        List<Minion> minions = new List<Minion>();
+        for (int x = Math.Max(centerTile.X - tileRadius, 0); x <= Math.Min(centerTile.X + tileRadius, BoardWidth-1); x++)
+        for (int y = Math.Max(centerTile.Y - tileRadius, 0); y <= Math.Min(centerTile.Y + tileRadius, BoardHeight-1); y++)
+        for (var index = 0; index < MinionGrid[x, y].Count; index++)
+        {
+            Minion m = MinionGrid[x, y][index];
+            if ((m.Team == team) != onlyTeam) continue;
+            if (Vector3.Distance(m.Position, center) > radius) continue;
+            minions.Add(m);
+        }
+        return minions;
+    }
+    public static List<Minion> GetMinionsInRadius3d(Vector3 center, float radius, bool isFlying)
+    {
+        Int2D centerTile = PosToTilePos(center);
+        int tileRadius = (int)(radius / 24) + 1;
+        radius--;
+        List<Minion> minions = new List<Minion>();
+        for (int x = Math.Max(centerTile.X - tileRadius, 0); x <= Math.Min(centerTile.X + tileRadius, BoardWidth-1); x++)
+        for (int y = Math.Max(centerTile.Y - tileRadius, 0); y <= Math.Min(centerTile.Y + tileRadius, BoardHeight-1); y++)
+        for (var index = 0; index < MinionGrid[x, y].Count; index++)
+        {
+            Minion m = MinionGrid[x, y][index];
+            if (m.IsFlying != isFlying) continue;
+            if (Vector3.Distance(m.Position, center) > radius) continue;
+            minions.Add(m);
+        }
+        return minions;
+    }
+    public static List<Minion> GetMinionsInRadius3d(Vector3 center, float radius, bool isFlying, Team? team, bool onlyTeam = false)
+    {
+        Int2D centerTile = PosToTilePos(center);
+        int tileRadius = (int)(radius / 24) + 1;
+        radius--;
+        List<Minion> minions = new List<Minion>();
+        for (int x = Math.Max(centerTile.X - tileRadius, 0); x <= Math.Min(centerTile.X + tileRadius, BoardWidth-1); x++)
+        for (int y = Math.Max(centerTile.Y - tileRadius, 0); y <= Math.Min(centerTile.Y + tileRadius, BoardHeight-1); y++)
+        for (var index = 0; index < MinionGrid[x, y].Count; index++)
+        {
+            Minion m = MinionGrid[x, y][index];
+            if (m.IsFlying != isFlying) continue;
+            if ((m.Team == team) != onlyTeam) continue;
+            if (Vector3.Distance(m.Position, center) > radius) continue;
+            minions.Add(m);
         }
         return minions;
     }

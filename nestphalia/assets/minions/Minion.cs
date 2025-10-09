@@ -11,7 +11,7 @@ public class MinionTemplate : JsonAsset
     public double MaxHealth;
     public double Armor;
     public double Damage;
-    public AttackTemplate Attack;
+    public SubAsset<AttackTemplate> Attack;
     public double AttackDuration;
     public double Speed;
     public float PhysicsRadius; // This is a float because Raylib.CheckCircleOverlap() wants floats
@@ -45,8 +45,15 @@ public class MinionTemplate : JsonAsset
             SpriteFrames.Add(Minion.AnimationState.Base, new List<Vector2>([Vector2.Zero]));
         }
 
-        string j = $@"{{""ID"": ""{ID}_attack"", ""Texture"": ""minion_bullet"", ""Damage"": {Damage}, ""Speed"": 400}}";
-        Attack = new MeleeAttackTemplate(JObject.Parse(j));
+        if (!jObject.ContainsKey("Attack"))
+        {
+            string j = $@"{{""ID"": ""{ID}_attack"", ""Damage"": {Damage}}}";
+            Attack = new SubAsset<AttackTemplate>(new MeleeAttackTemplate(JObject.Parse(j)));
+        }
+        else
+        {
+            Attack = new SubAsset<AttackTemplate>(jObject.GetValue("Attack")!);
+        }
     }
 
     // Implementations of Instantiate() must call Register!
@@ -70,7 +77,7 @@ public class MinionTemplate : JsonAsset
             $"HP: {MaxHealth}\n" +
             (Armor == 0 ? "" : $"Armor: {Armor}\n") +
             $"Speed: {Speed}\n" +
-            $"Damage: {Attack.Damage} ({Attack.Damage / AttackDuration}/s)\n" +
+            $"Damage: {Attack.Asset.Damage} ({Attack.Asset.Damage / AttackDuration}/s)\n" +
             $"Size: {PhysicsRadius * 2}\n" +
             $"{Description}";
     }
@@ -115,7 +122,7 @@ public partial class Minion : ISprite, IMortal
     public readonly int ID;
     
     // Components
-    protected BaseState State; 
+    public BaseState State; 
     public MinionTemplate Template;
     public Team Team { get; }
     public NavPath NavPath;
@@ -189,10 +196,10 @@ public partial class Minion : ISprite, IMortal
         if (target == null)
         {
             GameConsole.WriteLine($"{Template.ID} attacked an empty tile");
-            Template.Attack.Instantiate(NextPos.XYZ(), this, Position);
+            Template.Attack.Asset.Instantiate(NextPos.XYZ(), this, Position);
             return;
         }
-        Template.Attack.Instantiate(target, this, Position);
+        Template.Attack.Asset.Instantiate(target, this, Position);
     }
     
     public virtual void Draw()
@@ -377,7 +384,6 @@ public partial class Minion : ISprite, IMortal
             {
                 Raylib.DrawCircleLinesV(Position.XY(), Template.PhysicsRadius, Color.Orange);
                 Raylib.DrawLineV(Position.XY(), Position.XY() + DrawOffset.XYZ2D(), Color.Orange);
-                GUI.DrawTextLeft((int)Position.X, (int)Position.Y, State.ToString(), anchor: Screen.TopLeft);
             }
         }
     }

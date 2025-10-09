@@ -218,7 +218,7 @@ public class LevelEditorScene : Scene
             for (int i = 0; i < _structures.Count; i++)
             {
                 bool selected = _selectedStructure == _structures[i];
-                ButtonState butt = TileButtonPro((2) + (i % 10) * 28, 40 + (i / 10) * 28, _structures[i].Texture, selected, anchor: Screen.TopLeft);
+                ButtonState butt = StructureButtonPro((2) + (i % 10) * 28, 40 + (i / 10) * 28, _structures[i], selected, anchor: Screen.TopLeft);
                 if (butt == ButtonState.Pressed)
                 {
                     _selectedStructure = _structures[i];

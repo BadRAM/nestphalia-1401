@@ -33,7 +33,7 @@ Art todo:
 - Bug animations
 - Structure reworks
 
-Programming todo:
+Programmer todo:
 =================
 
 ----- V2 -----

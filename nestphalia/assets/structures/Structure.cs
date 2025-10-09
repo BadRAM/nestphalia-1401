@@ -48,6 +48,13 @@ public class StructureTemplate : JsonAsset
                $"HP: {MaxHealth}\n" +
                $"{Description}";
     }
+
+    public virtual void Draw(Vector2 pos, Color tint)
+    {
+        int x = (int)(pos.X - 12);
+        int y = (int)(pos.Y - (Texture.Height - 12));
+        Raylib.DrawTexture(Texture, x, y, tint);
+    }
 }
 
 public class Structure : ISprite, IMortal

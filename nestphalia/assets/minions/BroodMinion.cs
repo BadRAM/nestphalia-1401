@@ -29,7 +29,7 @@ public class BroodMinionTemplate : MinionTemplate
             $"HP: {MaxHealth}\n" +
             (Armor == 0 ? "" : $"Armor: {Armor}\n") +
             $"Speed: {Speed}\n" +
-            $"Damage: {Attack.Damage} ({Attack.Damage / AttackDuration}/s)\n" +
+            $"Damage: {Attack.Asset.Damage} ({Attack.Asset.Damage / AttackDuration}/s)\n" +
             $"Size: {PhysicsRadius * 2}\n" +
             $"spawns 1 {spawn.Name} every {SpawnInterval}s\n" +
             $"spawns {SpawnsOnDeath} on death\n\n" +

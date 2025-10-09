@@ -30,7 +30,8 @@ public class SpringBoard : Structure
     public SpringBoard(SpringBoardTemplate template, Team team, int x, int y, Vector2 targetOffset) : base(template, team, x, y)
     {
         _template = template;
-        if (team.IsRightSide) targetOffset.X = -targetOffset.X;
+        // TODO: This sucks.
+        if (team.HudLocation == Team.HUDLocation.Right) targetOffset.X = -targetOffset.X;
         _target = Position.XY() + targetOffset;
     }
     

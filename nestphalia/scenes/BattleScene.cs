@@ -229,11 +229,14 @@ public class BattleScene : Scene
         if (Input.Pressed(MouseButton.Left))
         {
             _selectedMinion = null;
-            foreach (Minion m in World.GetMinionsInRegion(World.GetMouseTilePos(), 2))
+            foreach (Minion m in World.GetMinionsInRegion(World.GetMouseTilePos(), 4))
             {
-                if (CheckCollisionPointCircle(GetScreenToWorld2D(GetMousePosition(), World.Camera), m.Position.XYZ2D(), 2*m.Template.PhysicsRadius))
+                if (CheckCollisionPointCircle(World.GetMousePos(), m.Position.XYZ2D(), 2*m.Template.PhysicsRadius))
                 {
-                    _selectedMinion = m;
+                    if (_selectedMinion == null || Vector2.Distance(World.GetMousePos(), m.Position.XYZ2D()) < Vector2.Distance(World.GetMousePos(), _selectedMinion.Position.XYZ2D()))
+                    {
+                        _selectedMinion = m;
+                    }
                 }
             }
         }
@@ -344,7 +347,7 @@ public class BattleScene : Scene
         if (State == States.BattleFinished) return;
 
         Team loser = World.LeftTeam;
-        if (World.LeftTeam.Health <= 0 || Input.Pressed(KeyboardKey.Minus))
+        if (World.LeftTeam.Health <= 0)
         {
             _winner = World.RightTeam;
             loser = World.LeftTeam;

@@ -7,17 +7,13 @@ namespace nestphalia;
 // This is a minion that targets a wall, delivers a large explosive to it, and then retreats back to it's nest.
 public class SapperMinionTemplate : MinionTemplate
 {
-    // public Texture2D RetreatingTexture;
     public Texture2D BombTexture;
-    
     
     public SapperMinionTemplate(JObject jObject) : base(jObject)
     {
         BombTexture = Resources.GetTextureByName(jObject.Value<string?>("BombTexture") ?? "");
         AttackDuration = 0;
 
-        string j = $@"{{""ID"": ""{ID}_bomb"", ""Texture"": ""{jObject.Value<string?>("BombTexture") ?? ""}"", ""ArcDuration"": 0.4, ""ArcHeight"": 4, ""Damage"": {Damage}}}";
-        Attack = new MortarShellTemplate(JObject.Parse(j));
     }
 
     public override Minion Instantiate(Team team, Vector3 position, NavPath? navPath)

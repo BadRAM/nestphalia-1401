@@ -57,14 +57,9 @@ public class Door : Structure
         }
         else
         {
-            foreach (Minion m in World.GetMinionsInRegion(new Int2D(X,Y), 2))
+            if (World.GetMinionsInRadius(Position.XY(), (float)_template.Range, false, Team, true).Count != 0)
             {
-                if (!m.IsFlying && 
-                    m.Team == Team && 
-                    Raylib.CheckCollisionCircles(Position.XY(), (float)_template.Range, m.Position.XY(), m.Template.PhysicsRadius))
-                {
-                    _isOpen = true;
-                }
+                _isOpen = true;
             }
         }
     }

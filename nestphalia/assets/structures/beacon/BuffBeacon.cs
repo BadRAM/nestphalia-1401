@@ -37,41 +37,28 @@ public class BuffBeacon : ActiveAbilityBeacon
     public override void Activate(Vector2 targetPosition)
     {
         base.Activate(targetPosition);
-        foreach (Minion minion in World.GetMinionsInRegion(World.PosToTilePos(targetPosition), (int)(_template.Radius / 24) + 1))
+        StatusEffect statusTemplate;
+        switch (_template.Effect)
         {
-            if (Vector2.Distance(minion.Position.XY(), targetPosition) > _template.Radius) continue;
-            switch (_template.Effect)
-            {
-                case "Burning":
-                    minion.Status.Add(new BurningStatus(_template.Power, _template.Duration));
-                    break;
-                case "Frenzy":
-                    minion.Status.Add(new StatusEffect(_template.Effect, _template.Effect, _template.Duration, Color.Red));
-                    break;
-                default:
-                    minion.Status.Add(new StatusEffect(_template.Effect, _template.Effect, _template.Duration, Color.Green));
-                    break;
-            }
+            case "Burning":
+                statusTemplate = new BurningStatus(_template.Power, _template.Duration);
+                break;
+            case "Frenzy":
+                statusTemplate = new StatusEffect(_template.Effect, _template.Effect, _template.Duration, Color.Red);
+                break;
+            default:
+                statusTemplate = new StatusEffect(_template.Effect, _template.Effect, _template.Duration, Color.Green);
+                break;
+        }
+        foreach (Minion minion in World.GetMinionsInRadius(targetPosition, (float)_template.Radius))
+        {
+            minion.Status.Add(statusTemplate.Clone());
         }
     }
 
     // TODO: Implement SelectPosition properly for buff
     public override Vector2? SelectPosition(double minimumValue)
     {
-        // Vector2 bestPos = Vector2.Zero;
-        // double bestValue = Double.MaxValue;
-        // foreach (Minion minion in World.Minions)
-        // {
-        //     if (minion.Team != Team) continue;
-        //     double d = Vector2.Distance(minion.Position.XY(), World.GetTileCenter(minion.GetTargetTile()));
-        //     if (d <= minimumValue)
-        //     {
-        //         bestPos = minion.Position.XY();
-        //         bestValue = d;
-        //     }
-        // }
-        //
-        // return bestValue > minimumValue ? bestPos : null;
         return null;
     }
 }
