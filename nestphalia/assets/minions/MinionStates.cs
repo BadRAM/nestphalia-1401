@@ -123,7 +123,7 @@ public partial class Minion
         public override void Update()
         {
             float t = (float)((Time.Scaled - _attackStartedTime) / _duration);
-            Me.Position = new Vector3(Vector2.Lerp(_startPos, _endPos, t), _altitude - (float)(_altitude * Easings.Ballistic(t) * 0.8f));
+            Me.Position = new Vector3(Vector2.Lerp(_startPos, _endPos, t), _altitude - (float)((_altitude-8) * Easings.Ballistic(t)));
             if (!_hasAttacked && t >= 0.5)
             {
                 _hasAttacked = true;

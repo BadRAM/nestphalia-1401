@@ -27,8 +27,8 @@ public class MenuScene : Scene
         if (!_settingsOpen)
         {
             DrawTextCentered(0, -200, "NESTPHALIA 1401", 48);
-            DrawTextLeft(-470, -350, "V2.0.a14 - Quest Update");
-            DrawTextLeft(-470, 320, "By BadRAM and rosettedotnet\nWith music from the mod archive");
+            DrawTextLeft(-470, -350, "V2.0.a15 - Quest Update");
+            DrawTextLeft(-470, 320, "By BadRAM, Rune, and rosettedotnet\nWith music from the mod archive");
         
             if (Button300(-150, -80, "Start")) new CampaignScene().Start();
             if (Button300(-150, -40, "Custom Battle") || Input.Pressed(KeyboardKey.T)) new CustomBattleMenu().Start();

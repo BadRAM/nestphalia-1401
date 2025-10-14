@@ -4,8 +4,6 @@ using Newtonsoft.Json.Linq;
 namespace nestphalia;
 
 // This class is for loading game content from disc into memory as objects.
-// In the past, all the content data itself was hard coded into this file, but now that it's been shrunkled it might be
-// more consistent to access these functions through Resources.
 public static class Assets
 {
     private static Dictionary<string, JsonAsset> _assets = new Dictionary<string, JsonAsset>();
