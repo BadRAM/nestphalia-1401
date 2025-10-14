@@ -1,7 +1,7 @@
 [
   {
     "ID": "nest_ant",
-    "Type": "SpawnerTemplate",
+    "Type": "Spawner",
     "Name": "Anthill",
     "Description": "",
     "Texture": "spawner",
@@ -16,7 +16,7 @@
   },
   {
     "ID": "minion_ant",
-    "Type": "MinionTemplate",
+    "Type": "Minion",
     "Name": "Ant",
     "Description": "\nThanks, ants. Thants.",
     "MaxHealth": 20.0,
@@ -59,7 +59,7 @@
   },
   {
     "ID": "nest_grasshopper",
-    "Type": "SpawnerTemplate",
+    "Type": "Spawner",
     "Name": "Grasshopper Glade",
     "Description": "",
     "Texture": "spawner4",
@@ -73,7 +73,7 @@
   },
   {
     "ID": "minion_grasshopper",
-    "Type": "HopperMinionTemplate",
+    "Type": "HopperMinion",
     "Name": "Grasshopper",
     "Description": "\nHoppers are renowned for their short temper and musical talent",
     "MaxHealth": 40.0,
@@ -126,7 +126,7 @@
   },
   {
     "ID": "nest_bee",
-    "Type": "SpawnerTemplate",
+    "Type": "Spawner",
     "Name": "Beehive",
     "Description": "",
     "Texture": "spawner3",
@@ -140,7 +140,7 @@
   },
   {
     "ID": "minion_bee",
-    "Type": "FlyingMinionTemplate",
+    "Type": "FlyingMinion",
     "Name": "Bee",
     "Description": "\n\"For the Queen!\"",
     "CruisingHeight": 32.0,
@@ -185,7 +185,7 @@
   },
   {
     "ID": "nest_snail",
-    "Type": "SpawnerTemplate",
+    "Type": "Spawner",
     "Name": "Snail Warren",
     "Description": "",
     "Texture": "spawner2",
@@ -199,7 +199,7 @@
   },
   {
     "ID": "minion_snail",
-    "Type": "MinionTemplate",
+    "Type": "Minion",
     "Name": "Snail",
     "Description": "\nSnails get it done.",
     "Texture": "snail",
@@ -209,11 +209,11 @@
     "AttackDuration": 1.0,
     "Speed": 35.0,
     "PhysicsRadius": 6.0,
-    "AnimFrameRate": 30,
+    "AnimFrameRate": 30
   },
   {
     "ID": "nest_ladybug",
-    "Type": "SpawnerTemplate",
+    "Type": "Spawner",
     "Name": "Ladybug Nest",
     "Description": "Ladybugs fly until they are hit, then walk the rest of the way.",
     "Texture": "spawner4",
@@ -227,7 +227,7 @@
   },
   {
     "ID": "minion_ladybug",
-    "Type": "FlyUntilHitMinionTemplate",
+    "Type": "FlyUntilHitMinion",
     "Name": "Ladybug",
     "Description": "\nWe're coming in hot!",
     "LandSpeed": 25.0,
@@ -291,7 +291,7 @@
   },
   {
     "ID": "nest_archer",
-    "Type": "SpawnerTemplate",
+    "Type": "Spawner",
     "Name": "Archer Anthill",
     "Description": "Archer ants can attack from a distance.",
     "Texture": "spawner",
@@ -305,7 +305,7 @@
   },
   {
     "ID": "minion_archer",
-    "Type": "RangedMinionTemplate",
+    "Type": "RangedMinion",
     "Name": "Archer Ant",
     "Description": "",
     "MaxHealth": 20.0,
@@ -318,7 +318,7 @@
     "Range": 72,
     "Attack":{
       "ID": "minion_archer_arrow",
-      "Type": "ArcProjectileTemplate",
+      "Type": "ArcProjectile",
       "Texture": "arrow",
       "Damage": 4.0,
       "ArcHeight": 18,
@@ -359,7 +359,7 @@
   },
   {
     "ID": "nest_sapper_beetle",
-    "Type": "SpawnerTemplate",
+    "Type": "Spawner",
     "Name": "Beetle Burrow",
     "Description": "Sapper Beetles attack once, then return to their nest to join the next wave\n\n\"General Paulby found great success by instructing his beetles to resupply after each attack\"",
     "Texture": "spawner4",
@@ -373,7 +373,7 @@
   },
   {
     "ID": "minion_sapper_beetle",
-    "Type": "SapperMinionTemplate",
+    "Type": "SapperMinion",
     "Name": "Beetle",
     "Description": "\nWide load coming through!",
     "MaxHealth": 55.0,
@@ -386,13 +386,13 @@
     "BombTexture": "sapper_bomb",
     "Attack":{
       "ID": "minion_sapper_beetle_bomb",
-      "Type": "ArcProjectileTemplate",
+      "Type": "ArcProjectile",
       "Texture": "sapper_bomb",
       "ArcDuration": 0.4,
       "ArcHeight": 4,
       "HitEffect":{
         "ID": "minion_sapper_beetle_bomb_explosion",
-        "Type": "ExplosionTemplate",
+        "Type": "Explosion",
         "Texture": "explosion32",
         "SoundEffect": "explosion",
         "BlastRadius": 0,
@@ -451,7 +451,7 @@
   },
   {
     "ID": "nest_spider",
-    "Type": "SpawnerTemplate",
+    "Type": "Spawner",
     "Name": "Spider Nest",
     "Description": "",
     "Texture": "spawner4",
@@ -465,7 +465,7 @@
   },
   {
     "ID": "minion_spider",
-    "Type": "BroodMinionTemplate",
+    "Type": "BroodMinion",
     "Name": "Spider Broodmother",
     "Description": "",
     "SpawnInterval": 1.0,
@@ -512,7 +512,7 @@
   },
   {
     "ID": "minion_spiderling",
-    "Type": "MinionTemplate",
+    "Type": "Minion",
     "Name": "Spiderling",
     "Description": "\n\"I was born ready!\"",
     "MaxHealth": 15.0,
@@ -556,7 +556,7 @@
   },
   {
     "ID": "nest_frog",
-    "Type": "SpawnerTemplate",
+    "Type": "Spawner",
     "Name": "Frog Pond",
     "Description": "",
     "Texture": "spawner4",
@@ -570,7 +570,7 @@
   },
   {
     "ID": "minion_frog",
-    "Type": "HopperMinionTemplate",
+    "Type": "HopperMinion",
     "Name": "Frog",
     "Description": "\nAt least it's on our side.\nFor now...",
     "MaxHealth": 1500.0,

@@ -19,17 +19,17 @@
   },
   {
     "ID": "floor_1",
-    "Type": "FloorTileTemplate",
+    "Type": "FloorTile",
     "Texture": "floor1"
   },
   {
     "ID": "floor_2",
-    "Type": "FloorTileTemplate",
+    "Type": "FloorTile",
     "Texture": "floor2"
   },
   {
     "ID": "floor_empty",
-    "Type": "FloorTileTemplate",
+    "Type": "FloorTile",
     "Texture": "clear"
   },
   {
@@ -42,7 +42,7 @@
   },
   {
     "ID": "wall_mud",
-    "Type": "StructureTemplate",
+    "Type": "Structure",
     "Name": "Mud Wall",
     "Description": "",
     "Texture": "wall",
@@ -52,7 +52,7 @@
   },
   {
     "ID": "wall_wood",
-    "Type": "StructureTemplate",
+    "Type": "Structure",
     "Name": "Wooden Wall",
     "Description": "",
     "Texture": "wall_wood",
@@ -62,7 +62,7 @@
   },
   {
     "ID": "wall_stone",
-    "Type": "StructureTemplate",
+    "Type": "Structure",
     "Name": "Stone Wall",
     "Description": "",
     "Texture": "wall2",
@@ -72,7 +72,7 @@
   },
   {
     "ID": "honey_pot",
-    "Type": "StructureTemplate",
+    "Type": "Structure",
     "Name": "Honey Pot",
     "Description": "Decoy nest",
     "Texture": "honeypot",
@@ -82,7 +82,7 @@
   },
   {
     "ID": "glue_paper",
-    "Type": "GluePaperTemplate",
+    "Type": "GluePaper",
     "Name": "Glue Paper",
     "Description": "",
     "Texture": "stickypaper",
@@ -91,7 +91,7 @@
   },
   {
     "ID": "hazard_sign",
-    "Type": "HazardSignTemplate",
+    "Type": "HazardSign",
     "Name": "Hazard Sign",
     "Description": "",
     "Texture": "hazard_sign",
@@ -101,7 +101,7 @@
   },
   {
     "ID": "door_weak",
-    "Type": "DoorTemplate",
+    "Type": "Door",
     "Name": "Gate",
     "Description": "",
     "Texture": "doorClosed",
@@ -113,7 +113,7 @@
   },
   {
     "ID": "door_strong",
-    "Type": "DoorTemplate",
+    "Type": "Door",
     "Name": "Vault Door",
     "Description": "",
     "Texture": "vault_door_closed",
@@ -125,7 +125,7 @@
   },
   {
     "ID": "springboard_test",
-    "Type": "SpringBoardTemplate",
+    "Type": "SpringBoard",
     "Name": "Prototype Springboard",
     "Description": "WHEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE",
     "Texture": "spring",
@@ -139,7 +139,7 @@
   },
   {
     "ID": "springboard_forward",
-    "Type": "SpringBoardTemplate",
+    "Type": "SpringBoard",
     "Name": "Forward Springboard",
     "Description": "Boing!",
     "Texture": "spring",
@@ -152,7 +152,7 @@
   },
   {
     "ID": "springboard_backward",
-    "Type": "SpringBoardTemplate",
+    "Type": "SpringBoard",
     "Name": "Backward Springboard",
     "Description": "!gnioB",
     "Texture": "spring",
@@ -165,14 +165,14 @@
   },
   {
     "ID": "tower_basic",
-    "Type": "TowerTemplate",
+    "Type": "Tower",
     "Name": "Watchtower",
     "Description": "\n\"Look! Ants!\"",
     "Texture": "turret",
     "Range": 120.0,
     "Attack":{
       "ID": "tower_basic_arrow",
-      "Type": "ArcProjectileTemplate",
+      "Type": "ArcProjectile",
       "Texture": "arrow",
       "Damage": 15.0,
       "ArcHeight": 18,
@@ -188,14 +188,14 @@
   },
   {
     "ID": "tower_machinegun",
-    "Type": "TowerTemplate",
+    "Type": "Tower",
     "Name": "Millipede Ranger",
     "Description": "\nWhen his accuracy is questioned, the Millipede ranger insists that he can put as many arrows in a target as a dozen ant archers.",
     "Texture": "turret2",
     "Range": 100.0,
     "Attack":{
       "ID": "tower_machinegun_bullet",
-      "Type": "ProjectileTemplate",
+      "Type": "Projectile",
       "Texture": "bullet",
       "Damage": 5.0,
       "Speed": 400.0
@@ -209,20 +209,20 @@
   },
   {
     "ID": "minefield",
-    "Type": "MinefieldTemplate",
+    "Type": "Minefield",
     "Name": "Minefield",
     "Description": "\nFriendly bugs can safely traverse mines, but hate doing so.",
     "Texture": "mine",
     "MaxCharges": 4,
     "Bomb": {
       "ID": "mine_armed",
-      "Type": "ArcProjectileTemplate",
+      "Type": "ArcProjectile",
       "Texture": "mine",
       "ArcDuration": 0.4,
       "ArcHeight": 0,
       "HitEffect": {
         "ID": "mine_explosion",
-        "Type": "ExplosionTemplate",
+        "Type": "Explosion",
         "Texture": "explosion32",
         "SoundEffect": "explosion",
         "BlastRadius": 48.0,
@@ -237,20 +237,20 @@
   },
   {
     "ID": "tower_mortar",
-    "Type": "TowerTemplate",
+    "Type": "Tower",
     "Name": "Mortar",
     "Description": "Splash damage, radius 48\nCan only hit grounded units",
     "Texture": "mortar",
     "Range": 90.0,
     "Attack":{
       "ID": "tower_mortar_shell",
-      "Type": "ArcProjectileTemplate",
+      "Type": "ArcProjectile",
       "Texture": "bullet",
       "ArcDuration": 0.7,
       "ArcHeight": 96.0,
       "HitEffect":{
         "ID": "tower_mortar_shell_explosion",
-        "Type": "ExplosionTemplate",
+        "Type": "Explosion",
         "Texture": "explosion32",
         "SoundEffect": "explosion",
         "BlastRadius": 48.0,
@@ -268,14 +268,14 @@
   },
   {
     "ID": "tower_lightning",
-    "Type": "TowerTemplate",
+    "Type": "Tower",
     "Name": "Lightning Tower",
     "Description": "Can only hit midair units",
     "Texture": "tower_lightning",
     "Range": 120.0,
     "Attack":{
       "ID": "tower_lightning_attack",
-      "Type": "LightningBoltTemplate",
+      "Type": "LightningBolt",
       "Damage": 10.0,
       "Speed": 0.0
     },
@@ -290,14 +290,14 @@
   },
   {
     "ID": "tower_sniper",
-    "Type": "TowerTemplate",
+    "Type": "Tower",
     "Name": "Mantis Sniper",
     "Description": "\n\"Don't tell my wife where I am.\"",
     "Texture": "turret3",
     "Range": 450.0,
     "Attack":{
       "ID": "tower_sniper_bullet",
-      "Type": "ProjectileTemplate",
+      "Type": "Projectile",
       "Texture": "bullet",
       "Damage": 60.0,
       "Speed": 800.0
@@ -311,7 +311,7 @@
   },
   {
     "ID": "beacon_rally",
-    "Type": "RallyBeaconTemplate",
+    "Type": "RallyBeacon",
     "Name": "Rally Stratagem",
     "Description": "Commands all your bugs to a single target\n\n\"Strength in numbers! They can't stop all of us!\"",
     "Texture": "flag1",
@@ -324,7 +324,7 @@
   },
   {
     "ID": "beacon_repair",
-    "Type": "RepairBeaconTemplate",
+    "Type": "RepairBeacon",
     "Name": "Repair Stratagem",
     "Description": "Rebuilds one structure, and adjacent walls",
     "Texture": "flag2",
@@ -337,7 +337,7 @@
   },
   {
     "ID": "beacon_spawnboost",
-    "Type": "SpawnBoostBeaconTemplate",
+    "Type": "SpawnBoostBeacon",
     "Name": "Brood Stratagem",
     "Description": "Adjacent nests send an extra wave of bugs to the target location",
     "Texture": "flag1",
@@ -350,7 +350,7 @@
   },
   {
     "ID": "beacon_frenzy",
-    "Type": "BuffBeaconTemplate",
+    "Type": "BuffBeacon",
     "Name": "Frenzy Stratagem",
     "Description": "Causes a frenzy in an area",
     "Texture": "flag1",
@@ -366,7 +366,7 @@
   },
   {
     "ID": "beacon_burn",
-    "Type": "BuffBeaconTemplate",
+    "Type": "BuffBeacon",
     "Name": "Inferno Stratagem",
     "Description": "Burns all minions in an area",
     "Texture": "flag1",
@@ -383,7 +383,7 @@
   },
   {
     "ID": "beacon_boulder",
-    "Type": "AttackBeaconTemplate",
+    "Type": "AttackBeacon",
     "Name": "Boulder Chucker",
     "Description": "Drops a giant rock on a square.",
     "Texture": "flag1",
@@ -392,13 +392,13 @@
     "AbilityIcon": "ability_icon_frenzy",
     "Attack": {
       "ID": "beacon_boulder_boulder",
-      "Type": "ArcProjectileTemplate",
+      "Type": "ArcProjectile",
       "Texture": "boulder",
       "ArcDuration": 1.5,
       "ArcHeight": 240.0,
       "HitEffect": {
         "ID": "beacon_boulder_boulder_boulder",
-        "Type": "BoulderTemplate",
+        "Type": "Boulder",
         "Texture": "explosion32",
         "BlastRadius": 48.0,
         "Damage": 10.0
