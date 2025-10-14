@@ -17,6 +17,8 @@ public class PathFinder
     
     private Stopwatch _swTotalTime = new Stopwatch();
     private int _totalPaths = 0;
+
+    private const int BorderThickness = 1;
     
     #if DEBUG
     private long _totalNodes = 0;
@@ -77,6 +79,17 @@ public class PathFinder
             }
             navPath.Points.Clear();
         }
+        // start and endpoint nodes can be in the forbidden zone, offset the _antinodes count so that batch pathing comes to the correct total.
+        foreach (PathNode antiNode in _antinodeQueue)
+        {
+            if (antiNode.Pos.X < BorderThickness ||
+                antiNode.Pos.Y < BorderThickness ||
+                antiNode.Pos.X >= World.BoardWidth - BorderThickness ||
+                antiNode.Pos.Y >= World.BoardHeight - BorderThickness)
+            {
+                _antinodes--;
+            }
+        }
 
         // ===== Path Solver Loop =====================================================================================
         while (true)
@@ -128,7 +141,8 @@ public class PathFinder
                 // guard against nodes we've already found the best path to
                 continue;
             }
-            
+
+
             if (_anti)
             {
                 _antinodes++;
@@ -138,11 +152,12 @@ public class PathFinder
                 _nodes++;
             }
             
+            
             // ----- Process selected node ------------------------------------------------------------------------
             _nodeGrid[n.Pos.X,n.Pos.Y] = n;
             
             // Batchmode stops once the entire board is filled with antinodes
-            if (batchMode && _antinodes >= World.BoardHeight * World.BoardWidth)
+            if (batchMode && _antinodes >= (World.BoardHeight - BorderThickness*2) * (World.BoardWidth - BorderThickness * 2))
             {
                 #if DEBUG
                 _swMisc.Stop();
@@ -157,33 +172,34 @@ public class PathFinder
 
             // ----- Add new nodes for consideration --------------------------------------------------------------
             #region  Add Nodes
+            int pad = BorderThickness + 1; // How many edge tiles are off limits?
             // left
-            if (n.Pos.X-1 >= 0)
+            if (n.Pos.X-pad >= 0)
             {
                 AddWeightedNode(n.Pos, n.Pos.X-1, n.Pos.Y, 1, navPath.Team, navPath);
             }
             
             // right
-            if (n.Pos.X+1 < World.BoardWidth)
+            if (n.Pos.X+pad < World.BoardWidth)
             {
                 AddWeightedNode(n.Pos, n.Pos.X+1, n.Pos.Y, 1, navPath.Team, navPath);
             }
             
             // up
-            if (n.Pos.Y-1 >= 0)
+            if (n.Pos.Y-pad >= 0)
             {
                 AddWeightedNode(n.Pos, n.Pos.X, n.Pos.Y-1, 1, navPath.Team, navPath);
             }
             
             // down
-            if (n.Pos.Y+1 < World.BoardHeight)
+            if (n.Pos.Y+pad < World.BoardHeight)
             {
                 AddWeightedNode(n.Pos, n.Pos.X, n.Pos.Y+1, 1, navPath.Team, navPath);
             }
             
             // top left
-            if (   n.Pos.X - 1 > 0 
-                && n.Pos.Y - 1 > 0 
+            if (   n.Pos.X - pad > 0 
+                && n.Pos.Y - pad > 0 
                 && !navPath.Team.GetNavSolid(n.Pos.X-1, n.Pos.Y)
                 && !navPath.Team.GetNavSolid(n.Pos.X, n.Pos.Y-1))
             {
@@ -191,8 +207,8 @@ public class PathFinder
             }
             
             // top right
-            if (   n.Pos.X + 1 < World.BoardWidth 
-                && n.Pos.Y - 1 > 0 
+            if (   n.Pos.X + pad < World.BoardWidth 
+                && n.Pos.Y - pad > 0 
                 && !navPath.Team.GetNavSolid(n.Pos.X+1, n.Pos.Y)
                 && !navPath.Team.GetNavSolid(n.Pos.X, n.Pos.Y-1))
             {
@@ -200,8 +216,8 @@ public class PathFinder
             }
             
             // bottom left
-            if (   n.Pos.X - 1 > 0 
-                && n.Pos.Y + 1 < World.BoardHeight 
+            if (   n.Pos.X - pad > 0 
+                && n.Pos.Y + pad < World.BoardHeight 
                 && !navPath.Team.GetNavSolid(n.Pos.X-1, n.Pos.Y)
                 && !navPath.Team.GetNavSolid(n.Pos.X, n.Pos.Y+1))
             {
@@ -209,8 +225,8 @@ public class PathFinder
             }
             
             // bottom right
-            if (   n.Pos.X + 1 < World.BoardWidth
-                && n.Pos.Y + 1 < World.BoardHeight
+            if (   n.Pos.X + pad < World.BoardWidth
+                && n.Pos.Y + pad < World.BoardHeight
                 && !navPath.Team.GetNavSolid(n.Pos.X+1, n.Pos.Y)
                 && !navPath.Team.GetNavSolid(n.Pos.X, n.Pos.Y+1))
             {
@@ -271,6 +287,8 @@ public class PathFinder
 
         foreach (NavPath navPath in navPaths)
         {
+            navPath.Start.X = Math.Clamp(navPath.Start.X, BorderThickness, World.BoardWidth - BorderThickness - 1);
+            navPath.Start.Y = Math.Clamp(navPath.Start.Y, BorderThickness, World.BoardHeight - BorderThickness - 1);
             PathNode an = _nodeGrid[navPath.Start.X, navPath.Start.Y];
             navPath.Points.Clear();
             

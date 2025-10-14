@@ -97,7 +97,7 @@ public class Fort
             totalCost += t.Price;
             if (t is SpawnerTemplate) nestCount++;
             if (t is ActiveAbilityBeaconTemplate) stratagemCount++;
-            if (!campaign.UnlockedStructures.Contains(t.ID)) illegalBuilding = true;
+            if (!campaign.Unlocks.Contains(t.ID)) illegalBuilding = true;
         }
         
         string reason = "";

@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using Raylib_cs;
@@ -63,15 +64,61 @@ public static class Utils
         return rect;
     }
     public static Vector2 TopLeft(this Rectangle rect) { return rect.Position; }
-    public static Vector2 Top(this Rectangle rect) { return new Vector2(rect.X + rect.Width/2, rect.Y) ; }
-    public static Vector2 TopRight(this Rectangle rect) { return new Vector2(rect.X + rect.Width, rect.Y) ; }
-    public static Vector2 Left(this Rectangle rect) { return new Vector2(rect.X, rect.Y + rect.Height/2) ; }
-    public static Vector2 Center(this Rectangle rect) { return new Vector2(rect.X + rect.Width/2, rect.Y + rect.Height/2) ; }
-    public static Vector2 Right(this Rectangle rect) { return new Vector2(rect.X + rect.Width, rect.Y + rect.Height/2) ; }
-    public static Vector2 BottomLeft(this Rectangle rect) { return new Vector2(rect.X, rect.Y + rect.Height) ; }
-    public static Vector2 Bottom(this Rectangle rect) { return new Vector2(rect.X + rect.Width/2, rect.Y + rect.Height) ; }
-    public static Vector2 BottomRight(this Rectangle rect) { return new Vector2(rect.X + rect.Width, rect.Y + rect.Height) ; }
+    public static Vector2 TopCenter(this Rectangle rect) { return new Vector2(rect.X + rect.Width/2, rect.Y); }
+    public static Vector2 TopRight(this Rectangle rect) { return new Vector2(rect.X + rect.Width, rect.Y); }
+    public static Vector2 LeftCenter(this Rectangle rect) { return new Vector2(rect.X, rect.Y + rect.Height/2); }
+    public static Vector2 Center(this Rectangle rect) { return new Vector2(rect.X + rect.Width/2, rect.Y + rect.Height/2); }
+    public static Vector2 RightCenter(this Rectangle rect) { return new Vector2(rect.X + rect.Width, rect.Y + rect.Height/2); }
+    public static Vector2 BottomLeft(this Rectangle rect) { return new Vector2(rect.X, rect.Y + rect.Height); }
+    public static Vector2 BottomCenter(this Rectangle rect) { return new Vector2(rect.X + rect.Width/2, rect.Y + rect.Height); }
+    public static Vector2 BottomRight(this Rectangle rect) { return new Vector2(rect.X + rect.Width, rect.Y + rect.Height); }
+    public static float Top(this Rectangle rect) { return rect.Y; }
+    public static float Bottom(this Rectangle rect) { return rect.Y + rect.Height; }
+    public static float Left(this Rectangle rect) { return rect.X; }
+    public static float Right(this Rectangle rect) { return rect.X + rect.Width; }
+    public static float CenterX(this Rectangle rect) { return rect.X + rect.Width/2; }
+    public static float CenterY(this Rectangle rect) { return rect.Y + rect.Height/2; }
 
+    public static Color HexToColor(string hex)
+    {
+        Color ret = new Color(255, 255, 255, 255);
+        if (hex[0] == '#') hex = hex.Substring(1);
+        hex = hex.ToUpper();
+        ret.R = byte.Parse(hex.Substring(0, 2), NumberStyles.HexNumber); 
+        ret.G = byte.Parse(hex.Substring(2, 2), NumberStyles.HexNumber); 
+        ret.B = byte.Parse(hex.Substring(4, 2), NumberStyles.HexNumber);
+        if (hex.Length == 8) ret.A = byte.Parse(hex.Substring(6, 2), NumberStyles.HexNumber); 
+        return ret;
+    }
+
+    public static Color? TryHexToColor(string hex)
+    {
+        if (hex.Length == 0) return null;
+        if (hex[0] == '#') hex = hex.Substring(1);
+        if (!(hex.Length == 6 || hex.Length == 8)) return null;
+        hex = hex.ToUpper();
+        if (!hex.OnlyContains("0123456789ABCDEF")) return null;
+        return HexToColor(hex);
+    }
+
+    public static bool OnlyContains(this string str, string allowableChars)
+    {
+        foreach (char c in str)
+        {
+            if (!allowableChars.Contains(c)) return false;
+        }
+        return true;
+    }
+
+    public static string ToHex(this Color color)
+    {
+        string ret = "";
+        ret += color.R.ToString("X2");
+        ret += color.G.ToString("X2");
+        ret += color.B.ToString("X2");
+        ret += color.A.ToString("X2");
+        return ret;
+    }
     
     public static float MoveTowards(this float start, float target, float maxDistanceDelta)
     {

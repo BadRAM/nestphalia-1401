@@ -307,8 +307,8 @@ public class Team
         
         // ability slots
         int posX = 0;
-        if (HudLocation == HUDLocation.Right) posX = Screen.CenterX + 462;
-        if (HudLocation == HUDLocation.Left)  posX = Screen.CenterX - 462;
+        if (HudLocation == HUDLocation.Right) posX = Screen.RightX - 68 * BeaconCap/2;
+        if (HudLocation == HUDLocation.Left)  posX = Screen.LeftX  + 68 * BeaconCap/2;
         for (int i = 0; i < BeaconCap; i++)
         {
             int x = posX + i * 68 - 134;
@@ -329,10 +329,10 @@ public class Team
         }
         
         // health bar
-        Raylib.DrawTextureRec(_healthBar, new Rectangle(0, 80, 300, 40), new Vector2(HudLocation == HUDLocation.Right ? Screen.CenterX + 20  : Screen.CenterX - 320, Screen.BottomY - 44), Color.White);
+        Raylib.DrawTextureRec(_healthBar, new Rectangle(0, 80, 300, 40), new Vector2(HudLocation == HUDLocation.Right ? Screen.CenterX + 20  : Screen.CenterX - 320, 0), Color.White);
         float hpBarSize = (float)(300 * _health / _maxHealth);
-        Raylib.DrawTextureRec(_healthBar, new Rectangle( HudLocation == HUDLocation.Right ? 300 - hpBarSize : 0, 40, hpBarSize, 40), new Vector2(HudLocation == HUDLocation.Right ? (300 - hpBarSize) + Screen.CenterX + 20  : Screen.CenterX - 320, Screen.BottomY -44), Color.White);
-        GUI.DrawTextCentered(HudLocation == HUDLocation.Right ? Screen.CenterX + 160 : Screen.CenterX - 160, Screen.BottomY - 24, $"{Name} - {_health:n0}/{_maxHealth:n0}", anchor: Screen.TopLeft);
+        Raylib.DrawTextureRec(_healthBar, new Rectangle( HudLocation == HUDLocation.Right ? 300 - hpBarSize : 0, 40, hpBarSize, 40), new Vector2(HudLocation == HUDLocation.Right ? (300 - hpBarSize) + Screen.CenterX + 20  : Screen.CenterX - 320, 0), Color.White);
+        GUI.DrawTextCentered(HudLocation == HUDLocation.Right ? Screen.CenterX + 160 : Screen.CenterX - 160, 20, $"{Name} - {_health:n0}/{_maxHealth:n0}", anchor: Screen.TopLeft);
     }
     
     public double GetTileWeight(int x, int y)

@@ -33,6 +33,20 @@ class Cmd {
     }
 }
 
+class Save {
+    // ======== Save Data ========
+    // This class deals with data in the campaign.sav file
+
+    // Check if the active save file has an unlock entry for the given id
+    foreign static has(id)
+
+    // Give the active save file an unlock entry with the given id
+    foreign static give(id)
+
+    // Remove an unlock entry, if it exists. returns true on success.
+    foreign static clear(id)
+}
+
 class Sound {
     // ======== Sound Control ========
     // This class plays SFX, not music

@@ -38,6 +38,7 @@ public class BattleScene : Scene
     private Texture2D _canopyShadowHighlights;
     private Texture2D _clock;
     private Texture2D _clockHand;
+    private Texture2D _bgTex;
     private StretchyTexture _selectBoxBG;
     private static SoundResource _waveStartSoundEffect;
     
@@ -77,6 +78,7 @@ public class BattleScene : Scene
         _canopyShadowHighlights = Resources.GetTextureByName("shadow_canopy_godray");
         _clock = Resources.GetTextureByName("clock");
         _clockHand = Resources.GetTextureByName("clock_hand");
+        _bgTex = Resources.GetTextureByName("battle_bg");
         SetTextureFilter(_canopyShadow, TextureFilter.Bilinear);
         SetTextureFilter(_canopyShadowHighlights, TextureFilter.Bilinear);
         _waveStartSoundEffect = Resources.GetSoundByName("start");
@@ -103,7 +105,8 @@ public class BattleScene : Scene
         Screen.BeginDrawing();
         ClearBackground(new Color(16, 8, 4, 255));
         
-        DrawGradientBackground(_level.GradientTop, _level.GradientBottom);        
+        // DrawGradientBackground(_level.GradientTop, _level.GradientBottom);        
+        Screen.DrawBackgroundTex(_bgTex, Color.Gray);
         
         World.DrawFloor();
         World.Draw();
@@ -478,10 +481,10 @@ public class BattleScene : Scene
 
     private void DrawClock()
     {
-        DrawTexture(_clock, 10, 10, Color.White);
-        DrawTexturePro(_clockHand, _clockHand.Rect(), new Rectangle(74, 74, _clockHand.Size()), _clockHand.Size()/2, (float)Time.Scaled * 18 - 27, Color.White);
-        DrawTextLeft(174, 10, Wave.ToString(), 128, anchor:Screen.TopLeft);
-        if (Screen.DebugMode) DrawTextLeft(256, 10, $"WaveTick: {WaveTick}", anchor:Screen.TopLeft);
+        DrawTexture(_clock, Screen.CenterX - 64, Screen.TopY, Color.White);
+        DrawTextCentered(Screen.CenterX, 64, Wave.ToString(), 128, anchor:Screen.TopLeft);
+        DrawTexturePro(_clockHand, _clockHand.Rect(), new Rectangle(Screen.CenterX, Screen.TopY + 64, _clockHand.Size()), _clockHand.Size()/2, (float)Time.Scaled * 18 - 27, Color.White);
+        // if (Screen.DebugMode) DrawTextLeft(256, 10, $"WaveTick: {WaveTick}", anchor:Screen.TopLeft);
     }
 
     private void DrawCanopyShadows()

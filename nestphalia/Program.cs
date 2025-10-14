@@ -6,8 +6,32 @@ namespace nestphalia;
 static class Program
 {
 	public static Scene CurrentScene;
+	public static CampaignSaveData? ActiveCampaign;
 	
     public static void Main()
+    {
+#if DEBUG
+	    Start();
+	    Loop();
+	    End();
+#else
+	    try
+	    {
+			Start();
+			Loop();
+			End();
+	    }
+	    catch (Exception e)
+	    {
+			string log = string.Join('\n', GameConsole.LogHistory) + "\n\n======== CRITICAL ERROR ========\n" + e.ToString();
+			string path = Directory.GetCurrentDirectory() + $"\\crash-{DateTime.Now.ToString("yyyy-MM-dd-hh-mm-ss")}.log";
+		    File.WriteAllText(path, log);
+		    Console.WriteLine($"Wrote crash log out to {path}");
+	    }
+#endif
+    }
+
+    private static void Start()
     {
 	    Stopwatch startupTimer = Stopwatch.StartNew();
 	    Settings.Load();
@@ -42,40 +66,45 @@ static class Program
 	    GameConsole.WriteLine($"Assets loaded in {startupTimer.ElapsedMilliseconds}ms");
 	    startupTimer.Stop();
 	    Screen.Load();
-        GUI.Initialize();
-        GameConsole.WrenCommand.Execute("""System.print("Wren VM is running.")""");
+	    GUI.Initialize();
+	    GameConsole.WrenCommand.Execute("""System.print("Wren VM is running.")""");
         
-        // Start the first scene. TODO: loading screen, then intro cutscene, rather than menu
+	    // Start the first scene. TODO: loading screen, then intro cutscene, rather than menu
         
-        new IntroScene().Start();
-        
-        while (!Raylib.WindowShouldClose())
-        {
-	        Time.UpdateTime();
-	        Input.Poll();
+	    new IntroScene().Start();
+    }
+
+    private static void Loop()
+    {
+	    while (!Raylib.WindowShouldClose())
+	    {
+		    Time.UpdateTime();
+		    Input.Poll();
 			
-	        if (Raylib.IsWindowResized())
-	        {
-		        Screen.UpdateBounds();
-	        }
+		    if (Raylib.IsWindowResized())
+		    {
+			    Screen.UpdateBounds();
+		    }
 	        
-			CurrentScene.Update();
-			if (Raylib.WindowShouldClose()) break;
+		    CurrentScene.Update();
+		    if (Raylib.WindowShouldClose()) break;
 			
-			PopupManager.Update();
-			GameConsole.Draw();
-			GUI.UpdateCursor();
+		    PopupManager.Update();
+		    GameConsole.Draw();
+		    GUI.UpdateCursor();
 			
-			Screen.EndDrawing();
+		    Screen.EndDrawing();
 			
-			Raylib.UpdateMusicStream(Resources.MusicPlaying);
-        }
-		
-        GameConsole.WriteLine("Quitting time!");
+		    Raylib.UpdateMusicStream(Resources.MusicPlaying);
+	    }
+    }
+
+    private static void End()
+    {
+	    GameConsole.WriteLine("Quitting time!");
         
 	    Resources.Unload();
         
 	    Raylib.CloseAudioDevice();
-        //CloseWindow();
     }
 }

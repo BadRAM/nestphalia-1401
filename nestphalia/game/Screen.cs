@@ -7,7 +7,7 @@ namespace nestphalia;
 public static class Screen
 {
     public static int MinWidth = 960;
-    public static int MinHeight = 720;
+    public static int MinHeight = 720;    
     
     public static int CenterX;
     public static int CenterY;
@@ -150,10 +150,19 @@ public static class Screen
         for (int x = 0; x <= RightX/24; x++)
         for (int y = 0; y <= BottomY/24; y++)
         {
-            DrawTexture(_backgroundNoise[x][y] ? _tile1 : _tile2, x * 24, y * 24 - 12, tint);
+            DrawTexture(_backgroundNoise[x][y] ? _tile1 : _tile2, x * 24, y * 24, tint);
         }
         DrawRectangle(CenterX - MinWidth/2, CenterY - MinHeight/2, MinWidth, MinHeight, new Color(10, 10, 10, 64));
         DrawTexture(_graffiti[_graffitiPicked], _graffitiPosX, _graffitiPosY, Color.White);
+    }
+
+    public static void DrawBackgroundTex(Texture2D tex, Color tint)
+    {
+        for (int x = 0; x <= RightX/tex.Width; x++)
+        for (int y = 0; y <= BottomY/tex.Height; y++)
+        {
+            DrawTexture(tex, x * tex.Width, y * tex.Height, tint);
+        }
     }
 
     public static void SetCamera(Camera2D? camera = null)

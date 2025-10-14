@@ -28,7 +28,7 @@ public abstract class ActiveAbilityBeacon : Structure
         _template = template;
         TimeLastUsed = Time.Scaled;
     }
-
+    
     public virtual void Activate(Vector2 targetPosition)
     {
         TimeLastUsed = Time.Scaled;
@@ -42,7 +42,7 @@ public abstract class ActiveAbilityBeacon : Structure
         if (!IsReady())
         {
             Raylib.DrawRectangle(posX+2, posY+2, 60, (int)(2 + 60 * (1-(Time.Scaled - TimeLastUsed) / _template.Cooldown)), new Color(255, 255, 255, 64));
-            GUI.DrawTextCentered(posX + 32, posY + 32, (_template.Cooldown - (Time.Scaled - TimeLastUsed) ).ToString("N0"));
+            GUI.DrawTextCentered(posX + 32, posY + 32, (_template.Cooldown - (Time.Scaled - TimeLastUsed) ).ToString("N0"), anchor:Vector2.Zero);
         }
 
         if (Time.Scaled - TimeLastUsed < 10)

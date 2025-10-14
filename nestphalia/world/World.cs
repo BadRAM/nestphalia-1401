@@ -420,7 +420,7 @@ public static class World
         tileTypeTotals += "+===============================+========+=====+========+\n";
         #endif
         
-        GUI.DrawMonoTextLeft(10, 128,
+        GUI.DrawMonoTextLeft(10, 0,
             $"FPS: {Raylib.GetFPS()}\n" +
             $"Clock: {Time.Scaled:N2} Tick: {Time.Tick}\n" +
             $"Bugs: {Minions.Count}\n" +

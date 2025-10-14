@@ -9,13 +9,13 @@
   },
   "GradientTop": {
     "R": 0,
-    "G": 0,
-    "B": 0,
+    "G": 64,
+    "B": 7,
     "A": 255
   },
   "GradientBottom": {
-    "R": 0,
-    "G": 0,
+    "R": 64,
+    "G": 25,
     "B": 0,
     "A": 255
   },
@@ -50,7 +50,7 @@
   },
   "Music": "",
   "Weather": "",
-  "Script": "Cmd.dialog(\"Here in leftsville we have a saying:\")\nCmd.dialog(\"...\")\nCmd.dialog(\"I forgot :(\")\n\nEvent.structureDestroyed(27, 15, Fn.new {\n  Cmd.dialog(\"AArgh! Our defense grid!\")\n})\n\nEvent.teamHealthBelow(\"right\", 0.5, Fn.new {\n  Cmd.dialog(\"Noooo! It's all falling apart!\")\n  Cmd.dialog(\"You won't get away with this!\") \n})\n\nclass WaveDefense {\n  construct new() {\n    _count = 0\n  }\n  call() {\n    _count = _count + 1\n    Cmd.dialog(\"Wave %(_count)\")\n    Cmd.spawn(\"minion_ladybug\", \"right\", _count, 45, 2, 24, 2)\n    Cmd.spawn(\"minion_bee\", \"right\", _count*2+4, 45, 10, 24, 10)\n    Cmd.spawn(\"minion_ladybug\", \"right\", _count, 45, 19, 24, 19)\n  }\n}\n\n// Event.timer(10, true, WaveDefense.new())\n\nEvent.battleOver(\"left\", Fn.new {\n  Cmd.dialog(\"This isn't the last you'll see of Leftsville!\")\n})\n\nEvent.battleOver(\"right\", Fn.new {\n  Cmd.dialog(\"We're the best! We're the best!\")\n})\n\n// Event.timer(2, false, Fn.new {\n//   Cmd.dialog(\"The reinforcements will be here any second now...\")\n//   Event.timer(8, true, Fn.new {\n//     Cmd.spawn(\"minion_ladybug\", \"right\", 4, 45, 2, 24, 2)\n//     Cmd.spawn(\"minion_bee\", \"right\", 10, 45, 10, 24, 10)\n//     Cmd.spawn(\"minion_ladybug\", \"right\", 4, 45, 19, 24, 19)\n//   })\n// })",
+  "Script": "Cmd.dialog(\"Here in leftsville we have <c:red>a saying</c>:\")\r\nCmd.dialog(\"<pause:1> .<pause:1> .<pause:1> .\")\r\nCmd.dialog(\"I forgot<sound:mouth-harp> :(\")\r\n\r\nEvent.structureDestroyed(27, 15, Fn.new {\r\n  Cmd.dialog(\"AArgh! <pause:0.5>Our defense grid!\")\r\n})\r\n\r\nEvent.teamHealthBelow(\"right\", 0.5, Fn.new {\r\n  Cmd.dialog(\"Noooo! <pause:1>It's all falling apart!\")\r\n  Cmd.dialog(\"You won't get away with this!\") \r\n})\r\n\r\nclass WaveDefense {\r\n  construct new() {\r\n    _count = 0\r\n  }\r\n  call() {\r\n    _count = _count + 1\r\n    Cmd.dialog(\"Wave %(_count)\")\r\n    Cmd.spawn(\"minion_ladybug\", \"right\", _count, 45, 2, 24, 2)\r\n    Cmd.spawn(\"minion_bee\", \"right\", _count*2+4, 45, 10, 24, 10)\r\n    Cmd.spawn(\"minion_ladybug\", \"right\", _count, 45, 19, 24, 19)\r\n  }\r\n}\r\n\r\n// Event.timer(10, true, WaveDefense.new())\r\n\r\nEvent.battleOver(\"left\", Fn.new {\r\n  Cmd.dialog(\"This isn't the last you'll see of Leftsville!\")\r\n})\r\n\r\nEvent.battleOver(\"right\", Fn.new {\r\n  Cmd.dialog(\"We're the best! We're the best!\")\r\n})\r\n\r\n// Event.timer(2, false, Fn.new {\r\n//   Cmd.dialog(\"The reinforcements will be here any second now...\")\r\n//   Event.timer(8, true, Fn.new {\r\n//     Cmd.spawn(\"minion_ladybug\", \"right\", 4, 45, 2, 24, 2)\r\n//     Cmd.spawn(\"minion_bee\", \"right\", 10, 45, 10, 24, 10)\r\n//     Cmd.spawn(\"minion_ladybug\", \"right\", 4, 45, 19, 24, 19)\r\n//   })\r\n// })",
   "FloorTiles": [
     [
       "floor_2",
@@ -2467,16 +2467,16 @@
     {
       "TextureID": "scatter_oak",
       "Position": {
-        "X": 427.0,
-        "Y": 402.0
+        "X": 196.0,
+        "Y": 461.0
       },
-      "Rotation": 0.0
+      "Rotation": 630.0
     },
     {
       "TextureID": "scatter_oak",
       "Position": {
-        "X": 324.0,
-        "Y": 232.0
+        "X": 238.0,
+        "Y": 172.0
       },
       "Rotation": 0.0
     },
@@ -2491,10 +2491,10 @@
     {
       "TextureID": "scatter_oak",
       "Position": {
-        "X": 75.0,
-        "Y": 437.0
+        "X": 76.0,
+        "Y": 466.0
       },
-      "Rotation": 0.0
+      "Rotation": 90.0
     },
     {
       "TextureID": "scatter_oak",
@@ -2515,8 +2515,8 @@
     {
       "TextureID": "scatter_oak",
       "Position": {
-        "X": 276.0,
-        "Y": 429.0
+        "X": 309.0,
+        "Y": 455.0
       },
       "Rotation": 0.0
     },
@@ -2547,10 +2547,10 @@
     {
       "TextureID": "scatter_oak",
       "Position": {
-        "X": 26.0,
-        "Y": 241.0
+        "X": 66.0,
+        "Y": 243.0
       },
-      "Rotation": 0.0
+      "Rotation": 90.0
     },
     {
       "TextureID": "scatter_oak",

@@ -70,7 +70,7 @@ public class EditorScene : Scene
         _buildableStructures = new List<StructureTemplate>();
         if (!_sandboxMode)
         {
-            foreach (string structure in _data.UnlockedStructures)
+            foreach (string structure in _data.Unlocks)
             {
                 if (!Assets.Exists<StructureTemplate>(structure))
                 {

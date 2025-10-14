@@ -27,14 +27,14 @@ public class PickerPopup : Popup
     {
         // Draw background etc
         GUI.DrawStretchyTexture(_bgTex, _rect);
-        GUI.DrawTextCentered(0, 10, _titleText, anchor: Screen.Center + _rect.Top());
+        GUI.DrawTextCentered(0, 10, _titleText, anchor: Screen.Center + _rect.TopCenter());
         
         // Draw options
         int pageSize = (int)(_rect.Height - 60) / 40;
         int itemsToDraw = Math.Min(pageSize, _items.Count - pageSize * _page);
         for (int i = 0; i < itemsToDraw; i++)
         {
-            if (GUI.Button300(-150, (int)(i * 40 + _rect.Top().Y + 24), _items[i+pageSize*_page]))
+            if (GUI.Button300(-150, (int)(i * 40 + _rect.TopCenter().Y + 24), _items[i+pageSize*_page]))
             {
                 Pick(i+pageSize*_page);
             }
@@ -43,9 +43,9 @@ public class PickerPopup : Popup
         // Draw page buttons if relevant
         if (_items.Count > pageSize)
         {
-            if (GUI.Button100(-150, -44, "<", _page > 0, Screen.Center + _rect.Bottom())) _page--;
-                GUI.Button100(-50,  -44, $"{_page+1}/{_items.Count / pageSize + 1}", false, Screen.Center + _rect.Bottom());
-            if (GUI.Button100( 50,  -44, ">", _page < _items.Count / pageSize, anchor: Screen.Center + _rect.Bottom())) _page++;
+            if (GUI.Button100(-150, -44, "<", _page > 0, Screen.Center + _rect.BottomCenter())) _page--;
+                GUI.Button100(-50,  -44, $"{_page+1}/{_items.Count / pageSize + 1}", false, Screen.Center + _rect.BottomCenter());
+            if (GUI.Button100( 50,  -44, ">", _page < _items.Count / pageSize, anchor: Screen.Center + _rect.BottomCenter())) _page++;
         }
     }
 

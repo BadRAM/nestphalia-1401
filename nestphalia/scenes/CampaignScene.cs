@@ -8,7 +8,7 @@ public class CampaignSaveData
 {
     public double Money = 2000;
     public List<string> BeatenLevels = new List<string>();
-    public List<string> UnlockedStructures = new List<string>();
+    public List<string> Unlocks = new List<string>();
     public List<string> NewUnlocks = new List<string>();
     public Color TeamColor = Color.Blue;
     
@@ -72,7 +72,7 @@ public class CampaignScene : Scene
         else
         {
             _data = new CampaignSaveData();
-            _data.UnlockedStructures = new List<string>() {"wall_mud", "tower_basic", "nest_ant"};
+            _data.Unlocks = new List<string>() {"wall_mud", "tower_basic", "nest_ant"};
             _data.Save();
         }
     }
@@ -80,6 +80,7 @@ public class CampaignScene : Scene
     public void Start(Fort? fort = null)
     {
         Program.CurrentScene = this;
+        Program.ActiveCampaign = _data;
         Screen.RegenerateBackground();
         _data.Save();
         // Resources.PlayMusicByName("hook_-_paranoya");
@@ -253,9 +254,9 @@ public class CampaignScene : Scene
             _data.NewUnlocks.Clear();
             foreach (string unlock in _selectedLevel.UnlockReward)
             {
-                if (!_data.UnlockedStructures.Contains(unlock))
+                if (!_data.Unlocks.Contains(unlock))
                 {
-                    _data.UnlockedStructures.Add(unlock);
+                    _data.Unlocks.Add(unlock);
                     _data.NewUnlocks.Add(unlock);
                 }
             }

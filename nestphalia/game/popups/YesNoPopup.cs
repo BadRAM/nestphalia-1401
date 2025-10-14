@@ -25,14 +25,14 @@ public class YesNoPopup : Popup
     public override void Draw()
     {
         _rect = GUI.DrawStretchyTexture(_bgTex, _rect, draggable:true);
-        GUI.DrawTextCentered(0, 20, _titleText, anchor: Screen.Center + _rect.Top());
-        GUI.DrawTextCentered(0, 40, _bodyText, anchor: Screen.Center + _rect.Top());
-        if (GUI.Button180(-182, -50, _yesText, anchor: Screen.Center + _rect.Bottom()))
+        GUI.DrawTextCentered(0, 20, _titleText, anchor: Screen.Center + _rect.TopCenter());
+        GUI.DrawTextCentered(0, 40, _bodyText, anchor: Screen.Center + _rect.TopCenter());
+        if (GUI.Button180(-182, -50, _yesText, anchor: Screen.Center + _rect.BottomCenter()))
         {
             Close();
             _closeAction.Invoke(true);
         }
-        if (GUI.Button180(2, -50, _noText, anchor: Screen.Center + _rect.Bottom()))
+        if (GUI.Button180(2, -50, _noText, anchor: Screen.Center + _rect.BottomCenter()))
         {
             Close();
             _closeAction.Invoke(false);

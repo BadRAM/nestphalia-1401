@@ -12,6 +12,7 @@ public class MenuScene : Scene
     public void Start()
     {
         Program.CurrentScene = this;
+        Program.ActiveCampaign = null;
         RegenerateBackground();
         // Resources.PlayMusicByName("unreal_technology_demo_95_-_unreals");
         Resources.PlayMusicByName("nd_intro_live");
@@ -44,6 +45,19 @@ public class MenuScene : Scene
             if (Settings.RestartNeeded) DrawTextLeft(155, 92, "Restart to apply changes");
             
             if (DebugMode && Button300(200, -40, "Level Editor")) new LevelEditorScene().Start();
+            if (DebugMode)
+            {
+                string testString =
+                    "Hello <c:blue>blue</c> <c:green>world</c>.\n" +
+                    "one two three four five six seven eight nine" +
+                    "\n\nnowrap\n" +
+                    "wordbreakwordbreakwordbreakwordbreakwordbreak";
+                RichText t = new RichText(testString);
+                t.Wrap(200, size:32);
+                t.DrawLeft(-400, -300, size:32);
+                DrawTextLeft(-400, 300, t.GetTaggedString(), size:32);
+                RichText.DrawLeft(-190, -300, t.GetTaggedString(), size:32);
+            }
         }
         else
         {

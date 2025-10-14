@@ -77,13 +77,12 @@ public class WrenCommand
             if (signature == "win(_)") foreign = Win;
         }
         
-        // Events
-        if (classname == "Event")
+        // Save
+        if (classname == "Save")
         {
-            if (signature == "teamHealthBelow(_,_,_)") foreign = TeamHealthBelowEvent;
-            if (signature == "timer(_,_,_)") foreign = TimerEvent;
-            if (signature == "structureDestroyed(_,_,_)") foreign = StructureDestroyedEvent;
-            if (signature == "battleOver(_,_)") foreign = BattleOverEvent;
+            if (signature == "has(_)") foreign = HasUnlock;
+            if (signature == "give(_)") foreign = GiveUnlock;
+            if (signature == "clear(_)") foreign = ClearUnlock;
         }
         
         // Sound
@@ -100,6 +99,15 @@ public class WrenCommand
             if (classname == "Music" && signature == "getLength()") foreign = GetMusicLength;
             if (classname == "Music" && signature == "getTime()") foreign = GetMusicTime;
             if (classname == "Music" && signature == "setTime(_)") foreign = SetMusicTime;
+        }
+                
+        // Events
+        if (classname == "Event")
+        {
+            if (signature == "teamHealthBelow(_,_,_)") foreign = TeamHealthBelowEvent;
+            if (signature == "timer(_,_,_)") foreign = TimerEvent;
+            if (signature == "structureDestroyed(_,_,_)") foreign = StructureDestroyedEvent;
+            if (signature == "battleOver(_,_)") foreign = BattleOverEvent;
         }
         
         // Math
@@ -312,6 +320,50 @@ public class WrenCommand
         
         // do winning here
         battleScene.SetWinner(t);
+    }
+
+    // Wren: hasUnlock(id)
+    private void HasUnlock(WrenVM vm)
+    {
+        string id = wrenGetSlotString(vm, 1);
+        
+        if (Program.ActiveCampaign == null)
+        {
+            GameConsole.WriteLine("hasUnlock() Error: No active save data!");
+            return;
+        }
+        
+        wrenSetSlotBool(vm, 0, Program.ActiveCampaign.Unlocks.Contains(id));
+    }
+
+    private void GiveUnlock(WrenVM vm)
+    {
+        string id = wrenGetSlotString(vm, 1);
+        
+        if (Program.ActiveCampaign == null)
+        {
+            GameConsole.WriteLine("GiveUnlock() Error: No active save data!");
+            return;
+        }
+        
+        if (!Program.ActiveCampaign.Unlocks.Contains(id))
+        {
+            Program.ActiveCampaign.Unlocks.Add(id);
+            Program.ActiveCampaign.NewUnlocks.Add(id);
+        }
+    }
+
+    private void ClearUnlock(WrenVM vm)
+    {
+        string id = wrenGetSlotString(vm, 1);
+        
+        if (Program.ActiveCampaign == null)
+        {
+            GameConsole.WriteLine("ClearUnlock() Error: No active save data!");
+            return;
+        }
+        
+        wrenSetSlotBool(vm, 0, Program.ActiveCampaign.Unlocks.Remove(id));
     }
     
     #endregion

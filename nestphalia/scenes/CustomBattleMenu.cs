@@ -103,12 +103,11 @@ public class CustomBattleMenu : Scene
         }
         
         if (_leftFort != null && _rightFort != null &&
-            GUI.Button300(-150, 260, "Begin!"))
+            (GUI.Button300(-150, 260, "Begin!") || Input.Pressed(KeyboardKey.T)))
         {
             new BattleScene().Start(Assets.Get<Level>("level_arena"), _leftFort, _rightFort, BattleOver, _leftIsPlayer, _rightIsPlayer, _deterministicMode);
         }
-
-        if (Input.Pressed(KeyboardKey.T))
+        else if (Input.Pressed(KeyboardKey.T))
         {
             if (_rightFort == null || _leftFort == null)
             {
@@ -125,10 +124,6 @@ public class CustomBattleMenu : Scene
                 _leftFort.LoadToBoard(_arenaLevel.FortSpawnZones[0]);
                 _rightFort = forts[0];
                 _rightFort.LoadToBoard(_arenaLevel.FortSpawnZones[1]);
-            }
-            else
-            {
-                new BattleScene().Start(Assets.Get<Level>("level_arena"), _leftFort, _rightFort, BattleOver, _leftIsPlayer, _rightIsPlayer, _deterministicMode);
             }
         }
     }

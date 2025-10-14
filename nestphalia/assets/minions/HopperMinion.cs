@@ -18,11 +18,10 @@ public class HopperMinionTemplate : MinionTemplate
 
 public class HopperMinion : Minion
 {
-    public HopperMinion(MinionTemplate template, Team team, Vector3 position, NavPath? navPath) : base(template, team,
-        position, navPath)
+    public HopperMinion(MinionTemplate template, Team team, Vector3 position, NavPath? navPath) : base(template, team, position, navPath)
     {
     }
-
+    
     public override void Update()
     {
         if (State is Move && !Status.Has("Glued"))
@@ -32,7 +31,7 @@ public class HopperMinion : Minion
             if (ahead != null)
             {
                 Structure? structureAhead = World.GetTile((Int2D)ahead);
-
+                
                 if (structureAhead == null ||
                     (!structureAhead.PhysSolid(this) &&
                      (structureAhead.Team != Team || structureAhead is not Minefield)))
