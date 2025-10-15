@@ -355,7 +355,7 @@ public partial class Minion : ISprite, IMortal
 
     public void DrawDebug(bool overrideHover = false)
     {
-        if (overrideHover || Raylib.CheckCollisionPointCircle(Raylib.GetScreenToWorld2D(Raylib.GetMousePosition(), World.Camera), Position.XYZ2D(), 2*Template.PhysicsRadius))
+        if (overrideHover || Raylib.CheckCollisionPointCircle(World.GetCursor(), Position.XYZ2D(), 2*Template.PhysicsRadius))
         {
             if (Screen.DebugMode) Raylib.DrawCircleV(NextPos, 2, Color.Green);
 

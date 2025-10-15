@@ -120,7 +120,7 @@ public class EditorScene : Scene
     public override void Update()
     {
         // ===== INPUT + UPDATE =====
-        _mouseTilePos = World.GetMouseTilePos();
+        _mouseTilePos = World.GetCursorTilePos();
         
         switch (_toolActive)
         {
@@ -138,7 +138,7 @@ public class EditorScene : Scene
                 throw new ArgumentOutOfRangeException();
         }
         
-        if (Input.Pressed(MouseButton.Right))
+        if (Input.Pressed(InputAction.AltClick))
         {
             if (MouseIsInBounds())
             {
@@ -175,14 +175,14 @@ public class EditorScene : Scene
         if (MouseIsInBounds())
         {
             Screen.SetCamera(World.Camera);
-            Vector2 mousePos = World.GetTileCenter(World.GetMouseTilePos());
+            Vector2 mousePos = World.GetTileCenter(World.GetCursorTilePos());
             if (_brush is TowerTemplate t)
             {
                 DrawCircleLines((int)mousePos.X, (int)mousePos.Y, (int)t.Range, new Color(200, 50, 50, 255));
             }
             if (_brush != null)
             {
-                _brush.Draw(World.GetTileCenter(World.GetMouseTilePos()), new Color(128, 128, 255, 128));
+                _brush.Draw(World.GetTileCenter(World.GetCursorTilePos()), new Color(128, 128, 255, 128));
             }
             Screen.SetCamera();
         }
@@ -198,7 +198,7 @@ public class EditorScene : Scene
         if (Button90(290, 238, "Save", enabled:_unsaved)) Save();
         if (Button90(380, 238, "Save As")) SaveAs();
         if (Button180(290, 276, "Load")) Load();
-        if (Button180(290, 314, "Exit") || Input.Pressed(Input.InputAction.Exit)) Exit();
+        if (Button180(290, 314, "Exit") || Input.Pressed(InputAction.Exit)) Exit();
         
         // Bottom center buttons
         if (Button90(-64, -358, "Sell", _toolActive != EditorTool.Erase))
@@ -301,7 +301,7 @@ public class EditorScene : Scene
                 _toolActive = EditorTool.Brush;
             }
 
-            if (CheckCollisionPointRec(GetScaledMousePosition(), new Rectangle(Screen.CenterX - 470, Screen.CenterY + y * 38 - 310, 360, 36)))
+            if (CheckCollisionPointRec(GetScaledCursorPosition(), new Rectangle(Screen.CenterX - 470, Screen.CenterY + y * 38 - 310, 360, 36)))
             {
                 _toolTipStructure = s;
             }
@@ -327,7 +327,7 @@ public class EditorScene : Scene
 
         string tip = WrapText(_toolTipStructure.GetStats(), 270);
 
-        Rectangle rect = new Rectangle(GetScaledMousePosition() + Vector2.One * 12, MeasureText(tip) + Vector2.One * 4);
+        Rectangle rect = new Rectangle(GetScaledCursorPosition() + Vector2.One * 12, MeasureText(tip) + Vector2.One * 4);
 
         rect.Position = Vector2.Clamp(rect.Position, Vector2.Zero, Screen.BottomRight - rect.Size);
         
@@ -337,7 +337,7 @@ public class EditorScene : Scene
 
     private void PathTestTool()
     {
-        NavPath navPath = new NavPath("editor", new Int2D(21, 11), World.GetMouseTilePos(), World.RightTeam);
+        NavPath navPath = new NavPath("editor", new Int2D(21, 11), World.GetCursorTilePos(), World.RightTeam);
         pathFinder.FindPath(navPath);
         
         Screen.SetCamera(World.Camera);
@@ -358,9 +358,9 @@ public class EditorScene : Scene
     
     private void EraseTool()
     {
-        if (Input.Held(MouseButton.Left))
+        if (Input.Held(InputAction.Click))
         {
-            Int2D tilePos = World.GetMouseTilePos();
+            Int2D tilePos = World.GetCursorTilePos();
             
             if (tilePos.X >= 1 && tilePos.X < 21 && tilePos.Y >= 1 && tilePos.Y < 21 
                 && _brush != World.GetTile(tilePos)?.Template)
@@ -380,9 +380,9 @@ public class EditorScene : Scene
             _toolActive = EditorTool.Erase;
             return;
         }
-        if (Input.Held(MouseButton.Left))
+        if (Input.Held(InputAction.Click))
         {
-            Int2D tilePos = World.GetMouseTilePos();
+            Int2D tilePos = World.GetCursorTilePos();
             
             if (tilePos.X >= 1 && tilePos.X < 21 && tilePos.Y >= 1 && tilePos.Y < 21 
                 && _brush != World.GetTile(tilePos)?.Template)

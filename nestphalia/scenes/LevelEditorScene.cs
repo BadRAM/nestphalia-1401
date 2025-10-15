@@ -74,11 +74,17 @@ public class LevelEditorScene : Scene
         
         Program.CurrentScene = this;
         Load();
+
+        if (Input.GamepadMode) // No gamers allowed >:[
+        {
+            new MenuScene().Start();
+            PopupManager.Start(new AlertPopup("No Gamers Allowed!", "This feature is only available for mouse+keyboard users.", "Fine...", () => {}));
+        }
     }
     
     public override void Update()
     {
-        if (Input.Pressed(Input.InputAction.Exit))
+        if (Input.Pressed(InputAction.Exit))
         {
             Screen.DebugMode = true;
             new MenuScene().Start();
@@ -88,12 +94,12 @@ public class LevelEditorScene : Scene
         {
             if (_toolActive == LevelEditorTool.StructureBrush)
             {
-                _selectedStructure = World.GetTile(World.GetMouseTilePos())?.Template;
+                _selectedStructure = World.GetTile(World.GetCursorTilePos())?.Template;
             }
 
             if (_toolActive == LevelEditorTool.FloorBrush)
             {
-                Int2D m = World.GetMouseTilePos();
+                Int2D m = World.GetCursorTilePos();
                 FloorTileTemplate picked = World.GetFloorTile(m.X, m.Y).Template;
                 if (!_selectedFloors.Remove(picked))
                 {
@@ -102,9 +108,9 @@ public class LevelEditorScene : Scene
             }
         }
         
-        if (Input.Held(MouseButton.Right))
+        if (Input.Held(InputAction.AltClick))
         {
-            World.Camera.Offset += Raylib.GetMouseDelta();
+            World.Camera.Offset += Input.GetCursorDelta();
         }
         
         switch (_toolActive)
@@ -236,12 +242,12 @@ public class LevelEditorScene : Scene
 
     private void ScatterBrush()
     {
-        if (!Input.Held(MouseButton.Left)) _grabScatter = null;
+        if (!Input.Held(InputAction.Click)) _grabScatter = null;
         if (_grabScatter == null)
         {
             foreach (FloorScatter scatter in World.FloorScatters)
             {
-                if (Raylib.CheckCollisionPointRec(World.GetMousePos() - GetScaledMouseDelta(), scatter.Rect()))
+                if (Raylib.CheckCollisionPointRec(World.GetCursor() - GetScaledCursorDelta(), scatter.Rect()))
                 {
                     _grabScatter = scatter;
                     break;
@@ -251,19 +257,19 @@ public class LevelEditorScene : Scene
         if (_grabScatter != null)
         {
             SetCursorLook(MouseCursor.ResizeAll);
-            if (Input.Held(MouseButton.Left))
+            if (Input.Held(InputAction.Click))
             {
                 if (Input.Held(KeyboardKey.F))
                 {
-                    _grabScatter.Rotation += GetScaledMouseDelta().X;
+                    _grabScatter.Rotation += GetScaledCursorDelta().X;
                 }
                 else if (Input.Held(KeyboardKey.LeftShift))
                 {
-                    _grabScatter.Position = World.GetTileCenter(World.GetMouseTilePos()) - Vector2.One * 12;
+                    _grabScatter.Position = World.GetTileCenter(World.GetCursorTilePos()) - Vector2.One * 12;
                 }
                 else
                 {
-                    _grabScatter.Position += GetScaledMouseDelta();
+                    _grabScatter.Position += GetScaledCursorDelta();
                 }
 
                 if (Input.Pressed(KeyboardKey.R))
@@ -287,18 +293,18 @@ public class LevelEditorScene : Scene
         }
         else
         {
-            if (_selectedScatter != "" && Input.Pressed(MouseButton.Left))
+            if (_selectedScatter != "" && Input.Pressed(InputAction.Click))
             {
-                World.FloorScatters.Add(new FloorScatter(_selectedScatter, World.GetMousePos(), 0));
+                World.FloorScatters.Add(new FloorScatter(_selectedScatter, World.GetCursor(), 0));
             }
         }
     }
 
     private void FloorBrush()
     {
-        if (Input.Held(MouseButton.Left) && Raylib.GetMousePosition().X > 300)
+        if (Input.Held(InputAction.Click) && Input.GetCursor().X > 300)
         {
-            Int2D tilePos = World.GetMouseTilePos();
+            Int2D tilePos = World.GetCursorTilePos();
             if (tilePos.X >= 0 && tilePos.X < _level.WorldSize.X && tilePos.Y >= 0 && tilePos.Y < _level.WorldSize.Y) 
             {
                 if (_selectedFloors.Count > 0)
@@ -315,9 +321,9 @@ public class LevelEditorScene : Scene
     
     private void StructureBrush()
     {
-        if (Input.Held(MouseButton.Left) && Raylib.GetMousePosition().X > 300)
+        if (Input.Held(InputAction.Click) && Input.GetCursor().X > 300)
         {
-            Int2D tilePos = World.GetMouseTilePos();
+            Int2D tilePos = World.GetCursorTilePos();
             if (tilePos.X >= 0 && tilePos.X < _level.WorldSize.X && tilePos.Y >= 1 && tilePos.Y < _level.WorldSize.Y) 
             {
                 World.SetTile(_selectedStructure, World.RightTeam, tilePos);
@@ -328,7 +334,7 @@ public class LevelEditorScene : Scene
     private void DrawToolTip()
     {
         if (_tooltip == "") return;
-        Rectangle rect = new Rectangle(GetScaledMousePosition() + Vector2.One * 12, MeasureText(_tooltip) + Vector2.One * 4);
+        Rectangle rect = new Rectangle(GetScaledCursorPosition() + Vector2.One * 12, MeasureText(_tooltip) + Vector2.One * 4);
         rect.Position = Vector2.Clamp(rect.Position, Vector2.Zero, Screen.BottomRight - rect.Size);
         DrawStretchyTexture(_panelBg, rect, anchor:Screen.TopLeft);
         DrawTextLeft(rect.Position + Vector2.One * 2, _tooltip, anchor:Screen.TopLeft);

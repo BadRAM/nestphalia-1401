@@ -426,7 +426,7 @@ public static class World
             $"Bugs: {Minions.Count}\n" +
             $"Sprites: {Sprites.Count}\n" +
             $"Camera Target:{Camera.Target} Offset:{Camera.Offset} Zoom:{Camera.Zoom}\n" +
-            $"Tile {GetMouseTilePos().ToString()}\n" +
+            $"Tile {GetCursorTilePos().ToString()}\n" +
             $"Fate: {(Determinator.Fate == Determinator.FateModes.Guarding ? "SET IN STONE" : Determinator.battleName)}\n" +
             // $"Total collision checks: {_totalCollideChecks/1000}k\n" +
             // $"ms/1k checks: {((_swUpdateMinionsCollide.Elapsed.TotalMilliseconds * 1000) / _totalCollideChecks).ToString("N4")}\n\n" +
@@ -768,14 +768,14 @@ public static class World
         return new Int2D(x, y);
     }
 
-    public static Int2D GetMouseTilePos()
+    public static Int2D GetCursorTilePos()
     {
-        return PosToTilePos(Raylib.GetScreenToWorld2D(Raylib.GetMousePosition(), Camera));
+        return PosToTilePos(Raylib.GetScreenToWorld2D(Input.GetCursor(), Camera));
     }
     
-    public static Vector2 GetMousePos()
+    public static Vector2 GetCursor()
     {
-        return Raylib.GetScreenToWorld2D(Raylib.GetMousePosition(), Camera);
+        return Raylib.GetScreenToWorld2D(Input.GetCursor(), Camera);
     }
     
     public static Rectangle GetTileBounds(int x, int y)

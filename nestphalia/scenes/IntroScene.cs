@@ -46,8 +46,8 @@ public class IntroScene : Scene
         if (Time.Unscaled - _startTime > _duration || 
             Input.Pressed(KeyboardKey.Escape) || 
             Input.Pressed(KeyboardKey.Space) || 
-            Input.Pressed(KeyboardKey.T) || 
-            Input.Released(MouseButton.Left))
+            Input.Pressed(InputAction.QuickLoad) || 
+            Input.Released(InputAction.Click))
         {
             new MenuScene().Start();
         }

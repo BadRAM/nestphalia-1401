@@ -86,6 +86,7 @@ public static class Resources
         // Dir is set by settings load, which is the first thing that happens
         
         MissingTexture = Raylib.LoadTexture(Dir + "/resources/sprites/missingtex.png");
+        Input.CursorSprite = Raylib.LoadTexture(Dir + "/resources/sprites/cursor.png");
         
         _accessibleFont = Raylib.LoadFont(Dir + "/resources/pixelplay16.png");
         _defaultFont = Raylib.LoadFont(Dir + "/resources/alagard.png");

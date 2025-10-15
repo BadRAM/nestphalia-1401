@@ -27,11 +27,11 @@ public class MenuScene : Scene
         if (!_settingsOpen)
         {
             DrawTextCentered(0, -200, "NESTPHALIA 1401", 48);
-            DrawTextLeft(-470, -350, "V2.0.a15 - Quest Update");
-            DrawTextLeft(-470, 320, "By BadRAM, Rune, and rosettedotnet\nWith music from the mod archive");
+            DrawTextLeft(4, 4, "V2.0.a15 - Quest Update", anchor:FocusZone.TopLeft());
+            DrawTextLeft(4, -36, "By BadRAM, Rune, and rosettedotnet\nWith music from the mod archive", anchor:FocusZone.BottomLeft());
         
             if (Button300(-150, -80, "Start")) new CampaignScene().Start();
-            if (Button300(-150, -40, "Custom Battle") || Input.Pressed(KeyboardKey.T)) new CustomBattleMenu().Start();
+            if (Button300(-150, -40, "Custom Battle") || Input.Pressed(InputAction.QuickLoad)) new CustomBattleMenu().Start();
             if (Button300(-150,   0, "Settings")) _settingsOpen = !_settingsOpen;
             if (Button300(-150,  80, "Quit"))
             {
@@ -69,7 +69,7 @@ public class MenuScene : Scene
     {
         AlertPopup p = new AlertPopup("Hydra", "Cut one head, two more take it's place!", "Slice!", () =>
         {
-            if (!Input.Pressed(Input.InputAction.Exit))
+            if (!Input.Pressed(InputAction.Exit))
             {
                 Hydra();
                 Hydra();

@@ -10,6 +10,8 @@ public class Fort
     public string[] Board = new string[20 * 20]; // TODO: Make this a dimensional array, currently blocked by serialization strategy. New serializer could fix.
     [JsonIgnore] public string Path = "";
     [JsonIgnore] public double TotalCost;
+    [JsonIgnore] public int NestCount;
+    [JsonIgnore] public bool HasSecret;
     
     // This constructor is for making new forts from scratch
     public Fort(string path)
@@ -26,6 +28,7 @@ public class Fort
         Board = j.Value<JArray>("Board")?.ToObject<string[]>() ?? throw new ArgumentNullException();
         if (Board.Length != 20 * 20) throw new Exception("Invalid board size");
         Path = path;
+        UpdateStats();
     }
     
     public void LoadToBoard(Level.FortSpawnZone spawnZone)
@@ -120,19 +123,20 @@ public class Fort
         }
     }
 
-    public void UpdateCost()
+    public void UpdateStats()
     {
-        double totalCost = 0;
+        TotalCost = 0;
+        NestCount = 0;
         
         for (int x = 0; x < 20; ++x)
         for (int y = 0; y < 20; ++y)
         {
             if (!Assets.Exists<StructureTemplate>(Board[x+y*20])) continue;
             StructureTemplate t = Assets.Get<StructureTemplate>(Board[x+y*20]);
-            totalCost += t.Price;
+            TotalCost += t.Price;
+            if (t.Class == StructureTemplate.StructureClass.Nest) NestCount++;
+            if (t.Class == StructureTemplate.StructureClass.Secret) HasSecret = true;
         }
-        
-        TotalCost = totalCost;
     }
     
     public void SaveToDisc()
@@ -157,7 +161,7 @@ public class Fort
         
         string jsonString = File.ReadAllText(filepath);
         Fort fort = new Fort(JObject.Parse(jsonString), filepath);
-        fort.UpdateCost();
+        fort.UpdateStats();
         GameConsole.WriteLine($"Loaded {fort.Name}, path: {filepath}");
         return fort;
     }

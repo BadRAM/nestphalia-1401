@@ -121,7 +121,6 @@ public class Level : JsonAsset
                $"Cost: ${totalCost}\n";
     }
     
-    // TODO: This struct should live somewhere else.
     public struct FortSpawnZone(int X, int Y, int Rotations, bool Flip)
     {
         public int X;

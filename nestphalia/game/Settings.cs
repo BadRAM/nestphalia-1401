@@ -12,6 +12,7 @@ public class SavedSettings
     public double WindowScale = 1;
     public bool AccessibleFont;
     public bool SmallScreenMode;
+    public bool Fullscreen;
     public string ResourcePathOverride = "";
 }
 
@@ -47,7 +48,7 @@ public static class Settings
     // returns true if the 'close' button has been pressed
     public static bool DrawSettingsMenu()
     {
-        double vol = Slider(-150, -100, "Music Volume", Saved.MusicVolume);
+        double vol = Slider(-150, -200, "Music Volume", Saved.MusicVolume);
         if (Math.Abs(vol - Saved.MusicVolume) > 0.0001) // If volume was changed
         {
             Saved.MusicVolume = vol;
@@ -55,22 +56,36 @@ public static class Settings
             Save();
         }
         
-        vol = Slider(-150, -50, "SFX Volume", Saved.SFXVolume);
+        vol = Slider(-150, -150, "SFX Volume", Saved.SFXVolume);
         if (Math.Abs(vol - Saved.SFXVolume) > 0.0001) // If volume was changed
         {
             Saved.SFXVolume = vol;
             Save();
         }
         
-        if (Button300(-150, 0, "Accessible Font"))
+        if (Button270(-135, -100, "Accessible Font"))
         {
             Saved.AccessibleFont = !Saved.AccessibleFont;
             Resources.SetFontAccessibility(Saved.AccessibleFont);
             Save();
         }
+
+        if (Button270(-135, -60, "Fullscreen"))
+        {
+            Saved.Fullscreen = !Saved.Fullscreen;
+            Raylib.ToggleBorderlessWindowed();
+            Screen.UpdateBounds(Saved.Fullscreen ? null : Vector2.One);
+            Save();
+        }
+
+        // if (Button270(-135, -20, "Dense UI Mode"))
+        // {
+        //     Saved.SmallScreenMode = !Saved.SmallScreenMode;
+        //     Screen.UpdateBounds();
+        // }
         
         bool resizing = false;
-        if (Button100(-150, 40, "-") || Input.Pressed(KeyboardKey.Minus))
+        if (Button90(-150, 40, "-") || Input.Pressed(KeyboardKey.Minus))
         {
             Vector2 res = new Vector2(Raylib.GetScreenWidth(), Raylib.GetScreenHeight()) / (float)Saved.WindowScale;
             Saved.WindowScale -= 0.25;
@@ -80,8 +95,8 @@ public static class Settings
             Screen.UpdateBounds(res);
             resizing = true;
         }
-        Button100(-50, 40, Saved.WindowScale.ToString("N2"));
-        if (Button100(50, 40, "+") || Input.Pressed(KeyboardKey.Equal))
+        Button90(-50, 40, Saved.WindowScale.ToString("N2"));
+        if (Button90(50, 40, "+") || Input.Pressed(KeyboardKey.Equal))
         {
             Vector2 res = new Vector2(Raylib.GetScreenWidth(), Raylib.GetScreenHeight()) / (float)Saved.WindowScale;
             Saved.WindowScale += 0.25;
@@ -91,6 +106,6 @@ public static class Settings
             resizing = true;
         }
         
-        return Button300(-150, 160, "Save & Return", enabled: !resizing) || Input.Pressed(Input.InputAction.Exit);
+        return Button300(-150, 160, "Save & Return", enabled: !resizing) || Input.Pressed(InputAction.Exit);
     }
 }

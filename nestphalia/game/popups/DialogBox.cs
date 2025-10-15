@@ -44,7 +44,7 @@ public class DialogBox : Popup
         DrawStretchyTexture(_background, _rect);
 
         _timeToNextChar -= Time.DeltaTime;
-        if(Input.Held(MouseButton.Left)) _timeToNextChar -= Time.DeltaTime;
+        if(Input.Held(InputAction.Click) || Input.Held(InputAction.Click)) _timeToNextChar -= Time.DeltaTime;
         if (!_finished && _timeToNextChar <= 0)
         {
             _timeToNextChar += _timePerChar;
@@ -76,7 +76,7 @@ public class DialogBox : Popup
             DrawTexture(_portrait, x, Screen.CenterY + 104, Color.White);
         }
         
-        if (Input.Pressed(Input.InputAction.AdvanceDialogue) || Input.Pressed(MouseButton.Left))
+        if (Input.Pressed(InputAction.Click))
         {
             if (_charsRevealed < _text.Text.Length)
             {

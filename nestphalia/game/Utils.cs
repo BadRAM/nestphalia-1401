@@ -192,6 +192,20 @@ public static class Utils
         return new Vector2(vec.X, vec.Y - vec.Z);
     }
 
+    public static Vector2 ClampRect(this Vector2 vec, Rectangle rec)
+    {
+        vec.X = Math.Clamp(vec.X, rec.X, rec.X + rec.Width);
+        vec.Y = Math.Clamp(vec.Y, rec.Y, rec.Y + rec.Height);
+        return vec;
+    }
+    
+    public static Vector2 Clamp(this Vector2 vec, float xMin, float xMax, float yMin, float yMax)
+    {
+        vec.X = Math.Clamp(vec.X, xMin, xMax);
+        vec.Y = Math.Clamp(vec.Y, yMin, yMax);
+        return vec;
+    }
+
     public static double Angle(this Vector2 vec)
     {
         return Math.Atan2(vec.Y, vec.X);

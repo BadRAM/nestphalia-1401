@@ -186,8 +186,8 @@ public static class Command
         }
         
         List<string> words = new List<string>(args.Split(" "));
-        int startX = words[0] == "." ? World.GetMouseTilePos().X : int.Parse(words[0]);
-        int startY = words[1] == "." ? World.GetMouseTilePos().Y : int.Parse(words[1]);
+        int startX = words[0] == "." ? World.GetCursorTilePos().X : int.Parse(words[0]);
+        int startY = words[1] == "." ? World.GetCursorTilePos().Y : int.Parse(words[1]);
         int w = 1;
         if (words.Count >= 3) int.TryParse(words[2], out w);
         int h = 1;
@@ -218,8 +218,8 @@ public static class Command
         if (!Assets.Exists<StructureTemplate>(words[0])) throw new Exception("Invalid structure ID!");
         StructureTemplate structure = Assets.Get<StructureTemplate>(words[0]);
         Team team = words[1].ToLower() == "left" ? World.LeftTeam : World.RightTeam;
-        int startX = words[2] == "." ? World.GetMouseTilePos().X : int.Parse(words[2]);
-        int startY = words[3] == "." ? World.GetMouseTilePos().Y : int.Parse(words[3]);
+        int startX = words[2] == "." ? World.GetCursorTilePos().X : int.Parse(words[2]);
+        int startY = words[3] == "." ? World.GetCursorTilePos().Y : int.Parse(words[3]);
         int w = 1;
         if (words.Count >= 5) int.TryParse(words[4], out w);
         int h = 1;

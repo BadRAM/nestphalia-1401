@@ -75,7 +75,6 @@ public class RichText
         anchor ??= Screen.Center;
         pos += anchor.Value;
         Vector2 offset = Vector2.Zero;
-        float lineHeight = Raylib.MeasureTextEx(Resources.Font, "gl", size, size / GUI.FontSize).Y; //todo: calculate this in a smarter way.
         
         baseColor ??= new Color(255, 255, 255, 255);
         Color? colorOverride = null;
@@ -98,7 +97,7 @@ public class RichText
                         break;
                     case "br":
                         offset.X = 0;
-                        offset.Y += lineHeight;
+                        offset.Y += size;
                         break;
                     case null:
                         break;
@@ -108,7 +107,7 @@ public class RichText
             if (Text[i] == '\n')
             {
                 offset.X = 0;
-                offset.Y += lineHeight;
+                offset.Y += size;
             }
             else
             {

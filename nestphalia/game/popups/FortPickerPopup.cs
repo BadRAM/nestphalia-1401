@@ -17,7 +17,7 @@ public class FortPickerPopup : Popup
     private int _page = 0;
     private FortPickerPopup? _parent;
 
-    public FortPickerPopup(string path, Action<Fort> fortReturnAction, Action<string> newFortAction, FortPickerPopup? parent = null, int height = 590)
+    public FortPickerPopup(string path, Action<Fort> fortReturnAction, Action<string> newFortAction, FortPickerPopup? parent = null)
     {
         _titleText = "Load";
         _path = path;
@@ -42,13 +42,14 @@ public class FortPickerPopup : Popup
         _fortReturnAction = fortReturnAction;
         _newFortAction = newFortAction;
 
+        int height = Settings.Saved.SmallScreenMode ? 480 : 590;
         _rect = new Rectangle(-160, -height / 2, 320, height);
         _bgTex = Assets.Get<StretchyTexture>("stretch_default");
     }
 
     public override void Draw()
     {
-        if (Input.Pressed(Input.InputAction.Exit))
+        if (Input.Pressed(InputAction.Exit))
         {
             Close(); // we can use this to cancel because we aren't using the normal exitaction
             return;
@@ -93,8 +94,7 @@ public class FortPickerPopup : Popup
         }
         else if (picked < _directories.Count) // Open directory
         {
-            PopupManager.Start(new FortPickerPopup(_directories[picked] + "/", _fortReturnAction, _newFortAction, this,
-                (int)_rect.Height));
+            PopupManager.Start(new FortPickerPopup(_directories[picked] + "/", _fortReturnAction, _newFortAction, this));
         }
         else if (picked < _directories.Count + _forts.Count) // Select fort
         {

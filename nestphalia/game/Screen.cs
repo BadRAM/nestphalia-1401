@@ -7,7 +7,7 @@ namespace nestphalia;
 public static class Screen
 {
     public static int MinWidth = 960;
-    public static int MinHeight = 720;    
+    public static int MinHeight = 720;
     
     public static int CenterX;
     public static int CenterY;
@@ -24,6 +24,8 @@ public static class Screen
     public static Vector2 BottomLeft;
     public static Vector2 Bottom;
     public static Vector2 BottomRight;
+
+    public static Rectangle FocusZone;
 
     public static bool DebugMode;
 
@@ -50,8 +52,10 @@ public static class Screen
         InitWindow(MinWidth, MinHeight, "Nestphalia 1401");
         SetTargetFPS(Time.FrameRate);
         SetExitKey(KeyboardKey.Null);
+        if (Settings.Saved.Fullscreen) ToggleBorderlessWindowed();
         BeginMode2D(_screenCamera);
         SetMouseScale(1, 1);
+        HideCursor();
         UpdateBounds();
     }
 
@@ -112,16 +116,31 @@ public static class Screen
     
     public static void UpdateBounds(Vector2? windowSize = null)
     {
-        GameConsole.WriteLine($"WindowScale = {GUI.GetWindowScale()}");
-
         Vector2 scale = GUI.GetWindowScale();
-        GameConsole.WriteLine($"Scale is X:{scale.X},Y:{scale.Y}");
+
+        if (Settings.Saved.SmallScreenMode)
+        {
+            MinWidth = 640;
+            MinHeight = 480;
+        }
+        else
+        {
+            MinWidth = 960;
+            MinHeight = 720;
+        }
+        
         SetWindowMinSize((int)(scale.X * MinWidth), (int)(scale.Y * MinHeight));
         _screenCamera.Zoom = (float)Settings.Saved.WindowScale;
         
+        Vector2 monitor = new Vector2(GetMonitorWidth(GetCurrentMonitor()), GetMonitorHeight(GetCurrentMonitor()));
         if (windowSize != null && !IsWindowMaximized() && !IsWindowFullscreen())
         {
+            windowSize = windowSize.Value.Clamp(scale.X * MinWidth, int.MaxValue, scale.Y * MinHeight, int.MaxValue);
             SetWindowSize((int)windowSize.Value.X, (int)windowSize.Value.Y);
+        }
+        else if (Settings.Saved.Fullscreen)
+        {
+            SetWindowSize((int)monitor.X, (int)monitor.Y);
         }
         
         RightX = (int)(GetScreenWidth() / scale.X);
@@ -139,6 +158,11 @@ public static class Screen
         BottomLeft = new Vector2(LeftX, BottomY);
         Bottom = new Vector2(CenterX, BottomY);
         BottomRight = new Vector2(RightX, BottomY);
+        
+        FocusZone.Width = MinWidth;
+        FocusZone.Height = MinHeight;
+        FocusZone.X = CenterX - MinWidth / 2;
+        FocusZone.Y = CenterY - MinHeight / 2;
 
         RegenerateBackground();
     }
@@ -176,19 +200,21 @@ public static class Screen
     {
         Raylib.BeginDrawing();
         SetCamera();
-        if (Input.Pressed(Input.InputAction.Debug)) DebugMode = !DebugMode;
+        if (Input.Pressed(InputAction.Debug)) DebugMode = !DebugMode;
     }
 
     public static void EndDrawing()
     {
         if (DebugMode && Input.Held(KeyboardKey.LeftShift))
         {
-            Vector2 mPos = GUI.GetScaledMousePosition() - Center;
+            Vector2 mPos = GUI.GetScaledCursorPosition() - Center;
             GUI.DrawTextLeft((int)mPos.X + 10, (int)mPos.Y, $"mPos: {mPos}\n" +
-                                                            $"Abs: {GUI.GetScaledMousePosition()}\n" +
-                                                            $"Unscaled: {GetMousePosition()}\n" +
-                                                            $"World: {GetScreenToWorld2D(GetMousePosition(), World.Camera)}\n" +
-                                                            $"World Tile: {World.GetMouseTilePos()}");
+                                                            $"Abs: {GUI.GetScaledCursorPosition()}\n" +
+                                                            $"Unscaled: {Input.GetCursor()}\n" +
+                                                            $"Click: {Input.GetScaledClickPos()}" +
+                                                            $"ClickUnscaled: {Input.GetClickPos()}" +
+                                                            $"World: {World.GetCursor()}\n" +
+                                                            $"World Tile: {World.GetCursorTilePos()}");
         }
         Raylib.EndDrawing();
     }

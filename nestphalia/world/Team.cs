@@ -250,26 +250,16 @@ public class Team
         // use abilities
         if (IsPlayerControlled)
         {
-            if (_usingAbility != -1 && (Beacons[_usingAbility]?.IsReady() ?? false) && Input.Pressed(MouseButton.Left))
+            if (_usingAbility != -1 && (Beacons[_usingAbility]?.IsReady() ?? false) && Input.Pressed(InputAction.Click))
             {
-                Beacons[_usingAbility]?.Activate(Raylib.GetScreenToWorld2D(Raylib.GetMousePosition(), World.Camera));
+                Beacons[_usingAbility]?.Activate(World.GetCursor());
                 _usingAbility = -1;
             }
-            if ((Beacons[0]?.IsReady() ?? false) && Input.Pressed(Input.InputAction.Use1)) _usingAbility = 0;
-            if ((Beacons[1]?.IsReady() ?? false) && Input.Pressed(Input.InputAction.Use2)) _usingAbility = 1;
-            if ((Beacons[2]?.IsReady() ?? false) && Input.Pressed(Input.InputAction.Use3)) _usingAbility = 2;
-            if ((Beacons[3]?.IsReady() ?? false) && Input.Pressed(Input.InputAction.Use4)) _usingAbility = 3;
-
-            int posX = 0;
-            if (HudLocation == HUDLocation.Right) posX = Screen.CenterX + 450;
-            if (HudLocation == HUDLocation.Left)  posX = Screen.CenterX - 450;
-            for (int i = 0; i < BeaconCap; i++)
-            {
-                if (Input.Pressed(MouseButton.Left) && Raylib.CheckCollisionPointRec(GUI.GetScaledMousePosition(), new Rectangle( posX + i*68 - 150, Screen.BottomY - 68, 64, 64)))
-                {
-                    _usingAbility = i;
-                }
-            }
+            
+            if ((Beacons[0]?.IsReady() ?? false) && Input.Pressed(InputAction.Use1)) _usingAbility = 0;
+            if ((Beacons[1]?.IsReady() ?? false) && Input.Pressed(InputAction.Use2)) _usingAbility = 1;
+            if ((Beacons[2]?.IsReady() ?? false) && Input.Pressed(InputAction.Use3)) _usingAbility = 2;
+            if ((Beacons[3]?.IsReady() ?? false) && Input.Pressed(InputAction.Use4)) _usingAbility = 3;
         }
         else
         {
@@ -321,9 +311,13 @@ public class Team
             if (IsPlayerControlled)
             {
                 GUI.DrawTextLeft(x, y, (i + 1).ToString());
-                if ((Beacons[i]?.IsReady() ?? false) && Raylib.CheckCollisionPointRec(GUI.GetScaledMousePosition(), new Rectangle( x, y, 64, 64)))
+                if ((Beacons[i]?.IsReady() ?? false) && Raylib.CheckCollisionPointRec(GUI.GetScaledCursorPosition(), new Rectangle( x, y, 64, 64)))
                 {
                     Raylib.DrawRectangle(x, y, 64, 64, new Color(255, 255, 255, 32));
+                    if (Input.Pressed(InputAction.Click))
+                    {
+                        _usingAbility = i;
+                    }
                 }
             }
         }

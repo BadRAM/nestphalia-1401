@@ -126,7 +126,7 @@ public class BattleScene : Scene
                 break;
             case States.BattleActive:
                 DrawClock();
-                if (Input.Held(Input.InputAction.FastForward))
+                if (Input.Held(InputAction.FastForward))
                 {
                     DrawRectangle(0,0,Screen.RightX,Screen.BottomY,new Color(0,0,0,128));
                     DrawTextCentered(0, 0, $"{_skips+1}X SPEED", 48);
@@ -186,11 +186,11 @@ public class BattleScene : Scene
 
     private void HandleInputs()
     {
-        if (Input.Pressed(Input.InputAction.Pause) || Input.Pressed(Input.InputAction.Exit))
+        if (Input.Pressed(InputAction.Pause) || Input.Pressed(InputAction.Exit))
         {
             TogglePaused();
         }
-        if (State == States.Paused && Input.Pressed(Input.InputAction.FrameStep)) // Frame step
+        if (State == States.Paused && Input.Pressed(InputAction.FrameStep)) // Frame step
         {
             Time.Paused = false;
             Time.UpdateTime();
@@ -198,45 +198,28 @@ public class BattleScene : Scene
             Time.Paused = true;
         }
         
-        if (Input.Pressed(Input.InputAction.FastForward))
+        if (Input.Pressed(InputAction.FastForward))
         {
             SetMasterVolume(0.25f);
         }
-        if (Input.Released(Input.InputAction.FastForward))
+        if (Input.Released(InputAction.FastForward))
         {
             SetMasterVolume(1f);
         }
 
-        if (Input.Held(Input.InputAction.CameraLeft))
-        {
-            World.Camera.Offset.X += 4;
-        }
-        if (Input.Held(Input.InputAction.CameraRight))
-        {
-            World.Camera.Offset.X -= 4;
-        }
-        if (Input.Held(Input.InputAction.CameraUp))
-        {
-            World.Camera.Offset.Y += 4;
-        }
-        if (Input.Held(Input.InputAction.CameraDown))
-        {
-            World.Camera.Offset.Y -= 4;
-        }
-
-        if (Input.Pressed(Input.InputAction.PathDebug))
+        if (Input.Pressed(InputAction.Debug) && Input.Held(KeyboardKey.LeftShift))
         {
             _pathFinderDebug = !_pathFinderDebug;
         }
 
-        if (Input.Pressed(MouseButton.Left))
+        if (Input.Pressed(InputAction.Click))
         {
             _selectedMinion = null;
-            foreach (Minion m in World.GetMinionsInRegion(World.GetMouseTilePos(), 4))
+            foreach (Minion m in World.GetMinionsInRegion(World.GetCursorTilePos(), 4))
             {
-                if (CheckCollisionPointCircle(World.GetMousePos(), m.Position.XYZ2D(), 2*m.Template.PhysicsRadius))
+                if (CheckCollisionPointCircle(World.GetCursor(), m.Position.XYZ2D(), 2*m.Template.PhysicsRadius))
                 {
-                    if (_selectedMinion == null || Vector2.Distance(World.GetMousePos(), m.Position.XYZ2D()) < Vector2.Distance(World.GetMousePos(), _selectedMinion.Position.XYZ2D()))
+                    if (_selectedMinion == null || Vector2.Distance(World.GetCursor(), m.Position.XYZ2D()) < Vector2.Distance(World.GetCursor(), _selectedMinion.Position.XYZ2D()))
                     {
                         _selectedMinion = m;
                     }
@@ -244,51 +227,86 @@ public class BattleScene : Scene
             }
         }
         
-        if (Input.Held(MouseButton.Right))
+        if (Input.Held(InputAction.AltClick))
         {
-            World.Camera.Target -= GetMouseDelta() / World.Camera.Zoom;
+            if (Input.GamepadMode)
+            {
+                World.Camera.Target += Input.GetCursorDelta() / World.Camera.Zoom;
+                Input.SetCursor(Input.GetCursor() - Input.GetCursorDelta());
+            }
+            else
+            {
+                World.Camera.Target -= Input.GetCursorDelta() / World.Camera.Zoom;
+            }
+            World.Camera.Target = Vector2.Clamp(World.Camera.Target, Vector2.Zero, new Vector2(World.BoardWidth, World.BoardHeight) * 24);
+
+        }
+
+        // Right stick camera move
+        if (Input.GamepadMode)
+        {
+            World.Camera.Target += new Vector2(GetGamepadAxisMovement(0, GamepadAxis.RightX), GetGamepadAxisMovement(0, GamepadAxis.RightY)) * 4 / World.Camera.Zoom;
             World.Camera.Target = Vector2.Clamp(World.Camera.Target, Vector2.Zero, new Vector2(World.BoardWidth, World.BoardHeight) * 24);
         }
+        // InputAction Camera buttons
+        if (Input.Held(InputAction.CameraLeft))  World.Camera.Target.X += 4 / World.Camera.Zoom;
+        if (Input.Held(InputAction.CameraRight)) World.Camera.Target.X -= 4 / World.Camera.Zoom;
+        if (Input.Held(InputAction.CameraUp))    World.Camera.Target.Y += 4 / World.Camera.Zoom;
+        if (Input.Held(InputAction.CameraDown))  World.Camera.Target.Y -= 4 / World.Camera.Zoom;
         
-        // Snipped from raylib example
+        
+        // Snipped from raylib example, zoom on mouse
         Vector2 wheel = GetMouseWheelMoveV();
-        if (wheel.Y != 0)
+        if (wheel.Y != 0 
+            || Input.Pressed(InputAction.ViewClose) || Input.Released(InputAction.ViewClose) 
+            || Input.Pressed(InputAction.ViewWide) || Input.Released(InputAction.ViewWide))
         {
             // Get the world point that is under the mouse
-            Vector2 mouseWorldPos = GetScreenToWorld2D(GetMousePosition(), World.Camera);
-
+            Vector2 mouseWorldPos = World.GetCursor();
+            
             // Set the offset to where the mouse is
-            World.Camera.Offset = GetMousePosition();
+            World.Camera.Offset = Input.GetCursor();
             
             // Set the target to match, so that the camera maps the world space point 
             // under the cursor to the screen space point under the cursor at any zoom
             World.Camera.Target = mouseWorldPos;
 
-            // Zoom increment
-            // float scaleFactor = 1.0f + 0.25f;
-            // if (wheel < 0) scaleFactor = 1.0f/scaleFactor;
-            // World.Camera.Zoom = Math.Clamp(World.Camera.Zoom + wheel * 0.25f, 0.25f, 8f);
-            _zoomLevel += wheel.Y;
-            _zoomLevel = Math.Clamp(_zoomLevel, 0, _zoomLevels.Count-1);
-            World.Camera.Zoom = (float)_zoomLevels[(int)Math.Floor(_zoomLevel)];
-
+            if (!Input.GamepadMode)
+            {
+                _zoomLevel += wheel.Y;
+                _zoomLevel = Math.Clamp(_zoomLevel, 0, _zoomLevels.Count-1);
+                World.Camera.Zoom = (float)_zoomLevels[(int)Math.Floor(_zoomLevel)];
+            }
+            else
+            {
+                // Gamepad Zoom
+                if (Input.Held(InputAction.ViewClose))
+                {
+                    World.Camera.Zoom = 2 * GetWindowScale().X;
+                }
+                else if (Input.Held(InputAction.ViewWide))
+                {
+                    World.Camera.Zoom = 0.5f * GetWindowScale().X;
+                }
+                else
+                {
+                    _zoomLevel = 5;
+                    World.Camera.Zoom = 1 * GetWindowScale().X;
+                }
+            }
+            
             World.Camera.Target -= (World.Camera.Offset - Screen.Center) / World.Camera.Zoom;
             World.Camera.Offset = Screen.Center;
             
             World.Camera.Target = Vector2.Clamp(World.Camera.Target, Vector2.Zero, new Vector2(World.BoardWidth, World.BoardHeight) * 24);
         }
-        if (Screen.DebugMode)
-        {
-            World.Camera.Rotation += wheel.X;
-        }
-
+        
         if (IsWindowResized())
         {
             World.Camera.Offset = Screen.Center;
-            // World.Camera.Target = new Vector2(World.BoardWidth, World.BoardHeight) * 24 / 2;
         }
     }
-
+    
     // Updates the world, and repeats if FFW is enabled.
     private void UpdateWorld()
     {
@@ -299,7 +317,7 @@ public class BattleScene : Scene
         UpdateEvents();
         CheckWinner();
         
-        if (State == States.BattleActive && Input.Held(Input.InputAction.FastForward))
+        if (State == States.BattleActive && Input.Held(InputAction.FastForward))
         {
             _skips = 0;
             while (State == States.BattleActive && (GetTime() - startTime) + ((GetTime() - startTime) / (_skips + 1)) < Time.DeltaTime)
@@ -313,7 +331,7 @@ public class BattleScene : Scene
             }
         }
     }
-
+    
     private void UpdateEvents()
     {
         for (int i = _events.Count - 1; i >= 0; i--)
@@ -324,7 +342,7 @@ public class BattleScene : Scene
             }
         }
     }
-
+    
     public void TogglePaused()
     {
         switch (State)
@@ -469,7 +487,6 @@ public class BattleScene : Scene
                       $"{_selectedMinion.Status.ListEffects()}";
         text = WrapText(text, 240);
         DrawTextLeft(30, -150, text, color:Color.Black, anchor:Screen.Left);
-        if (Input.Pressed(KeyboardKey.B)) _selectedMinion.Status.Add(new BurningStatus(2, 5));
     }
 
     private void DrawGradientBackground(Color topColor, Color bottomColor)

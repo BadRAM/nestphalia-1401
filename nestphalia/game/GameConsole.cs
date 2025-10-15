@@ -26,7 +26,7 @@ public static class GameConsole
         } 
         else if (_open)
         {
-            if (GUI.GetScaledMousePosition().Y < Screen.BottomY/2)
+            if (GUI.GetScaledCursorPosition().Y < Screen.BottomY/2)
             {
                 Input.SetSuppressed(Input.SuppressionSource.GameConsole, true);
                 Input.StartSuppressionOverride(Input.SuppressionSource.GameConsole);

@@ -108,7 +108,7 @@ public class Tower : Structure
         base.Draw();
 
         // Draw range circle on hover
-        if (Screen.DebugMode && World.PosToTilePos(Raylib.GetScreenToWorld2D(Raylib.GetMousePosition(), World.Camera)) == new Int2D(X,Y))
+        if (Screen.DebugMode && World.PosToTilePos(World.GetCursor()) == new Int2D(X,Y))
         {
             Raylib.DrawCircleLinesV(Position.XY(), (int)_template.Range, new Color(200, 50, 50, 255));
             Raylib.DrawCircleV(Position.XY(), (int)_template.Range, new Color(200, 50, 50, 64));

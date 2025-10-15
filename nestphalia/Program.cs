@@ -69,7 +69,7 @@ static class Program
 	    GUI.Initialize();
 	    GameConsole.WrenCommand.Execute("""System.print("Wren VM is running.")""");
         
-	    // Start the first scene. TODO: loading screen, then intro cutscene, rather than menu
+	    // Start the first scene.
         
 	    new IntroScene().Start();
     }
@@ -91,6 +91,7 @@ static class Program
 			
 		    PopupManager.Update();
 		    GameConsole.Draw();
+		    Input.Draw();
 		    GUI.UpdateCursor();
 			
 		    Screen.EndDrawing();

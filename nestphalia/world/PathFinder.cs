@@ -234,18 +234,19 @@ public class PathFinder
             }
             #endregion
             
-            #if DEBUG
-            _swAddNodes.Stop();
-            if (Input.Held(Input.InputAction.PathDebug))
-            {
-                Screen.BeginDrawing();
-                Raylib.ClearBackground(new Color(16, 8, 4, 255));
-                World.DrawFloor();
-                World.Draw();
-                DrawDebug();
-                Raylib.EndDrawing();
-            }
-            #endif
+            // SUPER PATH DEBUGGER, shows path being built. 
+            // #if DEBUG
+            // _swAddNodes.Stop();
+            // if (Input.Held())
+            // {
+            //     Screen.BeginDrawing();
+            //     Raylib.ClearBackground(new Color(16, 8, 4, 255));
+            //     World.DrawFloor();
+            //     World.Draw();
+            //     DrawDebug();
+            //     Raylib.EndDrawing();
+            // }
+            // #endif
         }
         
         // ===== Navpath Generation ===================================================================================
